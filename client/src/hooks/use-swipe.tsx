@@ -36,17 +36,16 @@ export function useSwipe(handlers: SwipeHandlers) {
 
     console.log('Swipe detected:', { deltaX, deltaY, deltaTime });
 
-    // Determine swipe direction - make vertical swipes much easier to trigger
-    // If there's significant vertical movement (even with some horizontal), treat as vertical
-    if (Math.abs(deltaY) > 20 && Math.abs(deltaX) < Math.abs(deltaY) * 3) {
-      // Vertical swipe
-      if (deltaY < 0) {
-        console.log('Swipe up triggered');
-        handlers.onSwipeUp?.();
-      } else {
-        console.log('Swipe down triggered');
-        handlers.onSwipeDown?.();
-      }
+    // Determine swipe direction - make vertical swipes very easy to trigger
+    // Even tiny vertical movements can be up swipes if they're intentional
+    if (Math.abs(deltaY) > 5 && deltaY < 0 && Math.abs(deltaX) < 200) {
+      // Up swipe - very sensitive
+      console.log('Swipe up triggered (sensitive detection)');
+      handlers.onSwipeUp?.();
+    } else if (Math.abs(deltaY) > 20 && deltaY > 0 && Math.abs(deltaX) < Math.abs(deltaY) * 3) {
+      // Down swipe - normal sensitivity
+      console.log('Swipe down triggered');
+      handlers.onSwipeDown?.();
     } else if (Math.abs(deltaX) > Math.abs(deltaY)) {
       // Horizontal swipe
       if (deltaX > 0) {
@@ -80,16 +79,15 @@ export function useSwipe(handlers: SwipeHandlers) {
 
     console.log('Mouse swipe detected:', { deltaX, deltaY, deltaTime });
 
-    // Same logic for mouse - make vertical swipes easier
-    if (Math.abs(deltaY) > 20 && Math.abs(deltaX) < Math.abs(deltaY) * 3) {
-      // Vertical swipe
-      if (deltaY < 0) {
-        console.log('Mouse swipe up triggered');
-        handlers.onSwipeUp?.();
-      } else {
-        console.log('Mouse swipe down triggered');
-        handlers.onSwipeDown?.();
-      }
+    // Same logic for mouse - make up swipes very sensitive
+    if (Math.abs(deltaY) > 5 && deltaY < 0 && Math.abs(deltaX) < 200) {
+      // Up swipe - very sensitive
+      console.log('Mouse swipe up triggered (sensitive detection)');
+      handlers.onSwipeUp?.();
+    } else if (Math.abs(deltaY) > 20 && deltaY > 0 && Math.abs(deltaX) < Math.abs(deltaY) * 3) {
+      // Down swipe - normal sensitivity
+      console.log('Mouse swipe down triggered');
+      handlers.onSwipeDown?.();
     } else if (Math.abs(deltaX) > Math.abs(deltaY)) {
       // Horizontal swipe
       if (deltaX > 0) {
