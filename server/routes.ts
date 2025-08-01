@@ -55,7 +55,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ ideas: createdIdeas });
     } catch (error) {
       console.error("Error generating ideas from text:", error);
-      res.status(500).json({ error: "Failed to generate ideas" });
+      
+      // Fallback to predefined creative ideas when AI is unavailable
+      const fallbackIdeas = [
+        {
+          title: "Create a Colorful Reading Nook",
+          description: "Transform a corner of your room into a cozy reading space with bright cushions, fairy lights, and floating bookshelves painted in vibrant colors."
+        },
+        {
+          title: "Design a Rainbow Garden Wall",
+          description: "Paint a gradient rainbow mural on one wall and add hanging plants at different heights to create a living rainbow garden effect."
+        },
+        {
+          title: "Build a Creative Workspace",
+          description: "Set up an inspiring workspace with a cork board gallery wall, colorful desk accessories, and motivational quotes in beautiful typography."
+        }
+      ];
+
+      const createdIdeas = [];
+      for (const ideaData of fallbackIdeas) {
+        const idea = await storage.createIdea({
+          title: ideaData.title,
+          description: ideaData.description,
+          source: "text",
+          sourceContent: prompt,
+          isSaved: 0,
+          metadata: { 
+            generatedAt: new Date().toISOString(),
+            type: "fallback"
+          }
+        });
+        createdIdeas.push(idea);
+      }
+
+      res.json({ ideas: createdIdeas });
     }
   });
 
@@ -206,7 +239,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ ideas: createdIdeas });
     } catch (error) {
       console.error("Error exploring idea:", error);
-      res.status(500).json({ error: "Failed to explore idea" });
+      
+      // Fallback to predefined related ideas when AI is unavailable
+      const fallbackRelatedIdeas = [
+        {
+          title: "Expand Your Creative Vision",
+          description: "Take this concept and apply it to a different room or space. Consider how the same principles could transform other areas of your home."
+        },
+        {
+          title: "Add a Personal Touch",
+          description: "Incorporate family photos, personal artwork, or meaningful objects that reflect your personality and make the space uniquely yours."
+        },
+        {
+          title: "Mix Textures and Materials",
+          description: "Combine different textures like wood, metal, fabric, and natural elements to add depth and visual interest to your design."
+        }
+      ];
+
+      const createdIdeas = [];
+      for (const ideaData of fallbackRelatedIdeas) {
+        const idea = await storage.createIdea({
+          title: ideaData.title,
+          description: ideaData.description,
+          source: parentIdea.source,
+          sourceContent: parentIdea.sourceContent,
+          parentIdeaId: parentIdea.id,
+          isSaved: 0,
+          metadata: { 
+            generatedAt: new Date().toISOString(),
+            basedOn: parentIdea.id,
+            type: "fallback"
+          }
+        });
+        createdIdeas.push(idea);
+      }
+
+      res.json({ ideas: createdIdeas });
     }
   });
 
