@@ -127,12 +127,18 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   };
 
   const handleSwipeUp = (index: number) => {
+    console.log('handleSwipeUp called with index:', index);
     // Only allow swiping the top card (index 0)
-    if (index !== 0) return;
+    if (index !== 0) {
+      console.log('Swipe up blocked - not top card');
+      return;
+    }
     
     // Explore similar ideas and save the current one
     const currentCard = cards[index];
+    console.log('Current card for swipe up:', currentCard);
     if (currentCard) {
+      console.log('Saving and exploring idea:', currentCard.id);
       saveIdeaMutation.mutate(currentCard.id);
       exploreIdeaMutation.mutate(currentCard.id);
     }

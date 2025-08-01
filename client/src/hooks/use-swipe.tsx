@@ -30,23 +30,29 @@ export function useSwipe(handlers: SwipeHandlers) {
     const deltaTime = Date.now() - startTime.current;
     
     // Only trigger if the swipe was fast enough and long enough
-    if (deltaTime > 300 || (Math.abs(deltaX) < 50 && Math.abs(deltaY) < 50)) {
+    if (deltaTime > 500 || (Math.abs(deltaX) < 30 && Math.abs(deltaY) < 30)) {
       return;
     }
 
-    // Determine swipe direction
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    console.log('Swipe detected:', { deltaX, deltaY, deltaTime });
+
+    // Determine swipe direction - favor vertical swipes slightly
+    if (Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
       // Horizontal swipe
       if (deltaX > 0) {
+        console.log('Swipe right triggered');
         handlers.onSwipeRight?.();
       } else {
+        console.log('Swipe left triggered');
         handlers.onSwipeLeft?.();
       }
     } else {
       // Vertical swipe
       if (deltaY < 0) {
+        console.log('Swipe up triggered');
         handlers.onSwipeUp?.();
       } else {
+        console.log('Swipe down triggered');
         handlers.onSwipeDown?.();
       }
     }
@@ -67,20 +73,26 @@ export function useSwipe(handlers: SwipeHandlers) {
     const deltaY = endCoords.y - startCoords.current.y;
     const deltaTime = Date.now() - startTime.current;
     
-    if (deltaTime > 300 || (Math.abs(deltaX) < 50 && Math.abs(deltaY) < 50)) {
+    if (deltaTime > 500 || (Math.abs(deltaX) < 30 && Math.abs(deltaY) < 30)) {
       return;
     }
 
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    console.log('Mouse swipe detected:', { deltaX, deltaY, deltaTime });
+
+    if (Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
       if (deltaX > 0) {
+        console.log('Mouse swipe right triggered');
         handlers.onSwipeRight?.();
       } else {
+        console.log('Mouse swipe left triggered');
         handlers.onSwipeLeft?.();
       }
     } else {
       if (deltaY < 0) {
+        console.log('Mouse swipe up triggered');
         handlers.onSwipeUp?.();
       } else {
+        console.log('Mouse swipe down triggered');
         handlers.onSwipeDown?.();
       }
     }
