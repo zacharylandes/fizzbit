@@ -14,16 +14,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Generate ideas from text prompt
   app.post("/api/ideas/generate-from-text", async (req, res) => {
-    try {
-      const { prompt } = req.body;
-      
-      if (!prompt) {
-        return res.status(400).json({ error: "Prompt is required" });
-      }
+    const { prompt } = req.body;
+    
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt is required" });
+    }
 
-      // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    try {
+
+      // Use gpt-3.5-turbo for reliable access with new accounts
       const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-3.5-turbo",
         messages: [
           {
             role: "system",
@@ -103,9 +104,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Image data is required" });
       }
 
-      // Analyze image with OpenAI Vision
+      // Analyze image with OpenAI Vision - use gpt-4o-mini for vision tasks
       const visionResponse = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "user",
@@ -193,17 +194,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Generate ideas based on existing idea (for swipe up action)
   app.post("/api/ideas/:id/explore", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const parentIdea = await storage.getIdea(id);
-      
-      if (!parentIdea) {
-        return res.status(404).json({ error: "Idea not found" });
-      }
+    const { id } = req.params;
+    const parentIdea = await storage.getIdea(id);
+    
+    if (!parentIdea) {
+      return res.status(404).json({ error: "Idea not found" });
+    }
 
-      // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    try {
+
+      // Use gpt-3.5-turbo for reliable access with new accounts
       const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-3.5-turbo",
         messages: [
           {
             role: "system",
