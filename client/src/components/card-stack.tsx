@@ -63,11 +63,8 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     },
     onSuccess: (data) => {
       if (data.ideas && data.ideas.length > 0) {
-        // Add new ideas to the stack
-        setCards(prev => [
-          ...data.ideas.slice(0, 3),
-          ...prev.slice(3)
-        ]);
+        // Replace all cards with new related ideas
+        setCards(data.ideas.slice(0, 3));
         toast({
           title: "New Ideas Generated!",
           description: "Explore more creative variations based on your interest.",
@@ -92,21 +89,22 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     },
     onSuccess: (data) => {
       if (data.ideas && data.ideas.length > 0) {
+        // Remove top card and move others up, add new card at bottom
         setCards(prev => [
-          data.ideas[0],
-          ...prev.slice(0, 2)
+          ...prev.slice(1), // Move middle and bottom cards up
+          data.ideas[0]     // Add new card at bottom
         ]);
       }
     },
   });
 
   const handleSwipeLeft = (index: number) => {
-    // Dismiss - replace with new random idea
-    const currentCard = cards[index];
-    if (currentCard) {
-      const excludeIds = cards.map(c => c.id);
-      getRandomIdeasMutation.mutate(excludeIds);
-    }
+    // Only allow swiping the top card (index 0)
+    if (index !== 0) return;
+    
+    // Dismiss - remove top card and get new one for bottom
+    const excludeIds = cards.map(c => c.id);
+    getRandomIdeasMutation.mutate(excludeIds);
     
     toast({
       title: "Idea Dismissed",
@@ -115,20 +113,27 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   };
 
   const handleSwipeRight = (index: number) => {
-    // Save idea
+    // Only allow swiping the top card (index 0)
+    if (index !== 0) return;
+    
+    // Save idea and replace
     const currentCard = cards[index];
     if (currentCard) {
       saveIdeaMutation.mutate(currentCard.id);
-      // Also replace with new idea
+      // Get new idea for bottom of stack
       const excludeIds = cards.map(c => c.id);
       getRandomIdeasMutation.mutate(excludeIds);
     }
   };
 
   const handleSwipeUp = (index: number) => {
-    // Explore similar ideas
+    // Only allow swiping the top card (index 0)
+    if (index !== 0) return;
+    
+    // Explore similar ideas and save the current one
     const currentCard = cards[index];
     if (currentCard) {
+      saveIdeaMutation.mutate(currentCard.id);
       exploreIdeaMutation.mutate(currentCard.id);
     }
     

@@ -1,7 +1,8 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { type Idea } from "@shared/schema";
 import { useSwipe } from "@/hooks/use-swipe";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
+import { useState } from "react";
 
 interface IdeaCardProps {
   idea: Idea;
@@ -36,17 +37,46 @@ const cardStyles = {
 };
 
 export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp }: IdeaCardProps) {
+  const [isExiting, setIsExiting] = useState(false);
+  const [exitDirection, setExitDirection] = useState<"left" | "right" | "up" | null>(null);
+  
+  const isTopCard = position === "top";
+  
   const swipeHandlers = useSwipe({
-    onSwipeLeft,
-    onSwipeRight,
-    onSwipeUp
+    onSwipeLeft: () => {
+      if (!isTopCard) return;
+      setIsExiting(true);
+      setExitDirection("left");
+      setTimeout(() => onSwipeLeft(), 300);
+    },
+    onSwipeRight: () => {
+      if (!isTopCard) return;
+      setIsExiting(true);
+      setExitDirection("right");
+      setTimeout(() => onSwipeRight(), 300);
+    },
+    onSwipeUp: () => {
+      if (!isTopCard) return;
+      setIsExiting(true);
+      setExitDirection("up");
+      setTimeout(() => onSwipeUp(), 300);
+    }
   });
 
   const cardNumber = position === "top" ? 1 : position === "middle" ? 2 : 3;
+  
+  // Exit animation variants
+  const exitVariants = {
+    left: { x: -400, opacity: 0, rotate: -15 },
+    right: { x: 400, opacity: 0, rotate: 15 },
+    up: { y: -400, opacity: 0, scale: 0.8 }
+  };
 
   return (
     <motion.div
-      className={`relative bg-white rounded-2xl shadow-2xl overflow-hidden cursor-pointer touch-target`}
+      className={`relative bg-white rounded-2xl shadow-2xl overflow-hidden touch-target ${
+        isTopCard ? "cursor-pointer" : "cursor-default"
+      }`}
       style={{ 
         ...cardStyles[position],
         minHeight: "44px",
@@ -54,10 +84,13 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
         height: "240px"
       }}
       initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.8 }}
+      animate={
+        isExiting && exitDirection
+          ? exitVariants[exitDirection]
+          : { opacity: 1, y: 0, x: 0, rotate: 0 }
+      }
       transition={{ duration: 0.3, ease: "easeOut" }}
-      {...swipeHandlers}
+      {...(isTopCard ? swipeHandlers : {})}
     >
       {/* Card Header - Always Visible */}
       <div className={`p-6 text-white relative bg-gradient-to-br ${gradients[position]}`}>
@@ -82,21 +115,23 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
           {idea.description}
         </p>
         
-        {/* Swipe Indicators */}
-        <div className="absolute bottom-4 left-6 right-6 flex justify-between items-center">
-          <div className="flex items-center text-xs text-white/70">
-            <ArrowLeft className="w-3 h-3 mr-1" />
-            Dismiss
+        {/* Swipe Indicators - Only show on top card */}
+        {isTopCard && (
+          <div className="absolute bottom-4 left-6 right-6 flex justify-between items-center">
+            <div className="flex items-center text-xs text-white/90 bg-white/10 px-2 py-1 rounded-full">
+              <ArrowLeft className="w-3 h-3 mr-1" />
+              Dismiss
+            </div>
+            <div className="flex items-center text-xs text-white/90 bg-white/10 px-2 py-1 rounded-full">
+              <ArrowUp className="w-3 h-3 mr-1" />
+              Explore
+            </div>
+            <div className="flex items-center text-xs text-white/90 bg-white/10 px-2 py-1 rounded-full">
+              <ArrowRight className="w-3 h-3 mr-1" />
+              Save
+            </div>
           </div>
-          <div className="flex items-center text-xs text-white/70">
-            <ArrowUp className="w-3 h-3 mr-1" />
-            Explore
-          </div>
-          <div className="flex items-center text-xs text-white/70">
-            <ArrowRight className="w-3 h-3 mr-1" />
-            Save
-          </div>
-        </div>
+        )}
       </div>
       
       {/* Card Content - Below visible area */}
