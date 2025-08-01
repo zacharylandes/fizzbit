@@ -36,17 +36,9 @@ export function useSwipe(handlers: SwipeHandlers) {
 
     console.log('Swipe detected:', { deltaX, deltaY, deltaTime });
 
-    // Determine swipe direction - favor vertical swipes slightly
-    if (Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
-      // Horizontal swipe
-      if (deltaX > 0) {
-        console.log('Swipe right triggered');
-        handlers.onSwipeRight?.();
-      } else {
-        console.log('Swipe left triggered');
-        handlers.onSwipeLeft?.();
-      }
-    } else {
+    // Determine swipe direction - make vertical swipes much easier to trigger
+    // If there's significant vertical movement (even with some horizontal), treat as vertical
+    if (Math.abs(deltaY) > 20 && Math.abs(deltaX) < Math.abs(deltaY) * 3) {
       // Vertical swipe
       if (deltaY < 0) {
         console.log('Swipe up triggered');
@@ -54,6 +46,15 @@ export function useSwipe(handlers: SwipeHandlers) {
       } else {
         console.log('Swipe down triggered');
         handlers.onSwipeDown?.();
+      }
+    } else if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      // Horizontal swipe
+      if (deltaX > 0) {
+        console.log('Swipe right triggered');
+        handlers.onSwipeRight?.();
+      } else {
+        console.log('Swipe left triggered');
+        handlers.onSwipeLeft?.();
       }
     }
   };
@@ -79,21 +80,24 @@ export function useSwipe(handlers: SwipeHandlers) {
 
     console.log('Mouse swipe detected:', { deltaX, deltaY, deltaTime });
 
-    if (Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
-      if (deltaX > 0) {
-        console.log('Mouse swipe right triggered');
-        handlers.onSwipeRight?.();
-      } else {
-        console.log('Mouse swipe left triggered');
-        handlers.onSwipeLeft?.();
-      }
-    } else {
+    // Same logic for mouse - make vertical swipes easier
+    if (Math.abs(deltaY) > 20 && Math.abs(deltaX) < Math.abs(deltaY) * 3) {
+      // Vertical swipe
       if (deltaY < 0) {
         console.log('Mouse swipe up triggered');
         handlers.onSwipeUp?.();
       } else {
         console.log('Mouse swipe down triggered');
         handlers.onSwipeDown?.();
+      }
+    } else if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      // Horizontal swipe
+      if (deltaX > 0) {
+        console.log('Mouse swipe right triggered');
+        handlers.onSwipeRight?.();
+      } else {
+        console.log('Mouse swipe left triggered');
+        handlers.onSwipeLeft?.();
       }
     }
   };
