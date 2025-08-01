@@ -5,8 +5,10 @@ import { insertIdeaSchema } from "@shared/schema";
 import OpenAI from "openai";
 
 const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
+  apiKey: process.env.OPENAI_API_KEY
 });
+
+
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
