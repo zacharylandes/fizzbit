@@ -20,18 +20,18 @@ const gradients = {
 const cardStyles = {
   top: {
     zIndex: 30,
-    transform: "translateY(0px) scale(1)",
-    marginTop: "0px"
+    transform: "scale(1)",
+    marginBottom: "-160px" // Overlap with next card
   },
   middle: {
     zIndex: 20,
-    transform: "translateY(-160px) scale(0.98)",
-    marginTop: "80px"
+    transform: "scale(0.98)",
+    marginBottom: "-160px" // Overlap with next card
   },
   bottom: {
     zIndex: 10,
-    transform: "translateY(-320px) scale(0.96)",
-    marginTop: "160px"
+    transform: "scale(0.96)",
+    marginBottom: "0px"
   }
 };
 
