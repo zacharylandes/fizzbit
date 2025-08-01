@@ -17,17 +17,22 @@ const gradients = {
   bottom: "from-sky-400 to-red-400"
 };
 
-const zIndexes = {
-  top: 30,
-  middle: 20,
-  bottom: 10
-};
-
-// Cards should stack with the top 1/3 of each visible
-const transforms = {
-  top: "translateY(0px)",
-  middle: "translateY(80px)", // Show top 1/3 of middle card
-  bottom: "translateY(160px)" // Show top 1/3 of bottom card
+const cardStyles = {
+  top: {
+    zIndex: 30,
+    transform: "translateY(0px) scale(1)",
+    marginTop: "0px"
+  },
+  middle: {
+    zIndex: 20,
+    transform: "translateY(-160px) scale(0.98)",
+    marginTop: "80px"
+  },
+  bottom: {
+    zIndex: 10,
+    transform: "translateY(-320px) scale(0.96)",
+    marginTop: "160px"
+  }
 };
 
 export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp }: IdeaCardProps) {
@@ -41,10 +46,9 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
 
   return (
     <motion.div
-      className={`absolute left-0 right-0 bg-white rounded-2xl shadow-2xl overflow-hidden cursor-pointer touch-target`}
+      className={`relative bg-white rounded-2xl shadow-2xl overflow-hidden cursor-pointer touch-target`}
       style={{ 
-        zIndex: zIndexes[position],
-        transform: transforms[position],
+        ...cardStyles[position],
         minHeight: "44px",
         minWidth: "44px",
         height: "240px"
