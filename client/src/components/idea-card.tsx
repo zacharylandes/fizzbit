@@ -23,10 +23,11 @@ const zIndexes = {
   bottom: 10
 };
 
+// Cards should stack with the top 1/3 of each visible
 const transforms = {
   top: "translateY(0px)",
-  middle: "translateY(120px)",
-  bottom: "translateY(240px)"
+  middle: "translateY(80px)", // Show top 1/3 of middle card
+  bottom: "translateY(160px)" // Show top 1/3 of bottom card
 };
 
 export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp }: IdeaCardProps) {
@@ -46,7 +47,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
         transform: transforms[position],
         minHeight: "44px",
         minWidth: "44px",
-        height: "360px"
+        height: "240px"
       }}
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}

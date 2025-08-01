@@ -150,7 +150,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   }
 
   return (
-    <div className="relative h-[480px] card-stack">
+    <div className="relative h-[320px] card-stack">
       {/* Swipe Instructions */}
       <div className="absolute -top-16 left-0 right-0 flex justify-center">
         <motion.div 
@@ -163,17 +163,21 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         </motion.div>
       </div>
 
+      {/* Render cards in reverse order so z-index works properly */}
       <AnimatePresence mode="popLayout">
-        {cards.slice(0, 3).map((card, index) => (
-          <IdeaCard
-            key={`${card.id}-${index}`}
-            idea={card}
-            position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
-            onSwipeLeft={() => handleSwipeLeft(index)}
-            onSwipeRight={() => handleSwipeRight(index)}
-            onSwipeUp={() => handleSwipeUp(index)}
-          />
-        ))}
+        {cards.slice(0, 3).reverse().map((card, reverseIndex) => {
+          const index = 2 - reverseIndex; // Convert back to original index
+          return (
+            <IdeaCard
+              key={`${card.id}-${index}`}
+              idea={card}
+              position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
+              onSwipeLeft={() => handleSwipeLeft(index)}
+              onSwipeRight={() => handleSwipeRight(index)}
+              onSwipeUp={() => handleSwipeUp(index)}
+            />
+          );
+        })}
       </AnimatePresence>
     </div>
   );
