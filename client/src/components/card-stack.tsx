@@ -13,6 +13,7 @@ interface CardStackProps {
 
 export function CardStack({ initialIdeas = [] }: CardStackProps) {
   const [cards, setCards] = useState<Idea[]>(initialIdeas);
+  const [stackVersion, setStackVersion] = useState(0);
   const { toast } = useToast();
 
   // Fetch random ideas if no initial ideas provided
@@ -107,6 +108,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     
     // Remove top card immediately, promote others
     setCards(prev => prev.slice(1));
+    setStackVersion(prev => prev + 1);
     
     // Get new idea to fill the stack back to 3 cards
     const excludeIds = cards.map(c => c.id);
@@ -127,6 +129,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     if (currentCard) {
       saveIdeaMutation.mutate(currentCard.id);
       setCards(prev => prev.slice(1));
+      setStackVersion(prev => prev + 1);
       
       // Get new idea to fill the stack back to 3 cards
       const excludeIds = cards.map(c => c.id);
@@ -151,6 +154,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       
       // Remove top card immediately, promote others
       setCards(prev => prev.slice(1));
+      setStackVersion(prev => prev + 1);
       
       // Generate one related idea to add at the bottom
       exploreIdeaMutation.mutate(currentCard.id);
@@ -191,11 +195,12 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       <div className="space-y-0">
         {cards.slice(0, 3).reverse().map((card, reverseIndex) => {
           const originalIndex = 2 - reverseIndex;
+          const position = originalIndex === 0 ? "top" : originalIndex === 1 ? "middle" : "bottom";
           return (
             <IdeaCard
-              key={`${card.id}-${originalIndex}`}
+              key={`${stackVersion}-${originalIndex}-${card.id}`}
               idea={card}
-              position={originalIndex === 0 ? "top" : originalIndex === 1 ? "middle" : "bottom"}
+              position={position}
               onSwipeLeft={() => handleSwipeLeft(originalIndex)}
               onSwipeRight={() => handleSwipeRight(originalIndex)}
               onSwipeUp={() => handleSwipeUp(originalIndex)}
