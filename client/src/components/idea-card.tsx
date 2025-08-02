@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { type Idea } from "@shared/schema";
 import { useSwipe } from "@/hooks/use-swipe";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 
 interface IdeaCardProps {
   idea: Idea;
@@ -39,28 +39,50 @@ const cardStyles = {
 export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp }: IdeaCardProps) {
   const [isExiting, setIsExiting] = useState(false);
   const [exitDirection, setExitDirection] = useState<"left" | "right" | "up" | null>(null);
+  const isProcessing = useRef(false);
   
   const isTopCard = position === "top";
   
+  const handleSwipeLeft = useCallback(() => {
+    if (!isTopCard || isProcessing.current) return;
+    isProcessing.current = true;
+    setIsExiting(true);
+    setExitDirection("left");
+    onSwipeLeft();
+    // Reset after animation
+    setTimeout(() => {
+      isProcessing.current = false;
+    }, 200);
+  }, [isTopCard, onSwipeLeft]);
+  
+  const handleSwipeRight = useCallback(() => {
+    if (!isTopCard || isProcessing.current) return;
+    isProcessing.current = true;
+    setIsExiting(true);
+    setExitDirection("right");
+    onSwipeRight();
+    // Reset after animation
+    setTimeout(() => {
+      isProcessing.current = false;
+    }, 200);
+  }, [isTopCard, onSwipeRight]);
+  
+  const handleSwipeUp = useCallback(() => {
+    if (!isTopCard || isProcessing.current) return;
+    isProcessing.current = true;
+    setIsExiting(true);
+    setExitDirection("up");
+    onSwipeUp();
+    // Reset after animation
+    setTimeout(() => {
+      isProcessing.current = false;
+    }, 200);
+  }, [isTopCard, onSwipeUp]);
+  
   const swipeHandlers = useSwipe({
-    onSwipeLeft: () => {
-      if (!isTopCard) return;
-      setIsExiting(true);
-      setExitDirection("left");
-      onSwipeLeft();
-    },
-    onSwipeRight: () => {
-      if (!isTopCard) return;
-      setIsExiting(true);
-      setExitDirection("right");
-      onSwipeRight();
-    },
-    onSwipeUp: () => {
-      if (!isTopCard) return;
-      setIsExiting(true);
-      setExitDirection("up");
-      onSwipeUp();
-    }
+    onSwipeLeft: handleSwipeLeft,
+    onSwipeRight: handleSwipeRight,
+    onSwipeUp: handleSwipeUp
   });
 
   const cardNumber = position === "top" ? 1 : position === "middle" ? 2 : 3;
@@ -89,7 +111,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
           ? exitVariants[exitDirection]
           : { opacity: 1, y: 0, x: 0, rotate: 0 }
       }
-      transition={{ duration: 0.15, ease: "easeOut" }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
       {...(isTopCard ? swipeHandlers : {})}
     >
       {/* Card Header - Always Visible */}
@@ -145,7 +167,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
             <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
             <span>Source: {idea.source === "text" ? "Text prompt" : "Image upload"}</span>
           </div>
-          {idea.metadata && typeof idea.metadata === 'object' && 'category' in idea.metadata && (
+          {idea.metadata && typeof idea.metadata === 'object' && 'category' in idea.metadata && typeof idea.metadata.category === 'string' && (
             <div className="flex items-center text-sm text-gray-600">
               <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
               <span>Category: {idea.metadata.category}</span>

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useCallback } from "react";
 
 export interface SwipeHandlers {
   onSwipeLeft?: () => void;
@@ -8,98 +8,91 @@ export interface SwipeHandlers {
 }
 
 export function useSwipe(handlers: SwipeHandlers) {
-  const [isPressed, setIsPressed] = useState(false);
   const startCoords = useRef({ x: 0, y: 0 });
-  const startTime = useRef(0);
+  const isDragging = useRef(false);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsPressed(true);
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
     const touch = e.touches[0];
     startCoords.current = { x: touch.clientX, y: touch.clientY };
-    startTime.current = Date.now();
-  };
+  }, []);
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!isPressed) return;
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!isDragging.current) return;
     
-    setIsPressed(false);
+    e.preventDefault();
+    e.stopPropagation();
+    isDragging.current = false;
+    
     const touch = e.changedTouches[0];
     const endCoords = { x: touch.clientX, y: touch.clientY };
     const deltaX = endCoords.x - startCoords.current.x;
     const deltaY = endCoords.y - startCoords.current.y;
-    const deltaTime = Date.now() - startTime.current;
     
-    console.log('Swipe detected:', { deltaX, deltaY, deltaTime });
+    console.log('Touch swipe detected:', { deltaX, deltaY });
 
-    // Only trigger if the swipe was fast enough (under 300ms for responsiveness)
-    if (deltaTime > 300) {
-      return;
-    }
-
-    // Check for up swipe FIRST with highest priority - any upward movement over 15px
-    if (deltaY < -15) {
-      console.log('Swipe up triggered');
+    // Check for up swipe FIRST with highest priority - any upward movement over 10px
+    if (deltaY < -10) {
+      console.log('Touch swipe up triggered');
       handlers.onSwipeUp?.();
       return;
     }
     
     // Then check for down swipe
-    if (deltaY > 15 && Math.abs(deltaY) > Math.abs(deltaX)) {
-      console.log('Swipe down triggered');
+    if (deltaY > 10 && Math.abs(deltaY) > Math.abs(deltaX)) {
+      console.log('Touch swipe down triggered');
       handlers.onSwipeDown?.();
       return;
     }
     
-    // Finally check horizontal swipes - need at least 25px movement
-    if (Math.abs(deltaX) > 25) {
+    // Finally check horizontal swipes - need at least 20px movement
+    if (Math.abs(deltaX) > 20) {
       if (deltaX > 0) {
-        console.log('Swipe right triggered');
+        console.log('Touch swipe right triggered');
         handlers.onSwipeRight?.();
       } else {
-        console.log('Swipe left triggered');
+        console.log('Touch swipe left triggered');
         handlers.onSwipeLeft?.();
       }
     }
-  };
+  }, [handlers]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsPressed(true);
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
     startCoords.current = { x: e.clientX, y: e.clientY };
-    startTime.current = Date.now();
-  };
+  }, []);
 
-  const handleMouseUp = (e: React.MouseEvent) => {
-    if (!isPressed) return;
+  const handleMouseUp = useCallback((e: React.MouseEvent) => {
+    if (!isDragging.current) return;
     
-    setIsPressed(false);
+    e.preventDefault();
+    e.stopPropagation();
+    isDragging.current = false;
+    
     const endCoords = { x: e.clientX, y: e.clientY };
     const deltaX = endCoords.x - startCoords.current.x;
     const deltaY = endCoords.y - startCoords.current.y;
-    const deltaTime = Date.now() - startTime.current;
     
-    console.log('Mouse swipe detected:', { deltaX, deltaY, deltaTime });
+    console.log('Mouse swipe detected:', { deltaX, deltaY });
 
-    // Only trigger if the swipe was fast enough (under 300ms for responsiveness)
-    if (deltaTime > 300) {
-      return;
-    }
-
-    // Check for up swipe FIRST with highest priority - any upward movement over 15px
-    if (deltaY < -15) {
+    // Check for up swipe FIRST with highest priority - any upward movement over 10px
+    if (deltaY < -10) {
       console.log('Mouse swipe up triggered');
       handlers.onSwipeUp?.();
       return;
     }
     
     // Then check for down swipe
-    if (deltaY > 15 && Math.abs(deltaY) > Math.abs(deltaX)) {
+    if (deltaY > 10 && Math.abs(deltaY) > Math.abs(deltaX)) {
       console.log('Mouse swipe down triggered');
       handlers.onSwipeDown?.();
       return;
     }
     
-    // Finally check horizontal swipes - need at least 25px movement
-    if (Math.abs(deltaX) > 25) {
+    // Finally check horizontal swipes - need at least 20px movement
+    if (Math.abs(deltaX) > 20) {
       if (deltaX > 0) {
         console.log('Mouse swipe right triggered');
         handlers.onSwipeRight?.();
@@ -108,7 +101,7 @@ export function useSwipe(handlers: SwipeHandlers) {
         handlers.onSwipeLeft?.();
       }
     }
-  };
+  }, [handlers]);
 
   return {
     onTouchStart: handleTouchStart,
