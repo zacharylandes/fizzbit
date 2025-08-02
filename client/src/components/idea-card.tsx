@@ -79,9 +79,9 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
       }`}
       style={{ 
         ...cardStyles[position],
-        minHeight: "44px",
-        minWidth: "44px",
-        height: "240px"
+        minHeight: "48px",
+        minWidth: "48px",
+        height: "220px"
       }}
       initial={{ opacity: 0, y: 50 }}
       animate={

@@ -166,16 +166,16 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   }
 
   return (
-    <div className="relative h-[320px] card-stack">
+    <div className="relative h-[280px] sm:h-[320px] card-stack">
       {/* Swipe Instructions */}
-      <div className="absolute -top-16 left-0 right-0 flex justify-center">
+      <div className="absolute -top-12 sm:-top-16 left-0 right-0 flex justify-center px-4">
         <motion.div 
-          className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium text-gray-700"
+          className="bg-white/90 backdrop-blur-sm rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700"
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
           <span className="text-coral mr-2">👆</span>
-          Swipe to interact with ideas
+          Swipe to interact
         </motion.div>
       </div>
 
