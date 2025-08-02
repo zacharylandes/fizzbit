@@ -22,9 +22,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
 
-      // Use gpt-3.5-turbo for reliable access with new accounts
+      // Use gpt-4o - the newest OpenAI model released May 13, 2024. do not change this unless explicitly requested by the user
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
@@ -203,9 +203,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
 
-      // Use gpt-3.5-turbo for reliable access with new accounts
+      // Use gpt-4o - the newest OpenAI model released May 13, 2024. do not change this unless explicitly requested by the user
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
