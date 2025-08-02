@@ -89,11 +89,11 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     },
     onSuccess: (data) => {
       if (data.ideas && data.ideas.length > 0) {
-        // Remove top card and move others up, add new card at bottom
-        setCards(prev => [
-          ...prev.slice(1), // Move middle and bottom cards up
-          data.ideas[0]     // Add new card at bottom
-        ]);
+        // Add new card to fill the stack back to 3 cards
+        setCards(prev => {
+          const newCards = [...prev, data.ideas[0]];
+          return newCards.slice(0, 3); // Keep only 3 cards max
+        });
       }
     },
   });
@@ -102,7 +102,10 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     // Only allow swiping the top card (index 0)
     if (index !== 0) return;
     
-    // Dismiss - remove top card and get new one for bottom
+    // Remove top card immediately, promote others
+    setCards(prev => prev.slice(1));
+    
+    // Get new idea to fill the stack back to 3 cards
     const excludeIds = cards.map(c => c.id);
     getRandomIdeasMutation.mutate(excludeIds);
     
@@ -116,11 +119,13 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     // Only allow swiping the top card (index 0)
     if (index !== 0) return;
     
-    // Save idea and replace
+    // Save idea and remove top card immediately, promote others
     const currentCard = cards[index];
     if (currentCard) {
       saveIdeaMutation.mutate(currentCard.id);
-      // Get new idea for bottom of stack
+      setCards(prev => prev.slice(1));
+      
+      // Get new idea to fill the stack back to 3 cards
       const excludeIds = cards.map(c => c.id);
       getRandomIdeasMutation.mutate(excludeIds);
     }
