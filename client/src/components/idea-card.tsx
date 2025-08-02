@@ -47,19 +47,19 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
       if (!isTopCard) return;
       setIsExiting(true);
       setExitDirection("left");
-      setTimeout(() => onSwipeLeft(), 300);
+      onSwipeLeft();
     },
     onSwipeRight: () => {
       if (!isTopCard) return;
       setIsExiting(true);
       setExitDirection("right");
-      setTimeout(() => onSwipeRight(), 300);
+      onSwipeRight();
     },
     onSwipeUp: () => {
       if (!isTopCard) return;
       setIsExiting(true);
       setExitDirection("up");
-      setTimeout(() => onSwipeUp(), 300);
+      onSwipeUp();
     }
   });
 
@@ -89,7 +89,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
           ? exitVariants[exitDirection]
           : { opacity: 1, y: 0, x: 0, rotate: 0 }
       }
-      transition={{ duration: 0.3, ease: "easeOut" }}
+      transition={{ duration: 0.15, ease: "easeOut" }}
       {...(isTopCard ? swipeHandlers : {})}
     >
       {/* Card Header - Always Visible */}
