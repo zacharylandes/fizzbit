@@ -32,28 +32,32 @@ export function useSwipe(handlers: SwipeHandlers) {
     
     console.log('Touch swipe detected:', { deltaX, deltaY });
 
-    // Check for up swipe FIRST with highest priority - any upward movement over 10px
-    if (deltaY < -10) {
-      console.log('Touch swipe up triggered');
-      handlers.onSwipeUp?.();
-      return;
-    }
+    // Determine primary direction based on which movement is larger
+    const isHorizontalPrimary = Math.abs(deltaX) > Math.abs(deltaY);
     
-    // Then check for down swipe
-    if (deltaY > 10 && Math.abs(deltaY) > Math.abs(deltaX)) {
-      console.log('Touch swipe down triggered');
-      handlers.onSwipeDown?.();
-      return;
-    }
-    
-    // Finally check horizontal swipes - need at least 20px movement
-    if (Math.abs(deltaX) > 20) {
-      if (deltaX > 0) {
-        console.log('Touch swipe right triggered');
-        handlers.onSwipeRight?.();
-      } else {
-        console.log('Touch swipe left triggered');
-        handlers.onSwipeLeft?.();
+    if (isHorizontalPrimary) {
+      // Horizontal swipes - need at least 15px movement
+      if (Math.abs(deltaX) > 15) {
+        if (deltaX > 0) {
+          console.log('Touch swipe right triggered');
+          handlers.onSwipeRight?.();
+        } else {
+          console.log('Touch swipe left triggered');
+          handlers.onSwipeLeft?.();
+        }
+        return;
+      }
+    } else {
+      // Vertical swipes - need at least 15px movement
+      if (Math.abs(deltaY) > 15) {
+        if (deltaY < 0) {
+          console.log('Touch swipe up triggered');
+          handlers.onSwipeUp?.();
+        } else {
+          console.log('Touch swipe down triggered');
+          handlers.onSwipeDown?.();
+        }
+        return;
       }
     }
   }, [handlers]);
@@ -77,28 +81,32 @@ export function useSwipe(handlers: SwipeHandlers) {
     
     console.log('Mouse swipe detected:', { deltaX, deltaY });
 
-    // Check for up swipe FIRST with highest priority - any upward movement over 10px
-    if (deltaY < -10) {
-      console.log('Mouse swipe up triggered');
-      handlers.onSwipeUp?.();
-      return;
-    }
+    // Determine primary direction based on which movement is larger
+    const isHorizontalPrimary = Math.abs(deltaX) > Math.abs(deltaY);
     
-    // Then check for down swipe
-    if (deltaY > 10 && Math.abs(deltaY) > Math.abs(deltaX)) {
-      console.log('Mouse swipe down triggered');
-      handlers.onSwipeDown?.();
-      return;
-    }
-    
-    // Finally check horizontal swipes - need at least 20px movement
-    if (Math.abs(deltaX) > 20) {
-      if (deltaX > 0) {
-        console.log('Mouse swipe right triggered');
-        handlers.onSwipeRight?.();
-      } else {
-        console.log('Mouse swipe left triggered');
-        handlers.onSwipeLeft?.();
+    if (isHorizontalPrimary) {
+      // Horizontal swipes - need at least 15px movement
+      if (Math.abs(deltaX) > 15) {
+        if (deltaX > 0) {
+          console.log('Mouse swipe right triggered');
+          handlers.onSwipeRight?.();
+        } else {
+          console.log('Mouse swipe left triggered');
+          handlers.onSwipeLeft?.();
+        }
+        return;
+      }
+    } else {
+      // Vertical swipes - need at least 15px movement
+      if (Math.abs(deltaY) > 15) {
+        if (deltaY < 0) {
+          console.log('Mouse swipe up triggered');
+          handlers.onSwipeUp?.();
+        } else {
+          console.log('Mouse swipe down triggered');
+          handlers.onSwipeDown?.();
+        }
+        return;
       }
     }
   }, [handlers]);
