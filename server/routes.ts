@@ -4,11 +4,21 @@ import { storage } from "./storage";
 import { insertIdeaSchema } from "@shared/schema";
 import OpenAI from "openai";
 
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY
-});
+// Initialize OpenAI with error handling
+let openai: OpenAI | null = null;
 
-
+try {
+  if (process.env.OPENAI_API_KEY) {
+    openai = new OpenAI({ 
+      apiKey: process.env.OPENAI_API_KEY
+    });
+  } else {
+    console.warn("Warning: OPENAI_API_KEY not found - AI features will use fallback responses");
+  }
+} catch (error) {
+  console.error("Failed to initialize OpenAI client:", error);
+  console.warn("AI features will use fallback responses");
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -21,6 +31,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
+      // Check if OpenAI client is available
+      if (!openai) {
+        throw new Error("OpenAI client not initialized");
+      }
 
       // Use gpt-4o - the newest OpenAI model released May 13, 2024. do not change this unless explicitly requested by the user
       const response = await openai.chat.completions.create({
@@ -102,6 +116,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!imageBase64) {
         return res.status(400).json({ error: "Image data is required" });
+      }
+
+      // Check if OpenAI client is available
+      if (!openai) {
+        throw new Error("OpenAI client not initialized");
       }
 
       // Analyze image with OpenAI Vision - use gpt-4o-mini for vision tasks
@@ -202,6 +221,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
+      // Check if OpenAI client is available
+      if (!openai) {
+        throw new Error("OpenAI client not initialized");
+      }
 
       // Use gpt-4o - the newest OpenAI model released May 13, 2024. do not change this unless explicitly requested by the user
       const response = await openai.chat.completions.create({
