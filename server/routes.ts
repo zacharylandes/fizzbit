@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertIdeaSchema } from "@shared/schema";
@@ -22,8 +22,14 @@ try {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Add global error handling middleware for async routes
+  const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) => 
+    (req: Request, res: Response, next: NextFunction) => {
+      Promise.resolve(fn(req, res, next)).catch(next);
+    };
+  
   // Generate ideas from text prompt
-  app.post("/api/ideas/generate-from-text", async (req, res) => {
+  app.post("/api/ideas/generate-from-text", asyncHandler(async (req, res) => {
     const { prompt } = req.body;
     
     if (!prompt) {
@@ -73,6 +79,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error generating ideas from text:", error);
       
+      // Enhanced error handling with more specific error types
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
       // Fallback to predefined creative ideas when AI is unavailable
       const fallbackIdeas = [
         {
@@ -107,7 +122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ ideas: createdIdeas });
     }
-  });
+  }));
 
   // Generate ideas from image
   app.post("/api/ideas/generate-from-image", async (req, res) => {
@@ -305,6 +320,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
+  // Add health check endpoint for deployment verification
+  app.get('/health', (req, res) => {
+    try {
+      const healthStatus = {
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        services: {
+          openai: openai ? 'available' : 'fallback_mode',
+          storage: 'available',
+          degraded_mode: process.env.DEGRADED_MODE === 'true'
+        }
+      };
+      
+      res.json(healthStatus);
+    } catch (error) {
+      console.error('Health check error:', error);
+      res.status(503).json({
+        status: 'unhealthy',
+        error: 'Health check failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+  
+  // Add graceful error handling for server creation
+  let httpServer;
+  try {
+    httpServer = createServer(app);
+    
+    // Add server error handling
+    httpServer.on('error', (error) => {
+      console.error('HTTP server error:', error);
+    });
+    
+    httpServer.on('clientError', (err, socket) => {
+      console.error('Client error:', err.message);
+      if (!socket.destroyed) {
+        socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+      }
+    });
+    
+  } catch (error) {
+    console.error('Failed to create HTTP server:', error);
+    throw new Error(`Server creation failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  
   return httpServer;
 }
