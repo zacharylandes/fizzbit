@@ -63,8 +63,11 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     },
     onSuccess: (data) => {
       if (data.ideas && data.ideas.length > 0) {
-        // Replace all cards with new related ideas
-        setCards(data.ideas.slice(0, 3));
+        // Add one related idea to the bottom of the stack
+        setCards(prev => {
+          const newCards = [...prev, data.ideas[0]];
+          return newCards.slice(0, 3); // Keep only 3 cards max
+        });
         toast({
           title: "New Ideas Generated!",
           description: "Explore more creative variations based on your interest.",
@@ -139,12 +142,17 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       return;
     }
     
-    // Explore similar ideas and save the current one
+    // Save current card and remove top card immediately, promote others
     const currentCard = cards[index];
     console.log('Current card for swipe up:', currentCard);
     if (currentCard) {
       console.log('Saving and exploring idea:', currentCard.id);
       saveIdeaMutation.mutate(currentCard.id);
+      
+      // Remove top card immediately, promote others
+      setCards(prev => prev.slice(1));
+      
+      // Generate one related idea to add at the bottom
       exploreIdeaMutation.mutate(currentCard.id);
     }
     
