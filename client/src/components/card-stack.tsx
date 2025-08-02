@@ -106,13 +106,15 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     // Only allow swiping the top card (index 0)
     if (index !== 0) return;
     
-    // Remove top card immediately, promote others
-    setCards(prev => prev.slice(1));
-    setStackVersion(prev => prev + 1);
-    
-    // Get new idea to fill the stack back to 3 cards
-    const excludeIds = cards.map(c => c.id);
-    getRandomIdeasMutation.mutate(excludeIds);
+    // Delay card removal to allow exit animation
+    setTimeout(() => {
+      setCards(prev => prev.slice(1));
+      setStackVersion(prev => prev + 1);
+      
+      // Get new idea to fill the stack back to 3 cards
+      const excludeIds = cards.slice(1).map(c => c.id); // Use remaining cards for exclude
+      getRandomIdeasMutation.mutate(excludeIds);
+    }, 250); // Match animation duration
     
     toast({
       title: "Idea Dismissed",
@@ -124,16 +126,19 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     // Only allow swiping the top card (index 0)
     if (index !== 0) return;
     
-    // Save idea and remove top card immediately, promote others
+    // Save idea and delay card removal to allow exit animation
     const currentCard = cards[index];
     if (currentCard) {
       saveIdeaMutation.mutate(currentCard.id);
-      setCards(prev => prev.slice(1));
-      setStackVersion(prev => prev + 1);
       
-      // Get new idea to fill the stack back to 3 cards
-      const excludeIds = cards.map(c => c.id);
-      getRandomIdeasMutation.mutate(excludeIds);
+      setTimeout(() => {
+        setCards(prev => prev.slice(1));
+        setStackVersion(prev => prev + 1);
+        
+        // Get new idea to fill the stack back to 3 cards
+        const excludeIds = cards.slice(1).map(c => c.id); // Use remaining cards for exclude
+        getRandomIdeasMutation.mutate(excludeIds);
+      }, 250); // Match animation duration
     }
   };
 
@@ -145,16 +150,18 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       return;
     }
     
-    // Save current card and remove top card immediately, promote others
+    // Save current card and delay removal to allow exit animation
     const currentCard = cards[index];
     console.log('Current card for swipe up:', currentCard);
     if (currentCard) {
       console.log('Saving and exploring idea:', currentCard.id);
       saveIdeaMutation.mutate(currentCard.id);
       
-      // Remove top card immediately, promote others
-      setCards(prev => prev.slice(1));
-      setStackVersion(prev => prev + 1);
+      // Delay card removal to allow exit animation
+      setTimeout(() => {
+        setCards(prev => prev.slice(1));
+        setStackVersion(prev => prev + 1);
+      }, 250); // Match animation duration
       
       // Generate one related idea to add at the bottom
       exploreIdeaMutation.mutate(currentCard.id);

@@ -49,10 +49,10 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
     setIsExiting(true);
     setExitDirection("left");
     onSwipeLeft();
-    // Reset after animation
+    // Reset after longer delay to prevent rapid swipes
     setTimeout(() => {
       isProcessing.current = false;
-    }, 200);
+    }, 300);
   }, [isTopCard, onSwipeLeft]);
   
   const handleSwipeRight = useCallback(() => {
@@ -61,10 +61,10 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
     setIsExiting(true);
     setExitDirection("right");
     onSwipeRight();
-    // Reset after animation
+    // Reset after longer delay to prevent rapid swipes
     setTimeout(() => {
       isProcessing.current = false;
-    }, 200);
+    }, 300);
   }, [isTopCard, onSwipeRight]);
   
   const handleSwipeUp = useCallback(() => {
@@ -73,10 +73,10 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
     setIsExiting(true);
     setExitDirection("up");
     onSwipeUp();
-    // Reset after animation
+    // Reset after longer delay to prevent rapid swipes
     setTimeout(() => {
       isProcessing.current = false;
-    }, 200);
+    }, 300);
   }, [isTopCard, onSwipeUp]);
   
   const swipeHandlers = useSwipe({
@@ -89,9 +89,9 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
   
   // Exit animation variants
   const exitVariants = {
-    left: { x: -400, opacity: 0, rotate: -15 },
-    right: { x: 400, opacity: 0, rotate: 15 },
-    up: { y: -400, opacity: 0, scale: 0.8 }
+    left: { x: -500, opacity: 0, rotate: -20, scale: 0.8 },
+    right: { x: 500, opacity: 0, rotate: 20, scale: 0.8 },
+    up: { y: -500, opacity: 0, scale: 0.6, rotate: 5 }
   };
 
   return (
@@ -111,7 +111,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
           ? exitVariants[exitDirection]
           : { opacity: 1, y: 0, x: 0, rotate: 0 }
       }
-      transition={{ duration: 0.2, ease: "easeOut" }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
       {...(isTopCard ? swipeHandlers : {})}
     >
       {/* Card Header - Always Visible */}
