@@ -36,8 +36,8 @@ export function useSwipe(handlers: SwipeHandlers) {
 
     console.log('Swipe detected:', { deltaX, deltaY, deltaTime });
 
-    // Check for up swipe FIRST with highest priority - any upward movement over 15px
-    if (deltaY < -15) {
+    // Check for up swipe FIRST with highest priority - any upward movement over 5px
+    if (deltaY < -5) {
       console.log('Swipe up triggered');
       handlers.onSwipeUp?.();
       return;
@@ -83,8 +83,8 @@ export function useSwipe(handlers: SwipeHandlers) {
 
     console.log('Mouse swipe detected:', { deltaX, deltaY, deltaTime });
 
-    // Check for up swipe FIRST with highest priority - any upward movement over 15px
-    if (deltaY < -15) {
+    // Check for up swipe FIRST with highest priority - any upward movement over 5px
+    if (deltaY < -5) {
       console.log('Mouse swipe up triggered');
       handlers.onSwipeUp?.();
       return;
