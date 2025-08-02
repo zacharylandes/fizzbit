@@ -49,14 +49,39 @@ app.use((req, res, next) => {
       log(`Warning: Missing environment variables: ${missingEnvVars.join(', ')}`);
     }
     
+    // Check for critical environment variables that could cause deployment failures
+    const criticalEnvVars = ['DATABASE_URL'];
+    const missingCriticalEnvVars = criticalEnvVars.filter(envVar => !process.env[envVar]);
+    
+    if (missingCriticalEnvVars.length > 0) {
+      log(`✗ Critical environment variables missing: ${missingCriticalEnvVars.join(', ')}`);
+      log(`These variables are required for the application to function properly in production.`);
+      // Don't exit in development mode, but log as error
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error(`Missing critical environment variables: ${missingCriticalEnvVars.join(', ')}`);
+      }
+    }
+    
     // Optional environment variables with warnings
     if (!process.env.OPENAI_API_KEY) {
       log("Warning: OPENAI_API_KEY not found - AI features will use fallback responses");
     }
     
+    // Log environment status for debugging
+    log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    log(`Port: ${process.env.PORT || '5000'}`);
+    log(`Database URL configured: ${process.env.DATABASE_URL ? 'Yes' : 'No'}`);
+    log(`OpenAI API Key configured: ${process.env.OPENAI_API_KEY ? 'Yes' : 'No'}`);
+    
     log("Registering routes...");
-    const server = await registerRoutes(app);
-    log("Routes registered successfully");
+    let server;
+    try {
+      server = await registerRoutes(app);
+      log("Routes registered successfully");
+    } catch (routeError: any) {
+      log(`✗ Failed to register routes: ${routeError.message}`);
+      throw new Error(`Route registration failed: ${routeError.message}`);
+    }
 
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
@@ -76,12 +101,22 @@ app.use((req, res, next) => {
     // doesn't interfere with the other routes
     if (app.get("env") === "development") {
       log("Setting up Vite dev server...");
-      await setupVite(app, server);
-      log("Vite dev server setup complete");
+      try {
+        await setupVite(app, server);
+        log("Vite dev server setup complete");
+      } catch (viteError: any) {
+        log(`✗ Failed to setup Vite dev server: ${viteError.message}`);
+        throw new Error(`Vite setup failed: ${viteError.message}`);
+      }
     } else {
       log("Setting up static file serving...");
-      serveStatic(app);
-      log("Static file serving setup complete");
+      try {
+        serveStatic(app);
+        log("Static file serving setup complete");
+      } catch (staticError: any) {
+        log(`✗ Failed to setup static file serving: ${staticError.message}`);
+        throw new Error(`Static file serving setup failed: ${staticError.message}`);
+      }
     }
 
     // ALWAYS serve the app on the port specified in the environment variable PORT
@@ -96,14 +131,24 @@ app.use((req, res, next) => {
     
     log(`Attempting to start server on port ${port}...`);
     
-    server.listen({
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    }, () => {
-      log(`✓ Server successfully started and serving on port ${port}`);
-      log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);
-      log(`✓ Server is ready to accept connections`);
+    // Use a Promise to handle server startup with timeout
+    await new Promise<void>((resolve, reject) => {
+      const startupTimeout = setTimeout(() => {
+        reject(new Error('Server startup timeout - failed to bind to port within 30 seconds'));
+      }, 30000);
+      
+      const serverInstance = server.listen(port, "0.0.0.0", () => {
+        clearTimeout(startupTimeout);
+        log(`✓ Server successfully started and serving on port ${port}`);
+        log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);
+        log(`✓ Server is ready to accept connections`);
+        resolve();
+      });
+      
+      serverInstance.on('error', (error) => {
+        clearTimeout(startupTimeout);
+        reject(error);
+      });
     });
     
     // Handle server errors
@@ -125,10 +170,38 @@ app.use((req, res, next) => {
     log(`✗ Failed to initialize server: ${error.message}`);
     console.error('Full initialization error:', error);
     
+    // Provide specific error handling and recovery suggestions
+    if (error.code === 'EADDRINUSE') {
+      log(`✗ Port ${process.env.PORT || '5000'} is already in use`);
+      log(`Suggestion: Check if another process is using this port or set a different PORT environment variable`);
+    } else if (error.code === 'EACCES') {
+      log(`✗ Permission denied to bind to port ${process.env.PORT || '5000'}`);
+      log(`Suggestion: Use a port number above 1024 or run with appropriate permissions`);
+    } else if (error.message.includes('DATABASE_URL')) {
+      log(`✗ Database connection issue detected`);
+      log(`Suggestion: Ensure DATABASE_URL environment variable is set correctly`);
+    } else if (error.message.includes('environment variables')) {
+      log(`✗ Environment configuration issue`);
+      log(`Suggestion: Check that all required environment variables are set in your deployment`);
+    } else if (error.message.includes('timeout')) {
+      log(`✗ Server startup timeout`);
+      log(`Suggestion: The server failed to start within 30 seconds - check for blocking operations during startup`);
+    }
+    
     // Log the stack trace in development for debugging
     if (process.env.NODE_ENV === 'development') {
       console.error('Stack trace:', error.stack);
+      log(`Development mode: Server will not exit to allow debugging`);
+      // In development, don't exit so the developer can debug
+      return;
     }
+    
+    // In production, log additional deployment-specific guidance
+    log(`Production deployment failed. Common causes:`);
+    log(`1. Missing environment variables (DATABASE_URL, etc.)`);
+    log(`2. Port binding issues (ensure PORT is correctly set)`);
+    log(`3. Database connectivity problems`);
+    log(`4. Memory or resource constraints during startup`);
     
     // Exit with error code to indicate failure
     process.exit(1);
@@ -139,12 +212,26 @@ app.use((req, res, next) => {
 process.on('uncaughtException', (error) => {
   log(`✗ Uncaught Exception: ${error.message}`);
   console.error('Uncaught Exception:', error);
+  
+  // In production, log additional context
+  if (process.env.NODE_ENV === 'production') {
+    console.error('This uncaught exception may have caused the deployment to fail');
+    console.error('Check your code for unhandled errors and add proper try-catch blocks');
+  }
+  
   process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
   log(`✗ Unhandled Rejection at Promise: ${promise}, reason: ${reason}`);
   console.error('Unhandled Rejection:', reason);
+  
+  // In production, log additional context
+  if (process.env.NODE_ENV === 'production') {
+    console.error('This unhandled promise rejection may have caused the deployment to fail');
+    console.error('Check your async code for missing catch blocks or error handling');
+  }
+  
   process.exit(1);
 });
 
