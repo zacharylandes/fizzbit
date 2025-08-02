@@ -22,7 +22,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   });
 
   useEffect(() => {
-    if (randomIdeasData && 'ideas' in randomIdeasData && Array.isArray(randomIdeasData.ideas) && initialIdeas.length === 0) {
+    if (randomIdeasData && typeof randomIdeasData === 'object' && randomIdeasData !== null && 'ideas' in randomIdeasData && Array.isArray(randomIdeasData.ideas) && initialIdeas.length === 0) {
       setCards(randomIdeasData.ideas.slice(0, 3));
     }
   }, [randomIdeasData, initialIdeas.length]);

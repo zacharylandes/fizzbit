@@ -29,15 +29,15 @@ export function useSwipe(handlers: SwipeHandlers) {
     const deltaY = endCoords.y - startCoords.current.y;
     const deltaTime = Date.now() - startTime.current;
     
-    // Only trigger if the swipe was fast enough and long enough
-    if (deltaTime > 500 || (Math.abs(deltaX) < 50 && Math.abs(deltaY) < 20)) {
+    // Only trigger if the swipe was fast enough and long enough - be more lenient for up swipes
+    if (deltaTime > 500 || (Math.abs(deltaX) < 30 && Math.abs(deltaY) < 15)) {
       return;
     }
 
     console.log('Swipe detected:', { deltaX, deltaY, deltaTime });
 
-    // Check for up swipe FIRST with highest priority - any upward movement over 20px
-    if (deltaY < -20) {
+    // Check for up swipe FIRST with highest priority - any upward movement over 10px
+    if (deltaY < -10) {
       console.log('Swipe up triggered');
       handlers.onSwipeUp?.();
       return;
@@ -77,14 +77,14 @@ export function useSwipe(handlers: SwipeHandlers) {
     const deltaY = endCoords.y - startCoords.current.y;
     const deltaTime = Date.now() - startTime.current;
     
-    if (deltaTime > 500 || (Math.abs(deltaX) < 50 && Math.abs(deltaY) < 20)) {
+    if (deltaTime > 500 || (Math.abs(deltaX) < 30 && Math.abs(deltaY) < 15)) {
       return;
     }
 
     console.log('Mouse swipe detected:', { deltaX, deltaY, deltaTime });
 
-    // Check for up swipe FIRST with highest priority - any upward movement over 20px
-    if (deltaY < -20) {
+    // Check for up swipe FIRST with highest priority - any upward movement over 10px
+    if (deltaY < -10) {
       console.log('Mouse swipe up triggered');
       handlers.onSwipeUp?.();
       return;
