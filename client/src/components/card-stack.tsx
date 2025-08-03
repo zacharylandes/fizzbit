@@ -109,7 +109,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         }
       }
 
-      // Create new stack
+      // Create new stack with simpler config
       const config = {
         allowedDirections: [
           Direction.LEFT,
@@ -117,13 +117,15 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
           Direction.UP
         ],
         throwOutConfidence: (xOffset: number, yOffset: number, element: HTMLElement) => {
-          const xConfidence = Math.min(Math.abs(xOffset) / element.offsetWidth, 1);
-          const yConfidence = Math.min(Math.abs(yOffset) / element.offsetHeight, 1);
-          return Math.max(xConfidence, yConfidence);
+          if (!element) return 0.5;
+          const width = element.offsetWidth || 300;
+          const height = element.offsetHeight || 400;
+          const xConfidence = Math.min(Math.abs(xOffset) / width, 1);
+          const yConfidence = Math.min(Math.abs(yOffset) / height, 1);
+          return Math.max(xConfidence, yConfidence, 0.5);
         },
-        rotation: (xOffset: number, yOffset: number, element: HTMLElement) => {
-          const maxRotation = 20;
-          return Math.max(Math.min(xOffset / element.offsetWidth * maxRotation, maxRotation), -maxRotation);
+        throwOutDistance: (xOffset: number, yOffset: number, element: HTMLElement) => {
+          return Math.sqrt(xOffset * xOffset + yOffset * yOffset);
         }
       };
 
@@ -169,11 +171,15 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       setTimeout(() => {
         cards.forEach(card => {
           const cardElement = cardRefs.current[card.id];
-          if (cardElement && stackRef.current) {
-            stackRef.current.createCard(cardElement);
+          if (cardElement && stackRef.current && cardElement.offsetWidth > 0) {
+            try {
+              stackRef.current.createCard(cardElement);
+            } catch (error) {
+              console.warn('Failed to create card:', error);
+            }
           }
         });
-      }, 100);
+      }, 150);
     }
   }, [cards, saveIdeaMutation, exploreIdeaMutation, toast, getRandomIdeasMutation]);
 
