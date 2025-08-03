@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Heart, Image, Type, Trash2 } from "lucide-react";
+import { Heart, Image, Type, Trash2 } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { type Idea } from "@shared/schema";
@@ -141,35 +141,19 @@ export default function SavedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {/* Header */}
-      <div className="border-b border-electric-blue/20 glass">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="glass border border-electric-purple/30 text-electric-purple hover:text-white hover:bg-electric-purple/20 transition-all duration-300"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
-                </Button>
-              </Link>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-electric-pink to-electric-cyan bg-clip-text text-transparent">Saved Ideas</h1>
-                <p className="text-white/70 text-sm">
-                  {savedIdeas.length} {savedIdeas.length === 1 ? 'idea' : 'ideas'} saved
-                </p>
-              </div>
-            </div>
-          </div>
+    <>
+      {/* Page Header */}
+      <div className="max-w-7xl mx-auto px-6 py-6">
+        <div>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-electric-pink to-electric-cyan bg-clip-text text-transparent mb-2">Saved Ideas</h1>
+          <p className="text-white/70 text-sm">
+            {savedIdeas.length} {savedIdeas.length === 1 ? 'idea' : 'ideas'} saved
+          </p>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 pb-8">
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -260,6 +244,6 @@ export default function SavedPage() {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }
