@@ -84,7 +84,7 @@ export default function CardStackMobile({ initialIdeas = [] }: CardStackMobilePr
         const newIdea: Idea = {
           id: Date.now().toString(),
           title: 'Another Great Idea',
-          description: 'Here\\'s another creative idea for you to explore.',
+          description: 'Here is another creative idea for you to explore.',
           source: 'text',
           createdAt: new Date().toISOString(),
         };

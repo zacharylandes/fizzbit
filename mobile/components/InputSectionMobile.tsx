@@ -100,8 +100,8 @@ export default function InputSectionMobile({ onIdeasGenerated }: InputSectionMob
               style={styles.textInput}
               value={textPrompt}
               onChangeText={setTextPrompt}
-              placeholder=\"Describe your inspiration or what you're looking for...\"
-              placeholderTextColor=\"#999\"
+              placeholder="Describe your inspiration or what you're looking for..."
+              placeholderTextColor="#999"
               multiline
               numberOfLines={4}
               editable={!isLoading}
