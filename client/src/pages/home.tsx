@@ -20,10 +20,10 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-coral via-teal to-sky-500">
-      {/* Header Section */}
+      {/* Header with Input Section */}
       <div className="relative pt-4 pb-2 px-4">
         <div className="flex items-center justify-between mb-3">
-          <h1 className="text-3xl font-bold text-white">Inspire Me</h1>
+          <h1 className="text-2xl font-bold text-white">Inspire Me</h1>
           <Button
             size="sm"
             className="bg-white/20 backdrop-blur-sm rounded-full p-3 text-white touch-target hover:bg-white/30"
@@ -37,16 +37,12 @@ export default function HomePage() {
           </Button>
         </div>
         
-        <p className="text-white/90 text-base font-medium mb-4">
-          Get creative ideas from your images or prompts
-        </p>
+        {/* Input Section moved into header */}
+        <InputSection onIdeasGenerated={handleIdeasGenerated} />
       </div>
 
-      {/* Input Section */}
-      <InputSection onIdeasGenerated={handleIdeasGenerated} />
-
       {/* Cards Section */}
-      <div className="px-4 pb-20 mt-4">
+      <div className="px-4 pb-20">
         <CardStack initialIdeas={currentIdeas} />
       </div>
 

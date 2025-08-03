@@ -93,7 +93,7 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
   const isLoading = generateFromTextMutation.isPending || generateFromImageMutation.isPending;
 
   return (
-    <div className="px-4 mb-4 relative z-10">
+    <div className="mb-4 relative z-10">
       <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl">
         <div className="flex flex-col gap-3 mb-4">
           {/* Image Upload Button */}
