@@ -169,6 +169,11 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
             exploreIdeaMutation.mutate(idea.id);
           }
 
+          // Clean up the card ref before removing from state
+          if (cardRefs.current[ideaId]) {
+            delete cardRefs.current[ideaId];
+          }
+
           // Remove card from state and fetch new ones
           const newCards = currentCards.filter(c => c.id !== ideaId);
           if (newCards.length <= 2) {
@@ -179,12 +184,19 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         });
       });
 
-      // Add all current cards to the stack
+      // Add all current cards to the stack with better validation
       setTimeout(() => {
         cards.forEach(card => {
           const cardElement = cardRefs.current[card.id];
-          if (cardElement && stackRef.current) {
-            stackRef.current.createCard(cardElement);
+          if (cardElement && cardElement.parentNode && stackRef.current) {
+            // Double check the element is still in the DOM
+            if (document.contains(cardElement)) {
+              try {
+                stackRef.current.createCard(cardElement);
+              } catch (error) {
+                console.warn('Failed to create Swing card:', error);
+              }
+            }
           }
         });
       }, 100);
