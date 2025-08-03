@@ -42,8 +42,13 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   useEffect(() => {
     if (initialIdeas.length > 0) {
       setCards(initialIdeas); // Use all initial ideas
-      // Reset exploration context when new ideas are provided
-      setCurrentExploreContext(null);
+      // Set exploration context from new ideas (photo/text prompt)
+      if (initialIdeas[0]?.sourceContent) {
+        setCurrentExploreContext({
+          originalPrompt: initialIdeas[0].sourceContent,
+          exploredIdea: initialIdeas[0]
+        });
+      }
       // Assign stable colors to initial cards
       const newColors: { [key: string]: number } = {};
       initialIdeas.forEach((card, index) => {
@@ -207,11 +212,11 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         const newCards = prev.filter(c => c.id !== ideaId);
         console.log('🎯 CARDS AFTER SWIPE - Remaining:', newCards.length);
         
-        // Smart prefetching: when we have 7 or fewer cards left
-        if (newCards.length <= 7) {
+        // Smart prefetching: when we have 5 or fewer cards left (more aggressive)
+        if (newCards.length <= 5) {
           console.log('🎯 PREFETCH CHECK - Cards left:', newCards.length, 'Explore context:', !!currentExploreContext);
           
-          // If we're in an exploration context, continue exploring with the most recent contextual idea
+          // If we're in an exploration context, always continue exploring
           if (currentExploreContext) {
             // Find the most recent idea that shares the same original prompt as our exploration context
             const contextualIdeas = newCards.filter(card => 
@@ -224,12 +229,12 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
               console.log('🎯 CONTINUING EXPLORATION - Based on most recent:', mostRecentContextualIdea.title);
               exploreIdeaMutation.mutate(mostRecentContextualIdea.id);
             } else {
-              // Fallback to the original explored idea if no contextual ideas remain
+              // Always fallback to the original explored idea to keep the context alive
               console.log('🎯 CONTINUING EXPLORATION - Fallback to original:', currentExploreContext.exploredIdea.title);
               exploreIdeaMutation.mutate(currentExploreContext.exploredIdea.id);
             }
           } else {
-            // Only fetch random ideas if we're not exploring
+            // Only fetch random ideas if we truly have no exploration context
             const excludeIds = newCards.map(c => c.id);
             console.log('🎯 FETCHING RANDOM - Excluding IDs:', excludeIds.length);
             getRandomIdeasMutation.mutate(excludeIds);
