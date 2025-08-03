@@ -143,7 +143,7 @@ export default function SavedPage() {
   return (
     <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Header */}
-      <div className="border-b border-border">
+      <div className="border-b border-electric-blue/20 glass">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -151,15 +151,15 @@ export default function SavedPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="glass border border-electric-purple/30 text-electric-purple hover:text-white hover:bg-electric-purple/20 transition-all duration-300"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back
                 </Button>
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Saved Ideas</h1>
-                <p className="text-muted-foreground text-sm">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-electric-pink to-electric-cyan bg-clip-text text-transparent">Saved Ideas</h1>
+                <p className="text-white/70 text-sm">
                   {savedIdeas.length} {savedIdeas.length === 1 ? 'idea' : 'ideas'} saved
                 </p>
               </div>
@@ -179,17 +179,20 @@ export default function SavedPage() {
           </div>
         ) : savedIdeas.length === 0 ? (
           <div className="text-center py-16">
-            <div className="bg-secondary/30 rounded-2xl p-12 max-w-md mx-auto">
-              <Heart className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <h2 className="text-xl font-semibold text-foreground mb-2">No saved ideas yet</h2>
-              <p className="text-muted-foreground mb-6">
-                Swipe right or up on ideas you love to save them here!
-              </p>
-              <Link href="/">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                  Start Exploring Ideas
-                </Button>
-              </Link>
+            <div className="bg-gradient-neon border border-electric-pink/30 rounded-2xl p-12 max-w-md mx-auto glow-electric-pink relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-aurora opacity-20 animate-pulse"></div>
+              <div className="relative z-10">
+                <Heart className="h-12 w-12 mx-auto mb-4 text-white animate-pulse" />
+                <h2 className="text-xl font-semibold text-white mb-2">No saved ideas yet</h2>
+                <p className="text-white/80 mb-6">
+                  Swipe right or up on ideas you love to save them here!
+                </p>
+                <Link href="/">
+                  <Button className="bg-gradient-electric text-white hover:scale-105 glow-electric-blue transition-all duration-300">
+                    Start Exploring Ideas
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         ) : (
@@ -207,19 +210,19 @@ export default function SavedPage() {
                   onTouchEnd={(e) => handleTouchEnd(e, idea.id)}
                   style={{ touchAction: 'pan-y' }}
                 >
-                  <Card className="bg-card border border-border shadow-sm relative overflow-hidden hover:shadow-md transition-shadow">
+                  <Card className="bg-gradient-cyber border border-electric-cyan/30 shadow-sm relative overflow-hidden hover:shadow-md transition-all duration-300 glow-electric-purple hover:scale-[1.02]">
                     {/* Swipe hint overlay */}
-                    <div className="absolute inset-0 bg-destructive/10 flex items-center justify-end pr-6 opacity-0 transition-opacity duration-200 hover:opacity-30">
-                      <Trash2 className="h-6 w-6 text-destructive" />
+                    <div className="absolute inset-0 glass bg-red-500/20 flex items-center justify-end pr-6 opacity-0 transition-opacity duration-200 hover:opacity-50">
+                      <Trash2 className="h-6 w-6 text-white" />
                     </div>
                     
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <CardTitle className="text-lg leading-tight mb-2 text-foreground">
+                          <CardTitle className="text-lg leading-tight mb-2 text-white">
                             {idea.title}
                           </CardTitle>
-                          <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                          <div className="flex items-center space-x-2 text-xs text-white/70">
                             {idea.source === 'image' ? (
                               <div className="flex items-center space-x-1">
                                 <Image className="h-3 w-3" />
@@ -232,21 +235,21 @@ export default function SavedPage() {
                               </div>
                             )}
                             {idea.parentIdeaId && (
-                              <span className="text-primary">• Explored idea</span>
+                              <span className="text-electric-yellow">• Explored idea</span>
                             )}
                           </div>
                         </div>
-                        <div className="w-3 h-3 rounded-full flex-shrink-0 ml-3 bg-primary" />
+                        <div className="w-3 h-3 rounded-full flex-shrink-0 ml-3 bg-white glow-electric-blue" />
                       </div>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <CardDescription className="text-muted-foreground leading-relaxed">
+                      <CardDescription className="text-white/80 leading-relaxed">
                         {idea.description}
                       </CardDescription>
                       {idea.sourceContent && idea.sourceContent !== "uploaded_image" && (
-                        <div className="mt-3 p-3 bg-secondary/30 rounded-lg">
-                          <p className="text-xs text-muted-foreground font-medium mb-1">Original inspiration:</p>
-                          <p className="text-xs text-foreground italic">"{idea.sourceContent}"</p>
+                        <div className="mt-3 p-3 glass border border-white/20 rounded-lg">
+                          <p className="text-xs text-white/70 font-medium mb-1">Original inspiration:</p>
+                          <p className="text-xs text-white italic">"{idea.sourceContent}"</p>
                         </div>
                       )}
                     </CardContent>

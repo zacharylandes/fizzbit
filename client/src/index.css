@@ -75,8 +75,19 @@ input, textarea {
   --ring: hsl(212, 12%, 87%);
   --radius: 0.75rem;
   
-  /* Modern accent colors */
-  --coral: hsl(220, 70%, 50%);
+  /* FrameKit-inspired vibrant colors */
+  --electric-blue: hsl(220, 100%, 66%);
+  --electric-purple: hsl(260, 100%, 70%);
+  --electric-pink: hsl(320, 100%, 75%);
+  --electric-cyan: hsl(180, 100%, 70%);
+  --electric-green: hsl(140, 100%, 65%);
+  --electric-orange: hsl(25, 100%, 65%);
+  --electric-yellow: hsl(50, 100%, 70%);
+  --neon-blue: hsl(200, 100%, 60%);
+  --neon-purple: hsl(280, 100%, 65%);
+  --neon-pink: hsl(330, 100%, 70%);
+  --neon-green: hsl(120, 100%, 60%);
+  --coral: hsl(15, 100%, 65%);
   --teal: hsl(180, 100%, 50%);
   --sky: hsl(200, 100%, 70%);
   --mint: hsl(140, 40%, 66%);
@@ -118,28 +129,100 @@ input, textarea {
 }
 
 @layer utilities {
-  .coral {
-    color: var(--coral);
+  /* Electric Colors */
+  .text-electric-blue { color: var(--electric-blue); }
+  .bg-electric-blue { background-color: var(--electric-blue); }
+  .border-electric-blue { border-color: var(--electric-blue); }
+  
+  .text-electric-purple { color: var(--electric-purple); }
+  .bg-electric-purple { background-color: var(--electric-purple); }
+  .border-electric-purple { border-color: var(--electric-purple); }
+  
+  .text-electric-pink { color: var(--electric-pink); }
+  .bg-electric-pink { background-color: var(--electric-pink); }
+  .border-electric-pink { border-color: var(--electric-pink); }
+  
+  .text-electric-cyan { color: var(--electric-cyan); }
+  .bg-electric-cyan { background-color: var(--electric-cyan); }
+  .border-electric-cyan { border-color: var(--electric-cyan); }
+  
+  .text-electric-green { color: var(--electric-green); }
+  .bg-electric-green { background-color: var(--electric-green); }
+  .border-electric-green { border-color: var(--electric-green); }
+  
+  .text-electric-orange { color: var(--electric-orange); }
+  .bg-electric-orange { background-color: var(--electric-orange); }
+  .border-electric-orange { border-color: var(--electric-orange); }
+  
+  /* Neon Colors */
+  .text-neon-blue { color: var(--neon-blue); }
+  .bg-neon-blue { background-color: var(--neon-blue); }
+  .border-neon-blue { border-color: var(--neon-blue); }
+  
+  .text-neon-purple { color: var(--neon-purple); }
+  .bg-neon-purple { background-color: var(--neon-purple); }
+  .border-neon-purple { border-color: var(--neon-purple); }
+  
+  .text-neon-pink { color: var(--neon-pink); }
+  .bg-neon-pink { background-color: var(--neon-pink); }
+  .border-neon-pink { border-color: var(--neon-pink); }
+  
+  .text-neon-green { color: var(--neon-green); }
+  .bg-neon-green { background-color: var(--neon-green); }
+  .border-neon-green { border-color: var(--neon-green); }
+  
+  /* Original Colors */
+  .coral { color: var(--coral); }
+  .bg-coral { background-color: var(--coral); }
+  .from-coral { --tw-gradient-from: var(--coral); }
+  .to-coral { --tw-gradient-to: var(--coral); }
+  .border-coral { border-color: var(--coral); }
+  .text-coral { color: var(--coral); }
+  
+  /* Vibrant Gradients */
+  .bg-gradient-electric {
+    background: linear-gradient(135deg, var(--electric-blue), var(--electric-purple));
   }
   
-  .bg-coral {
-    background-color: var(--coral);
+  .bg-gradient-neon {
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-blue));
   }
   
-  .from-coral {
-    --tw-gradient-from: var(--coral);
+  .bg-gradient-cyber {
+    background: linear-gradient(135deg, var(--electric-cyan), var(--electric-green));
   }
   
-  .to-coral {
-    --tw-gradient-to: var(--coral);
+  .bg-gradient-sunset {
+    background: linear-gradient(135deg, var(--electric-orange), var(--electric-pink));
   }
   
-  .border-coral {
-    border-color: var(--coral);
+  .bg-gradient-aurora {
+    background: linear-gradient(135deg, var(--electric-purple), var(--electric-cyan), var(--electric-pink));
   }
   
-  .text-coral {
-    color: var(--coral);
+  /* Glass effect */
+  .glass {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Glow effects */
+  .glow-electric-blue {
+    box-shadow: 0 0 20px rgba(56, 139, 253, 0.5);
+  }
+  
+  .glow-electric-purple {
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+  }
+  
+  .glow-electric-pink {
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
+  }
+  
+  .hover-glow:hover {
+    box-shadow: 0 0 30px rgba(56, 139, 253, 0.6);
+    transition: box-shadow 0.3s ease;
   }
 
   .card-stack {
