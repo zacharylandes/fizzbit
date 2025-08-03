@@ -192,20 +192,14 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     // After animation completes, handle the action
     setTimeout(() => {
       if (direction === 'right') {
-        // Save
+        // Right swipe: Save idea and continue
         saveIdeaMutation.mutate(idea.id);
       } else if (direction === 'up') {
-        // Explore - set this as the new exploration context
-        if (idea.sourceContent) {
-          console.log('🎯 SETTING EXPLORE CONTEXT - Prompt:', idea.sourceContent, 'Idea:', idea.title);
-          setCurrentExploreContext({
-            originalPrompt: idea.sourceContent,
-            exploredIdea: idea
-          });
-        }
+        // Up swipe: Save idea AND generate new ideas combining this idea with original prompt
         saveIdeaMutation.mutate(idea.id);
         exploreIdeaMutation.mutate(idea.id);
       }
+      // Left swipe: Just dismiss (no action needed)
 
       // Remove card from state and check if we need more cards
       setCards(prev => {

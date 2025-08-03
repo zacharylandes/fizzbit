@@ -48,11 +48,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         messages: [
           {
             role: "system",
-            content: "You are a creative inspiration assistant. Generate unique, actionable creative ideas based on user prompts. Respond with JSON containing an array of 3 ideas, each with 'title' and 'description' fields. Make descriptions engaging and specific."
+            content: "You are a creative inspiration assistant. Generate unique, actionable creative ideas based on user prompts. Respond with JSON containing an array of 10 ideas, each with 'title' and 'description' fields. Make descriptions engaging and specific."
           },
           {
             role: "user",
-            content: `Generate 3 creative ideas inspired by: ${prompt}`
+            content: `Generate 10 creative ideas inspired by: ${prompt}`
           }
         ],
         response_format: { type: "json_object" }
@@ -147,7 +147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             content: [
               {
                 type: "text",
-                text: "Analyze this image and generate 3 creative ideas inspired by what you see. Focus on colors, objects, themes, and mood. Respond with JSON containing an array of ideas, each with 'title' and 'description' fields."
+                text: "Analyze this image and generate 10 creative ideas inspired by what you see. Focus on colors, objects, themes, and mood. Respond with JSON containing an array of ideas, each with 'title' and 'description' fields."
               },
               {
                 type: "image_url",
