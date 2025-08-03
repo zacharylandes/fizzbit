@@ -105,41 +105,41 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     const idea = cards.find(c => c.id === ideaId);
     if (!idea) return;
 
+    // Immediately remove card from state to trigger position updates
+    setCards(prev => {
+      const newCards = prev.filter(c => c.id !== ideaId);
+      if (newCards.length <= 2) {
+        const excludeIds = newCards.map(c => c.id);
+        getRandomIdeasMutation.mutate(excludeIds);
+      }
+      return newCards;
+    });
+
     // Start animation
     setAnimatingCards(prev => ({
       ...prev,
       [ideaId]: { direction, isAnimating: true }
     }));
 
-    // After animation completes, handle the action
-    setTimeout(() => {
-      if (direction === 'left') {
-        // Dismiss
-        toast({
-          title: "Idea Dismissed", 
-          description: "Bringing you a fresh idea!",
-          duration: 2000,
-        });
-      } else if (direction === 'right') {
-        // Save
-        saveIdeaMutation.mutate(idea.id);
-      } else if (direction === 'up') {
-        // Explore
-        saveIdeaMutation.mutate(idea.id);
-        exploreIdeaMutation.mutate(idea.id);
-      }
-
-      // Remove card from state and fetch new ones
-      setCards(prev => {
-        const newCards = prev.filter(c => c.id !== ideaId);
-        if (newCards.length <= 2) {
-          const excludeIds = newCards.map(c => c.id);
-          getRandomIdeasMutation.mutate(excludeIds);
-        }
-        return newCards;
+    // Handle the action
+    if (direction === 'left') {
+      // Dismiss
+      toast({
+        title: "Idea Dismissed", 
+        description: "Bringing you a fresh idea!",
+        duration: 2000,
       });
+    } else if (direction === 'right') {
+      // Save
+      saveIdeaMutation.mutate(idea.id);
+    } else if (direction === 'up') {
+      // Explore
+      saveIdeaMutation.mutate(idea.id);
+      exploreIdeaMutation.mutate(idea.id);
+    }
 
-      // Clear animation state
+    // Clear animation state after animation completes
+    setTimeout(() => {
       setAnimatingCards(prev => {
         const newState = { ...prev };
         delete newState[ideaId];
@@ -232,7 +232,6 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
               onTouchEnd={(e) => handleTouchEnd(e, card.id)}
             >
               <IdeaCard
-                key={`${card.id}-${index}`}
                 idea={card}
                 position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
               />
