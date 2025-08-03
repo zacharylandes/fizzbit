@@ -1,11 +1,15 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
 import { type Idea } from "@shared/schema";
 import { IdeaCard } from "./idea-card";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectCards } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/effect-cards';
+import type { Swiper as SwiperType } from 'swiper';
 
 interface CardStackProps {
   initialIdeas?: Idea[];
@@ -13,7 +17,7 @@ interface CardStackProps {
 
 export function CardStack({ initialIdeas = [] }: CardStackProps) {
   const [cards, setCards] = useState<Idea[]>(initialIdeas);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const swiperRef = useRef<SwiperType | null>(null);
   const { toast } = useToast();
 
   // Fetch random ideas if no initial ideas provided
@@ -46,6 +50,10 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         description: "The idea has been added to your saved collection.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/ideas/saved"] });
+      // Move to next card
+      if (swiperRef.current) {
+        swiperRef.current.slideNext();
+      }
     },
     onError: () => {
       toast({
@@ -64,15 +72,16 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     },
     onSuccess: (data) => {
       if (data.ideas && data.ideas.length > 0) {
-        // Add one related idea to the bottom of the stack
-        setCards(prev => {
-          const newCards = [...prev, data.ideas[0]];
-          return newCards.slice(0, 3); // Keep only 3 cards max
-        });
+        // Add related ideas to the end of the stack
+        setCards(prev => [...prev, ...data.ideas]);
         toast({
           title: "New Ideas Generated!",
           description: "Explore more creative variations based on your interest.",
         });
+        // Move to next card
+        if (swiperRef.current) {
+          swiperRef.current.slideNext();
+        }
       }
     },
     onError: () => {
@@ -93,92 +102,40 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     },
     onSuccess: (data) => {
       if (data.ideas && data.ideas.length > 0) {
-        // Add new card to fill the stack back to 3 cards
-        setCards(prev => {
-          const newCards = [...prev, data.ideas[0]];
-          return newCards.slice(0, 3); // Keep only 3 cards max
-        });
+        // Add new cards to the end
+        setCards(prev => [...prev, ...data.ideas]);
       }
     },
   });
 
-  const handleSwipeLeft = (index: number) => {
-    // Only allow swiping the top card for smooth animations
-    if (index !== 0 || isAnimating) return;
-    
-    setIsAnimating(true);
-    
-    // Immediate card update to trigger position animations
-    setCards(prev => {
-      const newCards = prev.slice(1); // Remove top card
-      return newCards;
-    });
-    
-    // Get new idea after animation completes
-    setTimeout(() => {
-      const excludeIds = cards.slice(1).map(c => c.id);
+  const handleCardAction = (action: 'dismiss' | 'save' | 'explore', card: Idea) => {
+    switch (action) {
+      case 'dismiss':
+        toast({
+          title: "Idea Dismissed",
+          description: "Bringing you a fresh idea!",
+        });
+        if (swiperRef.current) {
+          swiperRef.current.slideNext();
+        }
+        break;
+      case 'save':
+        saveIdeaMutation.mutate(card.id);
+        break;
+      case 'explore':
+        saveIdeaMutation.mutate(card.id);
+        exploreIdeaMutation.mutate(card.id);
+        break;
+    }
+  };
+
+  const handleSlideChange = () => {
+    // When we're running low on cards, fetch more
+    const currentIndex = swiperRef.current?.realIndex || 0;
+    if (cards.length - currentIndex <= 2) {
+      const excludeIds = cards.map(c => c.id);
       getRandomIdeasMutation.mutate(excludeIds);
-      setIsAnimating(false);
-    }, 400);
-    
-    toast({
-      title: "Idea Dismissed",
-      description: "Bringing you a fresh idea!",
-    });
-  };
-
-  const handleSwipeRight = (index: number) => {
-    // Only allow swiping the top card for smooth animations
-    if (index !== 0 || isAnimating) return;
-    
-    const currentCard = cards[index];
-    if (currentCard) {
-      setIsAnimating(true);
-      saveIdeaMutation.mutate(currentCard.id);
-      
-      // Immediate card update to trigger position animations
-      setCards(prev => {
-        const newCards = prev.slice(1); // Remove top card
-        return newCards;
-      });
-      
-      // Get new idea after animation completes
-      setTimeout(() => {
-        const excludeIds = cards.slice(1).map(c => c.id);
-        getRandomIdeasMutation.mutate(excludeIds);
-        setIsAnimating(false);
-      }, 400);
     }
-  };
-
-  const handleSwipeUp = (index: number) => {
-    console.log('handleSwipeUp called with index:', index);
-    // Only allow swiping the top card for smooth animations
-    if (index !== 0 || isAnimating) return;
-    
-    const currentCard = cards[index];
-    console.log('Current card for swipe up:', currentCard);
-    if (currentCard) {
-      setIsAnimating(true);
-      saveIdeaMutation.mutate(currentCard.id);
-      
-      // Immediate card update to trigger position animations
-      setCards(prev => {
-        const newCards = prev.slice(1); // Remove top card
-        return newCards;
-      });
-      
-      // Generate related idea after animation completes
-      setTimeout(() => {
-        exploreIdeaMutation.mutate(currentCard.id);
-        setIsAnimating(false);
-      }, 400);
-    }
-    
-    toast({
-      title: "Exploring Similar Ideas",
-      description: "Generating variations based on this concept...",
-    });
   };
 
   if (cards.length === 0) {
@@ -193,35 +150,45 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   }
 
   return (
-    <div className="relative h-[280px] sm:h-[320px] card-stack">
+    <div className="relative h-[280px] sm:h-[320px] w-full max-w-[300px] mx-auto">
       {/* Swipe Instructions */}
-      <div className="absolute -top-12 sm:-top-16 left-0 right-0 flex justify-center px-4">
-        <motion.div 
-          className="bg-white/90 backdrop-blur-sm rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700"
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
+      <div className="absolute -top-12 sm:-top-16 left-0 right-0 flex justify-center px-4 z-50">
+        <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700">
           <span className="text-coral mr-2">👆</span>
           Swipe to interact
-        </motion.div>
+        </div>
       </div>
 
-      {/* Render cards - each card positions itself absolutely */}
-      <div className="relative w-full h-full">
-        {cards.slice(0, 3).map((card, index) => {
-          const position = index === 0 ? "top" : index === 1 ? "middle" : "bottom";
-          return (
+      {/* Swiper Card Stack */}
+      <Swiper
+        effect="cards"
+        grabCursor={true}
+        modules={[EffectCards]}
+        className="w-full h-full"
+        cardsEffect={{
+          perSlideOffset: 8,
+          perSlideRotate: 2,
+          rotate: true,
+          slideShadows: true,
+        }}
+        speed={500}
+        onSwiper={(swiper) => {
+          swiperRef.current = swiper;
+        }}
+        onSlideChange={handleSlideChange}
+      >
+        {cards.map((card, index) => (
+          <SwiperSlide key={card.id}>
             <IdeaCard
-              key={card.id}
               idea={card}
-              position={position}
-              onSwipeLeft={() => handleSwipeLeft(index)}
-              onSwipeRight={() => handleSwipeRight(index)}
-              onSwipeUp={() => handleSwipeUp(index)}
+              position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
+              onSwipeLeft={() => handleCardAction('dismiss', card)}
+              onSwipeRight={() => handleCardAction('save', card)}
+              onSwipeUp={() => handleCardAction('explore', card)}
             />
-          );
-        })}
-      </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </div>
   );
 }
