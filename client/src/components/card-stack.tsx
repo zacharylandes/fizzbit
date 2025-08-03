@@ -220,7 +220,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
           return (
             <div
-              key={card.id}
+              key={`${card.id}-${index}`}
               ref={(el) => {
                 if (el) cardRefs.current[card.id] = el;
               }}
