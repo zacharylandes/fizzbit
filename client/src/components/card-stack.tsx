@@ -5,7 +5,6 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Stack, Direction } from 'swing';
 
 interface CardStackProps {
   initialIdeas?: Idea[];
@@ -13,8 +12,8 @@ interface CardStackProps {
 
 export function CardStack({ initialIdeas = [] }: CardStackProps) {
   const [cards, setCards] = useState<Idea[]>(initialIdeas);
-  const stackRef = useRef<any>(null);
   const cardRefs = useRef<{ [key: string]: HTMLElement }>({});
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const { toast } = useToast();
 
   // Fetch random ideas if no initial ideas provided
@@ -97,91 +96,74 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     },
   });
 
-  // Recreate Swing stack whenever cards change
-  useEffect(() => {
-    if (cards.length > 0) {
-      // Clear existing stack
-      if (stackRef.current) {
-        try {
-          stackRef.current.off('throwout');
-        } catch (e) {
-          // Ignore errors when clearing
-        }
-      }
+  const handleSwipe = (ideaId: string, direction: 'left' | 'right' | 'up') => {
+    const idea = cards.find(c => c.id === ideaId);
+    if (!idea) return;
 
-      // Create new stack with simpler config
-      const config = {
-        allowedDirections: [
-          Direction.LEFT,
-          Direction.RIGHT, 
-          Direction.UP
-        ],
-        throwOutConfidence: (xOffset: number, yOffset: number, element: HTMLElement) => {
-          if (!element) return 0.5;
-          const width = element.offsetWidth || 300;
-          const height = element.offsetHeight || 400;
-          const xConfidence = Math.min(Math.abs(xOffset) / width, 1);
-          const yConfidence = Math.min(Math.abs(yOffset) / height, 1);
-          return Math.max(xConfidence, yConfidence, 0.5);
-        },
-        throwOutDistance: (xOffset: number, yOffset: number, element: HTMLElement) => {
-          return Math.sqrt(xOffset * xOffset + yOffset * yOffset);
-        }
-      };
-
-      stackRef.current = Stack(config);
-
-      // Add throwout event listener
-      stackRef.current.on('throwout', (eventObject: any) => {
-        const direction = eventObject.throwDirection;
-        const cardElement = eventObject.target;
-        const ideaId = cardElement.dataset.ideaId;
-        
-        // Find the idea from current cards state
-        setCards(currentCards => {
-          const idea = currentCards.find(c => c.id === ideaId);
-          if (!idea) return currentCards;
-
-          if (direction === Direction.LEFT) {
-            // Dismiss
-            toast({
-              title: "Idea Dismissed",
-              description: "Bringing you a fresh idea!",
-            });
-          } else if (direction === Direction.RIGHT) {
-            // Save
-            saveIdeaMutation.mutate(idea.id);
-          } else if (direction === Direction.UP) {
-            // Explore
-            saveIdeaMutation.mutate(idea.id);
-            exploreIdeaMutation.mutate(idea.id);
-          }
-
-          // Remove card from state and fetch new ones
-          const newCards = currentCards.filter(c => c.id !== ideaId);
-          if (newCards.length <= 2) {
-            const excludeIds = newCards.map(c => c.id);
-            getRandomIdeasMutation.mutate(excludeIds);
-          }
-          return newCards;
-        });
+    if (direction === 'left') {
+      // Dismiss
+      toast({
+        title: "Idea Dismissed",
+        description: "Bringing you a fresh idea!",
       });
-
-      // Add all current cards to the stack
-      setTimeout(() => {
-        cards.forEach(card => {
-          const cardElement = cardRefs.current[card.id];
-          if (cardElement && stackRef.current && cardElement.offsetWidth > 0) {
-            try {
-              stackRef.current.createCard(cardElement);
-            } catch (error) {
-              console.warn('Failed to create card:', error);
-            }
-          }
-        });
-      }, 150);
+    } else if (direction === 'right') {
+      // Save
+      saveIdeaMutation.mutate(idea.id);
+    } else if (direction === 'up') {
+      // Explore
+      saveIdeaMutation.mutate(idea.id);
+      exploreIdeaMutation.mutate(idea.id);
     }
-  }, [cards, saveIdeaMutation, exploreIdeaMutation, toast, getRandomIdeasMutation]);
+
+    // Remove card from state and fetch new ones
+    setCards(prev => {
+      const newCards = prev.filter(c => c.id !== ideaId);
+      if (newCards.length <= 2) {
+        const excludeIds = newCards.map(c => c.id);
+        getRandomIdeasMutation.mutate(excludeIds);
+      }
+      return newCards;
+    });
+  };
+
+  const handleTouchStart = (e: React.TouchEvent, ideaId: string) => {
+    const touch = e.touches[0];
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now()
+    };
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent, ideaId: string) => {
+    if (!touchStartRef.current) return;
+
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+    const deltaTime = Date.now() - touchStartRef.current.time;
+
+    // Only process quick swipes
+    if (deltaTime > 500) return;
+
+    const threshold = 80;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+
+    if (absX > threshold && absX > absY) {
+      // Horizontal swipe
+      if (deltaX > 0) {
+        handleSwipe(ideaId, 'right');
+      } else {
+        handleSwipe(ideaId, 'left');
+      }
+    } else if (absY > threshold && absY > absX && deltaY < 0) {
+      // Upward swipe
+      handleSwipe(ideaId, 'up');
+    }
+
+    touchStartRef.current = null;
+  };
 
   if (cards.length === 0) {
     return (
@@ -204,7 +186,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         </div>
       </div>
 
-      {/* Swing Card Stack */}
+      {/* Touch Card Stack */}
       <div className="relative w-full h-full">
         {cards.slice(0, 3).map((card, index) => (
           <div
@@ -212,11 +194,12 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
             ref={(el) => {
               if (el) cardRefs.current[card.id] = el;
             }}
-            data-idea-id={card.id}
-            className="absolute inset-0 cursor-grab"
+            className="absolute inset-0 cursor-grab touch-pan-x touch-pan-y"
             style={{
               zIndex: 3 - index, // Top card has highest z-index
             }}
+            onTouchStart={(e) => handleTouchStart(e, card.id)}
+            onTouchEnd={(e) => handleTouchEnd(e, card.id)}
           >
             <IdeaCard
               idea={card}
