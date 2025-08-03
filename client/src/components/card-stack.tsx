@@ -189,6 +189,12 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     };
   };
 
+  const handleTouchMove = (e: React.TouchEvent, ideaId: string) => {
+    // Prevent page scrolling during swipe
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   const handleTouchEnd = (e: React.TouchEvent, ideaId: string) => {
     if (!touchStartRef.current) return;
 
@@ -272,11 +278,13 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
               ref={(el) => {
                 if (el) cardRefs.current[card.id] = el;
               }}
-              className={`absolute inset-0 cursor-grab touch-pan-x touch-pan-y transition-transform duration-300 ease-out ${animationClass}`}
+              className={`absolute inset-0 cursor-grab transition-transform duration-300 ease-out ${animationClass}`}
               style={{
                 zIndex: 3 - index, // Top card has highest z-index
+                touchAction: 'none', // Disable all browser touch behaviors
               }}
               onTouchStart={(e) => handleTouchStart(e, card.id)}
+              onTouchMove={(e) => handleTouchMove(e, card.id)}
               onTouchEnd={(e) => handleTouchEnd(e, card.id)}
             >
               <IdeaCard
