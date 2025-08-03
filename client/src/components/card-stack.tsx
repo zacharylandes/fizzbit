@@ -130,6 +130,8 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     const idea = cards.find(c => c.id === ideaId);
     if (!idea) return;
 
+    console.log('HANDLE SWIPE:', direction, ideaId);
+
     // Start animation
     setAnimatingCards(prev => ({
       ...prev,
@@ -200,16 +202,24 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     const absX = Math.abs(deltaX);
     const absY = Math.abs(deltaY);
 
+    // Debug logging
+    console.log('Touch end:', { deltaX, deltaY, absX, absY, threshold });
+    
     if (absY > threshold && deltaY < 0) {
       // Upward swipe - prioritize this first
+      console.log('UP SWIPE DETECTED');
       handleSwipe(ideaId, 'up');
     } else if (absX > threshold) {
       // Horizontal swipe
       if (deltaX > 0) {
+        console.log('RIGHT SWIPE DETECTED');
         handleSwipe(ideaId, 'right');
       } else {
+        console.log('LEFT SWIPE DETECTED');
         handleSwipe(ideaId, 'left');
       }
+    } else {
+      console.log('NO SWIPE DETECTED');
     }
 
     touchStartRef.current = null;
