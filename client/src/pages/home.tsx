@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function HomePage() {
   const [currentIdeas, setCurrentIdeas] = useState<Idea[]>([]);
+  const [currentPrompt, setCurrentPrompt] = useState<string>("");
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
 
@@ -35,6 +36,16 @@ export default function HomePage() {
 
   const handleIdeasGenerated = (ideas: Idea[]) => {
     setCurrentIdeas(ideas);
+  };
+
+  const handlePromptChange = (prompt: string) => {
+    setCurrentPrompt(prompt);
+  };
+
+  const handleSwipeUpPrompt = (ideaContent: string) => {
+    // Set the swiped idea as the new prompt and generate new ideas
+    setCurrentPrompt(ideaContent);
+    // The InputSection will handle the actual idea generation
   };
 
   if (isLoading) {
@@ -68,7 +79,11 @@ export default function HomePage() {
           
           {/* Input Section */}
           <div className="mb-8">
-            <InputSection onIdeasGenerated={handleIdeasGenerated} />
+            <InputSection 
+              onIdeasGenerated={handleIdeasGenerated}
+              promptValue={currentPrompt}
+              onPromptChange={handlePromptChange}
+            />
           </div>
         </div>
       ) : null}
@@ -76,7 +91,10 @@ export default function HomePage() {
       {/* Cards Section */}
       {isAuthenticated && (
         <div className="max-w-7xl mx-auto px-6 pb-20">
-          <CardStack initialIdeas={currentIdeas} />
+          <CardStack 
+            initialIdeas={currentIdeas} 
+            onSwipeUpPrompt={handleSwipeUpPrompt}
+          />
         </div>
       )}
     </>

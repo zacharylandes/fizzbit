@@ -9,9 +9,10 @@ import { Sparkles, Image, Type, ArrowUp } from "lucide-react";
 
 interface CardStackProps {
   initialIdeas?: Idea[];
+  onSwipeUpPrompt?: (ideaContent: string) => void;
 }
 
-export function CardStack({ initialIdeas = [] }: CardStackProps) {
+export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps) {
   const [cards, setCards] = useState<Idea[]>(initialIdeas);
   const [animatingCards, setAnimatingCards] = useState<{ [key: string]: { direction: string; isAnimating: boolean } }>({});
   const [refreshKey, setRefreshKey] = useState(0);
@@ -179,9 +180,16 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         // Right swipe: Save idea and continue
         saveIdeaMutation.mutate(idea.id);
       } else if (direction === 'up') {
-        // Up swipe: Save idea AND generate new ideas combining this idea with original prompt
+        // Up swipe: Save idea AND use this idea as the new prompt
         saveIdeaMutation.mutate(idea.id);
-        exploreIdeaMutation.mutate(idea.id);
+        
+        // Use the idea's title as the new prompt and clear current cards
+        if (onSwipeUpPrompt) {
+          onSwipeUpPrompt(idea.title);
+          // Clear current cards to start fresh with new prompt
+          setCards([]);
+          setCurrentExploreContext(null);
+        }
       }
       // Left swipe: Just dismiss (no action needed)
 

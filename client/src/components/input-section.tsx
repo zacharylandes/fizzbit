@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Camera, Edit, Upload, Sparkles } from "lucide-react";
@@ -9,11 +9,13 @@ import { type Idea } from "@shared/schema";
 
 interface InputSectionProps {
   onIdeasGenerated: (ideas: Idea[]) => void;
+  promptValue?: string;
+  onPromptChange?: (prompt: string) => void;
 }
 
-export function InputSection({ onIdeasGenerated }: InputSectionProps) {
+export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChange }: InputSectionProps) {
   const [showTextInput, setShowTextInput] = useState(false);
-  const [textPrompt, setTextPrompt] = useState("");
+  const [textPrompt, setTextPrompt] = useState(promptValue);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -29,6 +31,7 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
       if (data.ideas) {
         onIdeasGenerated(data.ideas);
         setTextPrompt("");
+        onPromptChange?.("");
         toast({
           title: "Ideas Generated!",
           description: "Fresh creativity from your prompt ✨",
@@ -138,6 +141,21 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
     }
   };
 
+  const handleTextPromptChange = (value: string) => {
+    setTextPrompt(value);
+    onPromptChange?.(value);
+  };
+
+  // Update local state when controlled value changes
+  useEffect(() => {
+    setTextPrompt(promptValue);
+    if (promptValue) {
+      setShowTextInput(true);
+      // Auto-generate ideas when prompt is set externally (from swipe up)
+      generateFromTextMutation.mutate(promptValue);
+    }
+  }, [promptValue]);
+
   const isLoading = generateFromTextMutation.isPending || generateFromImageMutation.isPending;
 
   return (
@@ -180,7 +198,7 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
           <div className="mt-2 space-y-2">
             <Textarea 
               value={textPrompt}
-              onChange={(e) => setTextPrompt(e.target.value)}
+              onChange={(e) => handleTextPromptChange(e.target.value)}
               className="w-full h-20 p-3 glass border border-electric-blue/30 rounded-lg focus:border-electric-blue focus:outline-none resize-none text-sm text-white placeholder:text-white/50" 
               placeholder="Describe your inspiration..."
               disabled={isLoading}
