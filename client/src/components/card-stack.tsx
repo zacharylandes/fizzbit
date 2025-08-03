@@ -196,20 +196,20 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     // Only process quick swipes
     if (deltaTime > 500) return;
 
-    const threshold = 80;
+    const threshold = 60; // Lower threshold for better sensitivity
     const absX = Math.abs(deltaX);
     const absY = Math.abs(deltaY);
 
-    if (absX > threshold && absX > absY) {
-      // Horizontal swipe - more horizontal than vertical
+    if (absY > threshold && deltaY < 0) {
+      // Upward swipe - prioritize this first
+      handleSwipe(ideaId, 'up');
+    } else if (absX > threshold) {
+      // Horizontal swipe
       if (deltaX > 0) {
         handleSwipe(ideaId, 'right');
       } else {
         handleSwipe(ideaId, 'left');
       }
-    } else if (absY > threshold && absY > absX && deltaY < 0) {
-      // Upward swipe - more vertical than horizontal
-      handleSwipe(ideaId, 'up');
     }
 
     touchStartRef.current = null;
