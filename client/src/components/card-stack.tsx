@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import * as Swing from 'swing';
+import { Stack, Direction } from 'swing';
 
 interface CardStackProps {
   initialIdeas?: Idea[];
@@ -114,9 +114,9 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     if (cards.length > 0 && !stackRef.current) {
       const config = {
         allowedDirections: [
-          (Swing as any).Direction.LEFT,
-          (Swing as any).Direction.RIGHT, 
-          (Swing as any).Direction.UP
+          Direction.LEFT,
+          Direction.RIGHT, 
+          Direction.UP
         ],
         throwOutConfidence: (xOffset: number, yOffset: number, element: HTMLElement) => {
           const xConfidence = Math.min(Math.abs(xOffset) / element.offsetWidth, 1);
@@ -129,7 +129,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         }
       };
 
-      stackRef.current = (Swing as any).Stack(config);
+      stackRef.current = Stack(config);
 
       // Add throwout event listener
       stackRef.current.on('throwout', (eventObject: any) => {
@@ -140,16 +140,16 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         
         if (!idea) return;
 
-        if (direction === (Swing as any).Direction.LEFT) {
+        if (direction === Direction.LEFT) {
           // Dismiss
           toast({
             title: "Idea Dismissed",
             description: "Bringing you a fresh idea!",
           });
-        } else if (direction === (Swing as any).Direction.RIGHT) {
+        } else if (direction === Direction.RIGHT) {
           // Save
           saveIdeaMutation.mutate(idea.id);
-        } else if (direction === (Swing as any).Direction.UP) {
+        } else if (direction === Direction.UP) {
           // Explore
           saveIdeaMutation.mutate(idea.id);
           exploreIdeaMutation.mutate(idea.id);
