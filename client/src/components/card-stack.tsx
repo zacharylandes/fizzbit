@@ -62,8 +62,8 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to save the idea. Please try again.",
+        title: "Oops!",
+        description: "Couldn't save that idea. Try again?",
         variant: "destructive",
         duration: 1000,
       });
@@ -84,8 +84,8 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to generate related ideas. Please try again.",
+        title: "Hmm...",
+        description: "Couldn't explore that idea. Give it another try!",
         variant: "destructive",
         duration: 1000,
       });
@@ -134,18 +134,21 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         title: "Idea Dismissed", 
         description: "Bringing you a fresh idea!",
         duration: 1000,
+        variant: "info",
       });
     } else if (direction === 'right') {
       toast({
         title: "Idea Saved!",
-        description: "Added to your saved collection.",
+        description: "Added to your collection ❤️",
         duration: 1000,
+        variant: "save",
       });
     } else if (direction === 'up') {
       toast({
         title: "Exploring Idea!",
-        description: "Generating related creative concepts...",
+        description: "Generating creative variations ✨",
         duration: 1000,
+        variant: "explore",
       });
     }
 

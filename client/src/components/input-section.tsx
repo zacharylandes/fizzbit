@@ -31,15 +31,16 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
         setTextPrompt("");
         toast({
           title: "Ideas Generated!",
-          description: "Fresh creative ideas based on your prompt.",
+          description: "Fresh creativity from your prompt ✨",
           duration: 1000,
+          variant: "success",
         });
       }
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to generate ideas. Please try again.",
+        title: "Oops!",
+        description: "Couldn't generate ideas. Try again?",
         variant: "destructive",
         duration: 1000,
       });
@@ -59,15 +60,16 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
         onIdeasGenerated(data.ideas);
         toast({
           title: "Ideas Generated!",
-          description: "Creative ideas inspired by your image.",
+          description: "Creative magic from your image 🎨",
           duration: 1000,
+          variant: "success",
         });
       }
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to analyze image. Please try again.",
+        title: "Hmm...",
+        description: "Couldn't analyze that image. Try another?",
         variant: "destructive",
         duration: 1000,
       });
