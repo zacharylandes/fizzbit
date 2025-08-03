@@ -224,7 +224,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
           return (
             <div
-              key={`${card.id}-${refreshKey}`}
+              key={card.id}
               ref={(el) => {
                 if (el) cardRefs.current[card.id] = el;
               }}
@@ -236,6 +236,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
               onTouchEnd={(e) => handleTouchEnd(e, card.id)}
             >
               <IdeaCard
+                key={`${card.id}-${index}-${refreshKey}`}
                 idea={card}
                 position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
               />
