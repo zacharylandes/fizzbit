@@ -109,11 +109,10 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     // Delay card removal to allow exit animation
     setTimeout(() => {
       setCards(prev => {
-        // Remove top card and add new card at the end
+        // Remove top card - remaining cards will automatically move up
         const newCards = prev.slice(1);
         return newCards;
       });
-      setStackVersion(prev => prev + 1);
       
       // Get new idea to fill the stack back to 3 cards
       const excludeIds = cards.slice(1).map(c => c.id);
@@ -137,11 +136,10 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       
       setTimeout(() => {
         setCards(prev => {
-          // Remove top card
+          // Remove top card - remaining cards will automatically move up
           const newCards = prev.slice(1);
           return newCards;
         });
-        setStackVersion(prev => prev + 1);
         
         // Get new idea to fill the stack back to 3 cards
         const excludeIds = cards.slice(1).map(c => c.id);
@@ -165,11 +163,10 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       // Delay card removal to allow exit animation
       setTimeout(() => {
         setCards(prev => {
-          // Remove top card
+          // Remove top card - remaining cards will automatically move up
           const newCards = prev.slice(1);
           return newCards;
         });
-        setStackVersion(prev => prev + 1);
       }, 250); // Match animation duration
       
       // Generate one related idea to add at the bottom
@@ -214,7 +211,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
           const position = originalIndex === 0 ? "top" : originalIndex === 1 ? "middle" : "bottom";
           return (
             <IdeaCard
-              key={`${stackVersion}-${originalIndex}-${card.id}`}
+              key={card.id}
               idea={card}
               position={position}
               onSwipeLeft={() => handleSwipeLeft(originalIndex)}
