@@ -5,11 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { EffectCards } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/effect-cards';
-import type { Swiper as SwiperType } from 'swiper';
+import * as Swing from 'swing';
 
 interface CardStackProps {
   initialIdeas?: Idea[];
@@ -17,7 +13,8 @@ interface CardStackProps {
 
 export function CardStack({ initialIdeas = [] }: CardStackProps) {
   const [cards, setCards] = useState<Idea[]>(initialIdeas);
-  const swiperRef = useRef<SwiperType | null>(null);
+  const stackRef = useRef<any>(null);
+  const cardRefs = useRef<{ [key: string]: HTMLElement }>({});
   const { toast } = useToast();
 
   // Fetch random ideas if no initial ideas provided
@@ -50,10 +47,6 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         description: "The idea has been added to your saved collection.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/ideas/saved"] });
-      // Move to next card
-      if (swiperRef.current) {
-        swiperRef.current.slideNext();
-      }
     },
     onError: () => {
       toast({
@@ -78,7 +71,6 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
           title: "New Ideas Generated!",
           description: "Explore more creative variations based on your interest.",
         });
-        // Card already moved, don't move again
       }
     },
     onError: () => {
@@ -100,46 +92,91 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     onSuccess: (data) => {
       if (data.ideas && data.ideas.length > 0) {
         // Add new cards to the end
-        setCards(prev => [...prev, ...data.ideas]);
+        setCards(prev => {
+          const newCards = [...prev, ...data.ideas];
+          // Add new cards to swing stack
+          setTimeout(() => {
+            data.ideas.forEach((idea: Idea) => {
+              const cardElement = cardRefs.current[idea.id];
+              if (cardElement && stackRef.current) {
+                stackRef.current.createCard(cardElement);
+              }
+            });
+          }, 100);
+          return newCards;
+        });
       }
     },
   });
 
-  const handleCardAction = (action: 'dismiss' | 'save' | 'explore', card: Idea) => {
-    switch (action) {
-      case 'dismiss':
-        toast({
-          title: "Idea Dismissed",
-          description: "Bringing you a fresh idea!",
-        });
-        if (swiperRef.current) {
-          swiperRef.current.slideNext();
+  // Initialize Swing stack
+  useEffect(() => {
+    if (cards.length > 0 && !stackRef.current) {
+      const config = {
+        allowedDirections: [
+          (Swing as any).Direction.LEFT,
+          (Swing as any).Direction.RIGHT, 
+          (Swing as any).Direction.UP
+        ],
+        throwOutConfidence: (xOffset: number, yOffset: number, element: HTMLElement) => {
+          const xConfidence = Math.min(Math.abs(xOffset) / element.offsetWidth, 1);
+          const yConfidence = Math.min(Math.abs(yOffset) / element.offsetHeight, 1);
+          return Math.max(xConfidence, yConfidence);
+        },
+        rotation: (xOffset: number, yOffset: number, element: HTMLElement) => {
+          const maxRotation = 20;
+          return Math.max(Math.min(xOffset / element.offsetWidth * maxRotation, maxRotation), -maxRotation);
         }
-        break;
-      case 'save':
-        saveIdeaMutation.mutate(card.id);
-        break;
-      case 'explore':
-        // Move to next card after upward animation completes
-        setTimeout(() => {
-          if (swiperRef.current) {
-            swiperRef.current.slideNext();
-          }
-        }, 600);
-        saveIdeaMutation.mutate(card.id);
-        exploreIdeaMutation.mutate(card.id);
-        break;
-    }
-  };
+      };
 
-  const handleSlideChange = () => {
-    // When we're running low on cards, fetch more
-    const currentIndex = swiperRef.current?.realIndex || 0;
-    if (cards.length - currentIndex <= 2) {
-      const excludeIds = cards.map(c => c.id);
-      getRandomIdeasMutation.mutate(excludeIds);
+      stackRef.current = (Swing as any).Stack(config);
+
+      // Add throwout event listener
+      stackRef.current.on('throwout', (eventObject: any) => {
+        const direction = eventObject.throwDirection;
+        const cardElement = eventObject.target;
+        const ideaId = cardElement.dataset.ideaId;
+        const idea = cards.find(c => c.id === ideaId);
+        
+        if (!idea) return;
+
+        if (direction === (Swing as any).Direction.LEFT) {
+          // Dismiss
+          toast({
+            title: "Idea Dismissed",
+            description: "Bringing you a fresh idea!",
+          });
+        } else if (direction === (Swing as any).Direction.RIGHT) {
+          // Save
+          saveIdeaMutation.mutate(idea.id);
+        } else if (direction === (Swing as any).Direction.UP) {
+          // Explore
+          saveIdeaMutation.mutate(idea.id);
+          exploreIdeaMutation.mutate(idea.id);
+        }
+
+        // Remove card from state and fetch new ones
+        setCards(prev => {
+          const newCards = prev.filter(c => c.id !== ideaId);
+          if (newCards.length <= 2) {
+            const excludeIds = newCards.map(c => c.id);
+            getRandomIdeasMutation.mutate(excludeIds);
+          }
+          return newCards;
+        });
+      });
+
+      // Add cards to stack with a small delay to ensure DOM elements are ready
+      setTimeout(() => {
+        cards.forEach(card => {
+          const cardElement = cardRefs.current[card.id];
+          if (cardElement) {
+            stackRef.current.createCard(cardElement);
+          }
+        });
+      }, 100);
     }
-  };
+  }, [cards, saveIdeaMutation, exploreIdeaMutation, toast, getRandomIdeasMutation]);
 
   if (cards.length === 0) {
     return (
@@ -162,36 +199,27 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         </div>
       </div>
 
-      {/* Swiper Card Stack */}
-      <Swiper
-        effect="cards"
-        grabCursor={true}
-        modules={[EffectCards]}
-        className="w-full h-full"
-        cardsEffect={{
-          perSlideOffset: 8,
-          perSlideRotate: 2,
-          rotate: true,
-          slideShadows: true,
-        }}
-        speed={500}
-        onSwiper={(swiper) => {
-          swiperRef.current = swiper;
-        }}
-        onSlideChange={handleSlideChange}
-      >
-        {cards.map((card, index) => (
-          <SwiperSlide key={card.id}>
+      {/* Swing Card Stack */}
+      <div className="relative w-full h-full">
+        {cards.slice(0, 3).map((card, index) => (
+          <div
+            key={card.id}
+            ref={(el) => {
+              if (el) cardRefs.current[card.id] = el;
+            }}
+            data-idea-id={card.id}
+            className="absolute inset-0 cursor-grab"
+            style={{
+              zIndex: 3 - index, // Top card has highest z-index
+            }}
+          >
             <IdeaCard
               idea={card}
               position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
-              onSwipeLeft={() => handleCardAction('dismiss', card)}
-              onSwipeRight={() => handleCardAction('save', card)}
-              onSwipeUp={() => handleCardAction('explore', card)}
             />
-          </SwiperSlide>
+          </div>
         ))}
-      </Swiper>
+      </div>
     </div>
   );
 }

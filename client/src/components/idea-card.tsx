@@ -1,14 +1,9 @@
 import { type Idea } from "@shared/schema";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
-import { useVerticalSwipe } from "@/hooks/use-vertical-swipe";
-import { useState } from "react";
 
 interface IdeaCardProps {
   idea: Idea;
   position: "top" | "middle" | "bottom";
-  onSwipeLeft: () => void;
-  onSwipeRight: () => void;
-  onSwipeUp: () => void;
 }
 
 const gradients = {
@@ -17,35 +12,11 @@ const gradients = {
   bottom: "from-sky-400 to-red-400"
 };
 
-export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp }: IdeaCardProps) {
+export function IdeaCard({ idea, position }: IdeaCardProps) {
   const cardNumber = position === "top" ? 1 : position === "middle" ? 2 : 3;
-  const [isSwipingUp, setIsSwipingUp] = useState(false);
-
-  const { swipeOffset, isActive, ...verticalSwipeHandlers } = useVerticalSwipe({
-    onSwipeUp: () => {
-      setIsSwipingUp(true);
-      onSwipeUp();
-      setTimeout(() => setIsSwipingUp(false), 600);
-    },
-    threshold: 60
-  });
 
   return (
-    <div 
-      data-card-id={idea.id}
-      className={`relative bg-white rounded-2xl shadow-2xl overflow-hidden w-full h-full cursor-pointer transition-transform duration-200 ${
-        isSwipingUp ? 'scale-105' : ''
-      } ${isActive || isSwipingUp ? 'z-[100]' : 'z-10'}`}
-      style={{
-        transform: isActive 
-          ? `translateY(-${swipeOffset}px) scale(${1 + swipeOffset * 0.002})` 
-          : isSwipingUp 
-            ? 'translateY(-100vh) scale(0.8) rotate(5deg)' 
-            : 'none',
-        transition: isActive ? 'none' : isSwipingUp ? 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'transform 0.2s ease-out'
-      }}
-      {...verticalSwipeHandlers}
-    >
+    <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden w-full h-full cursor-pointer">
       {/* Card Header - Always Visible */}
       <div className={`p-6 text-white relative bg-gradient-to-br ${gradients[position]}`}>
         <div className="flex items-start justify-between mb-4">
@@ -75,9 +46,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
             <ArrowLeft className="w-3 h-3 mr-1" />
             Dismiss
           </div>
-          <div className={`flex items-center text-xs text-white/90 bg-white/10 px-2 py-1 rounded-full transition-all duration-200 ${
-            isSwipingUp || isActive ? 'bg-white/30 scale-110' : ''
-          }`}>
+          <div className="flex items-center text-xs text-white/90 bg-white/10 px-2 py-1 rounded-full">
             <ArrowUp className="w-3 h-3 mr-1" />
             Explore
           </div>
