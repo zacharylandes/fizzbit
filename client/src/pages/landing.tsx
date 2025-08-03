@@ -1,0 +1,107 @@
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Sparkles, Image, ArrowRight, Heart, Eye } from "lucide-react";
+
+export default function LandingPage() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-coral via-teal to-sky-500">
+      {/* Header */}
+      <div className="relative pt-8 pb-4 px-4">
+        <div className="text-center">
+          <div className="flex items-center justify-center mb-4">
+            <Sparkles className="h-8 w-8 text-white mr-3" />
+            <h1 className="text-4xl font-bold text-white">Inspire Me</h1>
+          </div>
+          <p className="text-white/90 text-lg mb-8">
+            Generate endless creative ideas from your photos and thoughts
+          </p>
+        </div>
+      </div>
+
+      {/* Features */}
+      <div className="px-4 pb-8">
+        <div className="space-y-4 max-w-md mx-auto">
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-coral/20 rounded-lg">
+                  <Image className="h-5 w-5 text-coral" />
+                </div>
+                <CardTitle className="text-lg">Photo Magic</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-gray-700">
+                Upload any photo and get 10 creative ideas inspired by what you see. Colors, objects, moods - all become inspiration!
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-teal-500/20 rounded-lg">
+                  <Sparkles className="h-5 w-5 text-teal-500" />
+                </div>
+                <CardTitle className="text-lg">Text Prompts</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-gray-700">
+                Describe your interests and get 10 personalized creative ideas. From hobbies to home decor - endless possibilities!
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-sky-500/20 rounded-lg">
+                  <Eye className="h-5 w-5 text-sky-500" />
+                </div>
+                <CardTitle className="text-lg">Explore & Chain</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-gray-700">
+                Love an idea? Swipe up to explore variations that blend your original inspiration with that specific concept!
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-pink-500/20 rounded-lg">
+                  <Heart className="h-5 w-5 text-pink-500" />
+                </div>
+                <CardTitle className="text-lg">Save & Organize</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-gray-700">
+                Build your personal collection of favorite ideas. Swipe right to save, swipe left to dismiss, swipe up to explore more!
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Login Button */}
+        <div className="text-center mt-8">
+          <a href="/api/login">
+            <Button 
+              size="lg"
+              className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 rounded-full px-8 py-4 text-lg font-medium shadow-lg touch-target"
+            >
+              Get Started
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </a>
+          <p className="text-white/70 text-sm mt-4">
+            Sign in with your Replit account to start creating
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

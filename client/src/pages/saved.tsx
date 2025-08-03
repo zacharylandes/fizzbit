@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Heart, Image, Type, Trash2 } from "lucide-react";
@@ -7,15 +7,34 @@ import { Link } from "wouter";
 import { type Idea } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function SavedPage() {
   const [animatingCards, setAnimatingCards] = useState<{ [key: string]: boolean }>({});
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const { toast } = useToast();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+      return;
+    }
+  }, [isAuthenticated, authLoading, toast]);
 
   // Fetch saved ideas
   const { data: savedIdeasData, isLoading } = useQuery({
     queryKey: ["/api/ideas/saved"],
+    enabled: isAuthenticated, // Only fetch if authenticated
   }) as { data: { ideas: Idea[] } | undefined; isLoading: boolean };
 
   const savedIdeas = savedIdeasData?.ideas || [];
@@ -35,7 +54,18 @@ export default function SavedPage() {
         variant: "info",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
       toast({
         title: "Oops!",
         description: "Couldn't remove that idea. Try again?",
@@ -94,6 +124,21 @@ export default function SavedPage() {
 
     touchStartRef.current = null;
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-coral via-teal to-sky-500 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-white/80">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null; // Will redirect to login
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-coral via-teal to-sky-500">

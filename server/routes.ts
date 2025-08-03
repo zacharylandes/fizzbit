@@ -2,6 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertIdeaSchema } from "@shared/schema";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import OpenAI from "openai";
 
 // Initialize OpenAI with error handling
@@ -21,6 +22,9 @@ try {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Auth middleware
+  await setupAuth(app);
   
   // Add global error handling middleware for async routes
   const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) => 
@@ -61,7 +65,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const aiResponse = JSON.parse(response.choices[0].message.content || "{}");
       const ideas = aiResponse.ideas || [];
 
-      // Store generated ideas in memory
+      // Store generated ideas in database (no user required for generated ideas)
       const createdIdeas = [];
       for (const ideaData of ideas) {
         const idea = await storage.createIdea({
@@ -203,11 +207,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Save an idea
-  app.post("/api/ideas/:id/save", async (req, res) => {
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Save an idea - now requires authentication
+  app.post("/api/ideas/:id/save", isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const savedIdea = await storage.saveIdea(id);
+      const userId = req.user.claims.sub;
+      const savedIdea = await storage.saveIdea(id, userId);
       res.json({ savedIdea });
     } catch (error) {
       console.error("Error saving idea:", error);
@@ -215,10 +232,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get saved ideas
-  app.get("/api/ideas/saved", async (req, res) => {
+  // Get saved ideas - now requires authentication
+  app.get("/api/ideas/saved", isAuthenticated, async (req: any, res) => {
     try {
-      const ideas = await storage.getSavedIdeas();
+      const userId = req.user.claims.sub;
+      const ideas = await storage.getSavedIdeas(userId);
       res.json({ ideas });
     } catch (error) {
       console.error("Error getting saved ideas:", error);
@@ -226,11 +244,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Unsave/delete an idea
-  app.delete("/api/ideas/:id/save", async (req, res) => {
+  // Unsave/delete an idea - now requires authentication
+  app.delete("/api/ideas/:id/save", isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      await storage.unsaveIdea(id);
+      const userId = req.user.claims.sub;
+      await storage.unsaveIdea(id, userId);
       res.json({ success: true, message: "Idea removed from saved" });
     } catch (error) {
       console.error("Error unsaving idea:", error);

@@ -1,152 +1,144 @@
-import { type Idea, type InsertIdea, type SavedIdea, type InsertSavedIdea } from "@shared/schema";
+import {
+  users,
+  ideas,
+  savedIdeas,
+  type User,
+  type UpsertUser,
+  type Idea,
+  type InsertIdea,
+  type SavedIdea,
+  type InsertSavedIdea,
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
+// Interface for storage operations
 export interface IStorage {
+  // User operations
+  // (IMPORTANT) these user operations are mandatory for Replit Auth.
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  
+  // Idea operations
   getIdea(id: string): Promise<Idea | undefined>;
-  createIdea(idea: InsertIdea): Promise<Idea>;
+  createIdea(idea: InsertIdea, userId?: string): Promise<Idea>;
   getRandomIdeas(count: number, excludeIds?: string[]): Promise<Idea[]>;
-  saveIdea(ideaId: string): Promise<SavedIdea>;
-  unsaveIdea(ideaId: string): Promise<void>;
-  getSavedIdeas(): Promise<Idea[]>;
+  saveIdea(ideaId: string, userId: string): Promise<SavedIdea>;
+  unsaveIdea(ideaId: string, userId: string): Promise<void>;
+  getSavedIdeas(userId: string): Promise<Idea[]>;
   getIdeaChain(parentIdeaId: string): Promise<Idea[]>;
 }
 
-export class MemStorage implements IStorage {
-  private ideas: Map<string, Idea>;
-  private savedIdeas: Map<string, SavedIdea>;
+export class DatabaseStorage implements IStorage {
+  // User operations
+  // (IMPORTANT) these user operations are mandatory for Replit Auth.
 
-  constructor() {
-    this.ideas = new Map();
-    this.savedIdeas = new Map();
-    
-    // Initialize with some default ideas
-    this.initializeDefaultIdeas();
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
-  private async initializeDefaultIdeas() {
-    const defaultIdeas: InsertIdea[] = [
-      {
-        title: "Create a Vibrant Art Gallery Wall",
-        description: "Transform your space with a curated collection of colorful artwork. Mix different sizes and mediums to create visual interest and personality in your room.",
-        source: "text",
-        sourceContent: "colorful home decoration",
-        isSaved: 0,
-        metadata: { category: "home-decor", colors: ["vibrant", "mixed"] }
-      },
-      {
-        title: "Design a Rainbow Reading Nook",
-        description: "Create a cozy corner with colorful cushions, bright lighting, and rainbow-organized bookshelves for the perfect reading escape.",
-        source: "text",
-        sourceContent: "cozy reading space",
-        isSaved: 0,
-        metadata: { category: "interior-design", colors: ["rainbow", "cozy"] }
-      },
-      {
-        title: "Build a Colorful Herb Garden",
-        description: "Combine functionality with beauty by creating a vibrant herb garden using colorful pots and creative arrangements both indoors and outdoors.",
-        source: "text",
-        sourceContent: "herb garden ideas",
-        isSaved: 0,
-        metadata: { category: "gardening", colors: ["natural", "bright"] }
-      },
-      {
-        title: "Craft a Mobile-Inspired Color Palette",
-        description: "Design a room using colors inspired by your favorite mobile app interfaces - think coral pinks, ocean blues, and energetic oranges.",
-        source: "text",
-        sourceContent: "mobile app design colors",
-        isSaved: 0,
-        metadata: { category: "color-theory", colors: ["coral", "blue", "orange"] }
-      },
-      {
-        title: "Create a Sunset Photography Series",
-        description: "Capture the magical golden hour with a series of sunset photographs using different angles, silhouettes, and foreground elements.",
-        source: "text",
-        sourceContent: "sunset photography",
-        isSaved: 0,
-        metadata: { category: "photography", colors: ["golden", "warm"] }
-      }
-    ];
-
-    for (const idea of defaultIdeas) {
-      await this.createIdea(idea);
-    }
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
   }
 
+  // Idea operations
   async getIdea(id: string): Promise<Idea | undefined> {
-    return this.ideas.get(id);
+    const [idea] = await db.select().from(ideas).where(eq(ideas.id, id));
+    return idea;
   }
 
-  async createIdea(insertIdea: InsertIdea): Promise<Idea> {
-    const id = randomUUID();
-    const idea: Idea = { 
-      ...insertIdea,
-      sourceContent: insertIdea.sourceContent ?? null,
-      parentIdeaId: insertIdea.parentIdeaId ?? null,
-      isSaved: insertIdea.isSaved ?? 0,
-      metadata: insertIdea.metadata ?? null,
-      id, 
-      createdAt: new Date()
-    };
-    this.ideas.set(id, idea);
+  async createIdea(insertIdea: InsertIdea, userId?: string): Promise<Idea> {
+    const [idea] = await db
+      .insert(ideas)
+      .values({
+        ...insertIdea,
+        userId,
+      })
+      .returning();
     return idea;
   }
 
   async getRandomIdeas(count: number, excludeIds: string[] = []): Promise<Idea[]> {
-    const allIdeas = Array.from(this.ideas.values()).filter(
-      idea => !excludeIds.includes(idea.id)
-    );
+    // Get random ideas - for now, just get all ideas and filter/shuffle in memory
+    // In production, this would use proper SQL for better performance
+    const allIdeas = await db.select().from(ideas);
+    
+    // Filter out excluded IDs
+    const filteredIdeas = allIdeas.filter(idea => !excludeIds.includes(idea.id));
     
     // Shuffle and return random ideas
-    const shuffled = allIdeas.sort(() => Math.random() - 0.5);
+    const shuffled = filteredIdeas.sort(() => Math.random() - 0.5);
     return shuffled.slice(0, count);
   }
 
-  async saveIdea(ideaId: string): Promise<SavedIdea> {
-    const id = randomUUID();
-    const savedIdea: SavedIdea = {
-      id,
-      ideaId,
-      createdAt: new Date()
-    };
-    this.savedIdeas.set(id, savedIdea);
+  async saveIdea(ideaId: string, userId: string): Promise<SavedIdea> {
+    const [savedIdea] = await db
+      .insert(savedIdeas)
+      .values({
+        ideaId,
+        userId,
+      })
+      .returning();
     
     // Mark the idea as saved
-    const idea = this.ideas.get(ideaId);
-    if (idea) {
-      idea.isSaved = 1;
-      this.ideas.set(ideaId, idea);
-    }
+    await db
+      .update(ideas)
+      .set({ isSaved: 1 })
+      .where(eq(ideas.id, ideaId));
     
     return savedIdea;
   }
 
-  async unsaveIdea(ideaId: string): Promise<void> {
-    // Find and remove the saved idea entry
-    const savedIdeaEntries = Array.from(this.savedIdeas.entries());
-    const savedEntry = savedIdeaEntries.find(([_, savedIdea]) => savedIdea.ideaId === ideaId);
+  async unsaveIdea(ideaId: string, userId: string): Promise<void> {
+    // Remove the saved idea entry
+    await db
+      .delete(savedIdeas)
+      .where(and(eq(savedIdeas.ideaId, ideaId), eq(savedIdeas.userId, userId)));
     
-    if (savedEntry) {
-      this.savedIdeas.delete(savedEntry[0]);
-    }
+    // Mark the idea as not saved (only if no other users have it saved)
+    const otherSavedEntries = await db
+      .select()
+      .from(savedIdeas)
+      .where(eq(savedIdeas.ideaId, ideaId));
     
-    // Mark the idea as not saved
-    const idea = this.ideas.get(ideaId);
-    if (idea) {
-      idea.isSaved = 0;
-      this.ideas.set(ideaId, idea);
+    if (otherSavedEntries.length === 0) {
+      await db
+        .update(ideas)
+        .set({ isSaved: 0 })
+        .where(eq(ideas.id, ideaId));
     }
   }
 
-  async getSavedIdeas(): Promise<Idea[]> {
-    const savedIdeaIds = Array.from(this.savedIdeas.values()).map(si => si.ideaId);
-    return Array.from(this.ideas.values()).filter(idea => savedIdeaIds.includes(idea.id));
+  async getSavedIdeas(userId: string): Promise<Idea[]> {
+    const result = await db
+      .select({ idea: ideas })
+      .from(savedIdeas)
+      .innerJoin(ideas, eq(savedIdeas.ideaId, ideas.id))
+      .where(eq(savedIdeas.userId, userId))
+      .orderBy(savedIdeas.createdAt);
+
+    return result.map(r => r.idea);
   }
 
   async getIdeaChain(parentIdeaId: string): Promise<Idea[]> {
-    return Array.from(this.ideas.values()).filter(
-      idea => idea.parentIdeaId === parentIdeaId
-    );
+    return await db
+      .select()
+      .from(ideas)
+      .where(eq(ideas.parentIdeaId, parentIdeaId));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

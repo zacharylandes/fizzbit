@@ -6,12 +6,22 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home";
 import SavedPage from "@/pages/saved";
+import LandingPage from "@/pages/landing";
+import { useAuth } from "@/hooks/useAuth";
 
 function Router() {
+  const { isAuthenticated, isLoading } = useAuth();
+
   return (
     <Switch>
-      <Route path="/" component={HomePage} />
-      <Route path="/saved" component={SavedPage} />
+      {isLoading || !isAuthenticated ? (
+        <Route path="/" component={LandingPage} />
+      ) : (
+        <>
+          <Route path="/" component={HomePage} />
+          <Route path="/saved" component={SavedPage} />
+        </>
+      )}
       <Route component={NotFound} />
     </Switch>
   );
