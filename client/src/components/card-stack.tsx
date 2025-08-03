@@ -174,8 +174,8 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       } else {
         handleSwipe(ideaId, 'left');
       }
-    } else if (absY > threshold && absY > absX && deltaY < 0) {
-      // Upward swipe
+    } else if (absY > threshold && deltaY < 0) {
+      // Upward swipe - removed the absY > absX condition to make it more responsive
       handleSwipe(ideaId, 'up');
     }
 
