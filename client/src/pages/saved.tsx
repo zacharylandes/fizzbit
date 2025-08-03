@@ -184,6 +184,14 @@ export default function SavedPage() {
             {savedIdeas.map((idea, index) => {
               const isAnimating = animatingCards[idea.id];
               
+              // Dynamic card styles that cycle through different gradients
+              const cardStyles = [
+                "bg-gradient-electric border-electric-blue/30 glow-electric-blue",
+                "bg-gradient-neon border-electric-pink/30 glow-electric-pink", 
+                "bg-gradient-cyber border-electric-cyan/30 glow-electric-purple",
+                "bg-gradient-sunset border-electric-orange/30 glow-electric-orange"
+              ];
+              
               return (
                 <div
                   key={idea.id}
@@ -194,7 +202,7 @@ export default function SavedPage() {
                   onTouchEnd={(e) => handleTouchEnd(e, idea.id)}
                   style={{ touchAction: 'pan-y' }}
                 >
-                  <Card className="bg-gradient-cyber border border-electric-cyan/30 shadow-sm relative overflow-hidden hover:shadow-md transition-all duration-300 glow-electric-purple hover:scale-[1.02]">
+                  <Card className={`${cardStyles[index % cardStyles.length]} shadow-sm relative overflow-hidden hover:shadow-md transition-all duration-300 hover:scale-[1.02]`}>
                     {/* Swipe hint overlay */}
                     <div className="absolute inset-0 glass bg-red-500/20 flex items-center justify-end pr-6 opacity-0 transition-opacity duration-200 hover:opacity-50">
                       <Trash2 className="h-6 w-6 text-white" />
