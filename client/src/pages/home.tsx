@@ -21,8 +21,8 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-coral via-teal to-sky-500">
       {/* Header Section */}
-      <div className="relative pt-8 pb-4 px-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="relative pt-4 pb-2 px-4">
+        <div className="flex items-center justify-between mb-3">
           <h1 className="text-3xl font-bold text-white">Inspire Me</h1>
           <Button
             size="sm"
@@ -37,7 +37,7 @@ export default function HomePage() {
           </Button>
         </div>
         
-        <p className="text-white/90 text-lg font-medium mb-8">
+        <p className="text-white/90 text-base font-medium mb-4">
           Get creative ideas from your images or prompts
         </p>
       </div>
@@ -46,7 +46,7 @@ export default function HomePage() {
       <InputSection onIdeasGenerated={handleIdeasGenerated} />
 
       {/* Cards Section */}
-      <div className="px-6 pb-20 mt-16">
+      <div className="px-4 pb-20 mt-4">
         <CardStack initialIdeas={currentIdeas} />
       </div>
 

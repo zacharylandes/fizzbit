@@ -93,11 +93,11 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
   const isLoading = generateFromTextMutation.isPending || generateFromImageMutation.isPending;
 
   return (
-    <div className="px-6 mb-8">
-      <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
-        <div className="flex gap-4 mb-4">
+    <div className="px-4 mb-4 relative z-10">
+      <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl">
+        <div className="flex flex-col gap-3 mb-4">
           {/* Image Upload Button */}
-          <div className="flex-1">
+          <div className="w-full">
             <input
               type="file"
               accept="image/*"
@@ -121,7 +121,7 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
           {/* Text Input Toggle */}
           <Button
             onClick={() => setShowTextInput(!showTextInput)}
-            className="flex-1 bg-gradient-to-r from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white rounded-xl py-6 px-6 font-semibold shadow-lg touch-target"
+            className="w-full bg-gradient-to-r from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white rounded-xl py-6 px-6 font-semibold shadow-lg touch-target"
             disabled={isLoading}
           >
             <Edit className="mr-2 h-5 w-5" />
