@@ -32,6 +32,7 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
         toast({
           title: "Ideas Generated!",
           description: "Fresh creative ideas based on your prompt.",
+          duration: 1000,
         });
       }
     },
@@ -40,6 +41,7 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
         title: "Error",
         description: "Failed to generate ideas. Please try again.",
         variant: "destructive",
+        duration: 1000,
       });
     },
   });
@@ -58,6 +60,7 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
         toast({
           title: "Ideas Generated!",
           description: "Creative ideas inspired by your image.",
+          duration: 1000,
         });
       }
     },
@@ -66,6 +69,7 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
         title: "Error",
         description: "Failed to analyze image. Please try again.",
         variant: "destructive",
+        duration: 1000,
       });
     },
   });

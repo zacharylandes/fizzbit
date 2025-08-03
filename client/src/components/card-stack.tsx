@@ -58,11 +58,6 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       return response.json();
     },
     onSuccess: () => {
-      toast({
-        title: "Idea Saved!",
-        description: "The idea has been added to your saved collection.",
-        duration: 2000,
-      });
       queryClient.invalidateQueries({ queryKey: ["/api/ideas/saved"] });
     },
     onError: () => {
@@ -70,7 +65,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         title: "Error",
         description: "Failed to save the idea. Please try again.",
         variant: "destructive",
-        duration: 2000,
+        duration: 1000,
       });
     },
   });
@@ -85,11 +80,6 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       if (data.ideas && data.ideas.length > 0) {
         // Add related ideas to the end of the stack
         setCards(prev => [...prev, ...data.ideas]);
-        toast({
-          title: "New Ideas Generated!",
-          description: "Explore more creative variations based on your interest.",
-          duration: 2000,
-        });
       }
     },
     onError: () => {
@@ -97,7 +87,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         title: "Error",
         description: "Failed to generate related ideas. Please try again.",
         variant: "destructive",
-        duration: 2000,
+        duration: 1000,
       });
     },
   });
@@ -138,16 +128,30 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       [ideaId]: { direction, isAnimating: true }
     }));
 
+    // Show immediate toast feedback
+    if (direction === 'left') {
+      toast({
+        title: "Idea Dismissed", 
+        description: "Bringing you a fresh idea!",
+        duration: 1000,
+      });
+    } else if (direction === 'right') {
+      toast({
+        title: "Idea Saved!",
+        description: "Added to your saved collection.",
+        duration: 1000,
+      });
+    } else if (direction === 'up') {
+      toast({
+        title: "Exploring Idea!",
+        description: "Generating related creative concepts...",
+        duration: 1000,
+      });
+    }
+
     // After animation completes, handle the action
     setTimeout(() => {
-      if (direction === 'left') {
-        // Dismiss
-        toast({
-          title: "Idea Dismissed", 
-          description: "Bringing you a fresh idea!",
-          duration: 2000,
-        });
-      } else if (direction === 'right') {
+      if (direction === 'right') {
         // Save
         saveIdeaMutation.mutate(idea.id);
       } else if (direction === 'up') {
