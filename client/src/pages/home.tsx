@@ -22,7 +22,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-coral via-teal to-sky-500">
       {/* Header with Input Section */}
-      <div className="relative pt-4 pb-2 px-4">
+      <div className="relative pt-2 pb-2 px-4">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-2xl font-bold text-white">Inspire Me</h1>
           <Link href="/saved">
