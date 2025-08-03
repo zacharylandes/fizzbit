@@ -22,17 +22,17 @@ const cardStyles = {
   bottom: {
     zIndex: 10,
     scale: 0.96,
-    marginTop: "0px"
+    y: 0
   },
   middle: {
     zIndex: 20,
     scale: 0.98,
-    marginTop: "-160px"
+    y: -160
   },
   top: {
     zIndex: 30,
     scale: 1,
-    marginTop: "-160px"
+    y: -160
   }
 };
 
@@ -96,15 +96,16 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
 
   return (
     <motion.div
-      className={`relative bg-white rounded-2xl shadow-2xl overflow-hidden touch-target ${
+      className={`absolute bg-white rounded-2xl shadow-2xl overflow-hidden touch-target ${
         isTopCard ? "cursor-pointer" : "cursor-default"
       }`}
       style={{ 
         minHeight: "48px",
         minWidth: "48px",
         height: "220px",
-        zIndex: cardStyles[position].zIndex,
-        marginTop: cardStyles[position].marginTop
+        width: "100%",
+        left: 0,
+        zIndex: cardStyles[position].zIndex
       }}
       initial={{ opacity: 0, y: 50, scale: 0.9 }}
       animate={
@@ -115,15 +116,15 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
               x: 0, 
               rotate: 0,
               scale: cardStyles[position].scale,
-              y: 0
+              y: cardStyles[position].y
             }
       }
       transition={{ 
-        duration: isExiting ? 0.25 : 0.4, 
+        duration: isExiting ? 0.25 : 0.5, 
         ease: "easeOut",
         type: "spring",
-        stiffness: 300,
-        damping: 30
+        stiffness: 200,
+        damping: 25
       }}
       {...(isTopCard ? swipeHandlers : {})}
     >

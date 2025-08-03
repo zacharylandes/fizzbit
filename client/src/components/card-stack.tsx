@@ -206,20 +206,18 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         </motion.div>
       </div>
 
-      {/* Render cards in reverse order - bottom card first so it appears behind */}
-      <div className="space-y-0">
-        {cards.slice(0, 3).reverse().map((card, reverseIndex) => {
-          const totalCards = Math.min(cards.length, 3);
-          const originalIndex = (totalCards - 1) - reverseIndex;
-          const position = originalIndex === 0 ? "top" : originalIndex === 1 ? "middle" : "bottom";
+      {/* Render cards - each card positions itself absolutely */}
+      <div className="relative w-full h-full">
+        {cards.slice(0, 3).map((card, index) => {
+          const position = index === 0 ? "top" : index === 1 ? "middle" : "bottom";
           return (
             <IdeaCard
               key={card.id}
               idea={card}
               position={position}
-              onSwipeLeft={() => handleSwipeLeft(originalIndex)}
-              onSwipeRight={() => handleSwipeRight(originalIndex)}
-              onSwipeUp={() => handleSwipeUp(originalIndex)}
+              onSwipeLeft={() => handleSwipeLeft(index)}
+              onSwipeRight={() => handleSwipeRight(index)}
+              onSwipeUp={() => handleSwipeUp(index)}
             />
           );
         })}
