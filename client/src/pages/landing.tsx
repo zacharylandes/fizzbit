@@ -13,7 +13,7 @@ export default function LandingPage() {
             <div className="p-2 bg-gradient-electric rounded-lg glow-electric-blue">
               <Lightbulb className="h-6 w-6 text-white animate-pulse" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-electric-blue to-electric-purple bg-clip-text text-transparent">SWIVL</span>
+            <span className="text-xl font-bold text-white">SWIVL</span>
           </div>
           <a href="/api/login">
             <button className="bg-gradient-neon text-white px-6 py-2 rounded-lg font-medium hover:scale-105 hover-glow transition-all duration-300">
@@ -134,7 +134,7 @@ export default function LandingPage() {
               <div className="p-2 bg-gradient-electric rounded-lg glow-electric-blue">
                 <Lightbulb className="h-5 w-5 text-white animate-pulse" />
               </div>
-              <span className="text-lg font-bold bg-gradient-to-r from-electric-blue to-electric-purple bg-clip-text text-transparent">SWIVL</span>
+              <span className="text-lg font-bold text-white">SWIVL</span>
             </div>
             <p className="text-muted-foreground text-sm">
               © 2025 SWIVL. All rights reserved.
