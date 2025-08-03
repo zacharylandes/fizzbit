@@ -120,10 +120,13 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         saveIdeaMutation.mutate(card.id);
         break;
       case 'explore':
-        // Move card immediately like horizontal swipes
-        if (swiperRef.current) {
-          swiperRef.current.slideNext();
-        }
+        // Card animation is handled in IdeaCard component
+        // Move to next card after animation completes
+        setTimeout(() => {
+          if (swiperRef.current) {
+            swiperRef.current.slideNext();
+          }
+        }, 400);
         saveIdeaMutation.mutate(card.id);
         exploreIdeaMutation.mutate(card.id);
         break;

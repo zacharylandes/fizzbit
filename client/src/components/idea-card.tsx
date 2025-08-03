@@ -24,20 +24,32 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
   const { swipeOffset, isActive, ...verticalSwipeHandlers } = useVerticalSwipe({
     onSwipeUp: () => {
       setIsSwipingUp(true);
-      onSwipeUp();
-      setTimeout(() => setIsSwipingUp(false), 300);
+      // Animate card upward and off screen
+      const cardElement = document.querySelector(`[data-card-id="${idea.id}"]`) as HTMLElement;
+      if (cardElement) {
+        cardElement.style.transform = 'translateY(-100vh) scale(0.8)';
+        cardElement.style.transition = 'transform 0.4s ease-out';
+      }
+      // Trigger action after animation starts
+      setTimeout(() => {
+        onSwipeUp();
+        setIsSwipingUp(false);
+      }, 200);
     },
     threshold: 60
   });
 
   return (
     <div 
+      data-card-id={idea.id}
       className={`relative bg-white rounded-2xl shadow-2xl overflow-hidden w-full h-full cursor-pointer transition-transform duration-200 ${
         isSwipingUp ? 'scale-105' : ''
       } ${isActive || isSwipingUp ? 'z-50' : 'z-10'}`}
       style={{
-        transform: isSwipingUp ? 'scale(1.05)' : 'none',
-        transition: 'transform 0.2s ease-out'
+        transform: isActive 
+          ? `translateY(-${swipeOffset}px) scale(${1 + swipeOffset * 0.002})` 
+          : 'none',
+        transition: isActive ? 'none' : 'transform 0.2s ease-out'
       }}
       {...verticalSwipeHandlers}
     >
