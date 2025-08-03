@@ -37,8 +37,8 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
           </div>
         </div>
         
-        <h3 className="text-xl font-bold mb-3">{idea.title}</h3>
-        <p className="text-white/90 leading-relaxed line-clamp-3">
+        <h3 className="text-xl font-bold mb-3 leading-tight">{idea.title}</h3>
+        <p className="text-white/90 leading-relaxed text-sm overflow-y-auto max-h-48 pr-2">
           {idea.description}
         </p>
         
