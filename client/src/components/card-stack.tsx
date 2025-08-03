@@ -230,24 +230,28 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
       {/* Swing Card Stack */}
       <div className="relative w-full h-full">
-        {cards.slice(0, 3).map((card, index) => (
-          <div
-            key={card.id}
-            ref={(el) => {
-              if (el) cardRefs.current[card.id] = el;
-            }}
-            data-idea-id={card.id}
-            className="absolute inset-0 cursor-grab"
-            style={{
-              zIndex: 3 - index, // Top card has highest z-index
-            }}
-          >
-            <IdeaCard
-              idea={card}
-              position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
-            />
-          </div>
-        ))}
+        {cards.slice(0, 3).map((card, index) => {
+          const zIndex = 100 + (3 - index); // Higher base z-index, top card highest
+          return (
+            <div
+              key={`${card.id}-${index}`} // Force re-render when position changes
+              ref={(el) => {
+                if (el) cardRefs.current[card.id] = el;
+              }}
+              data-idea-id={card.id}
+              className="absolute inset-0 cursor-grab transition-all duration-200"
+              style={{
+                zIndex: zIndex,
+                transform: `translateY(${index * 2}px) scale(${1 - index * 0.02})`, // Slight offset for visual depth
+              }}
+            >
+              <IdeaCard
+                idea={card}
+                position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
