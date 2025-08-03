@@ -97,9 +97,19 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     },
   });
 
-  // Initialize Swing stack once
+  // Recreate Swing stack whenever cards change
   useEffect(() => {
-    if (!stackRef.current) {
+    if (cards.length > 0) {
+      // Clear existing stack
+      if (stackRef.current) {
+        try {
+          stackRef.current.off('throwout');
+        } catch (e) {
+          // Ignore errors when clearing
+        }
+      }
+
+      // Create new stack
       const config = {
         allowedDirections: [
           Direction.LEFT,
@@ -154,32 +164,18 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
           return newCards;
         });
       });
-    }
-  }, [saveIdeaMutation, exploreIdeaMutation, toast, getRandomIdeasMutation]);
 
-  // Add cards to Swing stack whenever cards change
-  useEffect(() => {
-    if (stackRef.current && cards.length > 0) {
-      // Add new cards to the stack with a delay to ensure DOM is ready
+      // Add all current cards to the stack
       setTimeout(() => {
         cards.forEach(card => {
           const cardElement = cardRefs.current[card.id];
-          if (cardElement) {
-            try {
-              // Check if card is already in stack, if not add it
-              const existingCard = stackRef.current.getCard(cardElement);
-              if (!existingCard) {
-                stackRef.current.createCard(cardElement);
-              }
-            } catch (error) {
-              // If getCard throws error, card doesn't exist, so create it
-              stackRef.current.createCard(cardElement);
-            }
+          if (cardElement && stackRef.current) {
+            stackRef.current.createCard(cardElement);
           }
         });
-      }, 50);
+      }, 100);
     }
-  }, [cards]);
+  }, [cards, saveIdeaMutation, exploreIdeaMutation, toast, getRandomIdeasMutation]);
 
   if (cards.length === 0) {
     return (
