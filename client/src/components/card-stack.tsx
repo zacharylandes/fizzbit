@@ -97,9 +97,19 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     },
   });
 
-  // Initialize Swing stack once
+  // Recreate Swing stack whenever cards change
   useEffect(() => {
-    if (!stackRef.current) {
+    if (cards.length > 0) {
+      // Clear existing stack
+      if (stackRef.current) {
+        try {
+          stackRef.current.off('throwout');
+        } catch (e) {
+          // Ignore errors when clearing
+        }
+      }
+
+      // Create new stack
       const config = {
         allowedDirections: [
           Direction.LEFT,
@@ -107,26 +117,12 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
           Direction.UP
         ],
         throwOutConfidence: (xOffset: number, yOffset: number, element: HTMLElement) => {
-          // Require more intentional swiping - throw out after 110px movement
-          const threshold = 110;
-          if (Math.abs(xOffset) > threshold || Math.abs(yOffset) > threshold) {
-            return 1; // Immediately throw out
-          }
-          return 0; // Snap back to deck
-        },
-        throwOutDistance: (xOffset: number, yOffset: number, element: HTMLElement) => {
-          // Safety check for element
-          if (!element || !element.offsetWidth || !element.offsetHeight) {
-            return 400; // Default distance
-          }
-          // Ensure cards fully leave the screen
-          return Math.max(element.offsetWidth, element.offsetHeight) * 1.5;
+          const xConfidence = Math.min(Math.abs(xOffset) / element.offsetWidth, 1);
+          const yConfidence = Math.min(Math.abs(yOffset) / element.offsetHeight, 1);
+          return Math.max(xConfidence, yConfidence);
         },
         rotation: (xOffset: number, yOffset: number, element: HTMLElement) => {
           const maxRotation = 20;
-          if (!element || !element.offsetWidth) {
-            return Math.max(Math.min(xOffset / 300 * maxRotation, maxRotation), -maxRotation);
-          }
           return Math.max(Math.min(xOffset / element.offsetWidth * maxRotation, maxRotation), -maxRotation);
         }
       };
@@ -159,11 +155,6 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
             exploreIdeaMutation.mutate(idea.id);
           }
 
-          // Clean up the card ref before removing from state
-          if (cardRefs.current[ideaId]) {
-            delete cardRefs.current[ideaId];
-          }
-
           // Remove card from state and fetch new ones
           const newCards = currentCards.filter(c => c.id !== ideaId);
           if (newCards.length <= 2) {
@@ -173,39 +164,18 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
           return newCards;
         });
       });
-    }
-  }, [saveIdeaMutation, exploreIdeaMutation, toast, getRandomIdeasMutation]);
 
-  // Add new cards to existing stack when cards change
-  useEffect(() => {
-    if (stackRef.current && cards.length > 0) {
-      // Use longer delay to ensure React has finished updating DOM
+      // Add all current cards to the stack
       setTimeout(() => {
         cards.forEach(card => {
           const cardElement = cardRefs.current[card.id];
-          if (cardElement && cardElement.parentNode && stackRef.current) {
-            // Check if element is in DOM and not already in stack
-            if (document.contains(cardElement)) {
-              try {
-                // Check if card is already managed by stack
-                const existingCard = stackRef.current.getCard(cardElement);
-                if (!existingCard) {
-                  stackRef.current.createCard(cardElement);
-                }
-              } catch (error) {
-                // If getCard fails, card doesn't exist, so create it
-                try {
-                  stackRef.current.createCard(cardElement);
-                } catch (createError) {
-                  console.warn('Failed to create Swing card:', createError);
-                }
-              }
-            }
+          if (cardElement && stackRef.current) {
+            stackRef.current.createCard(cardElement);
           }
         });
-      }, 200); // Longer delay for better reliability
+      }, 100);
     }
-  }, [cards]);
+  }, [cards, saveIdeaMutation, exploreIdeaMutation, toast, getRandomIdeasMutation]);
 
   if (cards.length === 0) {
     return (
@@ -230,28 +200,24 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
       {/* Swing Card Stack */}
       <div className="relative w-full h-full">
-        {cards.slice(0, 3).map((card, index) => {
-          const zIndex = 100 + (3 - index); // Higher base z-index, top card highest
-          return (
-            <div
-              key={`${card.id}-${index}`} // Force re-render when position changes
-              ref={(el) => {
-                if (el) cardRefs.current[card.id] = el;
-              }}
-              data-idea-id={card.id}
-              className="absolute inset-0 cursor-grab transition-all duration-200"
-              style={{
-                zIndex: zIndex,
-                transform: `translateY(${index * 2}px) scale(${1 - index * 0.02})`, // Slight offset for visual depth
-              }}
-            >
-              <IdeaCard
-                idea={card}
-                position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
-              />
-            </div>
-          );
-        })}
+        {cards.slice(0, 3).map((card, index) => (
+          <div
+            key={card.id}
+            ref={(el) => {
+              if (el) cardRefs.current[card.id] = el;
+            }}
+            data-idea-id={card.id}
+            className="absolute inset-0 cursor-grab"
+            style={{
+              zIndex: 3 - index, // Top card has highest z-index
+            }}
+          >
+            <IdeaCard
+              idea={card}
+              position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
