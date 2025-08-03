@@ -76,17 +76,59 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
     },
   });
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Function to compress and resize image
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions (max 800px on longest side)
+        const maxSize = 800;
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, width, height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7); // 70% quality
+        resolve(compressedDataUrl);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        const base64 = result.split(',')[1]; // Remove data:image/jpeg;base64, prefix
-        setUploadedImage(result);
+      try {
+        const compressedDataUrl = await compressImage(file);
+        const base64 = compressedDataUrl.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+        setUploadedImage(compressedDataUrl);
         generateFromImageMutation.mutate(base64);
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to process image. Try a different one?",
+          variant: "destructive",
+          duration: 2000,
+        });
+      }
     }
   };
 
