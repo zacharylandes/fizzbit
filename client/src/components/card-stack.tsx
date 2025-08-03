@@ -152,7 +152,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   return (
     <div className="relative h-[280px] sm:h-[320px] w-full max-w-[300px] mx-auto z-20">
       {/* Swipe Instructions */}
-      <div className="fixed top-4 left-0 right-0 flex justify-center px-4 z-50">
+      <div className="fixed top-1 left-0 right-0 flex justify-center px-4 z-50">
         <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-xs font-medium text-gray-700">
           <span className="text-coral mr-1">👆</span>
           Swipe to interact
