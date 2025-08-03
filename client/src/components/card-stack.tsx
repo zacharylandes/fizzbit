@@ -12,6 +12,7 @@ interface CardStackProps {
 
 export function CardStack({ initialIdeas = [] }: CardStackProps) {
   const [cards, setCards] = useState<Idea[]>(initialIdeas);
+  const [animatingCards, setAnimatingCards] = useState<{ [key: string]: { direction: string; isAnimating: boolean } }>({});
   const cardRefs = useRef<{ [key: string]: HTMLElement }>({});
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const { toast } = useToast();
@@ -100,30 +101,46 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     const idea = cards.find(c => c.id === ideaId);
     if (!idea) return;
 
-    if (direction === 'left') {
-      // Dismiss
-      toast({
-        title: "Idea Dismissed",
-        description: "Bringing you a fresh idea!",
-      });
-    } else if (direction === 'right') {
-      // Save
-      saveIdeaMutation.mutate(idea.id);
-    } else if (direction === 'up') {
-      // Explore
-      saveIdeaMutation.mutate(idea.id);
-      exploreIdeaMutation.mutate(idea.id);
-    }
+    // Start animation
+    setAnimatingCards(prev => ({
+      ...prev,
+      [ideaId]: { direction, isAnimating: true }
+    }));
 
-    // Remove card from state and fetch new ones
-    setCards(prev => {
-      const newCards = prev.filter(c => c.id !== ideaId);
-      if (newCards.length <= 2) {
-        const excludeIds = newCards.map(c => c.id);
-        getRandomIdeasMutation.mutate(excludeIds);
+    // After animation completes, handle the action
+    setTimeout(() => {
+      if (direction === 'left') {
+        // Dismiss
+        toast({
+          title: "Idea Dismissed",
+          description: "Bringing you a fresh idea!",
+        });
+      } else if (direction === 'right') {
+        // Save
+        saveIdeaMutation.mutate(idea.id);
+      } else if (direction === 'up') {
+        // Explore
+        saveIdeaMutation.mutate(idea.id);
+        exploreIdeaMutation.mutate(idea.id);
       }
-      return newCards;
-    });
+
+      // Remove card from state and fetch new ones
+      setCards(prev => {
+        const newCards = prev.filter(c => c.id !== ideaId);
+        if (newCards.length <= 2) {
+          const excludeIds = newCards.map(c => c.id);
+          getRandomIdeasMutation.mutate(excludeIds);
+        }
+        return newCards;
+      });
+
+      // Clear animation state
+      setAnimatingCards(prev => {
+        const newState = { ...prev };
+        delete newState[ideaId];
+        return newState;
+      });
+    }, 300); // Animation duration
   };
 
   const handleTouchStart = (e: React.TouchEvent, ideaId: string) => {
@@ -188,25 +205,42 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
       {/* Touch Card Stack */}
       <div className="relative w-full h-full">
-        {cards.slice(0, 3).map((card, index) => (
-          <div
-            key={card.id}
-            ref={(el) => {
-              if (el) cardRefs.current[card.id] = el;
-            }}
-            className="absolute inset-0 cursor-grab touch-pan-x touch-pan-y"
-            style={{
-              zIndex: 3 - index, // Top card has highest z-index
-            }}
-            onTouchStart={(e) => handleTouchStart(e, card.id)}
-            onTouchEnd={(e) => handleTouchEnd(e, card.id)}
-          >
-            <IdeaCard
-              idea={card}
-              position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
-            />
-          </div>
-        ))}
+        {cards.slice(0, 3).map((card, index) => {
+          const animation = animatingCards[card.id];
+          const isAnimating = animation?.isAnimating;
+          const direction = animation?.direction;
+          
+          let animationClass = "";
+          if (isAnimating) {
+            if (direction === 'left') {
+              animationClass = "animate-slide-out-left";
+            } else if (direction === 'right') {
+              animationClass = "animate-slide-out-right";
+            } else if (direction === 'up') {
+              animationClass = "animate-slide-out-up";
+            }
+          }
+
+          return (
+            <div
+              key={card.id}
+              ref={(el) => {
+                if (el) cardRefs.current[card.id] = el;
+              }}
+              className={`absolute inset-0 cursor-grab touch-pan-x touch-pan-y transition-transform duration-300 ease-out ${animationClass}`}
+              style={{
+                zIndex: 3 - index, // Top card has highest z-index
+              }}
+              onTouchStart={(e) => handleTouchStart(e, card.id)}
+              onTouchEnd={(e) => handleTouchEnd(e, card.id)}
+            >
+              <IdeaCard
+                idea={card}
+                position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
