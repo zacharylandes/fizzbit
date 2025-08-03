@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, Image, ArrowRight, Heart, Eye } from "lucide-react";
+import { Sparkles, Image, ArrowRight, Heart, Eye, Lightbulb } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -9,8 +9,12 @@ export default function LandingPage() {
       <div className="relative pt-8 pb-4 px-4">
         <div className="text-center">
           <div className="flex items-center justify-center mb-4">
-            <Sparkles className="h-8 w-8 text-white mr-3" />
-            <h1 className="text-4xl font-bold text-white">Inspire Me</h1>
+            <div className="p-3 bg-white/20 rounded-full mr-4">
+              <Lightbulb className="h-10 w-10 text-yellow-300 animate-spin" style={{ animationDuration: '3s' }} />
+            </div>
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-coral via-teal-300 to-sky-300 bg-clip-text text-transparent">
+              Swivl
+            </h1>
           </div>
           <p className="text-white/90 text-lg mb-8">
             Generate endless creative ideas from your photos and thoughts
