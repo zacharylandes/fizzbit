@@ -13,7 +13,7 @@ interface CardStackProps {
 
 export function CardStack({ initialIdeas = [] }: CardStackProps) {
   const [cards, setCards] = useState<Idea[]>(initialIdeas);
-  const [stackVersion, setStackVersion] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
   const { toast } = useToast();
 
   // Fetch random ideas if no initial ideas provided
@@ -104,20 +104,22 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
   const handleSwipeLeft = (index: number) => {
     // Only allow swiping the top card for smooth animations
-    if (index !== 0) return;
+    if (index !== 0 || isAnimating) return;
     
-    // Delay card removal to allow exit animation
+    setIsAnimating(true);
+    
+    // Immediate card update to trigger position animations
+    setCards(prev => {
+      const newCards = prev.slice(1); // Remove top card
+      return newCards;
+    });
+    
+    // Get new idea after animation completes
     setTimeout(() => {
-      setCards(prev => {
-        // Remove top card - remaining cards will automatically move up
-        const newCards = prev.slice(1);
-        return newCards;
-      });
-      
-      // Get new idea to fill the stack back to 3 cards
       const excludeIds = cards.slice(1).map(c => c.id);
       getRandomIdeasMutation.mutate(excludeIds);
-    }, 250); // Match animation duration
+      setIsAnimating(false);
+    }, 400);
     
     toast({
       title: "Idea Dismissed",
@@ -127,50 +129,50 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
   const handleSwipeRight = (index: number) => {
     // Only allow swiping the top card for smooth animations
-    if (index !== 0) return;
+    if (index !== 0 || isAnimating) return;
     
-    // Save idea and delay card removal to allow exit animation
     const currentCard = cards[index];
     if (currentCard) {
+      setIsAnimating(true);
       saveIdeaMutation.mutate(currentCard.id);
       
+      // Immediate card update to trigger position animations
+      setCards(prev => {
+        const newCards = prev.slice(1); // Remove top card
+        return newCards;
+      });
+      
+      // Get new idea after animation completes
       setTimeout(() => {
-        setCards(prev => {
-          // Remove top card - remaining cards will automatically move up
-          const newCards = prev.slice(1);
-          return newCards;
-        });
-        
-        // Get new idea to fill the stack back to 3 cards
         const excludeIds = cards.slice(1).map(c => c.id);
         getRandomIdeasMutation.mutate(excludeIds);
-      }, 250); // Match animation duration
+        setIsAnimating(false);
+      }, 400);
     }
   };
 
   const handleSwipeUp = (index: number) => {
     console.log('handleSwipeUp called with index:', index);
     // Only allow swiping the top card for smooth animations
-    if (index !== 0) return;
+    if (index !== 0 || isAnimating) return;
     
-    // Save current card and delay removal to allow exit animation
     const currentCard = cards[index];
     console.log('Current card for swipe up:', currentCard);
     if (currentCard) {
-      console.log('Saving and exploring idea:', currentCard.id);
+      setIsAnimating(true);
       saveIdeaMutation.mutate(currentCard.id);
       
-      // Delay card removal to allow exit animation
-      setTimeout(() => {
-        setCards(prev => {
-          // Remove top card - remaining cards will automatically move up
-          const newCards = prev.slice(1);
-          return newCards;
-        });
-      }, 250); // Match animation duration
+      // Immediate card update to trigger position animations
+      setCards(prev => {
+        const newCards = prev.slice(1); // Remove top card
+        return newCards;
+      });
       
-      // Generate one related idea to add at the bottom
-      exploreIdeaMutation.mutate(currentCard.id);
+      // Generate related idea after animation completes
+      setTimeout(() => {
+        exploreIdeaMutation.mutate(currentCard.id);
+        setIsAnimating(false);
+      }, 400);
     }
     
     toast({
