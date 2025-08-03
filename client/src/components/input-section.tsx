@@ -11,9 +11,10 @@ interface InputSectionProps {
   onIdeasGenerated: (ideas: Idea[]) => void;
   promptValue?: string;
   onPromptChange?: (prompt: string) => void;
+  shouldAutoGenerate?: boolean;
 }
 
-export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChange }: InputSectionProps) {
+export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChange, shouldAutoGenerate = false }: InputSectionProps) {
   const [showTextInput, setShowTextInput] = useState(false);
   const [textPrompt, setTextPrompt] = useState(promptValue);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -151,10 +152,15 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     setTextPrompt(promptValue);
     if (promptValue) {
       setShowTextInput(true);
-      // Auto-generate ideas when prompt is set externally (from swipe up)
-      generateFromTextMutation.mutate(promptValue);
     }
   }, [promptValue]);
+
+  // Auto-generate ideas only when explicitly requested (from swipe up)
+  useEffect(() => {
+    if (shouldAutoGenerate && promptValue) {
+      generateFromTextMutation.mutate(promptValue);
+    }
+  }, [shouldAutoGenerate, promptValue]);
 
   const isLoading = generateFromTextMutation.isPending || generateFromImageMutation.isPending;
 

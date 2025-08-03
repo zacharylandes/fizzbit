@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function HomePage() {
   const [currentIdeas, setCurrentIdeas] = useState<Idea[]>([]);
   const [currentPrompt, setCurrentPrompt] = useState<string>("");
+  const [shouldAutoGenerate, setShouldAutoGenerate] = useState<boolean>(false);
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
 
@@ -34,18 +35,23 @@ export default function HomePage() {
     enabled: isAuthenticated, // Only fetch if authenticated
   }) as { data: { ideas: any[] } | undefined };
 
-  const handleIdeasGenerated = (ideas: Idea[]) => {
-    setCurrentIdeas(ideas);
-  };
 
   const handlePromptChange = (prompt: string) => {
     setCurrentPrompt(prompt);
+    // Turn off auto-generate when user is typing
+    setShouldAutoGenerate(false);
   };
 
   const handleSwipeUpPrompt = (ideaContent: string) => {
-    // Set the swiped idea as the new prompt and generate new ideas
+    // Set the swiped idea as the new prompt and trigger auto-generation
     setCurrentPrompt(ideaContent);
-    // The InputSection will handle the actual idea generation
+    setShouldAutoGenerate(true);
+  };
+
+  // Reset auto-generate flag after it's been used
+  const handleIdeasGeneratedWrapper = (ideas: Idea[]) => {
+    setCurrentIdeas(ideas);
+    setShouldAutoGenerate(false);
   };
 
   if (isLoading) {
@@ -80,9 +86,10 @@ export default function HomePage() {
           {/* Input Section */}
           <div className="mb-8">
             <InputSection 
-              onIdeasGenerated={handleIdeasGenerated}
+              onIdeasGenerated={handleIdeasGeneratedWrapper}
               promptValue={currentPrompt}
               onPromptChange={handlePromptChange}
+              shouldAutoGenerate={shouldAutoGenerate}
             />
           </div>
         </div>
