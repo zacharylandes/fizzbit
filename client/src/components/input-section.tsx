@@ -142,7 +142,7 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
 
   return (
     <div className="mb-3 relative z-10">
-      <div className="bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+      <div className="glass border border-electric-blue/30 rounded-xl p-3 shadow-lg">
         <div className="flex flex-row gap-2">
           {/* Image Upload Button */}
           <input
@@ -155,10 +155,10 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
           />
           <Button
             asChild
-            className="flex-1 bg-gradient-to-r from-coral to-pink-500 hover:from-coral/90 hover:to-pink-600 text-white rounded-lg py-3 px-4 font-medium shadow-md touch-target text-center"
+            className="flex-1 bg-gradient-electric hover:scale-105 glow-electric-blue text-white rounded-lg py-3 px-4 font-medium shadow-md touch-target text-center transition-all duration-300"
             disabled={isLoading}
           >
-            <label htmlFor="image-upload" className="cursor-pointer flex items-center justify-center">
+            <label htmlFor="image-upload" className="cursor-pointer flex items-center justify-center text-white font-medium">
               <Camera className="mr-1 h-4 w-4" />
               Image
             </label>
@@ -167,7 +167,7 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
           {/* Text Input Toggle */}
           <Button
             onClick={() => setShowTextInput(!showTextInput)}
-            className="flex-1 bg-gradient-to-r from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white rounded-lg py-3 px-4 font-medium shadow-md touch-target text-center"
+            className="flex-1 bg-gradient-neon hover:scale-105 glow-electric-pink text-white rounded-lg py-3 px-4 font-medium shadow-md touch-target text-center transition-all duration-300"
             disabled={isLoading}
           >
             <Edit className="mr-1 h-4 w-4" />
@@ -181,14 +181,14 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
             <Textarea 
               value={textPrompt}
               onChange={(e) => setTextPrompt(e.target.value)}
-              className="w-full h-20 p-3 border border-gray-300 rounded-lg focus:border-coral focus:outline-none resize-none text-sm" 
+              className="w-full h-20 p-3 glass border border-electric-blue/30 rounded-lg focus:border-electric-blue focus:outline-none resize-none text-sm text-white placeholder:text-white/50" 
               placeholder="Describe your inspiration..."
               disabled={isLoading}
             />
             <Button
               onClick={handleGenerateFromText}
               disabled={!textPrompt.trim() || isLoading}
-              className="w-full bg-gradient-to-r from-amber-500 to-coral hover:from-amber-600 hover:to-coral/90 text-white rounded-lg py-2 font-medium touch-target"
+              className="w-full bg-gradient-sunset hover:scale-105 glow-electric-orange text-white rounded-lg py-2 font-medium touch-target transition-all duration-300"
             >
               {isLoading ? (
                 <>
@@ -207,13 +207,13 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
         
         {/* Upload Preview Area - Compact */}
         {uploadedImage && (
-          <div className="mt-2 p-2 border border-dashed border-gray-300 rounded-lg text-center">
+          <div className="mt-2 p-2 glass border border-dashed border-electric-blue/30 rounded-lg text-center">
             <img 
               src={uploadedImage} 
               alt="Uploaded" 
               className="max-h-16 mx-auto rounded object-cover"
             />
-            <p className="text-xs text-gray-600 mt-1">
+            <p className="text-xs text-white/70 mt-1">
               {isLoading ? "Analyzing..." : "Ready!"}
             </p>
           </div>
