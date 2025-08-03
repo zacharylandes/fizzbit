@@ -97,19 +97,9 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     },
   });
 
-  // Recreate Swing stack whenever cards change
+  // Initialize Swing stack once
   useEffect(() => {
-    if (cards.length > 0) {
-      // Clear existing stack
-      if (stackRef.current) {
-        try {
-          stackRef.current.off('throwout');
-        } catch (e) {
-          // Ignore errors when clearing
-        }
-      }
-
-      // Create new stack
+    if (!stackRef.current) {
       const config = {
         allowedDirections: [
           Direction.LEFT,
@@ -183,25 +173,39 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
           return newCards;
         });
       });
+    }
+  }, [saveIdeaMutation, exploreIdeaMutation, toast, getRandomIdeasMutation]);
 
-      // Add all current cards to the stack with better validation
+  // Add new cards to existing stack when cards change
+  useEffect(() => {
+    if (stackRef.current && cards.length > 0) {
+      // Use longer delay to ensure React has finished updating DOM
       setTimeout(() => {
         cards.forEach(card => {
           const cardElement = cardRefs.current[card.id];
           if (cardElement && cardElement.parentNode && stackRef.current) {
-            // Double check the element is still in the DOM
+            // Check if element is in DOM and not already in stack
             if (document.contains(cardElement)) {
               try {
-                stackRef.current.createCard(cardElement);
+                // Check if card is already managed by stack
+                const existingCard = stackRef.current.getCard(cardElement);
+                if (!existingCard) {
+                  stackRef.current.createCard(cardElement);
+                }
               } catch (error) {
-                console.warn('Failed to create Swing card:', error);
+                // If getCard fails, card doesn't exist, so create it
+                try {
+                  stackRef.current.createCard(cardElement);
+                } catch (createError) {
+                  console.warn('Failed to create Swing card:', createError);
+                }
               }
             }
           }
         });
-      }, 100);
+      }, 200); // Longer delay for better reliability
     }
-  }, [cards, saveIdeaMutation, exploreIdeaMutation, toast, getRandomIdeasMutation]);
+  }, [cards]);
 
   if (cards.length === 0) {
     return (
