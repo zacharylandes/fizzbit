@@ -14,6 +14,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   const [cards, setCards] = useState<Idea[]>(initialIdeas);
   const [animatingCards, setAnimatingCards] = useState<{ [key: string]: { direction: string; isAnimating: boolean } }>({});
   const [refreshKey, setRefreshKey] = useState(0);
+  const [cardColors, setCardColors] = useState<{ [key: string]: number }>({});
   const cardRefs = useRef<{ [key: string]: HTMLElement }>({});
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const { toast } = useToast();
@@ -26,13 +27,27 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
   useEffect(() => {
     if (randomIdeasData && typeof randomIdeasData === 'object' && randomIdeasData !== null && 'ideas' in randomIdeasData && Array.isArray(randomIdeasData.ideas) && initialIdeas.length === 0) {
-      setCards(randomIdeasData.ideas.slice(0, 3));
+      const newCards = randomIdeasData.ideas.slice(0, 3);
+      setCards(newCards);
+      // Assign stable colors to new cards
+      const newColors: { [key: string]: number } = {};
+      newCards.forEach((card, index) => {
+        newColors[card.id] = index;
+      });
+      setCardColors(prev => ({ ...prev, ...newColors }));
     }
   }, [randomIdeasData, initialIdeas.length]);
 
   useEffect(() => {
     if (initialIdeas.length > 0) {
-      setCards(initialIdeas.slice(0, 3));
+      const newCards = initialIdeas.slice(0, 3);
+      setCards(newCards);
+      // Assign stable colors to initial cards
+      const newColors: { [key: string]: number } = {};
+      newCards.forEach((card, index) => {
+        newColors[card.id] = index;
+      });
+      setCardColors(prev => ({ ...prev, ...newColors }));
     }
   }, [initialIdeas]);
 
@@ -97,7 +112,16 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     onSuccess: (data) => {
       if (data.ideas && data.ideas.length > 0) {
         // Add new cards to the end
-        setCards(prev => [...prev, ...data.ideas]);
+        setCards(prev => {
+          const newCards = [...prev, ...data.ideas];
+          // Assign colors to new cards
+          const newColors: { [key: string]: number } = {};
+          data.ideas.forEach((card: Idea, index: number) => {
+            newColors[card.id] = (prev.length + index) % 3;
+          });
+          setCardColors(prevColors => ({ ...prevColors, ...newColors }));
+          return newCards;
+        });
       }
     },
   });
@@ -239,6 +263,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
                 key={`${card.id}-${index}-${refreshKey}`}
                 idea={card}
                 position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
+                colorIndex={cardColors[card.id] ?? 0}
               />
             </div>
           );

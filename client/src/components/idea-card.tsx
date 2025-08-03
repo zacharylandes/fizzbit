@@ -4,19 +4,21 @@ import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 interface IdeaCardProps {
   idea: Idea;
   position: "top" | "middle" | "bottom";
+  colorIndex: number;
 }
 
-const gradients = {
-  top: "from-pink-400 to-amber-400",
-  middle: "from-teal-400 to-emerald-400", 
-  bottom: "from-sky-400 to-red-400"
-};
+const gradients = [
+  "from-pink-400 to-amber-400",
+  "from-teal-400 to-emerald-400", 
+  "from-sky-400 to-red-400"
+];
 
-export function IdeaCard({ idea, position }: IdeaCardProps) {
+export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
   const cardNumber = position === "top" ? 1 : position === "middle" ? 2 : 3;
+  const gradient = gradients[colorIndex % gradients.length];
 
   return (
-    <div className={`relative rounded-2xl shadow-2xl overflow-hidden w-full h-full cursor-pointer bg-gradient-to-br ${gradients[position]}`}>
+    <div className={`relative rounded-2xl shadow-2xl overflow-hidden w-full h-full cursor-pointer bg-gradient-to-br ${gradient}`}>
       {/* Card Content - Full Height Gradient */}
       <div className="p-6 text-white relative h-full">
         <div className="flex items-start justify-between mb-4">
