@@ -57,48 +57,38 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-coral via-teal to-sky-500">
       {/* Main Header */}
-      <div className="bg-gradient-to-r from-coral/20 via-teal-500/20 to-sky-500/20 backdrop-blur-sm border-b border-white/30">
-        <div className="px-4 py-3">
+      <div className="bg-gradient-to-r from-coral/30 via-teal-500/30 to-sky-500/30 border-b border-white/20">
+        <div className="px-4 py-4">
           <div className="flex items-center justify-between">
             {/* SWIVL Brand */}
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-white/20 rounded-full">
+              <div className="p-2 bg-yellow-400/20 rounded-full">
                 <Lightbulb className="h-6 w-6 text-yellow-300 animate-spin" style={{ animationDuration: '3s' }} />
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-coral via-teal-300 to-sky-300 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold text-white">
                 SWIVL
               </h1>
             </div>
             
-            {/* Dynamic Auth Button */}
+            {/* Simple Auth Button */}
             {isAuthenticated ? (
-              <div className="flex items-center space-x-3">
-                {user && (
-                  <div className="flex items-center space-x-2 text-white">
-                    <User className="h-4 w-4" />
-                    <span className="text-sm font-medium">
-                      {(user as any).firstName || (user as any).email?.split('@')[0] || 'User'}
-                    </span>
-                  </div>
-                )}
-                <a href="/api/logout">
-                  <Button
-                    size="sm"
-                    className="bg-coral/80 backdrop-blur-sm rounded-full px-4 py-2 text-white touch-target hover:bg-coral flex items-center space-x-2 shadow-lg"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span className="text-sm font-medium">Logout</span>
-                  </Button>
-                </a>
-              </div>
+              <a href="/api/logout">
+                <Button
+                  size="sm"
+                  className="bg-coral text-white hover:bg-coral/80 rounded-full px-4 py-2 touch-target shadow-lg"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </a>
             ) : (
               <a href="/api/login">
                 <Button
                   size="sm"
-                  className="bg-coral/80 backdrop-blur-sm rounded-full px-4 py-2 text-white touch-target hover:bg-coral flex items-center space-x-2 shadow-lg"
+                  className="bg-coral text-white hover:bg-coral/80 rounded-full px-4 py-2 touch-target shadow-lg"
                 >
-                  <LogIn className="h-4 w-4" />
-                  <span className="text-sm font-medium">Login</span>
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Login
                 </Button>
               </a>
             )}
