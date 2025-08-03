@@ -119,7 +119,10 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         throwOutConfidence: (xOffset: number, yOffset: number, element: HTMLElement) => {
           // Safety check for element
           if (!element || !element.offsetWidth || !element.offsetHeight) {
-            return Math.abs(xOffset) > 80 || Math.abs(yOffset) > 80 ? 1 : 0;
+            // Fallback: check for significant movement in any direction
+            const xConfidence = Math.abs(xOffset) / 120; // ~40% of 300px default width
+            const yConfidence = Math.abs(yOffset) / 128; // ~40% of 320px default height
+            return Math.max(xConfidence, yConfidence);
           }
           // Lower threshold for easier throwing
           const xConfidence = Math.abs(xOffset) / (element.offsetWidth * 0.4);
