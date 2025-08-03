@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { Sparkles, Image, Type, ArrowUp } from "lucide-react";
 
 interface CardStackProps {
   initialIdeas?: Idea[];
@@ -313,10 +314,42 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
   if (cards.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 border-4 border-coral border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-white/80">Loading creative ideas...</p>
+      <div className="relative h-[400px] sm:h-[440px] w-full max-w-[340px] mx-auto z-30">
+        <div className="absolute inset-0">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border-0 h-full flex flex-col items-center justify-center p-8 text-center">
+            <div className="space-y-6">
+              {/* Icons */}
+              <div className="flex items-center justify-center space-x-4 mb-4">
+                <div className="p-3 bg-coral/20 rounded-full">
+                  <Sparkles className="h-8 w-8 text-coral animate-pulse" />
+                </div>
+                <div className="p-3 bg-teal-500/20 rounded-full">
+                  <Image className="h-8 w-8 text-teal-500" />
+                </div>
+                <div className="p-3 bg-sky-500/20 rounded-full">
+                  <Type className="h-8 w-8 text-sky-500" />
+                </div>
+              </div>
+              
+              {/* Message */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                  No ideas yet!
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Click above to get inspired ✨<br />
+                  Share a photo or describe your interests
+                </p>
+              </div>
+              
+              {/* Visual hint */}
+              <div className="flex items-center justify-center space-x-2 text-xs text-gray-400">
+                <ArrowUp className="h-4 w-4 animate-bounce" />
+                <span>Tap the input area</span>
+                <ArrowUp className="h-4 w-4 animate-bounce" style={{ animationDelay: '0.2s' }} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
