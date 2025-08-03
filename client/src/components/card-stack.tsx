@@ -117,17 +117,28 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
           Direction.UP
         ],
         throwOutConfidence: (xOffset: number, yOffset: number, element: HTMLElement) => {
+          // Safety check for element
+          if (!element || !element.offsetWidth || !element.offsetHeight) {
+            return Math.abs(xOffset) > 80 || Math.abs(yOffset) > 80 ? 1 : 0;
+          }
           // Lower threshold for easier throwing
           const xConfidence = Math.abs(xOffset) / (element.offsetWidth * 0.4);
           const yConfidence = Math.abs(yOffset) / (element.offsetHeight * 0.4);
           return Math.max(xConfidence, yConfidence);
         },
         throwOutDistance: (xOffset: number, yOffset: number, element: HTMLElement) => {
+          // Safety check for element
+          if (!element || !element.offsetWidth || !element.offsetHeight) {
+            return 400; // Default distance
+          }
           // Ensure cards fully leave the screen
           return Math.max(element.offsetWidth, element.offsetHeight) * 1.5;
         },
         rotation: (xOffset: number, yOffset: number, element: HTMLElement) => {
           const maxRotation = 20;
+          if (!element || !element.offsetWidth) {
+            return Math.max(Math.min(xOffset / 300 * maxRotation, maxRotation), -maxRotation);
+          }
           return Math.max(Math.min(xOffset / element.offsetWidth * maxRotation, maxRotation), -maxRotation);
         }
       };
