@@ -314,40 +314,38 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
   if (cards.length === 0) {
     return (
-      <div className="relative h-[400px] sm:h-[440px] w-full max-w-[340px] mx-auto z-30">
-        <div className="absolute inset-0">
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border-0 h-full flex flex-col items-center justify-center p-8 text-center">
-            <div className="space-y-6">
-              {/* Icons */}
-              <div className="flex items-center justify-center space-x-4 mb-4">
-                <div className="p-3 bg-coral/20 rounded-full">
-                  <Sparkles className="h-8 w-8 text-coral animate-pulse" />
-                </div>
-                <div className="p-3 bg-teal-500/20 rounded-full">
-                  <Image className="h-8 w-8 text-teal-500" />
-                </div>
-                <div className="p-3 bg-sky-500/20 rounded-full">
-                  <Type className="h-8 w-8 text-sky-500" />
-                </div>
+      <div className="relative h-[400px] sm:h-[440px] w-full max-w-[600px] mx-auto">
+        <div className="bg-card border border-border rounded-2xl h-full flex flex-col items-center justify-center p-8 text-center">
+          <div className="space-y-6">
+            {/* Icons */}
+            <div className="flex items-center justify-center space-x-4 mb-4">
+              <div className="p-3 bg-secondary rounded-xl">
+                <Sparkles className="h-6 w-6 text-primary" />
               </div>
-              
-              {/* Message */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  No ideas yet!
-                </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  Click above to get inspired ✨<br />
-                  Share a photo or describe your interests
-                </p>
+              <div className="p-3 bg-secondary rounded-xl">
+                <Image className="h-6 w-6 text-primary" />
               </div>
-              
-              {/* Visual hint */}
-              <div className="flex items-center justify-center space-x-2 text-xs text-gray-400">
-                <ArrowUp className="h-4 w-4 animate-bounce" />
-                <span>Tap the input area</span>
-                <ArrowUp className="h-4 w-4 animate-bounce" style={{ animationDelay: '0.2s' }} />
+              <div className="p-3 bg-secondary rounded-xl">
+                <Type className="h-6 w-6 text-primary" />
               </div>
+            </div>
+            
+            {/* Message */}
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                No ideas yet!
+              </h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Use the input above to get inspired<br />
+                Share a photo or describe your interests
+              </p>
+            </div>
+            
+            {/* Visual hint */}
+            <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
+              <ArrowUp className="h-4 w-4 animate-bounce" />
+              <span>Start creating</span>
+              <ArrowUp className="h-4 w-4 animate-bounce" style={{ animationDelay: '0.2s' }} />
             </div>
           </div>
         </div>
@@ -356,7 +354,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   }
 
   return (
-    <div className="relative h-[400px] sm:h-[440px] w-full max-w-[340px] mx-auto z-30">
+    <div className="relative h-[400px] sm:h-[440px] w-full max-w-[600px] mx-auto z-30">
       {/* Touch Card Stack */}
       <div className="relative w-full h-full">
         {cards.slice(0, 3).map((card, index) => {
