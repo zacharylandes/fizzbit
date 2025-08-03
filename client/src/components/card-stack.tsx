@@ -81,13 +81,17 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     onSuccess: (data, ideaId) => {
       console.log('🎯 EXPLORE SUCCESS - Received ideas:', data.ideas?.length || 0);
       if (data.ideas && data.ideas.length > 0) {
-        // Set the exploration context for future prefetching
+        // Set/maintain the exploration context for future prefetching
         const exploredIdea = cards.find(c => c.id === ideaId);
-        if (exploredIdea && exploredIdea.sourceContent) {
+        if (exploredIdea && exploredIdea.sourceContent && !currentExploreContext) {
+          // Only set new context if we don't already have one
+          console.log('🎯 SETTING NEW EXPLORE CONTEXT:', exploredIdea.sourceContent);
           setCurrentExploreContext({
             originalPrompt: exploredIdea.sourceContent,
             exploredIdea: exploredIdea
           });
+        } else if (currentExploreContext) {
+          console.log('🎯 MAINTAINING EXPLORE CONTEXT:', currentExploreContext.originalPrompt);
         }
         
         // Add related ideas to the front of the stack after current cards being shown
@@ -188,6 +192,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       } else if (direction === 'up') {
         // Explore - set this as the new exploration context
         if (idea.sourceContent) {
+          console.log('🎯 SETTING EXPLORE CONTEXT - Prompt:', idea.sourceContent, 'Idea:', idea.title);
           setCurrentExploreContext({
             originalPrompt: idea.sourceContent,
             exploredIdea: idea
@@ -206,10 +211,23 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         if (newCards.length <= 7) {
           console.log('🎯 PREFETCH CHECK - Cards left:', newCards.length, 'Explore context:', !!currentExploreContext);
           
-          // If we're in an exploration context, continue exploring
+          // If we're in an exploration context, continue exploring with the most recent contextual idea
           if (currentExploreContext) {
-            console.log('🎯 CONTINUING EXPLORATION - Based on:', currentExploreContext.exploredIdea.title);
-            exploreIdeaMutation.mutate(currentExploreContext.exploredIdea.id);
+            // Find the most recent idea that shares the same original prompt as our exploration context
+            const contextualIdeas = newCards.filter(card => 
+              card.sourceContent === currentExploreContext.originalPrompt
+            );
+            
+            if (contextualIdeas.length > 0) {
+              // Use the most recent contextual idea to continue exploration
+              const mostRecentContextualIdea = contextualIdeas[0]; // First card is most recent
+              console.log('🎯 CONTINUING EXPLORATION - Based on most recent:', mostRecentContextualIdea.title);
+              exploreIdeaMutation.mutate(mostRecentContextualIdea.id);
+            } else {
+              // Fallback to the original explored idea if no contextual ideas remain
+              console.log('🎯 CONTINUING EXPLORATION - Fallback to original:', currentExploreContext.exploredIdea.title);
+              exploreIdeaMutation.mutate(currentExploreContext.exploredIdea.id);
+            }
           } else {
             // Only fetch random ideas if we're not exploring
             const excludeIds = newCards.map(c => c.id);
