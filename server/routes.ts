@@ -192,7 +192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get random ideas for initial card stack
   app.get("/api/ideas/random", async (req, res) => {
     try {
-      const count = parseInt(req.query.count as string) || 3;
+      const count = parseInt(req.query.count as string) || 10; // Default to 10 ideas for better batching
       const excludeIds = req.query.exclude ? (req.query.exclude as string).split(',') : [];
       
       const ideas = await storage.getRandomIdeas(count, excludeIds);
@@ -242,11 +242,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create a more targeted prompt by combining original user intent with the specific idea they're interested in
-      let contextualPrompt = `Generate 3 new creative ideas inspired by this existing idea: "${parentIdea.title}" - ${parentIdea.description}.`;
+      let contextualPrompt = `Generate 10 new creative ideas inspired by this existing idea: "${parentIdea.title}" - ${parentIdea.description}.`;
       
       // If we have the original prompt/search context, combine it for better targeting
       if (parentIdea.sourceContent && parentIdea.sourceContent !== "uploaded_image") {
-        contextualPrompt = `The user originally was interested in: "${parentIdea.sourceContent}". They then showed particular interest in this idea: "${parentIdea.title}" - ${parentIdea.description}. Generate 3 new creative ideas that blend these concepts together, using both the original interest and this specific idea as inspiration. Make them feel like natural combinations or extensions that bridge both concepts.`;
+        contextualPrompt = `The user originally was interested in: "${parentIdea.sourceContent}". They then showed particular interest in this idea: "${parentIdea.title}" - ${parentIdea.description}. Generate 10 new creative ideas that blend these concepts together, using both the original interest and this specific idea as inspiration. Make them feel like natural combinations or extensions that bridge both concepts. Provide a good variety - some should be close variations, others should be more creative leaps that still connect the concepts.`;
       }
       
       contextualPrompt += ` Respond with JSON containing an array of ideas, each with 'title' and 'description' fields.`;
@@ -292,7 +292,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error exploring idea:", error);
       
-      // Fallback to contextual related ideas when AI is unavailable
+      // Fallback to contextual related ideas when AI is unavailable - generate 10 ideas
       const fallbackRelatedIdeas = parentIdea.sourceContent && parentIdea.sourceContent !== "uploaded_image" 
         ? [
             {
@@ -302,6 +302,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
             {
               title: `${parentIdea.sourceContent} Meets ${parentIdea.title}`,
               description: `A creative fusion that brings together your original vision for ${parentIdea.sourceContent} with the specific elements that attracted you to ${parentIdea.title}.`
+            },
+            {
+              title: `Advanced ${parentIdea.title} Concept`,
+              description: `Take this idea to the next level by incorporating advanced techniques inspired by your interest in ${parentIdea.sourceContent}.`
+            },
+            {
+              title: `Miniature ${parentIdea.title} Version`,
+              description: `Create a smaller-scale version that captures the essence of both ${parentIdea.title} and ${parentIdea.sourceContent}.`
+            },
+            {
+              title: `Seasonal ${parentIdea.title} Variation`,
+              description: `Adapt this concept to change with the seasons, incorporating elements from your original ${parentIdea.sourceContent} theme.`
+            },
+            {
+              title: `Budget-Friendly ${parentIdea.title}`,
+              description: `An affordable approach to ${parentIdea.title} that still honors your original vision for ${parentIdea.sourceContent}.`
+            },
+            {
+              title: `Interactive ${parentIdea.title} Experience`,
+              description: `Make this concept interactive and engaging, blending the best of ${parentIdea.title} with ${parentIdea.sourceContent}.`
+            },
+            {
+              title: `Collaborative ${parentIdea.title} Project`,
+              description: `Turn this into a group project where friends or family can contribute to both the ${parentIdea.title} concept and your ${parentIdea.sourceContent} interests.`
+            },
+            {
+              title: `Digital-Physical ${parentIdea.title} Hybrid`,
+              description: `Combine traditional elements of ${parentIdea.title} with modern technology, staying true to your ${parentIdea.sourceContent} vision.`
             },
             {
               title: `Next Level Creative Combination`,
@@ -320,6 +348,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
             {
               title: "Mix Textures and Materials",
               description: "Combine different textures like wood, metal, fabric, and natural elements to add depth and visual interest to your design."
+            },
+            {
+              title: "Color Variations",
+              description: "Experiment with different color palettes to see how they transform the mood and feel of this creative concept."
+            },
+            {
+              title: "Scale It Up",
+              description: "Take this idea and make it bigger and bolder, turning it into a statement piece that commands attention."
+            },
+            {
+              title: "Miniature Version",
+              description: "Create a smaller, more intimate version of this concept that works in tight spaces or as an accent piece."
+            },
+            {
+              title: "Seasonal Adaptation",
+              description: "Modify this idea to change with the seasons, keeping your space fresh and dynamic throughout the year."
+            },
+            {
+              title: "Functional Twist",
+              description: "Add practical functionality to this creative concept, making it both beautiful and useful in your daily life."
+            },
+            {
+              title: "Collaborative Project",
+              description: "Turn this into a group activity where friends or family can contribute their own creative touches and ideas."
+            },
+            {
+              title: "Modern Technology Integration",
+              description: "Incorporate smart technology or digital elements to give this traditional concept a contemporary edge."
             }
           ];
 

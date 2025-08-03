@@ -27,12 +27,12 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
   useEffect(() => {
     if (randomIdeasData && typeof randomIdeasData === 'object' && randomIdeasData !== null && 'ideas' in randomIdeasData && Array.isArray(randomIdeasData.ideas) && initialIdeas.length === 0) {
-      const newCards = randomIdeasData.ideas.slice(0, 3);
+      const newCards = randomIdeasData.ideas; // Use all random ideas, not just first 3
       setCards(newCards);
       // Assign stable colors to new cards
       const newColors: { [key: string]: number } = {};
       newCards.forEach((card, index) => {
-        newColors[card.id] = index;
+        newColors[card.id] = index % 3; // Cycle through 3 color options
       });
       setCardColors(prev => ({ ...prev, ...newColors }));
     }
@@ -40,12 +40,11 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
   useEffect(() => {
     if (initialIdeas.length > 0) {
-      const newCards = initialIdeas.slice(0, 3);
-      setCards(newCards);
+      setCards(initialIdeas); // Use all initial ideas
       // Assign stable colors to initial cards
       const newColors: { [key: string]: number } = {};
-      newCards.forEach((card, index) => {
-        newColors[card.id] = index;
+      initialIdeas.forEach((card, index) => {
+        newColors[card.id] = index % 3; // Cycle through 3 color options
       });
       setCardColors(prev => ({ ...prev, ...newColors }));
     }
@@ -78,8 +77,22 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     },
     onSuccess: (data) => {
       if (data.ideas && data.ideas.length > 0) {
-        // Add related ideas to the end of the stack
-        setCards(prev => [...prev, ...data.ideas]);
+        // Add related ideas to the front of the stack after current cards being shown
+        setCards(prev => {
+          // Keep the first 3 cards visible, then insert explore results
+          const visibleCards = prev.slice(0, 3);
+          const remainingCards = prev.slice(3);
+          const newCards = [...visibleCards, ...data.ideas, ...remainingCards];
+          
+          // Assign colors to new explore cards
+          const newColors: { [key: string]: number } = {};
+          data.ideas.forEach((card: Idea, index: number) => {
+            newColors[card.id] = (visibleCards.length + index) % 3;
+          });
+          setCardColors(prevColors => ({ ...prevColors, ...newColors }));
+          
+          return newCards;
+        });
       }
     },
     onError: () => {
@@ -163,13 +176,23 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         exploreIdeaMutation.mutate(idea.id);
       }
 
-      // Remove card from state and fetch new ones
+      // Remove card from state and check if we need more cards
       setCards(prev => {
         const newCards = prev.filter(c => c.id !== ideaId);
-        if (newCards.length <= 2) {
-          const excludeIds = newCards.map(c => c.id);
-          getRandomIdeasMutation.mutate(excludeIds);
+        
+        // Smart prefetching: fetch more random ideas when we have 7 or fewer cards left
+        // But only if we're not in an explore session (check if recent cards are explore results)
+        if (newCards.length <= 7) {
+          const recentCards = newCards.slice(0, 5);
+          const hasExploreResults = recentCards.some(card => card.parentIdeaId);
+          
+          // If we don't have explore results in the immediate queue, fetch random ideas
+          if (!hasExploreResults) {
+            const excludeIds = newCards.map(c => c.id);
+            getRandomIdeasMutation.mutate(excludeIds);
+          }
         }
+        
         return newCards;
       });
       
