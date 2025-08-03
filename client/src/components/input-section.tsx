@@ -93,9 +93,9 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
   const isLoading = generateFromTextMutation.isPending || generateFromImageMutation.isPending;
 
   return (
-    <div className="mb-4 relative z-10">
-      <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl">
-        <div className="flex flex-col gap-3 mb-4">
+    <div className="mb-3 relative z-10">
+      <div className="bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+        <div className="flex flex-row gap-2">
           {/* Image Upload Button */}
           <div className="w-full">
             <input
@@ -108,12 +108,12 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
             />
             <Button
               asChild
-              className="w-full bg-gradient-to-r from-coral to-pink-500 hover:from-coral/90 hover:to-pink-600 text-white rounded-xl py-6 px-6 font-semibold shadow-lg touch-target"
+              className="flex-1 bg-gradient-to-r from-coral to-pink-500 hover:from-coral/90 hover:to-pink-600 text-white rounded-lg py-3 px-4 font-medium shadow-md touch-target"
               disabled={isLoading}
             >
               <label htmlFor="image-upload" className="cursor-pointer">
-                <Camera className="mr-2 h-5 w-5" />
-                Upload Image
+                <Camera className="mr-1 h-4 w-4" />
+                Image
               </label>
             </Button>
           </div>
@@ -121,64 +121,57 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
           {/* Text Input Toggle */}
           <Button
             onClick={() => setShowTextInput(!showTextInput)}
-            className="w-full bg-gradient-to-r from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white rounded-xl py-6 px-6 font-semibold shadow-lg touch-target"
+            className="flex-1 bg-gradient-to-r from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white rounded-lg py-3 px-4 font-medium shadow-md touch-target"
             disabled={isLoading}
           >
-            <Edit className="mr-2 h-5 w-5" />
-            Text Prompt
+            <Edit className="mr-1 h-4 w-4" />
+            Text
           </Button>
         </div>
         
         {/* Text Input Area */}
         {showTextInput && (
-          <div className="space-y-4">
+          <div className="mt-2 space-y-2">
             <Textarea 
               value={textPrompt}
               onChange={(e) => setTextPrompt(e.target.value)}
-              className="w-full h-32 p-4 border-2 border-gray-200 rounded-xl focus:border-coral focus:outline-none resize-none" 
-              placeholder="Describe your inspiration or what you're looking for..."
+              className="w-full h-20 p-3 border border-gray-300 rounded-lg focus:border-coral focus:outline-none resize-none text-sm" 
+              placeholder="Describe your inspiration..."
               disabled={isLoading}
             />
             <Button
               onClick={handleGenerateFromText}
               disabled={!textPrompt.trim() || isLoading}
-              className="w-full bg-gradient-to-r from-amber-500 to-coral hover:from-amber-600 hover:to-coral/90 text-white rounded-xl py-3 font-semibold touch-target"
+              className="w-full bg-gradient-to-r from-amber-500 to-coral hover:from-amber-600 hover:to-coral/90 text-white rounded-lg py-2 font-medium touch-target"
             >
               {isLoading ? (
                 <>
-                  <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-3 h-3 mr-1 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   Generating...
                 </>
               ) : (
                 <>
-                  <Sparkles className="mr-2 h-5 w-5" />
-                  Generate Ideas
+                  <Sparkles className="mr-1 h-4 w-4" />
+                  Generate
                 </>
               )}
             </Button>
           </div>
         )}
         
-        {/* Upload Preview Area */}
-        <div className="mt-4 p-4 border-2 border-dashed border-gray-300 rounded-xl text-center text-gray-500">
-          {uploadedImage ? (
-            <div className="space-y-2">
-              <img 
-                src={uploadedImage} 
-                alt="Uploaded" 
-                className="max-h-32 mx-auto rounded-lg object-cover"
-              />
-              <p className="text-sm font-medium text-gray-700">
-                {isLoading ? "Analyzing image..." : "Image uploaded successfully!"}
-              </p>
-            </div>
-          ) : (
-            <>
-              <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-              <p>Uploaded image will appear here</p>
-            </>
-          )}
-        </div>
+        {/* Upload Preview Area - Compact */}
+        {uploadedImage && (
+          <div className="mt-2 p-2 border border-dashed border-gray-300 rounded-lg text-center">
+            <img 
+              src={uploadedImage} 
+              alt="Uploaded" 
+              className="max-h-16 mx-auto rounded object-cover"
+            />
+            <p className="text-xs text-gray-600 mt-1">
+              {isLoading ? "Analyzing..." : "Ready!"}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

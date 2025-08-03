@@ -45,6 +45,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       toast({
         title: "Idea Saved!",
         description: "The idea has been added to your saved collection.",
+        duration: 2000,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/ideas/saved"] });
     },
@@ -53,6 +54,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         title: "Error",
         description: "Failed to save the idea. Please try again.",
         variant: "destructive",
+        duration: 2000,
       });
     },
   });
@@ -70,6 +72,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         toast({
           title: "New Ideas Generated!",
           description: "Explore more creative variations based on your interest.",
+          duration: 2000,
         });
       }
     },
@@ -78,6 +81,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         title: "Error",
         description: "Failed to generate related ideas. Please try again.",
         variant: "destructive",
+        duration: 2000,
       });
     },
   });
@@ -112,8 +116,9 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       if (direction === 'left') {
         // Dismiss
         toast({
-          title: "Idea Dismissed",
+          title: "Idea Dismissed", 
           description: "Bringing you a fresh idea!",
+          duration: 2000,
         });
       } else if (direction === 'right') {
         // Save
@@ -194,15 +199,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   }
 
   return (
-    <div className="relative h-[280px] sm:h-[320px] w-full max-w-[300px] mx-auto z-30">
-      {/* Swipe Instructions */}
-      <div className="fixed top-1 left-0 right-0 flex justify-center px-4 z-50">
-        <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-xs font-medium text-gray-700">
-          <span className="text-coral mr-1">👆</span>
-          Swipe to interact
-        </div>
-      </div>
-
+    <div className="relative h-[400px] sm:h-[440px] w-full max-w-[340px] mx-auto z-30">
       {/* Touch Card Stack */}
       <div className="relative w-full h-full">
         {cards.slice(0, 3).map((card, index) => {
