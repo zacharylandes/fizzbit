@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState } from 'react';
 
 interface VerticalSwipeOptions {
   onSwipeUp?: () => void;
@@ -9,10 +9,32 @@ interface VerticalSwipeOptions {
 export function useVerticalSwipe({ onSwipeUp, onSwipeDown, threshold = 50 }: VerticalSwipeOptions) {
   const touchStartY = useRef<number>(0);
   const touchStartX = useRef<number>(0);
+  const [swipeOffset, setSwipeOffset] = useState<number>(0);
+  const [isActive, setIsActive] = useState<boolean>(false);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
     touchStartX.current = e.touches[0].clientX;
+    setSwipeOffset(0);
+    setIsActive(false);
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!touchStartY.current || !touchStartX.current) return;
+
+    const currentY = e.touches[0].clientY;
+    const currentX = e.touches[0].clientX;
+    
+    const deltaY = touchStartY.current - currentY;
+    const deltaX = Math.abs(touchStartX.current - currentX);
+    
+    // Only track vertical movement if horizontal movement is minimal
+    if (deltaX < 30 && deltaY > 10) {
+      setIsActive(true);
+      // Limit the offset to a reasonable range (0 to 80px upward)
+      const clampedOffset = Math.max(0, Math.min(deltaY, 80));
+      setSwipeOffset(clampedOffset);
+    }
   }, []);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
@@ -38,12 +60,18 @@ export function useVerticalSwipe({ onSwipeUp, onSwipeDown, threshold = 50 }: Ver
       }
     }
 
+    // Reset state
+    setSwipeOffset(0);
+    setIsActive(false);
     touchStartY.current = 0;
     touchStartX.current = 0;
   }, [onSwipeUp, onSwipeDown, threshold]);
 
   return {
     onTouchStart: handleTouchStart,
+    onTouchMove: handleTouchMove,
     onTouchEnd: handleTouchEnd,
+    swipeOffset,
+    isActive,
   };
 }

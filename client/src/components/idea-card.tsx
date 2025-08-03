@@ -21,7 +21,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
   const cardNumber = position === "top" ? 1 : position === "middle" ? 2 : 3;
   const [isSwipingUp, setIsSwipingUp] = useState(false);
 
-  const verticalSwipeHandlers = useVerticalSwipe({
+  const { swipeOffset, isActive, ...verticalSwipeHandlers } = useVerticalSwipe({
     onSwipeUp: () => {
       setIsSwipingUp(true);
       onSwipeUp();
@@ -35,6 +35,14 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
       className={`relative bg-white rounded-2xl shadow-2xl overflow-hidden w-full h-full cursor-pointer transition-transform duration-200 ${
         isSwipingUp ? 'scale-105' : ''
       }`}
+      style={{
+        transform: isActive 
+          ? `translateY(-${swipeOffset}px) scale(${1 + swipeOffset * 0.002})` 
+          : isSwipingUp 
+            ? 'scale(1.05)' 
+            : 'none',
+        transition: isActive ? 'none' : 'transform 0.2s ease-out'
+      }}
       {...verticalSwipeHandlers}
     >
       {/* Card Header - Always Visible */}
@@ -67,7 +75,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
             Dismiss
           </div>
           <div className={`flex items-center text-xs text-white/90 bg-white/10 px-2 py-1 rounded-full transition-all duration-200 ${
-            isSwipingUp ? 'bg-white/30 scale-110' : ''
+            isSwipingUp || isActive ? 'bg-white/30 scale-110' : ''
           }`}>
             <ArrowUp className="w-3 h-3 mr-1" />
             Explore
