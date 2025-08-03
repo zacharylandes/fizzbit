@@ -97,31 +97,29 @@ export function InputSection({ onIdeasGenerated }: InputSectionProps) {
       <div className="bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-lg">
         <div className="flex flex-row gap-2">
           {/* Image Upload Button */}
-          <div className="w-full">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-              id="image-upload"
-              disabled={isLoading}
-            />
-            <Button
-              asChild
-              className="flex-1 bg-gradient-to-r from-coral to-pink-500 hover:from-coral/90 hover:to-pink-600 text-white rounded-lg py-3 px-4 font-medium shadow-md touch-target"
-              disabled={isLoading}
-            >
-              <label htmlFor="image-upload" className="cursor-pointer">
-                <Camera className="mr-1 h-4 w-4" />
-                Image
-              </label>
-            </Button>
-          </div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+            id="image-upload"
+            disabled={isLoading}
+          />
+          <Button
+            asChild
+            className="flex-1 bg-gradient-to-r from-coral to-pink-500 hover:from-coral/90 hover:to-pink-600 text-white rounded-lg py-3 px-4 font-medium shadow-md touch-target text-center"
+            disabled={isLoading}
+          >
+            <label htmlFor="image-upload" className="cursor-pointer flex items-center justify-center">
+              <Camera className="mr-1 h-4 w-4" />
+              Image
+            </label>
+          </Button>
           
           {/* Text Input Toggle */}
           <Button
             onClick={() => setShowTextInput(!showTextInput)}
-            className="flex-1 bg-gradient-to-r from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white rounded-lg py-3 px-4 font-medium shadow-md touch-target"
+            className="flex-1 bg-gradient-to-r from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white rounded-lg py-3 px-4 font-medium shadow-md touch-target text-center"
             disabled={isLoading}
           >
             <Edit className="mr-1 h-4 w-4" />
