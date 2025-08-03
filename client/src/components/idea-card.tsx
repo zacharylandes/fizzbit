@@ -38,13 +38,9 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
         </div>
         
         <h3 className="text-xl font-bold mb-3 leading-tight">{idea.title}</h3>
-        <div className="relative">
-          <p className="text-white/90 leading-relaxed text-sm overflow-y-auto max-h-56 pr-2 scrollbar-thin scrollbar-track-white/10 scrollbar-thumb-white/30 hover:scrollbar-thumb-white/50">
-            {idea.description}
-          </p>
-          {/* Scroll indicator gradient at bottom */}
-          <div className="absolute bottom-0 left-0 right-2 h-4 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
-        </div>
+        <p className="text-white/90 leading-relaxed text-sm overflow-y-auto max-h-56 pr-2 scrollbar-thin scrollbar-track-white/10 scrollbar-thumb-white/30 hover:scrollbar-thumb-white/50">
+          {idea.description}
+        </p>
         
         {/* Swipe Indicators */}
         <div className="absolute bottom-4 left-6 right-6 flex justify-between items-center">

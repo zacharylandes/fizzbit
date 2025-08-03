@@ -76,13 +76,16 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       return response.json();
     },
     onSuccess: (data) => {
+      console.log('🎯 EXPLORE SUCCESS - Received ideas:', data.ideas?.length || 0);
       if (data.ideas && data.ideas.length > 0) {
         // Add related ideas to the front of the stack after current cards being shown
         setCards(prev => {
+          console.log('🎯 BEFORE - Total cards:', prev.length);
           // Keep the first 3 cards visible, then insert explore results
           const visibleCards = prev.slice(0, 3);
           const remainingCards = prev.slice(3);
           const newCards = [...visibleCards, ...data.ideas, ...remainingCards];
+          console.log('🎯 AFTER - Total cards:', newCards.length, 'New explore ideas:', data.ideas.length);
           
           // Assign colors to new explore cards
           const newColors: { [key: string]: number } = {};
@@ -179,16 +182,19 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       // Remove card from state and check if we need more cards
       setCards(prev => {
         const newCards = prev.filter(c => c.id !== ideaId);
+        console.log('🎯 CARDS AFTER SWIPE - Remaining:', newCards.length);
         
         // Smart prefetching: fetch more random ideas when we have 7 or fewer cards left
         // But only if we're not in an explore session (check if recent cards are explore results)
         if (newCards.length <= 7) {
           const recentCards = newCards.slice(0, 5);
           const hasExploreResults = recentCards.some(card => card.parentIdeaId);
+          console.log('🎯 PREFETCH CHECK - Cards left:', newCards.length, 'Has explore results:', hasExploreResults);
           
           // If we don't have explore results in the immediate queue, fetch random ideas
           if (!hasExploreResults) {
             const excludeIds = newCards.map(c => c.id);
+            console.log('🎯 FETCHING MORE - Excluding IDs:', excludeIds.length);
             getRandomIdeasMutation.mutate(excludeIds);
           }
         }
