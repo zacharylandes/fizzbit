@@ -218,9 +218,11 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
             }
           }
 
+          const position = index === 0 ? "top" : index === 1 ? "middle" : "bottom";
+          
           return (
             <div
-              key={card.id}
+              key={`${card.id}-${position}`}
               ref={(el) => {
                 if (el) cardRefs.current[card.id] = el;
               }}
@@ -233,7 +235,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
             >
               <IdeaCard
                 idea={card}
-                position={index === 0 ? "top" : index === 1 ? "middle" : "bottom"}
+                position={position}
               />
             </div>
           );
