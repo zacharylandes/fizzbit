@@ -235,6 +235,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).json({ error: "Idea not found" });
     }
 
+    // Debug logging for the parent idea
+    console.log('🔍 EXPLORE DEBUG - Parent idea:', {
+      id: parentIdea.id,
+      title: parentIdea.title,
+      description: parentIdea.description.substring(0, 100) + '...',
+      source: parentIdea.source,
+      sourceContent: parentIdea.sourceContent,
+      parentIdeaId: parentIdea.parentIdeaId
+    });
+
     try {
       // Check if OpenAI client is available
       if (!openai) {
@@ -250,6 +260,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       contextualPrompt += ` Respond with JSON containing an array of ideas, each with 'title' and 'description' fields.`;
+
+      // Debug logging for the contextual prompt
+      console.log('🔍 EXPLORE DEBUG - Contextual prompt:', contextualPrompt);
 
       // Use gpt-4o - the newest OpenAI model released May 13, 2024. do not change this unless explicitly requested by the user
       const response = await openai.chat.completions.create({
@@ -269,6 +282,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const aiResponse = JSON.parse(response.choices[0].message.content || "{}");
       const ideas = aiResponse.ideas || [];
+
+      // Debug logging for generated ideas
+      console.log('🔍 EXPLORE DEBUG - Generated ideas count:', ideas.length);
+      console.log('🔍 EXPLORE DEBUG - First 3 generated ideas:', ideas.slice(0, 3).map(idea => ({
+        title: idea.title,
+        description: idea.description?.substring(0, 80) + '...'
+      })));
 
       // Store generated ideas with parent reference
       const createdIdeas = [];
