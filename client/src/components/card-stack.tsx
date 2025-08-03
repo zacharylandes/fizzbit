@@ -99,19 +99,17 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
           console.log('🎯 MAINTAINING EXPLORE CONTEXT:', currentExploreContext.originalPrompt);
         }
         
-        // Add related ideas to the front of the stack after current cards being shown
+        // Add related ideas to the front of the stack so they show up immediately
         setCards(prev => {
           console.log('🎯 BEFORE - Total cards:', prev.length);
-          // Keep the first 3 cards visible, then insert explore results
-          const visibleCards = prev.slice(0, 3);
-          const remainingCards = prev.slice(3);
-          const newCards = [...visibleCards, ...data.ideas, ...remainingCards];
+          // Insert explore results at the beginning (they'll show up after the swiped card is removed)
+          const newCards = [...data.ideas, ...prev];
           console.log('🎯 AFTER - Total cards:', newCards.length, 'New explore ideas:', data.ideas.length);
           
           // Assign colors to new explore cards
           const newColors: { [key: string]: number } = {};
           data.ideas.forEach((card: Idea, index: number) => {
-            newColors[card.id] = (visibleCards.length + index) % 3;
+            newColors[card.id] = index % 3;
           });
           setCardColors(prevColors => ({ ...prevColors, ...newColors }));
           
