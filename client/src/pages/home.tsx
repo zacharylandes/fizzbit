@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { CardStack } from "@/components/card-stack";
 import { InputSection } from "@/components/input-section";
 import { type Idea } from "@shared/schema";
-import { Bookmark, Home, History, Settings, LogOut, User } from "lucide-react";
+import { Bookmark, Home, History, Settings, LogOut, User, Lightbulb, LogIn } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -56,21 +56,63 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-coral via-teal to-sky-500">
-      {/* Header with Input Section */}
-      <div className="relative pt-2 pb-2 px-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center space-x-3">
-            <h1 className="text-2xl font-bold text-white">Inspire Me</h1>
-            {user && (
-              <div className="flex items-center space-x-2 text-white/80">
-                <User className="h-4 w-4" />
-                <span className="text-sm">
-                  {user.firstName || user.email?.split('@')[0] || 'User'}
-                </span>
+      {/* Main Header */}
+      <div className="bg-white/10 backdrop-blur-sm border-b border-white/20">
+        <div className="px-4 py-3">
+          <div className="flex items-center justify-between">
+            {/* SWIVL Brand */}
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-white/20 rounded-full">
+                <Lightbulb className="h-6 w-6 text-yellow-300 animate-spin" style={{ animationDuration: '3s' }} />
               </div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-coral via-teal-300 to-sky-300 bg-clip-text text-transparent">
+                SWIVL
+              </h1>
+            </div>
+            
+            {/* Dynamic Auth Button */}
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-3">
+                {user && (
+                  <div className="flex items-center space-x-2 text-white/90">
+                    <User className="h-4 w-4" />
+                    <span className="text-sm font-medium">
+                      {user.firstName || user.email?.split('@')[0] || 'User'}
+                    </span>
+                  </div>
+                )}
+                <a href="/api/logout">
+                  <Button
+                    size="sm"
+                    className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white touch-target hover:bg-white/30 flex items-center space-x-2"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span className="text-sm">Logout</span>
+                  </Button>
+                </a>
+              </div>
+            ) : (
+              <a href="/api/login">
+                <Button
+                  size="sm"
+                  className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white touch-target hover:bg-white/30 flex items-center space-x-2"
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span className="text-sm">Login</span>
+                </Button>
+              </a>
             )}
           </div>
+        </div>
+      </div>
+      
+      {/* Content Header with Input Section */}
+      <div className="relative pt-4 pb-2 px-4">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-2">
+            <span className="text-white/90 text-lg font-medium">Get Inspired</span>
+          </div>
+          {isAuthenticated && (
             <Link href="/saved">
               <Button
                 size="sm"
@@ -84,68 +126,88 @@ export default function HomePage() {
                 )}
               </Button>
             </Link>
-            <a href="/api/logout">
-              <Button
-                size="sm"
-                className="bg-white/20 backdrop-blur-sm rounded-full p-3 text-white touch-target hover:bg-white/30"
-              >
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </a>
-          </div>
+          )}
         </div>
         
-        {/* Input Section moved into header */}
-        <InputSection onIdeasGenerated={handleIdeasGenerated} />
+        {/* Input Section */}
+        {isAuthenticated && (
+          <InputSection onIdeasGenerated={handleIdeasGenerated} />
+        )}
       </div>
 
       {/* Cards Section */}
-      <div className="px-4 pb-20">
-        <CardStack initialIdeas={currentIdeas} />
-      </div>
+      {isAuthenticated ? (
+        <div className="px-4 pb-20">
+          <CardStack initialIdeas={currentIdeas} />
+        </div>
+      ) : (
+        <div className="px-4 pb-20 text-center">
+          <div className="max-w-md mx-auto mt-16">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+              <h2 className="text-2xl font-bold text-white mb-4">
+                Welcome to SWIVL!
+              </h2>
+              <p className="text-white/90 mb-6 leading-relaxed">
+                Ready to unlock endless creative inspiration? Log in to start generating ideas from your photos and thoughts.
+              </p>
+              <a href="/api/login">
+                <Button 
+                  size="lg"
+                  className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 rounded-full px-8 py-3 text-lg font-medium shadow-lg touch-target"
+                >
+                  <LogIn className="mr-2 h-5 w-5" />
+                  Get Started
+                </Button>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-6 py-4">
-        <div className="flex justify-around items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex flex-col items-center space-y-1 touch-target text-coral"
-          >
-            <Home className="h-5 w-5" />
-            <span className="text-xs">Home</span>
-          </Button>
-          
-          <Link href="/saved">
+      {isAuthenticated && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-around items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex flex-col items-center space-y-1 touch-target text-coral"
+            >
+              <Home className="h-5 w-5" />
+              <span className="text-xs">Home</span>
+            </Button>
+            
+            <Link href="/saved">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex flex-col items-center space-y-1 touch-target text-gray-400 hover:text-gray-600"
+              >
+                <Bookmark className="h-5 w-5" />
+                <span className="text-xs">Saved</span>
+              </Button>
+            </Link>
+            
             <Button
               variant="ghost"
               size="sm"
               className="flex flex-col items-center space-y-1 touch-target text-gray-400 hover:text-gray-600"
             >
-              <Bookmark className="h-5 w-5" />
-              <span className="text-xs">Saved</span>
+              <History className="h-5 w-5" />
+              <span className="text-xs">History</span>
             </Button>
-          </Link>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex flex-col items-center space-y-1 touch-target text-gray-400 hover:text-gray-600"
-          >
-            <History className="h-5 w-5" />
-            <span className="text-xs">History</span>
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex flex-col items-center space-y-1 touch-target text-gray-400 hover:text-gray-600"
-          >
-            <Settings className="h-5 w-5" />
-            <span className="text-xs">Settings</span>
-          </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex flex-col items-center space-y-1 touch-target text-gray-400 hover:text-gray-600"
+            >
+              <Settings className="h-5 w-5" />
+              <span className="text-xs">Settings</span>
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
