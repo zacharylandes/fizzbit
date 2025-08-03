@@ -95,7 +95,7 @@ export default function LandingPage() {
           <a href="/api/login">
             <Button 
               size="lg"
-              className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 rounded-full px-8 py-4 text-lg font-medium shadow-lg touch-target"
+              className="bg-coral/80 backdrop-blur-sm text-white hover:bg-coral rounded-full px-8 py-4 text-lg font-medium shadow-lg touch-target"
             >
               Get Started
               <ArrowRight className="ml-2 h-5 w-5" />

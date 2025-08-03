@@ -57,7 +57,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-coral via-teal to-sky-500">
       {/* Main Header */}
-      <div className="bg-white/10 backdrop-blur-sm border-b border-white/20">
+      <div className="bg-gradient-to-r from-coral/20 via-teal-500/20 to-sky-500/20 backdrop-blur-sm border-b border-white/30">
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
             {/* SWIVL Brand */}
@@ -74,20 +74,20 @@ export default function HomePage() {
             {isAuthenticated ? (
               <div className="flex items-center space-x-3">
                 {user && (
-                  <div className="flex items-center space-x-2 text-white/90">
+                  <div className="flex items-center space-x-2 text-white">
                     <User className="h-4 w-4" />
                     <span className="text-sm font-medium">
-                      {user.firstName || user.email?.split('@')[0] || 'User'}
+                      {(user as any).firstName || (user as any).email?.split('@')[0] || 'User'}
                     </span>
                   </div>
                 )}
                 <a href="/api/logout">
                   <Button
                     size="sm"
-                    className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white touch-target hover:bg-white/30 flex items-center space-x-2"
+                    className="bg-coral/80 backdrop-blur-sm rounded-full px-4 py-2 text-white touch-target hover:bg-coral flex items-center space-x-2 shadow-lg"
                   >
                     <LogOut className="h-4 w-4" />
-                    <span className="text-sm">Logout</span>
+                    <span className="text-sm font-medium">Logout</span>
                   </Button>
                 </a>
               </div>
@@ -95,10 +95,10 @@ export default function HomePage() {
               <a href="/api/login">
                 <Button
                   size="sm"
-                  className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white touch-target hover:bg-white/30 flex items-center space-x-2"
+                  className="bg-coral/80 backdrop-blur-sm rounded-full px-4 py-2 text-white touch-target hover:bg-coral flex items-center space-x-2 shadow-lg"
                 >
                   <LogIn className="h-4 w-4" />
-                  <span className="text-sm">Login</span>
+                  <span className="text-sm font-medium">Login</span>
                 </Button>
               </a>
             )}
@@ -153,7 +153,7 @@ export default function HomePage() {
               <a href="/api/login">
                 <Button 
                   size="lg"
-                  className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 rounded-full px-8 py-3 text-lg font-medium shadow-lg touch-target"
+                  className="bg-coral/80 backdrop-blur-sm text-white hover:bg-coral rounded-full px-8 py-3 text-lg font-medium shadow-lg touch-target"
                 >
                   <LogIn className="mr-2 h-5 w-5" />
                   Get Started
