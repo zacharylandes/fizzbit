@@ -107,12 +107,12 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
           Direction.UP
         ],
         throwOutConfidence: (xOffset: number, yOffset: number, element: HTMLElement) => {
-          // Much more lenient thresholds - throw out after 60px movement
-          const threshold = 60;
+          // Require more intentional swiping - throw out after 110px movement
+          const threshold = 110;
           if (Math.abs(xOffset) > threshold || Math.abs(yOffset) > threshold) {
             return 1; // Immediately throw out
           }
-          return 0; // Don't throw out
+          return 0; // Snap back to deck
         },
         throwOutDistance: (xOffset: number, yOffset: number, element: HTMLElement) => {
           // Safety check for element
