@@ -201,14 +201,14 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     const absY = Math.abs(deltaY);
 
     if (absX > threshold && absX > absY) {
-      // Horizontal swipe
+      // Horizontal swipe - more horizontal than vertical
       if (deltaX > 0) {
         handleSwipe(ideaId, 'right');
       } else {
         handleSwipe(ideaId, 'left');
       }
-    } else if (absY > threshold && deltaY < 0) {
-      // Upward swipe - removed the absY > absX condition to make it more responsive
+    } else if (absY > threshold && absY > absX && deltaY < 0) {
+      // Upward swipe - more vertical than horizontal
       handleSwipe(ideaId, 'up');
     }
 
