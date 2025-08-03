@@ -21,24 +21,9 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const { toast } = useToast();
 
-  // Fetch random ideas if no initial ideas provided
-  const { data: randomIdeasData } = useQuery({
-    queryKey: ["/api/ideas/random"],
-    enabled: initialIdeas.length === 0,
-  });
+  // No auto-fetching of random ideas - users should start fresh each session
 
-  useEffect(() => {
-    if (randomIdeasData && typeof randomIdeasData === 'object' && randomIdeasData !== null && 'ideas' in randomIdeasData && Array.isArray(randomIdeasData.ideas) && initialIdeas.length === 0) {
-      const newCards = randomIdeasData.ideas; // Use all random ideas, not just first 3
-      setCards(newCards);
-      // Assign stable colors to new cards
-      const newColors: { [key: string]: number } = {};
-      newCards.forEach((card, index) => {
-        newColors[card.id] = index % 3; // Cycle through 3 color options
-      });
-      setCardColors(prev => ({ ...prev, ...newColors }));
-    }
-  }, [randomIdeasData, initialIdeas.length]);
+  // Removed auto-loading of random ideas - users start fresh each session
 
   useEffect(() => {
     if (initialIdeas.length > 0) {
