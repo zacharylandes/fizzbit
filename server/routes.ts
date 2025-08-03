@@ -241,17 +241,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error("OpenAI client not initialized");
       }
 
+      // Create a more targeted prompt by combining original user intent with the specific idea they're interested in
+      let contextualPrompt = `Generate 3 new creative ideas inspired by this existing idea: "${parentIdea.title}" - ${parentIdea.description}.`;
+      
+      // If we have the original prompt/search context, combine it for better targeting
+      if (parentIdea.sourceContent && parentIdea.sourceContent !== "uploaded_image") {
+        contextualPrompt = `The user originally was interested in: "${parentIdea.sourceContent}". They then showed particular interest in this idea: "${parentIdea.title}" - ${parentIdea.description}. Generate 3 new creative ideas that blend these concepts together, using both the original interest and this specific idea as inspiration. Make them feel like natural combinations or extensions that bridge both concepts.`;
+      }
+      
+      contextualPrompt += ` Respond with JSON containing an array of ideas, each with 'title' and 'description' fields.`;
+
       // Use gpt-4o - the newest OpenAI model released May 13, 2024. do not change this unless explicitly requested by the user
       const response = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
           {
             role: "system",
-            content: "You are a creative inspiration assistant. Generate ideas that build upon or are inspired by an existing idea. Create variations, extensions, or related concepts."
+            content: "You are a creative inspiration assistant. Generate ideas that thoughtfully combine user interests with specific concepts they've shown enthusiasm for. Create ideas that feel like natural extensions bridging multiple creative concepts together."
           },
           {
             role: "user",
-            content: `Generate 3 new creative ideas inspired by this existing idea: "${parentIdea.title}" - ${parentIdea.description}. Make them related but unique variations or extensions of this concept. Respond with JSON containing an array of ideas, each with 'title' and 'description' fields.`
+            content: contextualPrompt
           }
         ],
         response_format: { type: "json_object" }
@@ -282,21 +292,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error exploring idea:", error);
       
-      // Fallback to predefined related ideas when AI is unavailable
-      const fallbackRelatedIdeas = [
-        {
-          title: "Expand Your Creative Vision",
-          description: "Take this concept and apply it to a different room or space. Consider how the same principles could transform other areas of your home."
-        },
-        {
-          title: "Add a Personal Touch",
-          description: "Incorporate family photos, personal artwork, or meaningful objects that reflect your personality and make the space uniquely yours."
-        },
-        {
-          title: "Mix Textures and Materials",
-          description: "Combine different textures like wood, metal, fabric, and natural elements to add depth and visual interest to your design."
-        }
-      ];
+      // Fallback to contextual related ideas when AI is unavailable
+      const fallbackRelatedIdeas = parentIdea.sourceContent && parentIdea.sourceContent !== "uploaded_image" 
+        ? [
+            {
+              title: `Enhanced ${parentIdea.title}`,
+              description: `Take the core concept of "${parentIdea.title}" and combine it with your original interest in "${parentIdea.sourceContent}" to create an even more personalized version.`
+            },
+            {
+              title: `${parentIdea.sourceContent} Meets ${parentIdea.title}`,
+              description: `A creative fusion that brings together your original vision for ${parentIdea.sourceContent} with the specific elements that attracted you to ${parentIdea.title}.`
+            },
+            {
+              title: `Next Level Creative Combination`,
+              description: `Build upon both your original interest and this specific idea to create something that feels uniquely tailored to your creative vision.`
+            }
+          ]
+        : [
+            {
+              title: "Expand Your Creative Vision",
+              description: "Take this concept and apply it to a different room or space. Consider how the same principles could transform other areas of your home."
+            },
+            {
+              title: "Add a Personal Touch", 
+              description: "Incorporate family photos, personal artwork, or meaningful objects that reflect your personality and make the space uniquely yours."
+            },
+            {
+              title: "Mix Textures and Materials",
+              description: "Combine different textures like wood, metal, fabric, and natural elements to add depth and visual interest to your design."
+            }
+          ];
 
       const createdIdeas = [];
       for (const ideaData of fallbackRelatedIdeas) {
