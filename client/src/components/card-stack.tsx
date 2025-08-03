@@ -194,9 +194,9 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   }
 
   return (
-    <div className="relative h-[280px] sm:h-[320px] w-full">
+    <div className="relative h-[280px] sm:h-[320px] card-stack">
       {/* Swipe Instructions */}
-      <div className="absolute -top-12 sm:-top-16 left-0 right-0 flex justify-center px-4 z-40">
+      <div className="absolute -top-12 sm:-top-16 left-0 right-0 flex justify-center px-4">
         <motion.div 
           className="bg-white/90 backdrop-blur-sm rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700"
           animate={{ scale: [1, 1.05, 1] }}
@@ -207,18 +207,19 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         </motion.div>
       </div>
 
-      {/* Render cards - each card will position itself absolutely */}
-      <div className="relative w-full h-full">
-        {cards.slice(0, 3).map((card, index) => {
-          const position = index === 0 ? "top" : index === 1 ? "middle" : "bottom";
+      {/* Render cards in reverse order - bottom card first so it appears behind */}
+      <div className="space-y-0">
+        {cards.slice(0, 3).reverse().map((card, reverseIndex) => {
+          const originalIndex = 2 - reverseIndex;
+          const position = originalIndex === 0 ? "top" : originalIndex === 1 ? "middle" : "bottom";
           return (
             <IdeaCard
-              key={`${stackVersion}-${index}-${card.id}`}
+              key={`${stackVersion}-${originalIndex}-${card.id}`}
               idea={card}
               position={position}
-              onSwipeLeft={() => handleSwipeLeft(index)}
-              onSwipeRight={() => handleSwipeRight(index)}
-              onSwipeUp={() => handleSwipeUp(index)}
+              onSwipeLeft={() => handleSwipeLeft(originalIndex)}
+              onSwipeRight={() => handleSwipeRight(originalIndex)}
+              onSwipeUp={() => handleSwipeUp(originalIndex)}
             />
           );
         })}
