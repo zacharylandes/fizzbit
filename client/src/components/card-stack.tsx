@@ -207,7 +207,8 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       {/* Render cards in reverse order - bottom card first so it appears behind */}
       <div className="space-y-0">
         {cards.slice(0, 3).reverse().map((card, reverseIndex) => {
-          const originalIndex = 2 - reverseIndex;
+          const totalCards = Math.min(cards.length, 3);
+          const originalIndex = (totalCards - 1) - reverseIndex;
           const position = originalIndex === 0 ? "top" : originalIndex === 1 ? "middle" : "bottom";
           return (
             <IdeaCard
