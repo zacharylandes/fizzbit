@@ -117,17 +117,12 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
           Direction.UP
         ],
         throwOutConfidence: (xOffset: number, yOffset: number, element: HTMLElement) => {
-          // Safety check for element
-          if (!element || !element.offsetWidth || !element.offsetHeight) {
-            // Fallback: check for significant movement in any direction
-            const xConfidence = Math.abs(xOffset) / 120; // ~40% of 300px default width
-            const yConfidence = Math.abs(yOffset) / 128; // ~40% of 320px default height
-            return Math.max(xConfidence, yConfidence);
+          // Much more lenient thresholds - throw out after 60px movement
+          const threshold = 60;
+          if (Math.abs(xOffset) > threshold || Math.abs(yOffset) > threshold) {
+            return 1; // Immediately throw out
           }
-          // Lower threshold for easier throwing
-          const xConfidence = Math.abs(xOffset) / (element.offsetWidth * 0.4);
-          const yConfidence = Math.abs(yOffset) / (element.offsetHeight * 0.4);
-          return Math.max(xConfidence, yConfidence);
+          return 0; // Don't throw out
         },
         throwOutDistance: (xOffset: number, yOffset: number, element: HTMLElement) => {
           // Safety check for element
