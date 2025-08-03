@@ -44,7 +44,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
       data-card-id={idea.id}
       className={`relative bg-white rounded-2xl shadow-2xl overflow-hidden w-full h-full cursor-pointer transition-transform duration-200 ${
         isSwipingUp ? 'scale-105' : ''
-      } ${isActive || isSwipingUp ? 'z-50' : 'z-10'}`}
+      } ${isActive || isSwipingUp ? 'z-[100]' : 'z-10'}`}
       style={{
         transform: isActive 
           ? `translateY(-${swipeOffset}px) scale(${1 + swipeOffset * 0.002})` 
