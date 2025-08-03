@@ -1,5 +1,7 @@
 import { type Idea } from "@shared/schema";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
+import { useVerticalSwipe } from "@/hooks/use-vertical-swipe";
+import { useState } from "react";
 
 interface IdeaCardProps {
   idea: Idea;
@@ -17,9 +19,24 @@ const gradients = {
 
 export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp }: IdeaCardProps) {
   const cardNumber = position === "top" ? 1 : position === "middle" ? 2 : 3;
+  const [isSwipingUp, setIsSwipingUp] = useState(false);
+
+  const verticalSwipeHandlers = useVerticalSwipe({
+    onSwipeUp: () => {
+      setIsSwipingUp(true);
+      onSwipeUp();
+      setTimeout(() => setIsSwipingUp(false), 300);
+    },
+    threshold: 60
+  });
 
   return (
-    <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden w-full h-full cursor-pointer">
+    <div 
+      className={`relative bg-white rounded-2xl shadow-2xl overflow-hidden w-full h-full cursor-pointer transition-transform duration-200 ${
+        isSwipingUp ? 'scale-105' : ''
+      }`}
+      {...verticalSwipeHandlers}
+    >
       {/* Card Header - Always Visible */}
       <div className={`p-6 text-white relative bg-gradient-to-br ${gradients[position]}`}>
         <div className="flex items-start justify-between mb-4">
@@ -49,7 +66,9 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
             <ArrowLeft className="w-3 h-3 mr-1" />
             Dismiss
           </div>
-          <div className="flex items-center text-xs text-white/90 bg-white/10 px-2 py-1 rounded-full">
+          <div className={`flex items-center text-xs text-white/90 bg-white/10 px-2 py-1 rounded-full transition-all duration-200 ${
+            isSwipingUp ? 'bg-white/30 scale-110' : ''
+          }`}>
             <ArrowUp className="w-3 h-3 mr-1" />
             Explore
           </div>
