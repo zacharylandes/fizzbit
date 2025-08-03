@@ -7,6 +7,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#ff6b6b" />
     <title>Creative Inspiration - AI Idea Generator</title>
+    <script>
+      // Polyfill for libraries that expect Node.js global variable
+      if (typeof global === 'undefined') {
+        var global = window;
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
