@@ -26,10 +26,8 @@ export default function LandingPage() {
           <div className="text-center max-w-4xl mx-auto">
             {/* Large SWIVL Logo */}
             <div className="mb-8">
-              <h1 className="text-8xl md:text-9xl font-bold mb-4" style={{ fontFamily: 'Cherry Bomb One, cursive' }}>
-                <span className="bg-gradient-to-r from-electric-cyan via-electric-pink to-electric-purple bg-clip-text text-transparent drop-shadow-2xl glow-electric-blue">
-                  SWIVL
-                </span>
+              <h1 className="text-8xl md:text-9xl font-bold mb-4 text-white drop-shadow-2xl glow-electric-blue" style={{ fontFamily: 'Cherry Bomb One, cursive' }}>
+                SWIVL
               </h1>
             </div>
             
