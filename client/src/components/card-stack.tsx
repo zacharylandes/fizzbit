@@ -15,6 +15,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   const [animatingCards, setAnimatingCards] = useState<{ [key: string]: { direction: string; isAnimating: boolean } }>({});
   const [refreshKey, setRefreshKey] = useState(0);
   const [cardColors, setCardColors] = useState<{ [key: string]: number }>({});
+  const [currentExploreContext, setCurrentExploreContext] = useState<{ originalPrompt: string; exploredIdea: Idea } | null>(null);
   const cardRefs = useRef<{ [key: string]: HTMLElement }>({});
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const { toast } = useToast();
@@ -41,6 +42,8 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   useEffect(() => {
     if (initialIdeas.length > 0) {
       setCards(initialIdeas); // Use all initial ideas
+      // Reset exploration context when new ideas are provided
+      setCurrentExploreContext(null);
       // Assign stable colors to initial cards
       const newColors: { [key: string]: number } = {};
       initialIdeas.forEach((card, index) => {
@@ -75,9 +78,18 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       const response = await apiRequest("POST", `/api/ideas/${ideaId}/explore`);
       return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: (data, ideaId) => {
       console.log('🎯 EXPLORE SUCCESS - Received ideas:', data.ideas?.length || 0);
       if (data.ideas && data.ideas.length > 0) {
+        // Set the exploration context for future prefetching
+        const exploredIdea = cards.find(c => c.id === ideaId);
+        if (exploredIdea && exploredIdea.sourceContent) {
+          setCurrentExploreContext({
+            originalPrompt: exploredIdea.sourceContent,
+            exploredIdea: exploredIdea
+          });
+        }
+        
         // Add related ideas to the front of the stack after current cards being shown
         setCards(prev => {
           console.log('🎯 BEFORE - Total cards:', prev.length);
@@ -174,7 +186,13 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         // Save
         saveIdeaMutation.mutate(idea.id);
       } else if (direction === 'up') {
-        // Explore
+        // Explore - set this as the new exploration context
+        if (idea.sourceContent) {
+          setCurrentExploreContext({
+            originalPrompt: idea.sourceContent,
+            exploredIdea: idea
+          });
+        }
         saveIdeaMutation.mutate(idea.id);
         exploreIdeaMutation.mutate(idea.id);
       }
@@ -184,17 +202,18 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         const newCards = prev.filter(c => c.id !== ideaId);
         console.log('🎯 CARDS AFTER SWIPE - Remaining:', newCards.length);
         
-        // Smart prefetching: fetch more random ideas when we have 7 or fewer cards left
-        // But only if we're not in an explore session (check if recent cards are explore results)
+        // Smart prefetching: when we have 7 or fewer cards left
         if (newCards.length <= 7) {
-          const recentCards = newCards.slice(0, 5);
-          const hasExploreResults = recentCards.some(card => card.parentIdeaId);
-          console.log('🎯 PREFETCH CHECK - Cards left:', newCards.length, 'Has explore results:', hasExploreResults);
+          console.log('🎯 PREFETCH CHECK - Cards left:', newCards.length, 'Explore context:', !!currentExploreContext);
           
-          // If we don't have explore results in the immediate queue, fetch random ideas
-          if (!hasExploreResults) {
+          // If we're in an exploration context, continue exploring
+          if (currentExploreContext) {
+            console.log('🎯 CONTINUING EXPLORATION - Based on:', currentExploreContext.exploredIdea.title);
+            exploreIdeaMutation.mutate(currentExploreContext.exploredIdea.id);
+          } else {
+            // Only fetch random ideas if we're not exploring
             const excludeIds = newCards.map(c => c.id);
-            console.log('🎯 FETCHING MORE - Excluding IDs:', excludeIds.length);
+            console.log('🎯 FETCHING RANDOM - Excluding IDs:', excludeIds.length);
             getRandomIdeasMutation.mutate(excludeIds);
           }
         }
