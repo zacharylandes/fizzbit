@@ -16,9 +16,9 @@ export function IdeaCard({ idea, position }: IdeaCardProps) {
   const cardNumber = position === "top" ? 1 : position === "middle" ? 2 : 3;
 
   return (
-    <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden w-full h-full cursor-pointer">
-      {/* Card Header - Always Visible */}
-      <div className={`p-6 text-white relative bg-gradient-to-br ${gradients[position]}`}>
+    <div className={`relative rounded-2xl shadow-2xl overflow-hidden w-full h-full cursor-pointer bg-gradient-to-br ${gradients[position]}`}>
+      {/* Card Content - Full Height Gradient */}
+      <div className="p-6 text-white relative h-full">
         <div className="flex items-start justify-between mb-4">
           <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-medium">
             Idea #{cardNumber}
