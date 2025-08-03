@@ -21,7 +21,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-coral via-teal to-sky-500">
       {/* Header Section */}
-      <div className="relative pt-12 pb-8 px-6">
+      <div className="relative pt-8 pb-4 px-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-white">Inspire Me</h1>
           <Button
@@ -46,7 +46,7 @@ export default function HomePage() {
       <InputSection onIdeasGenerated={handleIdeasGenerated} />
 
       {/* Cards Section */}
-      <div className="px-6 pb-20">
+      <div className="px-6 pb-20 mt-16">
         <CardStack initialIdeas={currentIdeas} />
       </div>
 
