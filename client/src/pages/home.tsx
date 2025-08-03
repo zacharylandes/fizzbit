@@ -5,6 +5,7 @@ import { InputSection } from "@/components/input-section";
 import { type Idea } from "@shared/schema";
 import { Bookmark, Home, History, Settings } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 
 export default function HomePage() {
   const [currentIdeas, setCurrentIdeas] = useState<Idea[]>([]);
@@ -24,17 +25,19 @@ export default function HomePage() {
       <div className="relative pt-4 pb-2 px-4">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-2xl font-bold text-white">Inspire Me</h1>
-          <Button
-            size="sm"
-            className="bg-white/20 backdrop-blur-sm rounded-full p-3 text-white touch-target hover:bg-white/30"
-          >
-            <Bookmark className="h-5 w-5" />
-            {savedIdeasData?.ideas?.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-coral text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {savedIdeasData.ideas.length}
-              </span>
-            )}
-          </Button>
+          <Link href="/saved">
+            <Button
+              size="sm"
+              className="bg-white/20 backdrop-blur-sm rounded-full p-3 text-white touch-target hover:bg-white/30 relative"
+            >
+              <Bookmark className="h-5 w-5" />
+              {(savedIdeasData?.ideas?.length || 0) > 0 && (
+                <span className="absolute -top-1 -right-1 bg-coral text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {savedIdeasData?.ideas?.length || 0}
+                </span>
+              )}
+            </Button>
+          </Link>
         </div>
         
         {/* Input Section moved into header */}
@@ -58,14 +61,16 @@ export default function HomePage() {
             <span className="text-xs">Home</span>
           </Button>
           
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex flex-col items-center space-y-1 touch-target text-gray-400 hover:text-gray-600"
-          >
-            <Bookmark className="h-5 w-5" />
-            <span className="text-xs">Saved</span>
-          </Button>
+          <Link href="/saved">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex flex-col items-center space-y-1 touch-target text-gray-400 hover:text-gray-600"
+            >
+              <Bookmark className="h-5 w-5" />
+              <span className="text-xs">Saved</span>
+            </Button>
+          </Link>
           
           <Button
             variant="ghost"
