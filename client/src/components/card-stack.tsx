@@ -92,26 +92,14 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
     onSuccess: (data) => {
       if (data.ideas && data.ideas.length > 0) {
         // Add new cards to the end
-        setCards(prev => {
-          const newCards = [...prev, ...data.ideas];
-          // Add new cards to swing stack
-          setTimeout(() => {
-            data.ideas.forEach((idea: Idea) => {
-              const cardElement = cardRefs.current[idea.id];
-              if (cardElement && stackRef.current) {
-                stackRef.current.createCard(cardElement);
-              }
-            });
-          }, 100);
-          return newCards;
-        });
+        setCards(prev => [...prev, ...data.ideas]);
       }
     },
   });
 
-  // Initialize Swing stack
+  // Initialize Swing stack once
   useEffect(() => {
-    if (cards.length > 0 && !stackRef.current) {
+    if (!stackRef.current) {
       const config = {
         allowedDirections: [
           Direction.LEFT,
@@ -136,28 +124,29 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         const direction = eventObject.throwDirection;
         const cardElement = eventObject.target;
         const ideaId = cardElement.dataset.ideaId;
-        const idea = cards.find(c => c.id === ideaId);
         
-        if (!idea) return;
+        // Find the idea from current cards state
+        setCards(currentCards => {
+          const idea = currentCards.find(c => c.id === ideaId);
+          if (!idea) return currentCards;
 
-        if (direction === Direction.LEFT) {
-          // Dismiss
-          toast({
-            title: "Idea Dismissed",
-            description: "Bringing you a fresh idea!",
-          });
-        } else if (direction === Direction.RIGHT) {
-          // Save
-          saveIdeaMutation.mutate(idea.id);
-        } else if (direction === Direction.UP) {
-          // Explore
-          saveIdeaMutation.mutate(idea.id);
-          exploreIdeaMutation.mutate(idea.id);
-        }
+          if (direction === Direction.LEFT) {
+            // Dismiss
+            toast({
+              title: "Idea Dismissed",
+              description: "Bringing you a fresh idea!",
+            });
+          } else if (direction === Direction.RIGHT) {
+            // Save
+            saveIdeaMutation.mutate(idea.id);
+          } else if (direction === Direction.UP) {
+            // Explore
+            saveIdeaMutation.mutate(idea.id);
+            exploreIdeaMutation.mutate(idea.id);
+          }
 
-        // Remove card from state and fetch new ones
-        setCards(prev => {
-          const newCards = prev.filter(c => c.id !== ideaId);
+          // Remove card from state and fetch new ones
+          const newCards = currentCards.filter(c => c.id !== ideaId);
           if (newCards.length <= 2) {
             const excludeIds = newCards.map(c => c.id);
             getRandomIdeasMutation.mutate(excludeIds);
@@ -165,18 +154,32 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
           return newCards;
         });
       });
+    }
+  }, [saveIdeaMutation, exploreIdeaMutation, toast, getRandomIdeasMutation]);
 
-      // Add cards to stack with a small delay to ensure DOM elements are ready
+  // Add cards to Swing stack whenever cards change
+  useEffect(() => {
+    if (stackRef.current && cards.length > 0) {
+      // Add new cards to the stack with a delay to ensure DOM is ready
       setTimeout(() => {
         cards.forEach(card => {
           const cardElement = cardRefs.current[card.id];
           if (cardElement) {
-            stackRef.current.createCard(cardElement);
+            try {
+              // Check if card is already in stack, if not add it
+              const existingCard = stackRef.current.getCard(cardElement);
+              if (!existingCard) {
+                stackRef.current.createCard(cardElement);
+              }
+            } catch (error) {
+              // If getCard throws error, card doesn't exist, so create it
+              stackRef.current.createCard(cardElement);
+            }
           }
         });
-      }, 100);
+      }, 50);
     }
-  }, [cards, saveIdeaMutation, exploreIdeaMutation, toast, getRandomIdeasMutation]);
+  }, [cards]);
 
   if (cards.length === 0) {
     return (
