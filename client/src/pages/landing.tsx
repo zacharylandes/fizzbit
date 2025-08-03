@@ -12,7 +12,7 @@ export default function LandingPage() {
             <div className="p-3 bg-yellow-400/30 rounded-full mr-4">
               <Lightbulb className="h-10 w-10 text-yellow-300 animate-spin" style={{ animationDuration: '3s' }} />
             </div>
-            <h1 className="text-5xl font-bold text-white">
+            <h1 className="text-5xl font-bold text-gray-900 drop-shadow-lg">
               SWIVL
             </h1>
           </div>
