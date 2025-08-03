@@ -13,7 +13,6 @@ export default function LandingPage() {
             <div className="p-2 bg-gradient-electric rounded-lg glow-electric-blue">
               <Lightbulb className="h-6 w-6 text-white animate-pulse" />
             </div>
-            <span className="text-xl font-bold text-white">SWIVL</span>
           </div>
           <a href="/api/login">
             <button className="bg-gradient-neon text-white px-6 py-2 rounded-lg font-medium hover:scale-105 hover-glow transition-all duration-300">
@@ -25,10 +24,19 @@ export default function LandingPage() {
         {/* Hero Content */}
         <div className="max-w-7xl mx-auto px-6 py-20">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+            {/* Large SWIVL Logo */}
+            <div className="mb-8">
+              <h1 className="text-8xl md:text-9xl font-bold mb-4" style={{ fontFamily: 'Cherry Bomb One, cursive' }}>
+                <span className="bg-gradient-to-r from-electric-cyan via-electric-pink to-electric-purple bg-clip-text text-transparent drop-shadow-2xl glow-electric-blue">
+                  SWIVL
+                </span>
+              </h1>
+            </div>
+            
+            <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
               <span className="bg-gradient-to-r from-electric-cyan to-electric-blue bg-clip-text text-transparent">Make creative inspiration</span>
               <span className="block bg-gradient-to-r from-electric-pink to-electric-purple bg-clip-text text-transparent"> easy way</span>
-            </h1>
+            </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
               Generate endless creative ideas from your photos and thoughts with AI-powered inspiration that adapts to your unique style.
             </p>
