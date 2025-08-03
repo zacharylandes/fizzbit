@@ -33,7 +33,7 @@ const toastVariants = cva(
         info: "bg-gradient-to-r from-blue-500 to-sky-500 text-white border-l-4 border-l-blue-600 shadow-blue-200/50",
         warning: "bg-gradient-to-r from-amber-500 to-orange-500 text-white border-l-4 border-l-amber-600 shadow-amber-200/50",
         explore: "bg-gradient-to-r from-purple-500 to-pink-500 text-white border-l-4 border-l-purple-600 shadow-purple-200/50",
-        save: "bg-gradient-to-r from-coral to-pink-500 text-white border-l-4 border-l-pink-600 shadow-pink-200/50",
+        save: "bg-gradient-to-r from-pink-500 to-rose-500 text-white border-l-4 border-l-pink-600 shadow-pink-200/50",
       },
     },
     defaultVariants: {
