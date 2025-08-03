@@ -36,12 +36,8 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
         isSwipingUp ? 'scale-105' : ''
       } ${isActive || isSwipingUp ? 'z-50' : 'z-10'}`}
       style={{
-        transform: isActive 
-          ? `translateY(-${swipeOffset}px) scale(${1 + swipeOffset * 0.002})` 
-          : isSwipingUp 
-            ? 'scale(1.05)' 
-            : 'none',
-        transition: isActive ? 'none' : 'transform 0.2s ease-out'
+        transform: isSwipingUp ? 'scale(1.05)' : 'none',
+        transition: 'transform 0.2s ease-out'
       }}
       {...verticalSwipeHandlers}
     >

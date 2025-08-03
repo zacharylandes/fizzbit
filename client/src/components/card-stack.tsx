@@ -78,10 +78,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
           title: "New Ideas Generated!",
           description: "Explore more creative variations based on your interest.",
         });
-        // Move to next card
-        if (swiperRef.current) {
-          swiperRef.current.slideNext();
-        }
+        // Card already moved, don't move again
       }
     },
     onError: () => {
@@ -123,6 +120,10 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         saveIdeaMutation.mutate(card.id);
         break;
       case 'explore':
+        // Move card immediately like horizontal swipes
+        if (swiperRef.current) {
+          swiperRef.current.slideNext();
+        }
         saveIdeaMutation.mutate(card.id);
         exploreIdeaMutation.mutate(card.id);
         break;
