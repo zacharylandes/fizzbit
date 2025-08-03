@@ -103,16 +103,16 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   });
 
   const handleSwipeLeft = (index: number) => {
-    // Only allow swiping the top card (index 0)
-    if (index !== 0) return;
+    // Allow swiping any card
     
     // Delay card removal to allow exit animation
     setTimeout(() => {
-      setCards(prev => prev.slice(1));
+      setCards(prev => prev.filter((_, i) => i !== index));
       setStackVersion(prev => prev + 1);
       
       // Get new idea to fill the stack back to 3 cards
-      const excludeIds = cards.slice(1).map(c => c.id); // Use remaining cards for exclude
+      const remainingCards = cards.filter((_, i) => i !== index);
+      const excludeIds = remainingCards.map(c => c.id);
       getRandomIdeasMutation.mutate(excludeIds);
     }, 250); // Match animation duration
     
@@ -123,8 +123,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   };
 
   const handleSwipeRight = (index: number) => {
-    // Only allow swiping the top card (index 0)
-    if (index !== 0) return;
+    // Allow swiping any card
     
     // Save idea and delay card removal to allow exit animation
     const currentCard = cards[index];
@@ -132,11 +131,12 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       saveIdeaMutation.mutate(currentCard.id);
       
       setTimeout(() => {
-        setCards(prev => prev.slice(1));
+        setCards(prev => prev.filter((_, i) => i !== index));
         setStackVersion(prev => prev + 1);
         
         // Get new idea to fill the stack back to 3 cards
-        const excludeIds = cards.slice(1).map(c => c.id); // Use remaining cards for exclude
+        const remainingCards = cards.filter((_, i) => i !== index);
+        const excludeIds = remainingCards.map(c => c.id);
         getRandomIdeasMutation.mutate(excludeIds);
       }, 250); // Match animation duration
     }
@@ -144,11 +144,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
   const handleSwipeUp = (index: number) => {
     console.log('handleSwipeUp called with index:', index);
-    // Only allow swiping the top card (index 0)
-    if (index !== 0) {
-      console.log('Swipe up blocked - not top card');
-      return;
-    }
+    // Allow swiping any card
     
     // Save current card and delay removal to allow exit animation
     const currentCard = cards[index];
@@ -159,7 +155,7 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       
       // Delay card removal to allow exit animation
       setTimeout(() => {
-        setCards(prev => prev.slice(1));
+        setCards(prev => prev.filter((_, i) => i !== index));
         setStackVersion(prev => prev + 1);
       }, 250); // Match animation duration
       

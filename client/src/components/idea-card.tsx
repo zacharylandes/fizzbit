@@ -44,7 +44,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
   const isTopCard = position === "top";
   
   const handleSwipeLeft = useCallback(() => {
-    if (!isTopCard || isProcessing.current) return;
+    if (isProcessing.current) return;
     isProcessing.current = true;
     setIsExiting(true);
     setExitDirection("left");
@@ -53,10 +53,10 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
     setTimeout(() => {
       isProcessing.current = false;
     }, 300);
-  }, [isTopCard, onSwipeLeft]);
+  }, [onSwipeLeft]);
   
   const handleSwipeRight = useCallback(() => {
-    if (!isTopCard || isProcessing.current) return;
+    if (isProcessing.current) return;
     isProcessing.current = true;
     setIsExiting(true);
     setExitDirection("right");
@@ -65,10 +65,10 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
     setTimeout(() => {
       isProcessing.current = false;
     }, 300);
-  }, [isTopCard, onSwipeRight]);
+  }, [onSwipeRight]);
   
   const handleSwipeUp = useCallback(() => {
-    if (!isTopCard || isProcessing.current) return;
+    if (isProcessing.current) return;
     isProcessing.current = true;
     setIsExiting(true);
     setExitDirection("up");
@@ -77,7 +77,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
     setTimeout(() => {
       isProcessing.current = false;
     }, 300);
-  }, [isTopCard, onSwipeUp]);
+  }, [onSwipeUp]);
   
   const swipeHandlers = useSwipe({
     onSwipeLeft: handleSwipeLeft,
@@ -96,9 +96,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
 
   return (
     <motion.div
-      className={`relative bg-white rounded-2xl shadow-2xl overflow-hidden touch-target ${
-        isTopCard ? "cursor-pointer" : "cursor-default"
-      }`}
+      className="relative bg-white rounded-2xl shadow-2xl overflow-hidden touch-target cursor-pointer"
       style={{ 
         ...cardStyles[position],
         minHeight: "48px",
@@ -112,7 +110,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
           : { opacity: 1, y: 0, x: 0, rotate: 0 }
       }
       transition={{ duration: 0.25, ease: "easeOut" }}
-      {...(isTopCard ? swipeHandlers : {})}
+      {...swipeHandlers}
     >
       {/* Card Header - Always Visible */}
       <div className={`p-6 text-white relative bg-gradient-to-br ${gradients[position]}`}>
