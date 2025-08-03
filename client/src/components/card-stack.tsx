@@ -103,16 +103,20 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   });
 
   const handleSwipeLeft = (index: number) => {
-    // Allow swiping any card
+    // Only allow swiping the top card for smooth animations
+    if (index !== 0) return;
     
     // Delay card removal to allow exit animation
     setTimeout(() => {
-      setCards(prev => prev.filter((_, i) => i !== index));
+      setCards(prev => {
+        // Remove top card and add new card at the end
+        const newCards = prev.slice(1);
+        return newCards;
+      });
       setStackVersion(prev => prev + 1);
       
       // Get new idea to fill the stack back to 3 cards
-      const remainingCards = cards.filter((_, i) => i !== index);
-      const excludeIds = remainingCards.map(c => c.id);
+      const excludeIds = cards.slice(1).map(c => c.id);
       getRandomIdeasMutation.mutate(excludeIds);
     }, 250); // Match animation duration
     
@@ -123,7 +127,8 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   };
 
   const handleSwipeRight = (index: number) => {
-    // Allow swiping any card
+    // Only allow swiping the top card for smooth animations
+    if (index !== 0) return;
     
     // Save idea and delay card removal to allow exit animation
     const currentCard = cards[index];
@@ -131,12 +136,15 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       saveIdeaMutation.mutate(currentCard.id);
       
       setTimeout(() => {
-        setCards(prev => prev.filter((_, i) => i !== index));
+        setCards(prev => {
+          // Remove top card
+          const newCards = prev.slice(1);
+          return newCards;
+        });
         setStackVersion(prev => prev + 1);
         
         // Get new idea to fill the stack back to 3 cards
-        const remainingCards = cards.filter((_, i) => i !== index);
-        const excludeIds = remainingCards.map(c => c.id);
+        const excludeIds = cards.slice(1).map(c => c.id);
         getRandomIdeasMutation.mutate(excludeIds);
       }, 250); // Match animation duration
     }
@@ -144,7 +152,8 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
 
   const handleSwipeUp = (index: number) => {
     console.log('handleSwipeUp called with index:', index);
-    // Allow swiping any card
+    // Only allow swiping the top card for smooth animations
+    if (index !== 0) return;
     
     // Save current card and delay removal to allow exit animation
     const currentCard = cards[index];
@@ -155,7 +164,11 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
       
       // Delay card removal to allow exit animation
       setTimeout(() => {
-        setCards(prev => prev.filter((_, i) => i !== index));
+        setCards(prev => {
+          // Remove top card
+          const newCards = prev.slice(1);
+          return newCards;
+        });
         setStackVersion(prev => prev + 1);
       }, 250); // Match animation duration
       
@@ -181,9 +194,9 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   }
 
   return (
-    <div className="relative h-[280px] sm:h-[320px] card-stack">
+    <div className="relative h-[280px] sm:h-[320px] w-full">
       {/* Swipe Instructions */}
-      <div className="absolute -top-12 sm:-top-16 left-0 right-0 flex justify-center px-4">
+      <div className="absolute -top-12 sm:-top-16 left-0 right-0 flex justify-center px-4 z-40">
         <motion.div 
           className="bg-white/90 backdrop-blur-sm rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700"
           animate={{ scale: [1, 1.05, 1] }}
@@ -194,19 +207,18 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
         </motion.div>
       </div>
 
-      {/* Render cards in reverse order - bottom card first so it appears behind */}
-      <div className="space-y-0">
-        {cards.slice(0, 3).reverse().map((card, reverseIndex) => {
-          const originalIndex = 2 - reverseIndex;
-          const position = originalIndex === 0 ? "top" : originalIndex === 1 ? "middle" : "bottom";
+      {/* Render cards - each card will position itself absolutely */}
+      <div className="relative w-full h-full">
+        {cards.slice(0, 3).map((card, index) => {
+          const position = index === 0 ? "top" : index === 1 ? "middle" : "bottom";
           return (
             <IdeaCard
-              key={`${stackVersion}-${originalIndex}-${card.id}`}
+              key={`${stackVersion}-${index}-${card.id}`}
               idea={card}
               position={position}
-              onSwipeLeft={() => handleSwipeLeft(originalIndex)}
-              onSwipeRight={() => handleSwipeRight(originalIndex)}
-              onSwipeUp={() => handleSwipeUp(originalIndex)}
+              onSwipeLeft={() => handleSwipeLeft(index)}
+              onSwipeRight={() => handleSwipeRight(index)}
+              onSwipeUp={() => handleSwipeUp(index)}
             />
           );
         })}

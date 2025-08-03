@@ -21,18 +21,18 @@ const gradients = {
 const cardStyles = {
   bottom: {
     zIndex: 10,
-    transform: "scale(0.96)",
-    marginTop: "0px"
+    scale: 0.96,
+    y: 0
   },
   middle: {
     zIndex: 20,
-    transform: "scale(0.98)",
-    marginTop: "-160px" // Pull up to show top 1/3
+    scale: 0.98,
+    y: -160
   },
   top: {
     zIndex: 30,
-    transform: "scale(1)",
-    marginTop: "-160px" // Pull up to show top 1/3
+    scale: 1,
+    y: -160
   }
 };
 
@@ -44,7 +44,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
   const isTopCard = position === "top";
   
   const handleSwipeLeft = useCallback(() => {
-    if (isProcessing.current) return;
+    if (!isTopCard || isProcessing.current) return;
     isProcessing.current = true;
     setIsExiting(true);
     setExitDirection("left");
@@ -53,10 +53,10 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
     setTimeout(() => {
       isProcessing.current = false;
     }, 300);
-  }, [onSwipeLeft]);
+  }, [isTopCard, onSwipeLeft]);
   
   const handleSwipeRight = useCallback(() => {
-    if (isProcessing.current) return;
+    if (!isTopCard || isProcessing.current) return;
     isProcessing.current = true;
     setIsExiting(true);
     setExitDirection("right");
@@ -65,10 +65,10 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
     setTimeout(() => {
       isProcessing.current = false;
     }, 300);
-  }, [onSwipeRight]);
+  }, [isTopCard, onSwipeRight]);
   
   const handleSwipeUp = useCallback(() => {
-    if (isProcessing.current) return;
+    if (!isTopCard || isProcessing.current) return;
     isProcessing.current = true;
     setIsExiting(true);
     setExitDirection("up");
@@ -77,7 +77,7 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
     setTimeout(() => {
       isProcessing.current = false;
     }, 300);
-  }, [onSwipeUp]);
+  }, [isTopCard, onSwipeUp]);
   
   const swipeHandlers = useSwipe({
     onSwipeLeft: handleSwipeLeft,
@@ -96,21 +96,37 @@ export function IdeaCard({ idea, position, onSwipeLeft, onSwipeRight, onSwipeUp 
 
   return (
     <motion.div
-      className="relative bg-white rounded-2xl shadow-2xl overflow-hidden touch-target cursor-pointer"
+      className={`absolute bg-white rounded-2xl shadow-2xl overflow-hidden touch-target ${
+        isTopCard ? "cursor-pointer" : "cursor-default"
+      }`}
       style={{ 
-        ...cardStyles[position],
         minHeight: "48px",
         minWidth: "48px",
-        height: "220px"
+        height: "220px",
+        width: "100%",
+        left: 0,
+        zIndex: cardStyles[position].zIndex
       }}
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 50, scale: 0.9 }}
       animate={
         isExiting && exitDirection
           ? exitVariants[exitDirection]
-          : { opacity: 1, y: 0, x: 0, rotate: 0 }
+          : { 
+              opacity: 1, 
+              x: 0, 
+              rotate: 0,
+              scale: cardStyles[position].scale,
+              y: cardStyles[position].y
+            }
       }
-      transition={{ duration: 0.25, ease: "easeOut" }}
-      {...swipeHandlers}
+      transition={{ 
+        duration: isExiting ? 0.25 : 0.4, 
+        ease: "easeOut",
+        type: "spring",
+        stiffness: 300,
+        damping: 30
+      }}
+      {...(isTopCard ? swipeHandlers : {})}
     >
       {/* Card Header - Always Visible */}
       <div className={`p-6 text-white relative bg-gradient-to-br ${gradients[position]}`}>
