@@ -25,13 +25,13 @@ export default function LandingPage() {
       {/* Features */}
       <div className="px-4 pb-8">
         <div className="space-y-4 max-w-md mx-auto">
-          <Card className="bg-white/20 backdrop-blur-sm border border-white/30 shadow-xl">
+          <Card className="bg-black/20 backdrop-blur-sm border border-white/30 shadow-xl">
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-coral/20 rounded-lg">
                   <Image className="h-5 w-5 text-coral" />
                 </div>
-                <CardTitle className="text-lg text-white">Photo Magic</CardTitle>
+                <CardTitle className="text-lg text-white font-semibold">Photo Magic</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
@@ -41,13 +41,13 @@ export default function LandingPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/20 backdrop-blur-sm border border-white/30 shadow-xl">
+          <Card className="bg-black/20 backdrop-blur-sm border border-white/30 shadow-xl">
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-teal-500/20 rounded-lg">
                   <Sparkles className="h-5 w-5 text-teal-500" />
                 </div>
-                <CardTitle className="text-lg text-white">Text Prompts</CardTitle>
+                <CardTitle className="text-lg text-white font-semibold">Text Prompts</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
@@ -57,13 +57,13 @@ export default function LandingPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/20 backdrop-blur-sm border border-white/30 shadow-xl">
+          <Card className="bg-black/20 backdrop-blur-sm border border-white/30 shadow-xl">
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-sky-500/20 rounded-lg">
                   <Eye className="h-5 w-5 text-sky-500" />
                 </div>
-                <CardTitle className="text-lg text-white">Explore & Chain</CardTitle>
+                <CardTitle className="text-lg text-white font-semibold">Explore & Chain</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
@@ -73,13 +73,13 @@ export default function LandingPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/20 backdrop-blur-sm border border-white/30 shadow-xl">
+          <Card className="bg-black/20 backdrop-blur-sm border border-white/30 shadow-xl">
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-pink-500/20 rounded-lg">
                   <Heart className="h-5 w-5 text-pink-500" />
                 </div>
-                <CardTitle className="text-lg text-white">Save & Organize</CardTitle>
+                <CardTitle className="text-lg text-white font-semibold">Save & Organize</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
