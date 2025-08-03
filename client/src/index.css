@@ -225,4 +225,34 @@ input, textarea {
   .animate-bounce-in {
     animation: bounce-in 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
   }
+
+  /* Custom scrollbar styles for better mobile experience */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .scrollbar-track-white\/10::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+  }
+
+  .scrollbar-thumb-white\/30::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+  }
+
+  .scrollbar-thumb-white\/30:hover::-webkit-scrollbar-thumb,
+  .hover\:scrollbar-thumb-white\/50:hover::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Touch-friendly scrolling */
+  .scrollbar-thin {
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+  }
 }
