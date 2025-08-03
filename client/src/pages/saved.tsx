@@ -1,17 +1,99 @@
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Heart, Image, Type } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, Heart, Image, Type, Trash2 } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { type Idea } from "@shared/schema";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SavedPage() {
+  const [animatingCards, setAnimatingCards] = useState<{ [key: string]: boolean }>({});
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const { toast } = useToast();
+
   // Fetch saved ideas
   const { data: savedIdeasData, isLoading } = useQuery({
     queryKey: ["/api/ideas/saved"],
   }) as { data: { ideas: Idea[] } | undefined; isLoading: boolean };
 
   const savedIdeas = savedIdeasData?.ideas || [];
+
+  // Unsave idea mutation
+  const unsaveIdeaMutation = useMutation({
+    mutationFn: async (ideaId: string) => {
+      const response = await apiRequest("DELETE", `/api/ideas/${ideaId}/save`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/ideas/saved"] });
+      toast({
+        title: "Idea Removed",
+        description: "Moved to trash 🗑️",
+        duration: 2000,
+        variant: "info",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Oops!",
+        description: "Couldn't remove that idea. Try again?",
+        variant: "destructive",
+        duration: 2000,
+      });
+    },
+  });
+
+  const handleSwipeLeft = (ideaId: string) => {
+    // Start animation
+    setAnimatingCards(prev => ({ ...prev, [ideaId]: true }));
+    
+    // After animation, remove the idea
+    setTimeout(() => {
+      unsaveIdeaMutation.mutate(ideaId);
+      setAnimatingCards(prev => {
+        const newState = { ...prev };
+        delete newState[ideaId];
+        return newState;
+      });
+    }, 300);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent, ideaId: string) => {
+    const touch = e.touches[0];
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now()
+    };
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent, ideaId: string) => {
+    if (!touchStartRef.current) return;
+
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+    const deltaTime = Date.now() - touchStartRef.current.time;
+
+    // Only process quick swipes
+    if (deltaTime > 500) {
+      touchStartRef.current = null;
+      return;
+    }
+
+    const threshold = 80;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+
+    // Check for left swipe
+    if (deltaX < -threshold && absX > absY) {
+      handleSwipeLeft(ideaId);
+    }
+
+    touchStartRef.current = null;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-coral via-teal to-sky-500">
@@ -59,53 +141,72 @@ export default function SavedPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {savedIdeas.map((idea, index) => (
-              <Card key={idea.id} className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg leading-tight mb-2">
-                        {idea.title}
-                      </CardTitle>
-                      <div className="flex items-center space-x-2 text-xs text-gray-500">
-                        {idea.source === 'image' ? (
-                          <div className="flex items-center space-x-1">
-                            <Image className="h-3 w-3" />
-                            <span>From image</span>
+            {savedIdeas.map((idea, index) => {
+              const isAnimating = animatingCards[idea.id];
+              
+              return (
+                <div
+                  key={idea.id}
+                  className={`transition-all duration-300 ${
+                    isAnimating ? 'animate-slide-out-left opacity-0' : ''
+                  }`}
+                  onTouchStart={(e) => handleTouchStart(e, idea.id)}
+                  onTouchEnd={(e) => handleTouchEnd(e, idea.id)}
+                  style={{ touchAction: 'pan-y' }} // Allow vertical scrolling but capture horizontal swipes
+                >
+                  <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg relative overflow-hidden">
+                    {/* Swipe hint overlay */}
+                    <div className="absolute inset-0 bg-red-500 flex items-center justify-end pr-6 opacity-0 transition-opacity duration-200 hover:opacity-10">
+                      <Trash2 className="h-6 w-6 text-white" />
+                    </div>
+                    
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg leading-tight mb-2">
+                            {idea.title}
+                          </CardTitle>
+                          <div className="flex items-center space-x-2 text-xs text-gray-500">
+                            {idea.source === 'image' ? (
+                              <div className="flex items-center space-x-1">
+                                <Image className="h-3 w-3" />
+                                <span>From image</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center space-x-1">
+                                <Type className="h-3 w-3" />
+                                <span>From text</span>
+                              </div>
+                            )}
+                            {idea.parentIdeaId && (
+                              <span className="text-purple-600">• Explored idea</span>
+                            )}
                           </div>
-                        ) : (
-                          <div className="flex items-center space-x-1">
-                            <Type className="h-3 w-3" />
-                            <span>From text</span>
-                          </div>
-                        )}
-                        {idea.parentIdeaId && (
-                          <span className="text-purple-600">• Explored idea</span>
-                        )}
+                        </div>
+                        <div className={`w-3 h-3 rounded-full flex-shrink-0 ml-3 ${
+                          index % 3 === 0 
+                            ? 'bg-coral' 
+                            : index % 3 === 1 
+                            ? 'bg-teal-500' 
+                            : 'bg-sky-500'
+                        }`} />
                       </div>
-                    </div>
-                    <div className={`w-3 h-3 rounded-full flex-shrink-0 ml-3 ${
-                      index % 3 === 0 
-                        ? 'bg-coral' 
-                        : index % 3 === 1 
-                        ? 'bg-teal-500' 
-                        : 'bg-sky-500'
-                    }`} />
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <CardDescription className="text-gray-700 leading-relaxed">
-                    {idea.description}
-                  </CardDescription>
-                  {idea.sourceContent && idea.sourceContent !== "uploaded_image" && (
-                    <div className="mt-3 p-2 bg-gray-50 rounded-lg">
-                      <p className="text-xs text-gray-600 font-medium mb-1">Original inspiration:</p>
-                      <p className="text-xs text-gray-700 italic">"{idea.sourceContent}"</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <CardDescription className="text-gray-700 leading-relaxed">
+                        {idea.description}
+                      </CardDescription>
+                      {idea.sourceContent && idea.sourceContent !== "uploaded_image" && (
+                        <div className="mt-3 p-2 bg-gray-50 rounded-lg">
+                          <p className="text-xs text-gray-600 font-medium mb-1">Original inspiration:</p>
+                          <p className="text-xs text-gray-700 italic">"{idea.sourceContent}"</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

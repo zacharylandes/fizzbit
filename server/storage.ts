@@ -6,6 +6,7 @@ export interface IStorage {
   createIdea(idea: InsertIdea): Promise<Idea>;
   getRandomIdeas(count: number, excludeIds?: string[]): Promise<Idea[]>;
   saveIdea(ideaId: string): Promise<SavedIdea>;
+  unsaveIdea(ideaId: string): Promise<void>;
   getSavedIdeas(): Promise<Idea[]>;
   getIdeaChain(parentIdeaId: string): Promise<Idea[]>;
 }
@@ -117,6 +118,23 @@ export class MemStorage implements IStorage {
     }
     
     return savedIdea;
+  }
+
+  async unsaveIdea(ideaId: string): Promise<void> {
+    // Find and remove the saved idea entry
+    const savedIdeaEntries = Array.from(this.savedIdeas.entries());
+    const savedEntry = savedIdeaEntries.find(([_, savedIdea]) => savedIdea.ideaId === ideaId);
+    
+    if (savedEntry) {
+      this.savedIdeas.delete(savedEntry[0]);
+    }
+    
+    // Mark the idea as not saved
+    const idea = this.ideas.get(ideaId);
+    if (idea) {
+      idea.isSaved = 0;
+      this.ideas.set(ideaId, idea);
+    }
   }
 
   async getSavedIdeas(): Promise<Idea[]> {

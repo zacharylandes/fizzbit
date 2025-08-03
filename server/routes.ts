@@ -226,6 +226,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Unsave/delete an idea
+  app.delete("/api/ideas/:id/save", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.unsaveIdea(id);
+      res.json({ success: true, message: "Idea removed from saved" });
+    } catch (error) {
+      console.error("Error unsaving idea:", error);
+      res.status(500).json({ error: "Failed to remove idea" });
+    }
+  });
+
   // Generate ideas based on existing idea (for swipe up action)
   app.post("/api/ideas/:id/explore", async (req, res) => {
     const { id } = req.params;
