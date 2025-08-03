@@ -179,6 +179,8 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   };
 
   const handleTouchStart = (e: React.TouchEvent, ideaId: string) => {
+    // Prevent default behavior to avoid conflicts
+    e.preventDefault();
     const touch = e.touches[0];
     touchStartRef.current = {
       x: touch.clientX,
@@ -190,27 +192,35 @@ export function CardStack({ initialIdeas = [] }: CardStackProps) {
   const handleTouchEnd = (e: React.TouchEvent, ideaId: string) => {
     if (!touchStartRef.current) return;
 
+    // Prevent default behavior and stop propagation
+    e.preventDefault();
+    e.stopPropagation();
+
     const touch = e.changedTouches[0];
     const deltaX = touch.clientX - touchStartRef.current.x;
     const deltaY = touch.clientY - touchStartRef.current.y;
     const deltaTime = Date.now() - touchStartRef.current.time;
 
     // Only process quick swipes
-    if (deltaTime > 500) return;
+    if (deltaTime > 500) {
+      touchStartRef.current = null;
+      return;
+    }
 
-    const threshold = 60; // Lower threshold for better sensitivity
+    const threshold = 50; // Lower threshold for better sensitivity
     const absX = Math.abs(deltaX);
     const absY = Math.abs(deltaY);
 
     // Debug logging
-    console.log('Touch end:', { deltaX, deltaY, absX, absY, threshold });
+    console.log('Touch end:', { deltaX, deltaY, absX, absY, threshold, deltaTime });
     
-    if (absY > threshold && deltaY < 0) {
+    // Check for upward swipe first with more lenient conditions
+    if (deltaY < -threshold) {
       // Upward swipe - prioritize this first
       console.log('UP SWIPE DETECTED');
       handleSwipe(ideaId, 'up');
-    } else if (absX > threshold) {
-      // Horizontal swipe
+    } else if (absX > threshold && absX > absY) {
+      // Horizontal swipe - only if horizontal movement is dominant
       if (deltaX > 0) {
         console.log('RIGHT SWIPE DETECTED');
         handleSwipe(ideaId, 'right');
