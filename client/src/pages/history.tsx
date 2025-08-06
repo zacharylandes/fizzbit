@@ -35,40 +35,22 @@ export default function HistoryPage() {
     }
   }, [isAuthenticated, isLoading, toast]);
 
-  // For now, we'll use mock data since the backend doesn't have prompt history storage yet
-  // This would be replaced with a real API call when implemented
-  const mockHistory: PromptHistory[] = [
-    {
-      id: "1",
-      type: "text",
-      content: "Creative ideas for a sustainable garden",
-      timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
-      ideasGenerated: 5,
+  // Get real prompt history from API
+  const { data: promptHistoryData, isLoading: historyLoading, error } = useQuery<{prompts: PromptHistory[]}>({
+    queryKey: ["/api/prompts/history"],
+    enabled: isAuthenticated && !isLoading,
+    retry: (failureCount, error) => {
+      // Don't retry on 401 errors
+      if (error && error.message.includes("401")) {
+        return false;
+      }
+      return failureCount < 3;
     },
-    {
-      id: "2",
-      type: "image",
-      content: "uploaded_image",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-      ideasGenerated: 4,
-    },
-    {
-      id: "3",
-      type: "text",
-      content: "Modern minimalist bedroom decor",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
-      ideasGenerated: 6,
-    },
-    {
-      id: "4",
-      type: "text",
-      content: "Healthy meal prep ideas for busy weekdays",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
-      ideasGenerated: 7,
-    },
-  ];
+  });
 
-  const filteredHistory = mockHistory.filter(item =>
+  const promptHistory: PromptHistory[] = promptHistoryData?.prompts || [];
+  
+  const filteredHistory = promptHistory.filter((item: PromptHistory) =>
     item.content.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -105,12 +87,12 @@ export default function HistoryPage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || historyLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="w-8 h-8 mx-auto mb-4 border-2 border-electric-blue border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">Loading your prompt history...</p>
         </div>
       </div>
     );
@@ -171,7 +153,7 @@ export default function HistoryPage() {
             </CardContent>
           </Card>
         ) : (
-          filteredHistory.map((prompt, index) => {
+          filteredHistory.map((prompt: PromptHistory, index: number) => {
             const cardStyles = [
               "bg-gradient-electric border-electric-blue/30 glow-electric-blue",
               "bg-gradient-neon border-electric-pink/30 glow-electric-pink", 
@@ -235,12 +217,14 @@ export default function HistoryPage() {
         )}
       </div>
 
-      {/* Note about mock data */}
-      <div className="mt-8 p-4 glass border border-electric-blue/20 rounded-lg">
-        <p className="text-xs text-white/50 text-center">
-          Note: This is currently showing sample data. Prompt history storage will be implemented with backend integration.
-        </p>
-      </div>
+      {/* Error state */}
+      {error && (
+        <div className="mt-8 p-4 glass border border-red-500/30 rounded-lg">
+          <p className="text-sm text-red-400 text-center">
+            Failed to load prompt history. Please try refreshing the page.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

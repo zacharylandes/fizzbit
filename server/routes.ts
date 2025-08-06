@@ -33,8 +33,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     };
   
   // Generate ideas from text prompt
-  app.post("/api/ideas/generate-from-text", asyncHandler(async (req, res) => {
+  app.post("/api/ideas/generate-from-text", asyncHandler(async (req: any, res) => {
     const { prompt } = req.body;
+    const userId = req.user?.claims?.sub; // Get user ID if authenticated
     
     if (!prompt) {
       return res.status(400).json({ error: "Prompt is required" });
@@ -65,7 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const aiResponse = JSON.parse(response.choices[0].message.content || "{}");
       const ideas = aiResponse.ideas || [];
 
-      // Store generated ideas in database (no user required for generated ideas)
+      // Store generated ideas in database with user ID if authenticated
       const createdIdeas = [];
       for (const ideaData of ideas) {
         const idea = await storage.createIdea({
@@ -75,7 +76,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           sourceContent: prompt,
           isSaved: 0,
           metadata: { generatedAt: new Date().toISOString() }
-        });
+        }, userId);
         createdIdeas.push(idea);
       }
 
@@ -120,7 +121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             generatedAt: new Date().toISOString(),
             type: "fallback"
           }
-        });
+        }, userId);
         createdIdeas.push(idea);
       }
 
@@ -129,9 +130,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
 
   // Generate ideas from image
-  app.post("/api/ideas/generate-from-image", async (req, res) => {
+  app.post("/api/ideas/generate-from-image", async (req: any, res) => {
     try {
       const { imageBase64 } = req.body;
+      const userId = req.user?.claims?.sub; // Get user ID if authenticated
       
       if (!imageBase64) {
         return res.status(400).json({ error: "Image data is required" });
@@ -182,7 +184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             generatedAt: new Date().toISOString(),
             imageAnalysis: true
           }
-        });
+        }, userId);
         createdIdeas.push(idea);
       }
 
@@ -257,9 +259,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get prompt history - unique prompts used by the user
+  app.get("/api/prompts/history", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const promptHistory = await storage.getPromptHistory(userId);
+      res.json({ prompts: promptHistory });
+    } catch (error) {
+      console.error("Error getting prompt history:", error);
+      res.status(500).json({ error: "Failed to get prompt history" });
+    }
+  });
+
   // Generate ideas based on existing idea (for swipe up action)
-  app.post("/api/ideas/:id/explore", async (req, res) => {
+  app.post("/api/ideas/:id/explore", async (req: any, res) => {
     const { id } = req.params;
+    const userId = req.user?.claims?.sub; // Get user ID if authenticated
     const parentIdea = await storage.getIdea(id);
     
     if (!parentIdea) {
@@ -315,7 +330,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             generatedAt: new Date().toISOString(),
             basedOn: parentIdea.id
           }
-        });
+        }, userId);
         createdIdeas.push(idea);
       }
 
