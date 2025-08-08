@@ -179,7 +179,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
           />
           <Button
             asChild
-            className="flex-1 bg-primary-blue hover:bg-primary-blue/90 hover-lift text-white rounded-lg py-3 px-4 font-medium card-shadow touch-target text-center transition-all duration-300"
+            className="flex-1 bg-card-blue-gray hover:bg-card-blue-gray/90 hover-lift text-white rounded-lg py-3 px-4 font-medium card-shadow touch-target text-center transition-all duration-300"
             disabled={isLoading}
           >
             <label htmlFor="image-upload" className="cursor-pointer flex items-center justify-center text-white font-medium">
@@ -191,7 +191,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
           {/* Text Input Toggle */}
           <Button
             onClick={() => setShowTextInput(!showTextInput)}
-            className="flex-1 bg-primary-teal hover:bg-primary-teal/90 hover-lift text-white rounded-lg py-3 px-4 font-medium card-shadow touch-target text-center transition-all duration-300"
+            className="flex-1 bg-card-sage hover:bg-card-sage/90 hover-lift text-white rounded-lg py-3 px-4 font-medium card-shadow touch-target text-center transition-all duration-300"
             disabled={isLoading}
           >
             <Edit className="mr-2 h-4 w-4" />
@@ -212,7 +212,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
             <Button
               onClick={handleGenerateFromText}
               disabled={!textPrompt.trim() || isLoading}
-              className="w-full bg-primary-purple hover:bg-primary-purple/90 hover-lift text-white rounded-lg py-3 font-medium touch-target transition-all duration-300 card-shadow"
+              className="w-full bg-card-purple-gray hover:bg-card-purple-gray/90 hover-lift text-white rounded-lg py-3 font-medium touch-target transition-all duration-300 card-shadow"
             >
               {isLoading ? (
                 <>

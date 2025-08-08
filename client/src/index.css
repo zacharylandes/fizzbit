@@ -54,45 +54,47 @@ input, textarea {
 }
 
 :root {
-  /* Athos 2.0 Light Theme Colors */
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(240, 10%, 3.9%);
-  --muted: hsl(240, 4.8%, 95.9%);
-  --muted-foreground: hsl(240, 3.8%, 46.1%);
+  /* Athos 2.0 Beige Theme Colors */
+  --background: hsl(35, 20%, 96%);  /* Warm beige background */
+  --foreground: hsl(0, 0%, 20%);
+  --muted: hsl(35, 15%, 92%);
+  --muted-foreground: hsl(0, 0%, 45%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 20%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(240, 10%, 3.9%);
-  --border: hsl(240, 5.9%, 90%);
-  --input: hsl(240, 5.9%, 90%);
-  --primary: hsl(240, 9%, 9%);
+  --card-foreground: hsl(0, 0%, 20%);
+  --border: hsl(35, 12%, 85%);
+  --input: hsl(35, 12%, 90%);
+  --primary: hsl(270, 60%, 50%);  /* Purple primary */
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(240, 4.8%, 95.9%);
-  --secondary-foreground: hsl(240, 5.9%, 10%);
-  --accent: hsl(240, 4.8%, 95.9%);
-  --accent-foreground: hsl(240, 5.9%, 10%);
+  --secondary: hsl(35, 15%, 95%);
+  --secondary-foreground: hsl(0, 0%, 25%);
+  --accent: hsl(35, 15%, 93%);
+  --accent-foreground: hsl(0, 0%, 25%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(240, 5%, 64.9%);
   --radius: 0.5rem;
   
-  /* Athos 2.0 Accent Colors - Soft and Professional */
-  --accent-purple: hsl(260, 70%, 85%);
-  --accent-blue: hsl(220, 70%, 85%);
-  --accent-teal: hsl(180, 70%, 85%);
-  --accent-green: hsl(140, 70%, 85%);
-  --accent-yellow: hsl(50, 70%, 85%);
-  --accent-pink: hsl(320, 70%, 85%);
-  --accent-orange: hsl(25, 70%, 85%);
-  --accent-gray: hsl(0, 0%, 85%);
+  /* Pastel Card Colors from Athos 2.0 */
+  --card-sage: hsl(85, 20%, 60%);        /* Muted sage green like Continental card */
+  --card-sage-bg: hsl(85, 25%, 90%);     /* Light sage background */
+  --card-blue-gray: hsl(210, 20%, 55%);  /* Blue-gray like 3Lateral card */
+  --card-blue-gray-bg: hsl(210, 25%, 88%); /* Light blue-gray background */
+  --card-cream: hsl(45, 40%, 85%);       /* Warm cream like 7x card */
+  --card-cream-text: hsl(35, 45%, 45%);  /* Brown text for cream cards */
+  --card-light-blue: hsl(200, 30%, 75%); /* Soft light blue */
+  --card-light-blue-bg: hsl(200, 35%, 92%); /* Light blue background */
+  --card-purple-gray: hsl(270, 15%, 50%); /* Muted purple-gray */
+  --card-purple-gray-bg: hsl(270, 20%, 90%); /* Light purple background */
   
   /* Professional Primary Colors */
-  --primary-blue: hsl(220, 80%, 60%);
-  --primary-purple: hsl(260, 80%, 60%);
-  --primary-teal: hsl(180, 80%, 50%);
-  --primary-green: hsl(140, 80%, 50%);
-  --primary-orange: hsl(25, 80%, 60%);
-  --primary-pink: hsl(320, 80%, 60%);
+  --primary-blue: hsl(210, 20%, 55%);
+  --primary-purple: hsl(270, 30%, 55%);
+  --primary-teal: hsl(180, 25%, 50%);
+  --primary-green: hsl(85, 20%, 60%);
+  --primary-orange: hsl(35, 45%, 55%);
+  --primary-pink: hsl(320, 25%, 60%);
 }
 
 .dark {
@@ -171,6 +173,27 @@ input, textarea {
   .text-primary-pink { color: var(--primary-pink); }
   .bg-primary-pink { background-color: var(--primary-pink); }
   .border-primary-pink { border-color: var(--primary-pink); }
+  
+  /* Pastel Card Utility Classes */
+  .bg-card-sage { background-color: var(--card-sage-bg); }
+  .text-card-sage { color: var(--card-sage); }
+  .border-card-sage { border-color: var(--card-sage); }
+  
+  .bg-card-blue-gray { background-color: var(--card-blue-gray-bg); }
+  .text-card-blue-gray { color: var(--card-blue-gray); }
+  .border-card-blue-gray { border-color: var(--card-blue-gray); }
+  
+  .bg-card-cream { background-color: var(--card-cream); }
+  .text-card-cream { color: var(--card-cream-text); }
+  .border-card-cream { border-color: var(--card-cream-text); }
+  
+  .bg-card-light-blue { background-color: var(--card-light-blue-bg); }
+  .text-card-light-blue { color: var(--card-light-blue); }
+  .border-card-light-blue { border-color: var(--card-light-blue); }
+  
+  .bg-card-purple-gray { background-color: var(--card-purple-gray-bg); }
+  .text-card-purple-gray { color: var(--card-purple-gray); }
+  .border-card-purple-gray { border-color: var(--card-purple-gray); }
   
   /* Accent Colors */
   .text-accent-blue { color: var(--accent-blue); }

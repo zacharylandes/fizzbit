@@ -319,14 +319,14 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
           <div className="relative z-10 space-y-6">
             {/* Icons */}
             <div className="flex items-center justify-center space-x-4 mb-4">
-              <div className="p-3 bg-accent-blue border border-primary-blue/20 rounded-lg hover:scale-110 transition-all duration-300">
-                <Sparkles className="h-6 w-6 text-primary-blue" />
+              <div className="p-3 bg-card-sage border border-card-sage/30 rounded-lg hover:scale-110 transition-all duration-300">
+                <Sparkles className="h-6 w-6 text-card-sage" />
               </div>
-              <div className="p-3 bg-accent-purple border border-primary-purple/20 rounded-lg hover:scale-110 transition-all duration-300">
-                <Image className="h-6 w-6 text-primary-purple" />
+              <div className="p-3 bg-card-blue-gray border border-card-blue-gray/30 rounded-lg hover:scale-110 transition-all duration-300">
+                <Image className="h-6 w-6 text-card-blue-gray" />
               </div>
-              <div className="p-3 bg-accent-teal border border-primary-teal/20 rounded-lg hover:scale-110 transition-all duration-300">
-                <Type className="h-6 w-6 text-primary-teal" />
+              <div className="p-3 bg-card-light-blue border border-card-light-blue/30 rounded-lg hover:scale-110 transition-all duration-300">
+                <Type className="h-6 w-6 text-card-light-blue" />
               </div>
             </div>
             
@@ -343,9 +343,9 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
             
             {/* Visual hint */}
             <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
-              <ArrowUp className="h-4 w-4 animate-bounce text-primary-teal" />
+              <ArrowUp className="h-4 w-4 animate-bounce text-card-light-blue" />
               <span>Start creating</span>
-              <ArrowUp className="h-4 w-4 animate-bounce text-primary-teal" style={{ animationDelay: '0.2s' }} />
+              <ArrowUp className="h-4 w-4 animate-bounce text-card-light-blue" style={{ animationDelay: '0.2s' }} />
             </div>
           </div>
         </div>
@@ -360,10 +360,10 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
         {/* Show loading card if generating ideas and no cards available */}
         {isGeneratingIdeas && cards.length === 0 && (
           <div className="absolute inset-0 cursor-default" style={{ zIndex: 10 }}>
-            <div className="w-full h-full bg-card border border-primary-blue/30 rounded-xl p-6 flex flex-col items-center justify-center card-shadow">
+            <div className="w-full h-full bg-card border border-card-sage/30 rounded-xl p-6 flex flex-col items-center justify-center card-shadow">
               <div className="w-16 h-16 mb-4 relative">
-                <div className="absolute inset-0 border-4 border-primary-blue border-t-transparent rounded-full animate-spin"></div>
-                <Sparkles className="absolute inset-0 m-auto h-8 w-8 text-primary-blue animate-pulse" />
+                <div className="absolute inset-0 border-4 border-card-sage border-t-transparent rounded-full animate-spin"></div>
+                <Sparkles className="absolute inset-0 m-auto h-8 w-8 text-card-sage animate-pulse" />
               </div>
               <h3 className="text-xl font-bold text-card-foreground mb-2">Generating Ideas...</h3>
               <p className="text-muted-foreground text-center">Creating creative variations based on your interest</p>
@@ -375,7 +375,7 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
         {isGeneratingIdeas && cards.length > 0 && (
           <div className="absolute top-4 right-4 z-20">
             <div className="bg-card/80 backdrop-blur-sm border border-border rounded-full p-2 flex items-center space-x-2 card-shadow">
-              <div className="w-4 h-4 border-2 border-primary-blue border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-4 h-4 border-2 border-card-sage border-t-transparent rounded-full animate-spin"></div>
               <span className="text-xs text-card-foreground">Generating...</span>
             </div>
           </div>
