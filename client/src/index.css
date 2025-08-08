@@ -54,48 +54,49 @@ input, textarea {
 }
 
 :root {
-  --background: hsl(222, 84%, 5%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(222, 35%, 10%);
-  --muted-foreground: hsl(215, 16%, 47%);
-  --popover: hsl(222, 84%, 5%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(222, 84%, 5%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(217, 33%, 17%);
-  --input: hsl(217, 33%, 17%);
-  --primary: hsl(210, 40%, 98%);
-  --primary-foreground: hsl(222, 84%, 5%);
-  --secondary: hsl(217, 33%, 17%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(217, 33%, 17%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 63%, 31%);
+  /* Athos 2.0 Light Theme Colors */
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(240, 10%, 3.9%);
+  --muted: hsl(240, 4.8%, 95.9%);
+  --muted-foreground: hsl(240, 3.8%, 46.1%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(240, 10%, 3.9%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(240, 10%, 3.9%);
+  --border: hsl(240, 5.9%, 90%);
+  --input: hsl(240, 5.9%, 90%);
+  --primary: hsl(240, 9%, 9%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(240, 4.8%, 95.9%);
+  --secondary-foreground: hsl(240, 5.9%, 10%);
+  --accent: hsl(240, 4.8%, 95.9%);
+  --accent-foreground: hsl(240, 5.9%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(212, 12%, 87%);
-  --radius: 0.75rem;
+  --ring: hsl(240, 5%, 64.9%);
+  --radius: 0.5rem;
   
-  /* FrameKit-inspired vibrant colors */
-  --electric-blue: hsl(220, 100%, 66%);
-  --electric-purple: hsl(260, 100%, 70%);
-  --electric-pink: hsl(320, 100%, 75%);
-  --electric-cyan: hsl(180, 100%, 70%);
-  --electric-green: hsl(140, 100%, 65%);
-  --electric-orange: hsl(25, 100%, 65%);
-  --electric-yellow: hsl(50, 100%, 70%);
-  --neon-blue: hsl(200, 100%, 60%);
-  --neon-purple: hsl(280, 100%, 65%);
-  --neon-pink: hsl(330, 100%, 70%);
-  --neon-green: hsl(120, 100%, 60%);
-  --coral: hsl(15, 100%, 65%);
-  --teal: hsl(180, 100%, 50%);
-  --sky: hsl(200, 100%, 70%);
-  --mint: hsl(140, 40%, 66%);
-  --golden: hsl(43, 96%, 66%);
-  --pink: hsl(300, 100%, 81%);
+  /* Athos 2.0 Accent Colors - Soft and Professional */
+  --accent-purple: hsl(260, 70%, 85%);
+  --accent-blue: hsl(220, 70%, 85%);
+  --accent-teal: hsl(180, 70%, 85%);
+  --accent-green: hsl(140, 70%, 85%);
+  --accent-yellow: hsl(50, 70%, 85%);
+  --accent-pink: hsl(320, 70%, 85%);
+  --accent-orange: hsl(25, 70%, 85%);
+  --accent-gray: hsl(0, 0%, 85%);
+  
+  /* Professional Primary Colors */
+  --primary-blue: hsl(220, 80%, 60%);
+  --primary-purple: hsl(260, 80%, 60%);
+  --primary-teal: hsl(180, 80%, 50%);
+  --primary-green: hsl(140, 80%, 50%);
+  --primary-orange: hsl(25, 80%, 60%);
+  --primary-pink: hsl(320, 80%, 60%);
 }
 
 .dark {
+  /* Athos 2.0 Dark Theme */
   --background: hsl(240, 10%, 3.9%);
   --foreground: hsl(0, 0%, 98%);
   --muted: hsl(240, 3.7%, 15.9%);
@@ -106,8 +107,8 @@ input, textarea {
   --card-foreground: hsl(0, 0%, 98%);
   --border: hsl(240, 3.7%, 15.9%);
   --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
+  --primary: hsl(0, 0%, 98%);
+  --primary-foreground: hsl(240, 5.9%, 10%);
   --secondary: hsl(240, 3.7%, 15.9%);
   --secondary-foreground: hsl(0, 0%, 98%);
   --accent: hsl(240, 3.7%, 15.9%);
@@ -116,6 +117,23 @@ input, textarea {
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(240, 4.9%, 83.9%);
   --radius: 0.5rem;
+  
+  /* Dark Theme Professional Colors */
+  --accent-purple: hsl(260, 50%, 30%);
+  --accent-blue: hsl(220, 50%, 30%);
+  --accent-teal: hsl(180, 50%, 30%);
+  --accent-green: hsl(140, 50%, 30%);
+  --accent-yellow: hsl(50, 50%, 40%);
+  --accent-pink: hsl(320, 50%, 30%);
+  --accent-orange: hsl(25, 50%, 30%);
+  --accent-gray: hsl(0, 0%, 30%);
+  
+  --primary-blue: hsl(220, 80%, 60%);
+  --primary-purple: hsl(260, 80%, 60%);
+  --primary-teal: hsl(180, 80%, 50%);
+  --primary-green: hsl(140, 80%, 50%);
+  --primary-orange: hsl(25, 80%, 60%);
+  --primary-pink: hsl(320, 80%, 60%);
 }
 
 @layer base {
@@ -129,100 +147,86 @@ input, textarea {
 }
 
 @layer utilities {
-  /* Electric Colors */
-  .text-electric-blue { color: var(--electric-blue); }
-  .bg-electric-blue { background-color: var(--electric-blue); }
-  .border-electric-blue { border-color: var(--electric-blue); }
+  /* Athos 2.0 Professional Colors */
+  .text-primary-blue { color: var(--primary-blue); }
+  .bg-primary-blue { background-color: var(--primary-blue); }
+  .border-primary-blue { border-color: var(--primary-blue); }
   
-  .text-electric-purple { color: var(--electric-purple); }
-  .bg-electric-purple { background-color: var(--electric-purple); }
-  .border-electric-purple { border-color: var(--electric-purple); }
+  .text-primary-purple { color: var(--primary-purple); }
+  .bg-primary-purple { background-color: var(--primary-purple); }
+  .border-primary-purple { border-color: var(--primary-purple); }
   
-  .text-electric-pink { color: var(--electric-pink); }
-  .bg-electric-pink { background-color: var(--electric-pink); }
-  .border-electric-pink { border-color: var(--electric-pink); }
+  .text-primary-teal { color: var(--primary-teal); }
+  .bg-primary-teal { background-color: var(--primary-teal); }
+  .border-primary-teal { border-color: var(--primary-teal); }
   
-  .text-electric-cyan { color: var(--electric-cyan); }
-  .bg-electric-cyan { background-color: var(--electric-cyan); }
-  .border-electric-cyan { border-color: var(--electric-cyan); }
+  .text-primary-green { color: var(--primary-green); }
+  .bg-primary-green { background-color: var(--primary-green); }
+  .border-primary-green { border-color: var(--primary-green); }
   
-  .text-electric-green { color: var(--electric-green); }
-  .bg-electric-green { background-color: var(--electric-green); }
-  .border-electric-green { border-color: var(--electric-green); }
+  .text-primary-orange { color: var(--primary-orange); }
+  .bg-primary-orange { background-color: var(--primary-orange); }
+  .border-primary-orange { border-color: var(--primary-orange); }
   
-  .text-electric-orange { color: var(--electric-orange); }
-  .bg-electric-orange { background-color: var(--electric-orange); }
-  .border-electric-orange { border-color: var(--electric-orange); }
+  .text-primary-pink { color: var(--primary-pink); }
+  .bg-primary-pink { background-color: var(--primary-pink); }
+  .border-primary-pink { border-color: var(--primary-pink); }
   
-  /* Neon Colors */
-  .text-neon-blue { color: var(--neon-blue); }
-  .bg-neon-blue { background-color: var(--neon-blue); }
-  .border-neon-blue { border-color: var(--neon-blue); }
+  /* Accent Colors */
+  .text-accent-blue { color: var(--accent-blue); }
+  .bg-accent-blue { background-color: var(--accent-blue); }
+  .border-accent-blue { border-color: var(--accent-blue); }
   
-  .text-neon-purple { color: var(--neon-purple); }
-  .bg-neon-purple { background-color: var(--neon-purple); }
-  .border-neon-purple { border-color: var(--neon-purple); }
+  .text-accent-purple { color: var(--accent-purple); }
+  .bg-accent-purple { background-color: var(--accent-purple); }
+  .border-accent-purple { border-color: var(--accent-purple); }
   
-  .text-neon-pink { color: var(--neon-pink); }
-  .bg-neon-pink { background-color: var(--neon-pink); }
-  .border-neon-pink { border-color: var(--neon-pink); }
+  .text-accent-teal { color: var(--accent-teal); }
+  .bg-accent-teal { background-color: var(--accent-teal); }
+  .border-accent-teal { border-color: var(--accent-teal); }
   
-  .text-neon-green { color: var(--neon-green); }
-  .bg-neon-green { background-color: var(--neon-green); }
-  .border-neon-green { border-color: var(--neon-green); }
+  .text-accent-green { color: var(--accent-green); }
+  .bg-accent-green { background-color: var(--accent-green); }
+  .border-accent-green { border-color: var(--accent-green); }
   
-  /* Original Colors */
-  .coral { color: var(--coral); }
-  .bg-coral { background-color: var(--coral); }
-  .from-coral { --tw-gradient-from: var(--coral); }
-  .to-coral { --tw-gradient-to: var(--coral); }
-  .border-coral { border-color: var(--coral); }
-  .text-coral { color: var(--coral); }
+  .text-accent-orange { color: var(--accent-orange); }
+  .bg-accent-orange { background-color: var(--accent-orange); }
+  .border-accent-orange { border-color: var(--accent-orange); }
   
-  /* Vibrant Gradients */
-  .bg-gradient-electric {
-    background: linear-gradient(135deg, var(--electric-blue), var(--electric-purple));
+  .text-accent-pink { color: var(--accent-pink); }
+  .bg-accent-pink { background-color: var(--accent-pink); }
+  .border-accent-pink { border-color: var(--accent-pink); }
+  
+  /* Professional Gradients */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
   }
   
-  .bg-gradient-neon {
-    background: linear-gradient(135deg, var(--neon-pink), var(--neon-blue));
+  .bg-gradient-soft {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
   }
   
-  .bg-gradient-cyber {
-    background: linear-gradient(135deg, var(--electric-cyan), var(--electric-green));
+  .bg-gradient-teal {
+    background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
   }
   
-  .bg-gradient-sunset {
-    background: linear-gradient(135deg, var(--electric-orange), var(--electric-pink));
+  .bg-gradient-warm {
+    background: linear-gradient(135deg, var(--primary-orange), var(--primary-pink));
   }
   
-  .bg-gradient-aurora {
-    background: linear-gradient(135deg, var(--electric-purple), var(--electric-cyan), var(--electric-pink));
+  /* Card Styles */
+  .card-shadow {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   }
   
-  /* Glass effect */
-  .glass {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  .card-shadow-lg {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
   
-  /* Glow effects */
-  .glow-electric-blue {
-    box-shadow: 0 0 20px rgba(56, 139, 253, 0.5);
-  }
-  
-  .glow-electric-purple {
-    box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
-  }
-  
-  .glow-electric-pink {
-    box-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
-  }
-  
-  .hover-glow:hover {
-    box-shadow: 0 0 30px rgba(56, 139, 253, 0.6);
-    transition: box-shadow 0.3s ease;
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    transition: all 0.3s ease;
   }
 
   .card-stack {

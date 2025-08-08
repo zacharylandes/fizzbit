@@ -166,8 +166,8 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
 
   return (
     <div className="mb-3 relative z-10">
-      <div className="glass border border-electric-blue/30 rounded-xl p-3 shadow-lg">
-        <div className="flex flex-row gap-2">
+      <div className="bg-card border border-border rounded-xl p-4 card-shadow">
+        <div className="flex flex-row gap-3">
           {/* Image Upload Button */}
           <input
             type="file"
@@ -179,50 +179,50 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
           />
           <Button
             asChild
-            className="flex-1 bg-gradient-electric hover:scale-105 glow-electric-blue text-white rounded-lg py-3 px-4 font-medium shadow-md touch-target text-center transition-all duration-300"
+            className="flex-1 bg-primary-blue hover:bg-primary-blue/90 hover-lift text-white rounded-lg py-3 px-4 font-medium card-shadow touch-target text-center transition-all duration-300"
             disabled={isLoading}
           >
             <label htmlFor="image-upload" className="cursor-pointer flex items-center justify-center text-white font-medium">
-              <Camera className="mr-1 h-4 w-4" />
-              Image
+              <Camera className="mr-2 h-4 w-4" />
+              Upload Image
             </label>
           </Button>
           
           {/* Text Input Toggle */}
           <Button
             onClick={() => setShowTextInput(!showTextInput)}
-            className="flex-1 bg-gradient-neon hover:scale-105 glow-electric-pink text-white rounded-lg py-3 px-4 font-medium shadow-md touch-target text-center transition-all duration-300"
+            className="flex-1 bg-primary-teal hover:bg-primary-teal/90 hover-lift text-white rounded-lg py-3 px-4 font-medium card-shadow touch-target text-center transition-all duration-300"
             disabled={isLoading}
           >
-            <Edit className="mr-1 h-4 w-4" />
-            Text
+            <Edit className="mr-2 h-4 w-4" />
+            Write Text
           </Button>
         </div>
         
         {/* Text Input Area */}
         {showTextInput && (
-          <div className="mt-2 space-y-2">
+          <div className="mt-4 space-y-3">
             <Textarea 
               value={textPrompt}
               onChange={(e) => handleTextPromptChange(e.target.value)}
-              className="w-full h-20 p-3 glass border border-electric-blue/30 rounded-lg focus:border-electric-blue focus:outline-none resize-none text-sm text-white placeholder:text-white/50" 
-              placeholder="Describe your inspiration..."
+              className="w-full h-24 p-3 bg-background border border-input rounded-lg focus:border-ring focus:outline-none resize-none text-sm text-foreground placeholder:text-muted-foreground" 
+              placeholder="Describe your creative inspiration or what you'd like ideas about..."
               disabled={isLoading}
             />
             <Button
               onClick={handleGenerateFromText}
               disabled={!textPrompt.trim() || isLoading}
-              className="w-full bg-gradient-sunset hover:scale-105 glow-electric-orange text-white rounded-lg py-2 font-medium touch-target transition-all duration-300"
+              className="w-full bg-primary-purple hover:bg-primary-purple/90 hover-lift text-white rounded-lg py-3 font-medium touch-target transition-all duration-300 card-shadow"
             >
               {isLoading ? (
                 <>
-                  <div className="w-3 h-3 mr-1 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Generating...
+                  <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Generating Ideas...
                 </>
               ) : (
                 <>
-                  <Sparkles className="mr-1 h-4 w-4" />
-                  Generate
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Generate Ideas
                 </>
               )}
             </Button>
