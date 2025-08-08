@@ -18,6 +18,7 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
   const [refreshKey, setRefreshKey] = useState(0);
   const [cardColors, setCardColors] = useState<{ [key: string]: number }>({});
   const [currentExploreContext, setCurrentExploreContext] = useState<{ originalPrompt: string; exploredIdea: Idea } | null>(null);
+  const [isGeneratingIdeas, setIsGeneratingIdeas] = useState(false);
   const cardRefs = useRef<{ [key: string]: HTMLElement }>({});
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const { toast } = useToast();
@@ -67,10 +68,12 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
   // Explore idea mutation
   const exploreIdeaMutation = useMutation({
     mutationFn: async (ideaId: string) => {
+      setIsGeneratingIdeas(true);
       const response = await apiRequest("POST", `/api/ideas/${ideaId}/explore`);
       return response.json();
     },
     onSuccess: (data, ideaId) => {
+      setIsGeneratingIdeas(false);
       console.log('🎯 EXPLORE SUCCESS - Received ideas:', data.ideas?.length || 0);
       if (data.ideas && data.ideas.length > 0) {
         // Set/maintain the exploration context for future prefetching
@@ -105,6 +108,7 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
       }
     },
     onError: () => {
+      setIsGeneratingIdeas(false);
       toast({
         title: "Hmm...",
         description: "Couldn't explore that idea. Give it another try!",
@@ -189,6 +193,9 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
           // Clear current cards to start fresh with new prompt
           setCards([]);
           setCurrentExploreContext(null);
+        } else {
+          // If no onSwipeUpPrompt, explore the idea directly
+          exploreIdeaMutation.mutate(idea.id);
         }
       }
       // Left swipe: Just dismiss (no action needed)
@@ -351,6 +358,30 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
     <div className="relative h-[400px] sm:h-[440px] w-full max-w-[600px] mx-auto z-30">
       {/* Touch Card Stack */}
       <div className="relative w-full h-full">
+        {/* Show loading card if generating ideas and no cards available */}
+        {isGeneratingIdeas && cards.length === 0 && (
+          <div className="absolute inset-0 cursor-default" style={{ zIndex: 10 }}>
+            <div className="w-full h-full bg-gradient-electric border border-electric-blue/30 rounded-xl p-6 flex flex-col items-center justify-center glass glow-electric-blue">
+              <div className="w-16 h-16 mb-4 relative">
+                <div className="absolute inset-0 border-4 border-electric-blue border-t-transparent rounded-full animate-spin"></div>
+                <Sparkles className="absolute inset-0 m-auto h-8 w-8 text-electric-blue animate-pulse" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Generating Ideas...</h3>
+              <p className="text-white/70 text-center">Creating creative variations based on your interest</p>
+            </div>
+          </div>
+        )}
+        
+        {/* Show subtle loading indicator when generating and cards are available */}
+        {isGeneratingIdeas && cards.length > 0 && (
+          <div className="absolute top-4 right-4 z-20">
+            <div className="bg-black/50 backdrop-blur-sm rounded-full p-2 flex items-center space-x-2">
+              <div className="w-4 h-4 border-2 border-electric-blue border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-xs text-white/80">Generating...</span>
+            </div>
+          </div>
+        )}
+        
         {cards.slice(0, 3).map((card, index) => {
           const animation = animatingCards[card.id];
           const isAnimating = animation?.isAnimating;

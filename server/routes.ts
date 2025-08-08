@@ -47,20 +47,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error("OpenAI client not initialized");
       }
 
-      // Use gpt-4o - the newest OpenAI model released May 13, 2024. do not change this unless explicitly requested by the user
+      // Use gpt-4o-mini for faster response times in idea generation
       const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
-            content: "You are a creative inspiration assistant. Generate unique, actionable creative ideas based on user prompts. Respond with JSON containing an array of 10 ideas, each with 'title' and 'description' fields. Make descriptions engaging and specific."
+            content: "You are a creative inspiration assistant. Generate unique, actionable creative ideas based on user prompts. Respond with JSON containing an array of 5 ideas, each with 'title' and 'description' fields. Make descriptions engaging and specific."
           },
           {
             role: "user",
-            content: `Generate 10 creative ideas inspired by: ${prompt}`
+            content: `Generate 5 creative ideas inspired by: ${prompt}`
           }
         ],
-        response_format: { type: "json_object" }
+        response_format: { type: "json_object" },
+        max_tokens: 800  // Limit tokens for faster response
       });
 
       const aiResponse = JSON.parse(response.choices[0].message.content || "{}");
@@ -288,18 +289,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create a more targeted prompt by combining original user intent with the specific idea they're interested in
-      let contextualPrompt = `Generate 10 new creative ideas inspired by this existing idea: "${parentIdea.title}" - ${parentIdea.description}.`;
+      let contextualPrompt = `Generate 5 new creative ideas inspired by this existing idea: "${parentIdea.title}" - ${parentIdea.description}.`;
       
       // If we have the original prompt/search context, combine it for better targeting
       if (parentIdea.sourceContent && parentIdea.sourceContent !== "uploaded_image") {
-        contextualPrompt = `The user originally was interested in: "${parentIdea.sourceContent}". They then showed particular interest in this idea: "${parentIdea.title}" - ${parentIdea.description}. Generate 10 new creative ideas that blend these concepts together, using both the original interest and this specific idea as inspiration. Make them feel like natural combinations or extensions that bridge both concepts. Provide a good variety - some should be close variations, others should be more creative leaps that still connect the concepts.`;
+        contextualPrompt = `The user originally was interested in: "${parentIdea.sourceContent}". They then showed particular interest in this idea: "${parentIdea.title}" - ${parentIdea.description}. Generate 5 new creative ideas that blend these concepts together, using both the original interest and this specific idea as inspiration. Make them feel like natural combinations or extensions that bridge both concepts.`;
       }
       
       contextualPrompt += ` Respond with JSON containing an array of ideas, each with 'title' and 'description' fields.`;
 
-      // Use gpt-4o - the newest OpenAI model released May 13, 2024. do not change this unless explicitly requested by the user
+      // Use gpt-4o-mini for faster response times in explore/swipe up actions
       const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
@@ -310,7 +311,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             content: contextualPrompt
           }
         ],
-        response_format: { type: "json_object" }
+        response_format: { type: "json_object" },
+        max_tokens: 600  // Limit tokens for faster response
       });
 
       const aiResponse = JSON.parse(response.choices[0].message.content || "{}");
