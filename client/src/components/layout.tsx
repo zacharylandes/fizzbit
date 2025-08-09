@@ -91,8 +91,8 @@ export default function Layout({ children }: LayoutProps) {
             {/* SWIVL Brand */}
             <Link href="/">
               <div className="flex items-center space-x-3 cursor-pointer hover-lift transition-all duration-300">
-                <div className="p-2 bg-card-sage-bg border border-card-sage/40 rounded-lg card-shadow">
-                  <svg className="h-6 w-6 text-card-sage" viewBox="0 0 24 24" fill="none">
+                <div className="p-2 bg-card-light-blue-bg border border-card-light-blue/40 rounded-lg card-shadow">
+                  <svg className="h-6 w-6 text-card-light-blue" viewBox="0 0 24 24" fill="none">
                     <path
                       d="M12 2C12 2 8 6 8 12C8 18 12 22 12 22C12 22 16 18 16 12C16 6 12 2 12 2Z"
                       stroke="currentColor"

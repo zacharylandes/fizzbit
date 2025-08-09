@@ -10,8 +10,8 @@ export default function LandingPage() {
         {/* Navigation */}
         <nav className="flex items-center justify-between p-6 max-w-7xl mx-auto">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-card-sage-bg rounded-lg shadow-sm">
-              <svg className="h-6 w-6 text-card-sage" viewBox="0 0 24 24" fill="none">
+            <div className="p-2 bg-card-light-blue-bg rounded-lg shadow-sm">
+              <svg className="h-6 w-6 text-card-light-blue" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M12 2C12 2 8 6 8 12C8 18 12 22 12 22C12 22 16 18 16 12C16 6 12 2 12 2Z"
                   stroke="currentColor"
@@ -34,7 +34,7 @@ export default function LandingPage() {
             </h1>
           </div>
           <a href="/api/login">
-            <Button className="bg-card-blue-gray hover:bg-card-blue-gray/90 text-white border-0 shadow-sm">
+            <Button className="bg-card-light-blue-bg hover:bg-card-light-blue-bg/90 text-card-light-blue border-0 shadow-sm">
               Sign In
             </Button>
           </a>
@@ -151,8 +151,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-card-sage-bg rounded-lg shadow-sm">
-                <svg className="h-5 w-5 text-card-sage" viewBox="0 0 24 24" fill="none">
+              <div className="p-2 bg-card-light-blue-bg rounded-lg shadow-sm">
+                <svg className="h-5 w-5 text-card-light-blue" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M12 2C12 2 8 6 8 12C8 18 12 22 12 22C12 22 16 18 16 12C16 6 12 2 12 2Z"
                     stroke="currentColor"
