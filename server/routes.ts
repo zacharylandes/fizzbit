@@ -5,6 +5,9 @@ import { insertIdeaSchema } from "@shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import OpenAI from "openai";
 import { generateIdeasFromText, generateIdeasFromImage } from "./huggingface";
+import multer from "multer";
+import fs from "fs";
+import path from "path";
 
 // Initialize OpenAI with error handling
 let openai: OpenAI | null = null;
@@ -26,6 +29,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Auth middleware
   await setupAuth(app);
+  
+  // Configure multer for audio file uploads
+  const upload = multer({
+    dest: 'uploads/',
+    fileFilter: (req, file, cb) => {
+      // Accept audio files
+      if (file.mimetype.startsWith('audio/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only audio files are allowed!'), false);
+      }
+    },
+    limits: {
+      fileSize: 10 * 1024 * 1024 // 10MB limit
+    }
+  });
   
   // Add global error handling middleware for async routes
   const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) => 
@@ -176,6 +195,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.json({ ideas: createdIdeas });
+    }
+  }));
+
+  // Audio transcription and idea generation
+  app.post("/api/ideas/generate-from-audio", upload.single('audio'), asyncHandler(async (req: any, res) => {
+    const userId = req.user?.claims?.sub;
+    
+    if (!req.file) {
+      return res.status(400).json({ error: "Audio file is required" });
+    }
+
+    try {
+      console.log('📢 Processing audio file:', req.file.filename);
+      
+      if (!openai) {
+        throw new Error("OpenAI client not available");
+      }
+
+      // Transcribe audio using OpenAI Whisper
+      const audioReadStream = fs.createReadStream(req.file.path);
+      const transcription = await openai.audio.transcriptions.create({
+        file: audioReadStream,
+        model: "whisper-1",
+      });
+
+      console.log('📝 Transcription result:', transcription.text);
+      
+      // Clean up uploaded file
+      fs.unlinkSync(req.file.path);
+      
+      if (!transcription.text || transcription.text.trim().length === 0) {
+        return res.status(400).json({ error: "Could not transcribe audio. Please try speaking more clearly." });
+      }
+
+      // Generate ideas from transcribed text using Hugging Face
+      const ideas = await generateIdeasFromText(transcription.text);
+
+      // Store generated ideas
+      const createdIdeas = [];
+      for (const ideaData of ideas) {
+        const idea = await storage.createIdea({
+          title: ideaData.title,
+          description: ideaData.description,
+          source: "audio",
+          sourceContent: transcription.text,
+          isSaved: 0,
+          metadata: { 
+            generatedAt: new Date().toISOString(),
+            audioTranscription: true,
+            originalAudioDuration: transcription.duration || 0
+          }
+        }, userId);
+        createdIdeas.push(idea);
+      }
+
+      res.json({ 
+        ideas: createdIdeas,
+        transcription: transcription.text 
+      });
+    } catch (error) {
+      console.error("Error processing audio:", error);
+      
+      // Clean up file if it exists
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      
+      // Fallback ideas for audio processing errors
+      const fallbackIdeas = [
+        {
+          title: "Voice-Activated Creative Project",
+          description: "Start a creative project where you record voice memos as inspiration. Use your spoken thoughts as seeds for larger works."
+        },
+        {
+          title: "Audio Storytelling",
+          description: "Create an audio story or podcast episode. Focus on sound design, music, and compelling narrative voice."
+        },
+        {
+          title: "Musical Expression",
+          description: "Compose a piece of music or song that expresses the thoughts and feelings from your voice recording."
+        }
+      ];
+
+      const createdIdeas = [];
+      for (const ideaData of fallbackIdeas) {
+        const idea = await storage.createIdea({
+          title: ideaData.title,
+          description: ideaData.description,
+          source: "audio",
+          sourceContent: "audio_transcription_fallback",
+          isSaved: 0,
+          metadata: { 
+            generatedAt: new Date().toISOString(),
+            type: "fallback"
+          }
+        }, userId);
+        createdIdeas.push(idea);
+      }
+
+      res.json({ 
+        ideas: createdIdeas,
+        transcription: "Audio processing unavailable - here are some voice-inspired ideas!"
+      });
     }
   }));
 

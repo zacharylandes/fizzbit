@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Camera, Edit, Upload, Sparkles } from "lucide-react";
+import { Camera, Edit, Upload, Sparkles, Mic, MicOff, Square } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +18,10 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
   const [showTextInput, setShowTextInput] = useState(false);
   const [textPrompt, setTextPrompt] = useState(promptValue);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   // Text prompt mutation
@@ -49,6 +53,45 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
         description: "Couldn't generate ideas. Try again?",
         variant: "destructive",
         duration: 1000,
+      });
+    },
+  });
+
+  // Audio transcription and idea generation mutation
+  const generateFromAudioMutation = useMutation({
+    mutationFn: async (audioBlob: Blob) => {
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+      
+      const response = await fetch('/api/ideas/generate-from-audio', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.ideas) {
+        onIdeasGenerated(data.ideas);
+        toast({
+          title: "Ideas Generated!",
+          description: `From your voice: "${data.transcription?.slice(0, 50)}${data.transcription?.length > 50 ? '...' : ''}"`,
+          duration: 3000,
+          variant: "success",
+        });
+      }
+    },
+    onError: (error) => {
+      console.error('Audio generation error:', error);
+      toast({
+        title: "Voice Processing Failed",
+        description: "Couldn't understand the audio. Try speaking clearly.",
+        variant: "destructive",
+        duration: 2000,
       });
     },
   });
@@ -141,6 +184,76 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     }
   };
 
+  // Audio recording functions
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100,
+        } 
+      });
+      
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
+      
+      const audioChunks: Blob[] = [];
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunks.push(event.data);
+        }
+      };
+      
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        generateFromAudioMutation.mutate(audioBlob);
+        
+        // Stop all tracks to release microphone
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRecordingDuration(0);
+      
+      // Start duration counter
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingDuration(prev => prev + 1);
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      toast({
+        title: "Microphone Access Required",
+        description: "Please allow microphone access to record voice prompts.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
+      }
+    }
+  };
+
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const handleGenerateFromText = () => {
     if (textPrompt.trim()) {
       generateFromTextMutation.mutate(textPrompt.trim());
@@ -167,7 +280,19 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     }
   }, [shouldAutoGenerate, promptValue]);
 
-  const isLoading = generateFromTextMutation.isPending || generateFromImageMutation.isPending;
+  // Cleanup recording on unmount
+  useEffect(() => {
+    return () => {
+      if (isRecording && mediaRecorderRef.current) {
+        mediaRecorderRef.current.stop();
+      }
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+      }
+    };
+  }, [isRecording]);
+
+  const isLoading = generateFromTextMutation.isPending || generateFromImageMutation.isPending || generateFromAudioMutation.isPending;
 
   return (
     <div className="mb-3 relative z-10">
@@ -193,6 +318,29 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
             </label>
           </Button>
           
+          {/* Audio Recording Button */}
+          <Button
+            onClick={isRecording ? stopRecording : startRecording}
+            className={`flex-1 ${
+              isRecording 
+                ? 'bg-red-500 hover:bg-red-600 text-white border-red-600 animate-pulse'
+                : 'bg-card-cream-bg border-card-cream/40 hover:bg-card-cream-bg/90 text-card-cream'
+            } hover-lift rounded-lg py-3 px-4 font-medium card-shadow touch-target text-center transition-all duration-300`}
+            disabled={isLoading && !isRecording}
+          >
+            {isRecording ? (
+              <>
+                <Square className="mr-2 h-4 w-4" />
+                {formatDuration(recordingDuration)}
+              </>
+            ) : (
+              <>
+                <Mic className="mr-2 h-4 w-4" />
+                Voice Input
+              </>
+            )}
+          </Button>
+
           {/* Text Input Toggle */}
           <Button
             onClick={() => setShowTextInput(!showTextInput)}
