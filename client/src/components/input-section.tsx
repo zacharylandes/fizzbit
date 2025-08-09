@@ -22,7 +22,6 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const recordingStartTimeRef = useRef<number>(0);
   const { toast } = useToast();
 
   // Text prompt mutation
@@ -241,19 +240,12 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       setIsRecording(true);
       setRecordingDuration(0);
       
-      // Start duration counter with timestamp approach
-      recordingStartTimeRef.current = Date.now();
-      setRecordingDuration(0);
-      console.log('🎤 Recording started at:', recordingStartTimeRef.current);
-      
+      // Simple counter approach - increment every second
+      let seconds = 0;
       recordingIntervalRef.current = setInterval(() => {
-        const now = Date.now();
-        const elapsed = Math.floor((now - recordingStartTimeRef.current) / 1000);
-        console.log('⏰ Timer tick - now:', now, 'start:', recordingStartTimeRef.current, 'elapsed:', elapsed);
-        setRecordingDuration(current => {
-          console.log('📊 State update: current =', current, 'new =', elapsed);
-          return elapsed;
-        });
+        seconds++;
+        console.log('⏰ Simple timer tick:', seconds);
+        setRecordingDuration(seconds);
       }, 1000);
       
     } catch (error) {
@@ -389,7 +381,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
             ) : isRecording ? (
               <>
                 <div className="w-3 h-3 bg-white rounded-sm mr-2"></div>
-                Recording {formatDuration(recordingDuration)}
+                Recording {recordingDuration}s
               </>
             ) : (
               <>
