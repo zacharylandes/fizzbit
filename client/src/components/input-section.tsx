@@ -61,7 +61,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
   const generateFromAudioMutation = useMutation({
     mutationFn: async (audioBlob: Blob) => {
       const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.wav');
+      formData.append('audio', audioBlob, 'recording.webm');
       
       const response = await fetch('/api/ideas/generate-from-audio', {
         method: 'POST',
@@ -184,71 +184,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     }
   };
 
-  // Convert audio blob to WAV format
-  const convertToWav = async (webmBlob: Blob): Promise<Blob> => {
-    return new Promise((resolve, reject) => {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const fileReader = new FileReader();
-      
-      fileReader.onload = async (event) => {
-        try {
-          const arrayBuffer = event.target?.result as ArrayBuffer;
-          const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-          
-          // Convert to WAV
-          const wav = audioBufferToWav(audioBuffer);
-          const wavBlob = new Blob([wav], { type: 'audio/wav' });
-          resolve(wavBlob);
-        } catch (error) {
-          reject(error);
-        }
-      };
-      
-      fileReader.onerror = () => reject(new Error('Failed to read audio file'));
-      fileReader.readAsArrayBuffer(webmBlob);
-    });
-  };
 
-  // Convert AudioBuffer to WAV format
-  const audioBufferToWav = (buffer: AudioBuffer): ArrayBuffer => {
-    const length = buffer.length;
-    const numberOfChannels = buffer.numberOfChannels;
-    const sampleRate = buffer.sampleRate;
-    const arrayBuffer = new ArrayBuffer(44 + length * numberOfChannels * 2);
-    const view = new DataView(arrayBuffer);
-    
-    // WAV header
-    const writeString = (offset: number, string: string) => {
-      for (let i = 0; i < string.length; i++) {
-        view.setUint8(offset + i, string.charCodeAt(i));
-      }
-    };
-    
-    writeString(0, 'RIFF');
-    view.setUint32(4, 36 + length * numberOfChannels * 2, true);
-    writeString(8, 'WAVE');
-    writeString(12, 'fmt ');
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, numberOfChannels, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * numberOfChannels * 2, true);
-    view.setUint16(32, numberOfChannels * 2, true);
-    view.setUint16(34, 16, true);
-    writeString(36, 'data');
-    view.setUint32(40, length * numberOfChannels * 2, true);
-    
-    // Convert audio data
-    const offset = 44;
-    for (let i = 0; i < length; i++) {
-      for (let channel = 0; channel < numberOfChannels; channel++) {
-        const sample = Math.max(-1, Math.min(1, buffer.getChannelData(channel)[i]));
-        view.setInt16(offset + (i * numberOfChannels + channel) * 2, sample * 0x7FFF, true);
-      }
-    }
-    
-    return arrayBuffer;
-  };
 
   // Audio recording functions
   const startRecording = async () => {
@@ -283,22 +219,9 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
         }
       };
       
-      mediaRecorder.onstop = async () => {
-        try {
-          const audioBlob = new Blob(audioChunks, { type: mimeType || 'audio/webm' });
-          
-          // Convert to WAV for OpenAI compatibility
-          const wavBlob = await convertToWav(audioBlob);
-          generateFromAudioMutation.mutate(wavBlob);
-        } catch (error) {
-          console.error('Error converting audio:', error);
-          toast({
-            title: "Audio Processing Failed",
-            description: "Could not process the recording. Try again.",
-            variant: "destructive",
-            duration: 3000,
-          });
-        }
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: mimeType || 'audio/webm' });
+        generateFromAudioMutation.mutate(audioBlob);
         
         // Stop all tracks to release microphone
         stream.getTracks().forEach(track => track.stop());
