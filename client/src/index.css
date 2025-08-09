@@ -9,6 +9,8 @@ html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+  background-color: hsl(35, 20%, 96%);
+  overscroll-behavior: none;
 }
 
 /* Prevent zoom on inputs on iOS */
@@ -147,8 +149,15 @@ input, textarea {
     @apply border-border;
   }
 
+  html {
+    background-color: hsl(var(--background));
+    overscroll-behavior: none;
+  }
+
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
