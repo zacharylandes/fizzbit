@@ -339,7 +339,7 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
       return;
     }
 
-    const threshold = 50; // Lower threshold for better sensitivity
+    const threshold = 80; // Higher threshold for less sensitivity - requires more swipe distance
     const absX = Math.abs(deltaX);
     const absY = Math.abs(deltaY);
 
