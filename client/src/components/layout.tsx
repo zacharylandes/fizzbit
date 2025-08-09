@@ -149,8 +149,8 @@ export default function Layout({ children }: LayoutProps) {
                       size="sm"
                       className={`flex flex-col items-center space-y-1 p-3 h-auto transition-all duration-300 relative rounded-lg ${
                         isActive
-                          ? "bg-primary text-primary-foreground card-shadow"
-                          : "text-muted-foreground hover:text-primary hover:bg-accent hover-lift"
+                          ? "bg-card-sage text-white card-shadow"
+                          : "text-muted-foreground hover:text-card-sage hover:bg-card-sage-bg hover-lift"
                       }`}
                     >
                       <Icon className="h-5 w-5" />

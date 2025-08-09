@@ -87,6 +87,10 @@ input, textarea {
   --card-light-blue-bg: hsl(200, 35%, 92%); /* Light blue background */
   --card-purple-gray: hsl(270, 15%, 50%); /* Muted purple-gray */
   --card-purple-gray-bg: hsl(270, 20%, 90%); /* Light purple background */
+  --card-lavender: hsl(280, 30%, 70%);   /* Soft lavender */
+  --card-lavender-bg: hsl(280, 35%, 92%); /* Light lavender background */
+  --card-peach: hsl(15, 40%, 70%);       /* Soft peach */
+  --card-peach-bg: hsl(15, 45%, 92%);    /* Light peach background */
   
   /* Professional Primary Colors */
   --primary-blue: hsl(210, 20%, 55%);
@@ -198,6 +202,16 @@ input, textarea {
   .bg-card-purple-gray-bg { background-color: var(--card-purple-gray-bg) !important; }
   .text-card-purple-gray { color: var(--card-purple-gray) !important; }
   .border-card-purple-gray { border-color: var(--card-purple-gray); }
+  
+  .bg-card-lavender { background-color: var(--card-lavender) !important; }
+  .bg-card-lavender-bg { background-color: var(--card-lavender-bg) !important; }
+  .text-card-lavender { color: var(--card-lavender) !important; }
+  .border-card-lavender { border-color: var(--card-lavender); }
+  
+  .bg-card-peach { background-color: var(--card-peach) !important; }
+  .bg-card-peach-bg { background-color: var(--card-peach-bg) !important; }
+  .text-card-peach { color: var(--card-peach) !important; }
+  .border-card-peach { border-color: var(--card-peach); }
   
   /* Accent Colors */
   .text-accent-blue { color: var(--accent-blue); }
