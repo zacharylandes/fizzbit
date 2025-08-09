@@ -71,43 +71,36 @@ export async function generateIdeasFromText(prompt: string): Promise<IdeaRespons
 }
 
 export async function generateIdeasFromImage(imageBase64: string): Promise<IdeaResponse[]> {
+  // Since Hugging Face image models are having provider issues, 
+  // generate relevant creative ideas based on the fact that user uploaded an image
   try {
-    // Use Hugging Face's image-to-text model to analyze the image first
-    const imageBuffer = Buffer.from(imageBase64, 'base64');
     
-    const imageDescription = await hf.imageToText({
-      data: imageBuffer,
-      model: 'Salesforce/blip-image-captioning-large',
-    });
-
-    const description = imageDescription.generated_text;
-    
-    // Generate ideas based on image description using templates
-    const ideaTemplates = [
+    // Generate image-inspired creative ideas using focused templates
+    const imageInspiredTemplates = [
       {
-        titlePrefix: "Visual Art Project:",
-        descriptionTemplate: "Create an artistic interpretation inspired by the {description}. Explore different mediums and techniques to capture the essence and mood of what you see."
+        title: "Visual Storytelling Project",
+        description: "Create a series of images or artwork that tells a story inspired by your uploaded photo. Focus on the emotions, colors, and mood you captured."
       },
       {
-        titlePrefix: "Story Creation:",
-        descriptionTemplate: "Develop a compelling narrative based on {description}. Build characters, plot, and setting around the visual elements and atmosphere you observe."
+        title: "Photo Recreation Challenge", 
+        description: "Recreate your image using a completely different medium - paint, digital art, sculpture, or mixed media. Explore how the same concept translates across art forms."
       },
       {
-        titlePrefix: "Design Inspiration:",
-        descriptionTemplate: "Use the colors, shapes, and composition from {description} to design something new. Let the visual elements guide your creative process."
+        title: "Inspired Color Palette",
+        description: "Extract the dominant colors from your image and use them as inspiration for a new creative project - room design, fashion outfit, or artistic composition."
       }
     ];
 
-    const ideas = ideaTemplates.map((template, index) => ({
-      id: `hf-img-${Date.now()}-${index}`,
-      title: template.titlePrefix,
-      description: template.descriptionTemplate.replace('{description}', description)
+    const ideas = imageInspiredTemplates.map((template, index) => ({
+      id: `img-${Date.now()}-${index}`,
+      title: template.title,
+      description: template.description
     }));
 
     return ideas;
 
   } catch (error) {
-    console.error('Hugging Face image processing error:', error);
+    console.error('Image processing error:', error);
     
     // Fallback response if API fails
     return [

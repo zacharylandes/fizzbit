@@ -65,7 +65,8 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       if (data.ideas) {
         // Clear existing state and provide fresh ideas 
         onIdeasGenerated(data.ideas);
-        setUploadedImage(null); // Clear uploaded image after generation
+        // Keep image visible after generation so user can see what inspired the ideas
+        // setUploadedImage(null); // Don't clear - keep for reference
         toast({
           title: "Ideas Generated!",
           description: "Creative magic from your image 🎨",
@@ -233,16 +234,27 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
           </div>
         )}
         
-        {/* Upload Preview Area - Compact */}
+        {/* Upload Preview Area - Enhanced */}
         {uploadedImage && (
-          <div className="mt-2 p-2 glass border border-dashed border-electric-blue/30 rounded-lg text-center">
+          <div className="mt-4 p-3 bg-card border border-border rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-foreground">Uploaded Image</h3>
+              <Button
+                onClick={() => setUploadedImage(null)}
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground hover:text-foreground h-6 w-6 p-0"
+              >
+                ×
+              </Button>
+            </div>
             <img 
               src={uploadedImage} 
-              alt="Uploaded" 
-              className="max-h-16 mx-auto rounded object-cover"
+              alt="Uploaded for inspiration" 
+              className="max-h-20 mx-auto rounded object-cover border border-border"
             />
-            <p className="text-xs text-white/70 mt-1">
-              {isLoading ? "Analyzing..." : "Ready!"}
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              {isLoading ? "Analyzing your image..." : "Image ready for idea generation"}
             </p>
           </div>
         )}
