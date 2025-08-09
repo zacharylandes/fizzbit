@@ -52,6 +52,9 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
       setIsSwipeUpLoading(false);
       setSwipeUpPrompt("");
       setIsGeneratingIdeas(false);
+      
+      // Trigger immediate prefetch check for new cards
+      setTimeout(() => checkAndPrefetch(), 200);
     }
   }, [initialIdeas]);
 
@@ -203,11 +206,11 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
   const checkAndPrefetch = () => {
     console.log('🔄 Checking prefetch - Cards remaining:', cards.length, 'Has context:', !!currentExploreContext, 'Is pending:', prefetchMoreIdeasMutation.isPending);
     
-    // More aggressive prefetching - trigger when 5 or fewer cards remain
-    if (cards.length <= 5 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
+    // VERY aggressive prefetching - trigger when 8 or fewer cards remain
+    if (cards.length <= 8 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
       console.log('🔄 TRIGGERING PREFETCH for prompt:', currentExploreContext.originalPrompt);
       prefetchMoreIdeasMutation.mutate();
-    } else if (cards.length <= 2 && !currentExploreContext && !getRandomIdeasMutation.isPending) {
+    } else if (cards.length <= 3 && !currentExploreContext && !getRandomIdeasMutation.isPending) {
       // Emergency fallback to random ideas if no context and very low cards
       console.log('🔄 EMERGENCY PREFETCH - Getting random ideas');
       const existingIds = cards.map(c => c.id);
@@ -282,12 +285,12 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
         const newCards = prev.filter(c => c.id !== ideaId);
         console.log('🎯 CARDS AFTER SWIPE - Remaining:', newCards.length);
         
-        // Trigger smart prefetching check after state update
+        // Trigger smart prefetching check immediately after state update
         setTimeout(() => {
           checkAndPrefetch();
           // Also check again after cards state has fully updated
-          setTimeout(() => checkAndPrefetch(), 500);
-        }, 100);
+          setTimeout(() => checkAndPrefetch(), 100);
+        }, 50);
         
         return newCards;
       });
