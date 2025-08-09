@@ -71,33 +71,108 @@ export async function generateIdeasFromText(prompt: string): Promise<IdeaRespons
 }
 
 export async function generateIdeasFromImage(imageBase64: string): Promise<IdeaResponse[]> {
-  // Since Hugging Face image models are having provider issues, 
-  // generate relevant creative ideas based on the fact that user uploaded an image
   try {
+    // First try Hugging Face image analysis
+    let imageDescription = '';
     
-    // Generate image-inspired creative ideas using focused templates
-    const imageInspiredTemplates = [
-      {
-        title: "Visual Storytelling Project",
-        description: "Create a series of images or artwork that tells a story inspired by your uploaded photo. Focus on the emotions, colors, and mood you captured."
-      },
-      {
-        title: "Photo Recreation Challenge", 
-        description: "Recreate your image using a completely different medium - paint, digital art, sculpture, or mixed media. Explore how the same concept translates across art forms."
-      },
-      {
-        title: "Inspired Color Palette",
-        description: "Extract the dominant colors from your image and use them as inspiration for a new creative project - room design, fashion outfit, or artistic composition."
+    try {
+      const imageBuffer = Buffer.from(imageBase64, 'base64');
+      const hfResult = await hf.imageToText({
+        data: imageBuffer,
+        model: 'Salesforce/blip-image-captioning-large',
+      });
+      imageDescription = hfResult.generated_text || '';
+    } catch (hfError) {
+      console.log('Hugging Face image analysis failed, trying OpenAI vision...');
+      
+      // Fallback to OpenAI vision model
+      try {
+        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o',
+            messages: [
+              {
+                role: 'user',
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Describe this image in 1-2 sentences focusing on the main subject, colors, mood, and setting.'
+                  },
+                  {
+                    type: 'image_url',
+                    image_url: {
+                      url: `data:image/jpeg;base64,${imageBase64}`
+                    }
+                  }
+                ]
+              }
+            ],
+            max_tokens: 100
+          })
+        });
+
+        if (openaiResponse.ok) {
+          const openaiData = await openaiResponse.json();
+          imageDescription = openaiData.choices[0].message.content;
+        }
+      } catch (openaiError) {
+        console.log('OpenAI vision also failed, using generic image-based ideas');
       }
-    ];
+    }
 
-    const ideas = imageInspiredTemplates.map((template, index) => ({
-      id: `img-${Date.now()}-${index}`,
-      title: template.title,
-      description: template.description
-    }));
+    // Generate ideas based on the image analysis (or generic if analysis failed)
+    if (imageDescription.trim()) {
+      // Use actual image content for personalized ideas
+      const personalizedTemplates = [
+        {
+          title: "Recreate This Scene",
+          description: `${imageDescription} - Recreate this scene in a different artistic medium like watercolor, digital art, or sculpture. Focus on capturing the same mood and atmosphere.`
+        },
+        {
+          title: "Story Inspired by This Image",
+          description: `${imageDescription} - Write a short story or create a narrative inspired by what you see here. What happened before this moment? What happens next?`
+        },
+        {
+          title: "Color and Mood Study",
+          description: `${imageDescription} - Extract the colors and emotional tone from this image to inspire a new creative project - whether it's interior design, fashion, or another artwork.`
+        }
+      ];
 
-    return ideas;
+      return personalizedTemplates.map((template, index) => ({
+        id: `analyzed-img-${Date.now()}-${index}`,
+        title: template.title,
+        description: template.description,
+        sourceContent: `Image: ${imageDescription}`
+      }));
+    } else {
+      // Fallback generic image-inspired ideas
+      const genericTemplates = [
+        {
+          title: "Visual Storytelling Project",
+          description: "Create a series of images or artwork that tells a story inspired by your uploaded photo. Focus on the emotions, colors, and mood you captured."
+        },
+        {
+          title: "Photo Recreation Challenge", 
+          description: "Recreate your image using a completely different medium - paint, digital art, sculpture, or mixed media. Explore how the same concept translates across art forms."
+        },
+        {
+          title: "Inspired Color Palette",
+          description: "Extract the dominant colors from your image and use them as inspiration for a new creative project - room design, fashion outfit, or artistic composition."
+        }
+      ];
+
+      return genericTemplates.map((template, index) => ({
+        id: `generic-img-${Date.now()}-${index}`,
+        title: template.title,
+        description: template.description,
+        sourceContent: "Image upload"
+      }));
+    }
 
   } catch (error) {
     console.error('Image processing error:', error);
