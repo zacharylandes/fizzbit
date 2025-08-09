@@ -8,6 +8,7 @@ import { generateIdeasFromText, generateIdeasFromImage } from "./huggingface";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
+import { spawn } from "child_process";
 
 // Initialize OpenAI with error handling
 let openai: OpenAI | null = null;
@@ -24,6 +25,36 @@ try {
   console.error("Failed to initialize OpenAI client:", error);
   console.warn("AI features will use fallback responses");
 }
+
+// Function to convert audio to WAV format using FFmpeg
+const convertAudioToWav = (inputPath: string, outputPath: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const ffmpeg = spawn('ffmpeg', [
+      '-i', inputPath,           // Input file
+      '-acodec', 'pcm_s16le',    // Audio codec: PCM 16-bit little-endian
+      '-ar', '16000',            // Sample rate: 16kHz (optimal for Whisper)
+      '-ac', '1',                // Channels: mono
+      '-y',                      // Overwrite output file
+      outputPath                 // Output file
+    ]);
+
+    ffmpeg.stderr.on('data', (data) => {
+      console.log(`FFmpeg: ${data}`);
+    });
+
+    ffmpeg.on('close', (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`FFmpeg process exited with code ${code}`));
+      }
+    });
+
+    ffmpeg.on('error', (error) => {
+      reject(error);
+    });
+  });
+};
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -214,11 +245,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error("OpenAI client not available - audio transcription disabled");
       }
       
-      const audioReadStream = fs.createReadStream(req.file.path);
+      // Convert audio to WAV format for Whisper compatibility
+      const wavPath = req.file.path + '.wav';
+      await convertAudioToWav(req.file.path, wavPath);
+      
+      const audioReadStream = fs.createReadStream(wavPath);
       const transcription = await openai.audio.transcriptions.create({
         file: audioReadStream,
         model: "whisper-1",
       });
+      
+      // Clean up converted file
+      if (fs.existsSync(wavPath)) {
+        fs.unlinkSync(wavPath);
+      }
 
       console.log('📝 Transcription result:', transcription.text);
       
