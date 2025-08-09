@@ -19,6 +19,8 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
   const [cardColors, setCardColors] = useState<{ [key: string]: number }>({});
   const [currentExploreContext, setCurrentExploreContext] = useState<{ originalPrompt: string; exploredIdea: Idea } | null>(null);
   const [isGeneratingIdeas, setIsGeneratingIdeas] = useState(false);
+  const [isSwipeUpLoading, setIsSwipeUpLoading] = useState(false);
+  const [swipeUpPrompt, setSwipeUpPrompt] = useState<string>("");
   const cardRefs = useRef<{ [key: string]: HTMLElement }>({});
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const { toast } = useToast();
@@ -43,6 +45,10 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
         newColors[card.id] = index % 3; // Cycle through 3 color options
       });
       setCardColors(prev => ({ ...prev, ...newColors }));
+      
+      // Reset swipe up loading state when new ideas arrive
+      setIsSwipeUpLoading(false);
+      setSwipeUpPrompt("");
     }
   }, [initialIdeas]);
 
@@ -187,6 +193,10 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
         // Up swipe: Save idea AND use this idea as the new prompt
         saveIdeaMutation.mutate(idea.id);
         
+        // Show loading state immediately
+        setIsSwipeUpLoading(true);
+        setSwipeUpPrompt(idea.title);
+        
         // Use the idea's title as the new prompt and clear current cards
         if (onSwipeUpPrompt) {
           onSwipeUpPrompt(idea.title);
@@ -317,36 +327,53 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
       <div className="relative h-[400px] sm:h-[440px] w-full max-w-[600px] mx-auto">
         <div className="bg-card border border-border rounded-xl h-full flex flex-col items-center justify-center p-8 text-center card-shadow relative overflow-hidden">
           <div className="relative z-10 space-y-6">
-            {/* Icons */}
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              <div className="p-3 bg-card-sage border border-card-sage/30 rounded-lg hover:scale-110 transition-all duration-300">
-                <Sparkles className="h-6 w-6 text-card-sage" />
-              </div>
-              <div className="p-3 bg-card-blue-gray border border-card-blue-gray/30 rounded-lg hover:scale-110 transition-all duration-300">
-                <Image className="h-6 w-6 text-card-blue-gray" />
-              </div>
-              <div className="p-3 bg-card-light-blue border border-card-light-blue/30 rounded-lg hover:scale-110 transition-all duration-300">
-                <Type className="h-6 w-6 text-card-light-blue" />
-              </div>
-            </div>
-            
-            {/* Message */}
-            <div>
-              <h3 className="text-xl font-semibold text-card-foreground mb-2">
-                No ideas yet!
-              </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                Use the input above to get inspired<br />
-                Share a photo or describe your interests
-              </p>
-            </div>
-            
-            {/* Visual hint */}
-            <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
-              <ArrowUp className="h-4 w-4 animate-bounce text-card-light-blue" />
-              <span>Start creating</span>
-              <ArrowUp className="h-4 w-4 animate-bounce text-card-light-blue" style={{ animationDelay: '0.2s' }} />
-            </div>
+            {isSwipeUpLoading ? (
+              <>
+                {/* Loading State for Swipe Up */}
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Fetching new ideas!
+                </h3>
+                <p className="text-muted-foreground text-sm max-w-md">
+                  Generating creative ideas based on: "<span className="font-medium text-foreground">{swipeUpPrompt}</span>"
+                </p>
+              </>
+            ) : (
+              <>
+                {/* Default Empty State */}
+                <div className="flex items-center justify-center space-x-4 mb-4">
+                  <div className="p-3 bg-card-sage border border-card-sage/30 rounded-lg hover:scale-110 transition-all duration-300">
+                    <Sparkles className="h-6 w-6 text-card-sage" />
+                  </div>
+                  <div className="p-3 bg-card-blue-gray border border-card-blue-gray/30 rounded-lg hover:scale-110 transition-all duration-300">
+                    <Image className="h-6 w-6 text-card-blue-gray" />
+                  </div>
+                  <div className="p-3 bg-card-light-blue border border-card-light-blue/30 rounded-lg hover:scale-110 transition-all duration-300">
+                    <Type className="h-6 w-6 text-card-light-blue" />
+                  </div>
+                </div>
+                
+                {/* Message */}
+                <div>
+                  <h3 className="text-xl font-semibold text-card-foreground mb-2">
+                    No ideas yet!
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Use the input above to get inspired<br />
+                    Share a photo or describe your interests
+                  </p>
+                </div>
+                
+                {/* Visual hint */}
+                <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
+                  <ArrowUp className="h-4 w-4 animate-bounce text-card-light-blue" />
+                  <span>Start creating</span>
+                  <ArrowUp className="h-4 w-4 animate-bounce text-card-light-blue" style={{ animationDelay: '0.2s' }} />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
