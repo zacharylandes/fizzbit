@@ -127,10 +127,10 @@ export default function SavedPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-coral via-teal to-sky-500 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-white/80">Loading...</p>
+          <div className="w-16 h-16 mx-auto mb-4 border-4 border-card-purple-gray border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -145,8 +145,8 @@ export default function SavedPage() {
       {/* Page Header */}
       <div className="max-w-7xl mx-auto px-6 py-6">
         <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-electric-pink to-electric-cyan bg-clip-text text-transparent mb-2">Saved Ideas</h1>
-          <p className="text-white/70 text-sm">
+          <h1 className="text-2xl font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, serif' }}>Saved Ideas</h1>
+          <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
             {savedIdeas.length} {savedIdeas.length === 1 ? 'idea' : 'ideas'} saved
           </p>
         </div>
@@ -163,20 +163,17 @@ export default function SavedPage() {
           </div>
         ) : savedIdeas.length === 0 ? (
           <div className="text-center py-16">
-            <div className="bg-gradient-neon border border-electric-pink/30 rounded-2xl p-12 max-w-md mx-auto glow-electric-pink relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-aurora opacity-20 animate-pulse"></div>
-              <div className="relative z-10">
-                <Heart className="h-12 w-12 mx-auto mb-4 text-white animate-pulse" />
-                <h2 className="text-xl font-semibold text-white mb-2">No saved ideas yet</h2>
-                <p className="text-white/80 mb-6">
-                  Swipe right or up on ideas you love to save them here!
-                </p>
-                <Link href="/">
-                  <Button className="bg-gradient-electric text-white hover:scale-105 glow-electric-blue transition-all duration-300">
-                    Start Exploring Ideas
-                  </Button>
-                </Link>
-              </div>
+            <div className="bg-card border border-card-sage/30 rounded-2xl p-12 max-w-md mx-auto shadow-sm">
+              <Heart className="h-12 w-12 mx-auto mb-4 text-card-sage" />
+              <h2 className="text-xl font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, serif' }}>No saved ideas yet</h2>
+              <p className="text-muted-foreground mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
+                Swipe right or up on ideas you love to save them here!
+              </p>
+              <Link href="/">
+                <Button className="bg-card-sage text-white hover:bg-card-sage/90 shadow-sm">
+                  Start Exploring Ideas
+                </Button>
+              </Link>
             </div>
           </div>
         ) : (
@@ -205,8 +202,8 @@ export default function SavedPage() {
                 >
                   <Card className={`${cardStyles[index % cardStyles.length]} shadow-lg relative overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border-2`}>
                     {/* Swipe hint overlay */}
-                    <div className="absolute inset-0 glass bg-red-500/20 flex items-center justify-end pr-6 opacity-0 transition-opacity duration-200 hover:opacity-50">
-                      <Trash2 className="h-6 w-6 text-white" />
+                    <div className="absolute inset-0 bg-card-peach/20 flex items-center justify-end pr-6 opacity-0 transition-opacity duration-200 hover:opacity-50 rounded-xl">
+                      <Trash2 className="h-6 w-6 text-card-peach" />
                     </div>
                     
                     <CardHeader className="pb-2">

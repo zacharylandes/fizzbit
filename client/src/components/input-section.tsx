@@ -469,11 +469,11 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
             onClick={isRecording ? stopRecording : startRecording}
             className={`flex-1 max-w-[140px] ${
               isRecording 
-                ? 'bg-red-500 hover:bg-red-600 text-white border-red-500 shadow-md'
+                ? 'bg-card-peach hover:bg-card-peach/90 text-white border-card-peach shadow-md'
                 : generateFromAudioMutation.isPending
-                ? 'bg-blue-500 hover:bg-blue-600 text-white border-blue-500 shadow-md'
-                : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 shadow-sm'
-            } rounded-xl py-4 px-4 font-medium text-center transition-all duration-200 ease-in-out`}
+                ? 'bg-card-light-blue hover:bg-card-light-blue/90 text-white border-card-light-blue shadow-md'
+                : 'bg-card-light-blue-bg border-card-light-blue/40 hover:bg-card-light-blue-bg/90 hover-lift text-card-light-blue card-shadow'
+            } rounded-xl py-4 px-4 font-medium text-center transition-all duration-300`}
             disabled={(isLoading || generateFromAudioMutation.isPending) && !isRecording}
           >
             {generateFromAudioMutation.isPending ? (
@@ -498,9 +498,9 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
             onClick={() => setShowDrawingPad(!showDrawingPad)}
             className={`flex-1 max-w-[140px] ${
               showDrawingPad
-                ? 'bg-purple-500 hover:bg-purple-600 text-white border-purple-500 shadow-md'
-                : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 shadow-sm'
-            } rounded-xl py-4 px-4 font-medium text-center transition-all duration-200 ease-in-out`}
+                ? 'bg-card-lavender hover:bg-card-lavender/90 text-white border-card-lavender shadow-md'
+                : 'bg-card-lavender-bg border-card-lavender/40 hover:bg-card-lavender-bg/90 hover-lift text-card-lavender card-shadow'
+            } rounded-xl py-4 px-4 font-medium text-center transition-all duration-300`}
             disabled={isLoading}
           >
             <Paintbrush className="mr-2 h-4 w-4" />
@@ -510,13 +510,13 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
 
         {/* Drawing Pad */}
         {showDrawingPad && (
-          <div className="mt-4 p-4 bg-background border border-input rounded-lg">
+          <div className="mt-4 p-4 bg-card-lavender-bg border border-card-lavender/30 rounded-lg">
             <div className="flex flex-col items-center space-y-3">
               <canvas
                 ref={canvasRef}
                 width={300}
                 height={200}
-                className="border border-input rounded-lg cursor-crosshair touch-none"
+                className="border border-card-lavender/30 rounded-lg cursor-crosshair touch-none bg-white"
                 style={{ touchAction: 'none' }}
                 onMouseDown={startDrawing}
                 onMouseMove={draw}
@@ -531,7 +531,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
                   onClick={clearCanvas}
                   variant="outline"
                   size="sm"
-                  className="text-xs"
+                  className="text-xs border-card-lavender/40 text-card-lavender hover:bg-card-lavender-bg"
                 >
                   Clear
                 </Button>

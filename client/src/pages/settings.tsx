@@ -93,7 +93,7 @@ export default function SettingsPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="w-8 h-8 mx-auto mb-4 border-2 border-electric-blue border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 mx-auto mb-4 border-2 border-card-purple-gray border-t-transparent rounded-full animate-spin"></div>
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -107,23 +107,21 @@ export default function SettingsPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">
-          <span className="bg-gradient-to-r from-electric-purple to-electric-cyan bg-clip-text text-transparent">
-            Settings
-          </span>
+        <h1 className="text-3xl font-bold mb-2 text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
+          Settings
         </h1>
-        <p className="text-muted-foreground">Manage your account and preferences</p>
+        <p className="text-muted-foreground" style={{ fontFamily: 'Inter, sans-serif' }}>Manage your account and preferences</p>
       </div>
 
       <div className="grid gap-6">
         {/* Profile Settings */}
-        <Card className="glass border border-electric-blue/30 glow-electric-blue">
+        <Card className="bg-card border border-card-blue-gray/30 shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
+            <CardTitle className="flex items-center space-x-2 text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
               <UserIcon className="h-5 w-5" />
               <span>Profile Information</span>
             </CardTitle>
-            <CardDescription className="text-white/70">
+            <CardDescription className="text-muted-foreground" style={{ fontFamily: 'Inter, sans-serif' }}>
               Update your personal information and profile details
             </CardDescription>
           </CardHeader>
@@ -131,39 +129,39 @@ export default function SettingsPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Profile Picture */}
               <div className="flex items-center space-x-4">
-                <Avatar className="h-16 w-16 border-2 border-electric-blue/50">
+                <Avatar className="h-16 w-16 border-2 border-card-blue-gray/50">
                   <AvatarImage src={(user as User)?.profileImageUrl || undefined} alt="Profile" />
-                  <AvatarFallback className="bg-gradient-electric text-white">
+                  <AvatarFallback className="bg-card-blue-gray text-white">
                     <UserCircle className="h-8 w-8" />
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="text-sm font-medium text-white">Profile Picture</h3>
-                  <p className="text-xs text-white/70">Your profile picture from your authentication provider</p>
+                  <h3 className="text-sm font-medium text-foreground" style={{ fontFamily: 'Inter, sans-serif' }}>Profile Picture</h3>
+                  <p className="text-xs text-muted-foreground" style={{ fontFamily: 'Inter, sans-serif' }}>Your profile picture from your authentication provider</p>
                 </div>
               </div>
 
               {/* Form Fields */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName" className="text-white">First Name</Label>
+                  <Label htmlFor="firstName" className="text-foreground" style={{ fontFamily: 'Inter, sans-serif' }}>First Name</Label>
                   <Input
                     id="firstName"
                     type="text"
                     value={formData.firstName}
                     onChange={(e) => handleInputChange("firstName", e.target.value)}
-                    className="glass border-electric-blue/30 text-white placeholder:text-white/50 focus:border-electric-blue"
+                    className="bg-background border-card-blue-gray/30 text-foreground placeholder:text-muted-foreground focus:border-card-blue-gray"
                     placeholder="Enter your first name"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName" className="text-white">Last Name</Label>
+                  <Label htmlFor="lastName" className="text-foreground" style={{ fontFamily: 'Inter, sans-serif' }}>Last Name</Label>
                   <Input
                     id="lastName"
                     type="text"
                     value={formData.lastName}
                     onChange={(e) => handleInputChange("lastName", e.target.value)}
-                    className="glass border-electric-blue/30 text-white placeholder:text-white/50 focus:border-electric-blue"
+                    className="bg-background border-card-blue-gray/30 text-foreground placeholder:text-muted-foreground focus:border-card-blue-gray"
                     placeholder="Enter your last name"
                   />
                 </div>
