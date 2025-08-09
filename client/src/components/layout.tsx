@@ -46,8 +46,8 @@ export default function Layout({ children }: LayoutProps) {
             {/* SWIVL Brand */}
             <Link href="/">
               <div className="flex items-center space-x-3 cursor-pointer hover-lift transition-all duration-300">
-                <div className="p-2 bg-card-sage rounded-lg card-shadow">
-                  <Lightbulb className="h-6 w-6 text-white" />
+                <div className="p-2 bg-card-sage-bg rounded-lg card-shadow">
+                  <Lightbulb className="h-6 w-6 text-card-sage" />
                 </div>
                 <h1 className="text-xl font-bold text-primary">
                   SWIVL
@@ -60,7 +60,7 @@ export default function Layout({ children }: LayoutProps) {
               <a href="/api/logout">
                 <Button
                   size="sm"
-                  className="bg-card-purple-gray hover:bg-card-purple-gray/90 hover-lift text-white transition-all duration-300 px-4 py-2 card-shadow"
+                  className="bg-card-purple-gray-bg hover:bg-card-purple-gray-bg/90 hover-lift text-card-purple-gray transition-all duration-300 px-4 py-2 card-shadow"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
@@ -70,7 +70,7 @@ export default function Layout({ children }: LayoutProps) {
               <a href="/api/login">
                 <Button
                   size="sm"
-                  className="bg-card-blue-gray hover:bg-card-blue-gray/90 hover-lift text-white transition-all duration-300 px-4 py-2 card-shadow"
+                  className="bg-card-blue-gray-bg hover:bg-card-blue-gray-bg/90 hover-lift text-card-blue-gray transition-all duration-300 px-4 py-2 card-shadow"
                 >
                   <LogIn className="h-4 w-4 mr-2" />
                   Login
@@ -109,7 +109,7 @@ export default function Layout({ children }: LayoutProps) {
                       <Icon className="h-5 w-5" />
                       <span className="text-xs font-medium">{item.label}</span>
                       {item.badge && item.badge > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-card-sage text-white text-xs rounded-full h-5 w-5 flex items-center justify-center card-shadow">
+                        <span className="absolute -top-1 -right-1 bg-card-sage-bg text-card-sage text-xs rounded-full h-5 w-5 flex items-center justify-center card-shadow">
                           {item.badge}
                         </span>
                       )}

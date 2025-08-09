@@ -42,7 +42,7 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
               <div
                 key={i}
                 className={`w-2 h-2 rounded-full ${
-                  i === cardNumber ? accentColor.replace('text-', 'bg-') : "bg-muted"
+                  i === cardNumber ? accentColor.replace('text-card-', 'bg-card-') : "bg-muted"
                 }`}
               />
             ))}
@@ -56,7 +56,7 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
         
         {/* Swipe Indicators */}
         <div className="absolute bottom-4 left-6 right-6 flex justify-between items-center">
-          <div className="flex items-center text-xs text-muted-foreground bg-white/60 border border-border px-2 py-1 rounded-lg hover:bg-white/80 transition-all duration-300">
+          <div className="flex items-center text-xs text-foreground bg-white/60 border border-border px-2 py-1 rounded-lg hover:bg-white/80 transition-all duration-300">
             <ArrowLeft className="w-3 h-3 mr-1" />
             Dismiss
           </div>
@@ -64,7 +64,7 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
             <ArrowUp className="w-3 h-3 mr-1" />
             Explore
           </div>
-          <div className="flex items-center text-xs text-primary-green bg-white/60 border border-border px-2 py-1 rounded-lg hover:bg-white/80 transition-all duration-300">
+          <div className="flex items-center text-xs text-card-sage bg-white/60 border border-border px-2 py-1 rounded-lg hover:bg-white/80 transition-all duration-300">
             <ArrowRight className="w-3 h-3 mr-1" />
             Save
           </div>
