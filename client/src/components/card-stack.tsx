@@ -127,7 +127,55 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
     },
   });
 
-  // Get random ideas mutation
+  // Smart prefetch more ideas from the same prompt/context
+  const prefetchMoreIdeasMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentExploreContext?.originalPrompt) {
+        return { ideas: [] };
+      }
+
+      // Check if the original prompt was from an image or text
+      const isImagePrompt = currentExploreContext.originalPrompt.startsWith('Image:');
+      
+      if (isImagePrompt) {
+        // For image prompts, we can't regenerate from the same image, 
+        // so we generate related visual ideas using the description
+        const imageDescription = currentExploreContext.originalPrompt.replace('Image: ', '');
+        const response = await apiRequest("POST", "/api/ideas/generate-from-text", {
+          prompt: `Visual creative projects inspired by: ${imageDescription}`
+        });
+        return response.json();
+      } else {
+        // For text prompts, generate more ideas from the same prompt
+        const response = await apiRequest("POST", "/api/ideas/generate-from-text", {
+          prompt: currentExploreContext.originalPrompt
+        });
+        return response.json();
+      }
+    },
+    onSuccess: (data) => {
+      if (data.ideas && data.ideas.length > 0) {
+        console.log('🔄 PREFETCH SUCCESS - Adding', data.ideas.length, 'more ideas from original prompt');
+        // Add new ideas to the end of the stack
+        setCards(prev => {
+          const newCards = [...prev, ...data.ideas];
+          // Assign colors to new cards
+          const newColors: { [key: string]: number } = {};
+          data.ideas.forEach((card: Idea, index: number) => {
+            newColors[card.id] = (prev.length + index) % 3;
+          });
+          setCardColors(prevColors => ({ ...prevColors, ...newColors }));
+          return newCards;
+        });
+      }
+    },
+    onError: (error) => {
+      console.error('Prefetch failed:', error);
+      // Silent failure - don't bother user with prefetch errors
+    }
+  });
+
+  // Get random ideas mutation (fallback only)
   const getRandomIdeasMutation = useMutation({
     mutationFn: async (excludeIds: string[]) => {
       const excludeQuery = excludeIds.length > 0 ? `?exclude=${excludeIds.join(',')}` : '';
@@ -150,6 +198,16 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
       }
     },
   });
+
+  // Smart prefetching logic - check when cards get low
+  const checkAndPrefetch = () => {
+    console.log('🔄 Checking prefetch - Cards remaining:', cards.length, 'Has context:', !!currentExploreContext);
+    
+    if (cards.length <= 3 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
+      console.log('🔄 TRIGGERING PREFETCH for prompt:', currentExploreContext.originalPrompt);
+      prefetchMoreIdeasMutation.mutate();
+    }
+  };
 
   const handleSwipe = (ideaId: string, direction: 'left' | 'right' | 'up') => {
     const idea = cards.find(c => c.id === ideaId);
@@ -213,39 +271,13 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
       }
       // Left swipe: Just dismiss (no action needed)
 
-      // Remove card from state and check if we need more cards
+      // Remove card from state and trigger smart prefetching
       setCards(prev => {
         const newCards = prev.filter(c => c.id !== ideaId);
         console.log('🎯 CARDS AFTER SWIPE - Remaining:', newCards.length);
         
-        // Smart prefetching: when we have 5 or fewer cards left (more aggressive)
-        if (newCards.length <= 5) {
-          console.log('🎯 PREFETCH CHECK - Cards left:', newCards.length, 'Explore context:', !!currentExploreContext);
-          
-          // If we're in an exploration context, always continue exploring
-          if (currentExploreContext) {
-            // Find the most recent idea that shares the same original prompt as our exploration context
-            const contextualIdeas = newCards.filter(card => 
-              card.sourceContent === currentExploreContext.originalPrompt
-            );
-            
-            if (contextualIdeas.length > 0) {
-              // Use the most recent contextual idea to continue exploration
-              const mostRecentContextualIdea = contextualIdeas[0]; // First card is most recent
-              console.log('🎯 CONTINUING EXPLORATION - Based on most recent:', mostRecentContextualIdea.title);
-              exploreIdeaMutation.mutate(mostRecentContextualIdea.id);
-            } else {
-              // Always fallback to the original explored idea to keep the context alive
-              console.log('🎯 CONTINUING EXPLORATION - Fallback to original:', currentExploreContext.exploredIdea.title);
-              exploreIdeaMutation.mutate(currentExploreContext.exploredIdea.id);
-            }
-          } else {
-            // Only fetch random ideas if we truly have no exploration context
-            const excludeIds = newCards.map(c => c.id);
-            console.log('🎯 FETCHING RANDOM - Excluding IDs:', excludeIds.length);
-            getRandomIdeasMutation.mutate(excludeIds);
-          }
-        }
+        // Trigger smart prefetching check after state update
+        setTimeout(() => checkAndPrefetch(), 100);
         
         return newCards;
       });

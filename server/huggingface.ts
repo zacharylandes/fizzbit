@@ -15,10 +15,53 @@ export interface IdeaResponse {
 // Use a reliable model that supports text generation
 const TEXT_MODEL = 'gpt2';
 
-export async function generateIdeasFromText(prompt: string): Promise<IdeaResponse[]> {
+export async function generateIdeasFromText(prompt: string, count: number = 8): Promise<IdeaResponse[]> {
   try {
-    // For now, use a simple prompt-based approach since Llama model has compatibility issues
-    // We'll generate creative ideas based on the prompt
+    // Use OpenAI as primary since Hugging Face text models have issues
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: `You are a creative idea generator. Generate exactly ${count} unique, inspiring creative ideas based on the user prompt. Each idea should be practical and actionable. Format as JSON with "ideas" array containing objects with "title" and "description" fields. Make titles concise (max 5 words) and descriptions detailed but under 100 words.`
+          },
+          {
+            role: 'user',
+            content: `Generate ${count} creative ideas for: ${prompt}`
+          }
+        ],
+        max_tokens: 1000,
+        temperature: 0.8,
+        response_format: { type: "json_object" }
+      })
+    });
+
+    if (openaiResponse.ok) {
+      const openaiData = await openaiResponse.json();
+      const content = openaiData.choices[0].message.content;
+      
+      try {
+        const parsed = JSON.parse(content);
+        if (parsed.ideas && Array.isArray(parsed.ideas)) {
+          return parsed.ideas.map((idea: any, index: number) => ({
+            id: `text-${Date.now()}-${index}`,
+            title: idea.title || `Creative Idea ${index + 1}`,
+            description: idea.description || 'A creative project to explore.',
+            sourceContent: prompt
+          }));
+        }
+      } catch (parseError) {
+        console.error('Failed to parse OpenAI response:', parseError);
+      }
+    }
+
+    // Fallback to template-based ideas if OpenAI fails
     const ideaTemplates = [
       {
         titlePrefix: "Creative Workshop:",
@@ -31,16 +74,38 @@ export async function generateIdeasFromText(prompt: string): Promise<IdeaRespons
       {
         titlePrefix: "Community Initiative:",
         descriptionTemplate: "Start a community project focused on {topic}. Bring people together through challenges, shared goals, and collaborative creation that builds connections and inspires action."
+      },
+      {
+        titlePrefix: "Art Series:",
+        descriptionTemplate: "Create a collection of artworks exploring {topic}. Use different mediums and techniques to express various aspects and emotions related to your theme."
+      },
+      {
+        titlePrefix: "Interactive Experience:",
+        descriptionTemplate: "Design an immersive experience around {topic} that engages multiple senses and invites participation from your audience."
+      },
+      {
+        titlePrefix: "Storytelling Project:",
+        descriptionTemplate: "Develop a narrative-driven project about {topic} using your preferred medium - writing, video, podcast, or visual storytelling."
+      },
+      {
+        titlePrefix: "Learning Journey:",
+        descriptionTemplate: "Create an educational pathway that teaches others about {topic} through engaging activities, challenges, and hands-on exploration."
+      },
+      {
+        titlePrefix: "Social Impact:",
+        descriptionTemplate: "Design a project that uses {topic} to make a positive difference in your community or address a meaningful cause."
       }
     ];
 
-    // Generate unique ideas based on the prompt
-    const ideas = ideaTemplates.map((template, index) => {
+    // Take first 'count' templates and generate ideas
+    const selectedTemplates = ideaTemplates.slice(0, count);
+    const ideas = selectedTemplates.map((template, index) => {
       const topic = prompt.toLowerCase();
       return {
-        id: `hf-${Date.now()}-${index}`,
-        title: `${template.titlePrefix} ${prompt}`,
-        description: template.descriptionTemplate.replace('{topic}', topic)
+        id: `template-${Date.now()}-${index}`,
+        title: template.titlePrefix.replace(':', ''),
+        description: template.descriptionTemplate.replace('{topic}', topic),
+        sourceContent: prompt
       };
     });
 
@@ -70,7 +135,7 @@ export async function generateIdeasFromText(prompt: string): Promise<IdeaRespons
   }
 }
 
-export async function generateIdeasFromImage(imageBase64: string): Promise<IdeaResponse[]> {
+export async function generateIdeasFromImage(imageBase64: string, count: number = 8): Promise<IdeaResponse[]> {
   try {
     // First try Hugging Face image analysis
     let imageDescription = '';
@@ -127,7 +192,7 @@ export async function generateIdeasFromImage(imageBase64: string): Promise<IdeaR
 
     // Generate ideas based on the image analysis (or generic if analysis failed)
     if (imageDescription.trim()) {
-      // Use actual image content for personalized ideas
+      // Use actual image content for personalized ideas - expand to 8 variations
       const personalizedTemplates = [
         {
           title: "Recreate This Scene",
@@ -140,8 +205,28 @@ export async function generateIdeasFromImage(imageBase64: string): Promise<IdeaR
         {
           title: "Color and Mood Study",
           description: `${imageDescription} - Extract the colors and emotional tone from this image to inspire a new creative project - whether it's interior design, fashion, or another artwork.`
+        },
+        {
+          title: "Photo Series Extension",
+          description: `${imageDescription} - Create a series of related images that tell a bigger story. Capture different angles, times of day, or emotional moments in the same theme.`
+        },
+        {
+          title: "Mixed Media Interpretation",
+          description: `${imageDescription} - Combine multiple art forms to reinterpret this image - photography with text, digital art with physical elements, or music with visuals.`
+        },
+        {
+          title: "Minimalist Version",
+          description: `${imageDescription} - Reduce this image to its essential elements. Create a simplified, minimalist interpretation focusing on the core composition and feeling.`
+        },
+        {
+          title: "Different Perspective",
+          description: `${imageDescription} - Reimagine this scene from a completely different viewpoint or time period. How would it look from above, from inside, or 100 years ago?`
+        },
+        {
+          title: "Interactive Installation",
+          description: `${imageDescription} - Design an interactive art installation or experience that lets others step into and engage with the world depicted in your image.`
         }
-      ];
+      ].slice(0, count);
 
       return personalizedTemplates.map((template, index) => ({
         id: `analyzed-img-${Date.now()}-${index}`,
@@ -150,7 +235,7 @@ export async function generateIdeasFromImage(imageBase64: string): Promise<IdeaR
         sourceContent: `Image: ${imageDescription}`
       }));
     } else {
-      // Fallback generic image-inspired ideas
+      // Fallback generic image-inspired ideas - expand to 8
       const genericTemplates = [
         {
           title: "Visual Storytelling Project",
@@ -163,8 +248,28 @@ export async function generateIdeasFromImage(imageBase64: string): Promise<IdeaR
         {
           title: "Inspired Color Palette",
           description: "Extract the dominant colors from your image and use them as inspiration for a new creative project - room design, fashion outfit, or artistic composition."
+        },
+        {
+          title: "Abstract Interpretation",
+          description: "Transform your photo into an abstract artwork focusing on shapes, patterns, and emotional resonance rather than literal representation."
+        },
+        {
+          title: "Time-lapse Concept",
+          description: "Create a time-based project showing how the scene in your photo might change over hours, days, seasons, or years."
+        },
+        {
+          title: "Texture and Material Study",
+          description: "Focus on the textures and materials visible in your image to inspire a tactile art project using fabric, clay, metal, or natural materials."
+        },
+        {
+          title: "Lighting Experiment",
+          description: "Explore how different lighting conditions would change the mood and impact of your image through photography, digital art, or installation."
+        },
+        {
+          title: "Community Art Project",
+          description: "Use your image as inspiration for a collaborative artwork where others can contribute their own interpretations or additions."
         }
-      ];
+      ].slice(0, count);
 
       return genericTemplates.map((template, index) => ({
         id: `generic-img-${Date.now()}-${index}`,
