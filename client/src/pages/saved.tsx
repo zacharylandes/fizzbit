@@ -141,7 +141,7 @@ export default function SavedPage() {
   }
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       {/* Page Header */}
       <div className="max-w-7xl mx-auto px-6 py-6">
         <div>
@@ -152,8 +152,8 @@ export default function SavedPage() {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 pb-8">
+      {/* Content - flex-1 to push footer down */}
+      <div className="flex-1 max-w-7xl mx-auto px-6 pb-32">
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -252,6 +252,6 @@ export default function SavedPage() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
