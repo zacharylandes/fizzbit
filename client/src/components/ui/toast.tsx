@@ -27,13 +27,13 @@ const toastVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-white/95 text-gray-800 border-l-4 border-l-blue-400 shadow-blue-100/50",
-        destructive: "bg-red-500/95 text-white border-l-4 border-l-red-600 shadow-red-200/50",
-        success: "bg-gradient-to-r from-green-500 to-emerald-500 text-white border-l-4 border-l-green-600 shadow-green-200/50",
-        info: "bg-gradient-to-r from-blue-500 to-sky-500 text-white border-l-4 border-l-blue-600 shadow-blue-200/50",
-        warning: "bg-gradient-to-r from-amber-500 to-orange-500 text-white border-l-4 border-l-amber-600 shadow-amber-200/50",
-        explore: "bg-gradient-to-r from-purple-500 to-pink-500 text-white border-l-4 border-l-purple-600 shadow-purple-200/50",
-        save: "bg-gradient-to-r from-pink-500 to-rose-500 text-white border-l-4 border-l-pink-600 shadow-pink-200/50",
+        default: "bg-card-light-blue-bg border-l-4 border-l-card-light-blue text-card-light-blue shadow-md",
+        destructive: "bg-card-peach-bg border-l-4 border-l-card-peach text-card-peach shadow-md",
+        success: "bg-card-sage-bg border-l-4 border-l-card-sage text-card-sage shadow-md",
+        info: "bg-card-light-blue-bg border-l-4 border-l-card-light-blue text-card-light-blue shadow-md",
+        warning: "bg-card-peach-bg border-l-4 border-l-card-peach text-card-peach shadow-md",
+        explore: "bg-card-lavender-bg border-l-4 border-l-card-lavender text-card-lavender shadow-md",
+        save: "bg-card-sage-bg border-l-4 border-l-card-sage text-card-sage shadow-md",
       },
     },
     defaultVariants: {
