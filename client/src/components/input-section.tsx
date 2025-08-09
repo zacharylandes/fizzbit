@@ -244,10 +244,12 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       // Start duration counter with timestamp approach
       recordingStartTimeRef.current = Date.now();
       setRecordingDuration(0);
+      console.log('🎤 Recording started at:', recordingStartTimeRef.current);
       
       recordingIntervalRef.current = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - recordingStartTimeRef.current) / 1000);
-        console.log('Timer update - elapsed seconds:', elapsed);
+        const now = Date.now();
+        const elapsed = Math.floor((now - recordingStartTimeRef.current) / 1000);
+        console.log('⏰ Timer tick - now:', now, 'start:', recordingStartTimeRef.current, 'elapsed:', elapsed);
         setRecordingDuration(elapsed);
       }, 1000);
       
@@ -263,17 +265,20 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
   };
 
   const stopRecording = () => {
+    console.log('🛑 Stop recording called, current state:', { isRecording, hasRecorder: !!mediaRecorderRef.current });
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+      console.log('⏹️ Recording stopped, clearing interval');
       
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
         recordingIntervalRef.current = null;
+        console.log('✅ Interval cleared');
       }
       
-      // Reset duration
-      setRecordingDuration(0);
+      // Keep duration visible until processing starts, then reset
+      setTimeout(() => setRecordingDuration(0), 500);
     }
   };
 
