@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut } from "lucide-react";
+import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut, Pencil, Eraser } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +28,19 @@ interface DragState {
   offsetY: number;
 }
 
+interface DrawingState {
+  isDrawing: boolean;
+  tool: 'pen' | 'eraser';
+  color: string;
+  size: number;
+  paths: Array<{
+    id: string;
+    points: Array<{ x: number; y: number }>;
+    color: string;
+    size: number;
+  }>;
+}
+
 export default function SavedPage() {
   const [positions, setPositions] = useState<{ [ideaId: string]: { x: number; y: number } }>({});
   const [dragState, setDragState] = useState<DragState>({
@@ -43,8 +56,17 @@ export default function SavedPage() {
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
+  const [drawingState, setDrawingState] = useState<DrawingState>({
+    isDrawing: false,
+    tool: 'pen',
+    color: '#3b82f6',
+    size: 3,
+    paths: [],
+  });
+  const [isDrawingMode, setIsDrawingMode] = useState(false);
   
   const canvasRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
   const { toast } = useToast();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
@@ -295,9 +317,65 @@ export default function SavedPage() {
     };
   }, [dragState, isPanning, zoom, pan]);
 
+  // Drawing handlers
+  const handleDrawingStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDrawingMode || !svgRef.current) return;
+    
+    e.preventDefault();
+    const rect = svgRef.current.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    const x = (clientX - rect.left - pan.x) / zoom;
+    const y = (clientY - rect.top - pan.y) / zoom;
+    
+    const newPath = {
+      id: Date.now().toString(),
+      points: [{ x, y }],
+      color: drawingState.color,
+      size: drawingState.size,
+    };
+    
+    setDrawingState(prev => ({
+      ...prev,
+      isDrawing: true,
+      paths: [...prev.paths, newPath],
+    }));
+  }, [isDrawingMode, zoom, pan, drawingState.color, drawingState.size]);
+
+  const handleDrawingMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    if (!drawingState.isDrawing || !svgRef.current) return;
+    
+    e.preventDefault();
+    const rect = svgRef.current.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    const x = (clientX - rect.left - pan.x) / zoom;
+    const y = (clientY - rect.top - pan.y) / zoom;
+    
+    setDrawingState(prev => ({
+      ...prev,
+      paths: prev.paths.map((path, index) => 
+        index === prev.paths.length - 1
+          ? { ...path, points: [...path.points, { x, y }] }
+          : path
+      ),
+    }));
+  }, [drawingState.isDrawing, zoom, pan]);
+
+  const handleDrawingEnd = useCallback(() => {
+    setDrawingState(prev => ({ ...prev, isDrawing: false }));
+  }, []);
+
   // Zoom controls
   const handleZoomIn = () => setZoom(prev => Math.min(prev * 1.2, 3));
   const handleZoomOut = () => setZoom(prev => Math.max(prev / 1.2, 0.3));
+
+  // Clear all drawings
+  const clearDrawings = () => {
+    setDrawingState(prev => ({ ...prev, paths: [] }));
+  };
 
   if (authLoading) {
     return (
@@ -326,8 +404,50 @@ export default function SavedPage() {
             </p>
           </div>
           
-          {/* Zoom Controls */}
+          {/* Drawing and Zoom Controls */}
           <div className="flex items-center gap-2">
+            {/* Drawing Mode Toggle */}
+            <Button
+              size="sm"
+              variant={isDrawingMode ? "default" : "outline"}
+              onClick={() => setIsDrawingMode(!isDrawingMode)}
+              className="h-8 px-3"
+            >
+              <Pencil className="h-4 w-4 mr-1" />
+              <span className="text-xs">Draw</span>
+            </Button>
+            
+            {isDrawingMode && (
+              <>
+                {/* Color Picker */}
+                <div className="flex items-center gap-1">
+                  {['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#000000'].map(color => (
+                    <button
+                      key={color}
+                      className={`w-6 h-6 rounded-full border-2 ${
+                        drawingState.color === color ? 'border-gray-800' : 'border-gray-300'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => setDrawingState(prev => ({ ...prev, color }))}
+                    />
+                  ))}
+                </div>
+                
+                {/* Clear Drawings */}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={clearDrawings}
+                  className="h-8 px-2"
+                >
+                  <Eraser className="h-3 w-3" />
+                </Button>
+              </>
+            )}
+            
+            <div className="w-px h-6 bg-border mx-1" />
+            
+            {/* Zoom Controls */}
             <Button
               size="sm"
               variant="outline"
@@ -380,16 +500,21 @@ export default function SavedPage() {
         ) : (
           <div
             ref={canvasRef}
-            className="w-full h-full relative cursor-grab active:cursor-grabbing select-none"
+            className={`w-full h-full relative select-none ${
+              isDrawingMode ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing'
+            }`}
             style={{
               transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
               transformOrigin: '0 0',
               minHeight: '200vh',
               minWidth: '200vw',
             }}
-            onMouseDown={handleCanvasMouseDown}
-            onMouseMove={handleCanvasMouseMove}
-            onMouseUp={handleCanvasMouseUp}
+            onMouseDown={isDrawingMode ? handleDrawingStart : handleCanvasMouseDown}
+            onMouseMove={isDrawingMode ? handleDrawingMove : handleCanvasMouseMove}
+            onMouseUp={isDrawingMode ? handleDrawingEnd : handleCanvasMouseUp}
+            onTouchStart={isDrawingMode ? handleDrawingStart : undefined}
+            onTouchMove={isDrawingMode ? handleDrawingMove : undefined}
+            onTouchEnd={isDrawingMode ? handleDrawingEnd : undefined}
           >
             {/* Grid Background */}
             <div 
@@ -400,6 +525,29 @@ export default function SavedPage() {
                 backgroundPosition: `${pan.x}px ${pan.y}px`,
               }}
             />
+
+            {/* Drawing SVG Layer */}
+            <svg
+              ref={svgRef}
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                width: '100%',
+                height: '100%',
+                overflow: 'visible',
+              }}
+            >
+              {drawingState.paths.map((path) => (
+                <path
+                  key={path.id}
+                  d={`M ${path.points.map(p => `${p.x},${p.y}`).join(' L ')}`}
+                  stroke={path.color}
+                  strokeWidth={path.size}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              ))}
+            </svg>
 
             {/* Draggable Cards */}
             {savedIdeas.map((idea, index) => {
@@ -427,16 +575,16 @@ export default function SavedPage() {
                     width: '160px', // Square blocks, mobile-friendly
                     height: '160px',
                   }}
-                  onMouseDown={(e) => handleMouseDown(e, idea.id)}
-                  onTouchStart={(e) => handleTouchStart(e, idea.id)}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
+                  onMouseDown={(e) => !isDrawingMode && handleMouseDown(e, idea.id)}
+                  onTouchStart={(e) => !isDrawingMode && handleTouchStart(e, idea.id)}
+                  onTouchMove={!isDrawingMode ? handleTouchMove : undefined}
+                  onTouchEnd={!isDrawingMode ? handleTouchEnd : undefined}
                 >
                   <Card className={`${cardStyles[index % cardStyles.length]} w-full h-full border-2 card-shadow hover-lift transition-all duration-300 flex flex-col`}>
-                    {/* Drag Handle */}
-                    <div className="flex-shrink-0 p-2 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50 rounded-t-lg">
+                    {/* Drag Handle - Smaller */}
+                    <div className="flex-shrink-0 p-1.5 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50 rounded-t-lg">
                       <div className="flex items-center justify-between">
-                        <Move className="h-3 w-3 text-gray-600 dark:text-gray-300" />
+                        <Move className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
                         <Button
                           size="sm"
                           variant="ghost"
@@ -444,20 +592,21 @@ export default function SavedPage() {
                             e.stopPropagation();
                             unsaveIdeaMutation.mutate(idea.id);
                           }}
-                          className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600 text-gray-600 dark:text-gray-300"
+                          className="h-5 w-5 p-0 hover:bg-red-100 hover:text-red-600 text-gray-500 dark:text-gray-400"
                         >
-                          <Trash2 className="h-3 w-3" />
+                          <Trash2 className="h-2.5 w-2.5" />
                         </Button>
                       </div>
                     </div>
                     
                     {/* Content */}
                     <div className="flex-1 p-3 flex flex-col">
-                      <h3 className="font-medium text-xs leading-tight mb-2 text-gray-800 dark:text-gray-100 line-clamp-2">
+                      {/* Title - Larger and Centered */}
+                      <h3 className="font-semibold text-sm leading-tight mb-3 text-gray-800 dark:text-gray-100 line-clamp-2 text-center">
                         {idea.title}
                       </h3>
                       
-                      <p className="text-xs text-gray-700 dark:text-gray-200 line-clamp-3 flex-1">
+                      <p className="text-xs text-gray-700 dark:text-gray-200 line-clamp-3 flex-1 text-center">
                         {idea.description}
                       </p>
                       
