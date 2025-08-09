@@ -372,18 +372,13 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
     const deltaX = touch.clientX - touchStartRef.current.x;
     const deltaY = touch.clientY - touchStartRef.current.y;
     
-    // Calculate opacity based on distance moved
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    const maxDistance = 150;
-    const opacity = Math.max(0.3, 1 - (distance / maxDistance) * 0.7);
-    
     // Update drag state for visual feedback
     setDragStates(prev => ({
       ...prev,
       [ideaId]: { 
         x: deltaX * 0.8, // Slightly dampen movement for more realistic feel
         y: deltaY * 0.8, 
-        opacity,
+        opacity: 1, // Keep card fully opaque during drag
         isDragging: true 
       }
     }));
