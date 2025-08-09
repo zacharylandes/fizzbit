@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { insertIdeaSchema } from "@shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import OpenAI from "openai";
-import { generateIdeasFromText, generateIdeasFromImage } from "./huggingface";
+import { generateIdeasFromText, generateIdeasFromImage, generateRelatedIdeas } from "./huggingface";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
@@ -69,7 +69,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (file.mimetype.startsWith('audio/')) {
         cb(null, true);
       } else {
-        cb(new Error('Only audio files are allowed!'), false);
+        cb(new Error('Only audio files are allowed!'));
       }
     },
     limits: {
@@ -444,6 +444,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       contextualPrompt += ` Respond with JSON containing an array of ideas, each with 'title' and 'description' fields.`;
 
       // Use gpt-4o-mini for faster response times in explore/swipe up actions
+      // Use Llama 3 for faster and cheaper related idea generation
+      const llamaIdeas = await generateRelatedIdeas(contextualPrompt, 3);
+      
+      if (llamaIdeas.length > 0) {
+        const aiResponse = { ideas: llamaIdeas };
+        const relatedIdeas = aiResponse.ideas?.slice(0, 3) || [];
+        
+        const createdIdeas = [];
+        for (const ideaData of relatedIdeas) {
+          const newIdea = await storage.createIdea({
+            title: ideaData.title,
+            description: ideaData.description,
+            source: "exploration",
+            sourceContent: `Related to: ${parentIdea.title}`,
+            isSaved: 0,
+            metadata: { 
+              exploredFrom: id,
+              generatedAt: new Date().toISOString()
+            }
+          }, userId);
+          createdIdeas.push(newIdea);
+        }
+
+        return res.json({ ideas: createdIdeas });
+      }
+
+      // Fallback to OpenAI if Llama 3 fails
+      console.log('Llama 3 explore failed, falling back to OpenAI...');
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
