@@ -317,11 +317,23 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
               Upload Image
             </label>
           </Button>
-          
-          {/* Audio Recording Button */}
+
+          {/* Text Input Toggle */}
+          <Button
+            onClick={() => setShowTextInput(!showTextInput)}
+            className="flex-1 bg-card-sage-bg border-card-sage/40 hover:bg-card-sage-bg/90 hover-lift text-card-sage rounded-lg py-3 px-4 font-medium card-shadow touch-target text-center transition-all duration-300"
+            disabled={isLoading}
+          >
+            <Edit className="mr-2 h-4 w-4" />
+            Write Text
+          </Button>
+        </div>
+
+        {/* Audio Recording Button - Centered Below */}
+        <div className="mt-3 flex justify-center">
           <Button
             onClick={isRecording ? stopRecording : startRecording}
-            className={`flex-1 ${
+            className={`w-48 ${
               isRecording 
                 ? 'bg-red-500 hover:bg-red-600 text-white border-red-600 animate-pulse'
                 : 'bg-card-cream-bg border-card-cream/40 hover:bg-card-cream-bg/90 text-card-cream'
@@ -339,16 +351,6 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
                 Voice Input
               </>
             )}
-          </Button>
-
-          {/* Text Input Toggle */}
-          <Button
-            onClick={() => setShowTextInput(!showTextInput)}
-            className="flex-1 bg-card-sage-bg border-card-sage/40 hover:bg-card-sage-bg/90 hover-lift text-card-sage rounded-lg py-3 px-4 font-medium card-shadow touch-target text-center transition-all duration-300"
-            disabled={isLoading}
-          >
-            <Edit className="mr-2 h-4 w-4" />
-            Write Text
           </Button>
         </div>
         
