@@ -260,7 +260,11 @@ export default function SavedPage() {
 
   // Canvas panning
   const handleCanvasMouseDown = useCallback((e: React.MouseEvent) => {
-    if (e.target === canvasRef.current) {
+    // Only start panning if not clicking on a card or other interactive element
+    const target = e.target as HTMLElement;
+    const isCard = target.closest('[data-card-id]');
+    
+    if (!isCard) {
       setIsPanning(true);
       setDragState(prev => ({
         ...prev,
@@ -606,6 +610,7 @@ export default function SavedPage() {
               return (
                 <div
                   key={idea.id}
+                  data-card-id={idea.id}
                   className={`absolute cursor-move select-none transition-shadow duration-200 ${
                     isDragging ? 'shadow-2xl scale-105 z-50' : 'shadow-lg hover:shadow-xl z-10'
                   }`}
