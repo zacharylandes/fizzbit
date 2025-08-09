@@ -164,7 +164,7 @@ export default function HistoryPage() {
             return (
               <Card 
                 key={prompt.id} 
-                className={`${cardStyles[index % cardStyles.length]} cursor-pointer hover:scale-[1.02] transition-all duration-300 relative overflow-hidden`}
+                className={`${cardStyles[index % cardStyles.length]} cursor-pointer hover:scale-[1.02] transition-all duration-300 relative overflow-hidden shadow-lg border-2 hover:shadow-xl`}
                 onClick={() => handlePromptClick(prompt)}
               >
                 <div className="absolute inset-0 bg-gradient-aurora opacity-10 animate-pulse"></div>

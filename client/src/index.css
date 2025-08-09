@@ -371,4 +371,83 @@ input, textarea {
     -webkit-overflow-scrolling: touch;
     overflow-scrolling: touch;
   }
+
+  /* Electric Gradient Styles */
+  .bg-gradient-electric {
+    background: linear-gradient(135deg, 
+      hsl(240, 100%, 15%) 0%, 
+      hsl(260, 100%, 25%) 35%, 
+      hsl(280, 100%, 35%) 100%);
+  }
+
+  .bg-gradient-neon {
+    background: linear-gradient(135deg, 
+      hsl(320, 100%, 15%) 0%, 
+      hsl(340, 100%, 25%) 35%, 
+      hsl(360, 100%, 35%) 100%);
+  }
+
+  .bg-gradient-cyber {
+    background: linear-gradient(135deg, 
+      hsl(180, 100%, 15%) 0%, 
+      hsl(200, 100%, 25%) 35%, 
+      hsl(220, 100%, 35%) 100%);
+  }
+
+  .bg-gradient-sunset {
+    background: linear-gradient(135deg, 
+      hsl(20, 100%, 15%) 0%, 
+      hsl(40, 100%, 25%) 35%, 
+      hsl(60, 100%, 35%) 100%);
+  }
+
+  .bg-gradient-aurora {
+    background: linear-gradient(135deg, 
+      hsl(280, 100%, 20%) 0%, 
+      hsl(200, 100%, 25%) 50%, 
+      hsl(320, 100%, 30%) 100%);
+  }
+
+  /* Electric Colors */
+  .text-electric-blue { color: hsl(240, 100%, 70%); }
+  .text-electric-pink { color: hsl(320, 100%, 70%); }
+  .text-electric-cyan { color: hsl(180, 100%, 70%); }
+  .text-electric-orange { color: hsl(30, 100%, 70%); }
+  .text-electric-purple { color: hsl(280, 100%, 70%); }
+  .text-electric-green { color: hsl(120, 100%, 70%); }
+  .text-electric-yellow { color: hsl(60, 100%, 70%); }
+
+  .border-electric-blue\/30 { border-color: hsla(240, 100%, 70%, 0.3); }
+  .border-electric-pink\/30 { border-color: hsla(320, 100%, 70%, 0.3); }
+  .border-electric-cyan\/30 { border-color: hsla(180, 100%, 70%, 0.3); }
+  .border-electric-orange\/30 { border-color: hsla(30, 100%, 70%, 0.3); }
+  .border-electric-purple\/30 { border-color: hsla(280, 100%, 70%, 0.3); }
+
+  /* Glass Effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Glow Effects */
+  .glow-electric-blue {
+    box-shadow: 0 0 20px hsla(240, 100%, 70%, 0.3);
+  }
+
+  .glow-electric-pink {
+    box-shadow: 0 0 20px hsla(320, 100%, 70%, 0.3);
+  }
+
+  .glow-electric-purple {
+    box-shadow: 0 0 20px hsla(280, 100%, 70%, 0.3);
+  }
+
+  .glow-electric-orange {
+    box-shadow: 0 0 20px hsla(30, 100%, 70%, 0.3);
+  }
+
+  .glow-electric-cyan {
+    box-shadow: 0 0 20px hsla(180, 100%, 70%, 0.3);
+  }
 }

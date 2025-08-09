@@ -141,7 +141,7 @@ export default function SavedPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
       {/* Page Header */}
       <div className="max-w-7xl mx-auto px-6 py-6">
         <div>
@@ -152,8 +152,8 @@ export default function SavedPage() {
         </div>
       </div>
 
-      {/* Content - flex-1 to push footer down */}
-      <div className="flex-1 max-w-7xl mx-auto px-6 pb-32">
+      {/* Content - with proper bottom spacing for footer */}
+      <div className="flex-1 max-w-7xl mx-auto px-6" style={{ paddingBottom: '120px' }}>
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -202,7 +202,7 @@ export default function SavedPage() {
                   onTouchEnd={(e) => handleTouchEnd(e, idea.id)}
                   style={{ touchAction: 'pan-y' }}
                 >
-                  <Card className={`${cardStyles[index % cardStyles.length]} shadow-sm relative overflow-hidden hover:shadow-md transition-all duration-300 hover:scale-[1.02]`}>
+                  <Card className={`${cardStyles[index % cardStyles.length]} shadow-lg relative overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border-2`}>
                     {/* Swipe hint overlay */}
                     <div className="absolute inset-0 glass bg-red-500/20 flex items-center justify-end pr-6 opacity-0 transition-opacity duration-200 hover:opacity-50">
                       <Trash2 className="h-6 w-6 text-white" />
