@@ -13,8 +13,8 @@ export interface IdeaResponse {
   sourceContent?: string;
 }
 
-// Use Mistral as it has excellent provider support and is fast/cheap
-const TEXT_MODEL = 'mistralai/Mistral-7B-Instruct-v0.3';
+// Use Flan-T5 which has reliable text-generation support across providers
+const TEXT_MODEL = 'google/flan-t5-large';
 
 // Helper function to parse text-based responses from Mistral
 function parseTextResponse(text: string, count: number, prompt: string): IdeaResponse[] {
@@ -31,7 +31,7 @@ function parseTextResponse(text: string, count: number, prompt: string): IdeaRes
     if (trimmed.match(/^\d+\.|^-|^\*|^Title:|^Idea \d+:/i)) {
       if (currentIdea.title && currentIdea.description) {
         ideas.push({
-          id: `mistral-parsed-${Date.now()}-${ideas.length}`,
+          id: `t5-parsed-${Date.now()}-${ideas.length}`,
           title: currentIdea.title,
           description: currentIdea.description,
           sourceContent: prompt
@@ -54,7 +54,7 @@ function parseTextResponse(text: string, count: number, prompt: string): IdeaRes
   // Add the last idea if it exists
   if (currentIdea.title && currentIdea.description) {
     ideas.push({
-      id: `mistral-parsed-${Date.now()}-${ideas.length}`,
+      id: `t5-parsed-${Date.now()}-${ideas.length}`,
       title: currentIdea.title,
       description: currentIdea.description,
       sourceContent: prompt
@@ -64,91 +64,10 @@ function parseTextResponse(text: string, count: number, prompt: string): IdeaRes
   return ideas.slice(0, count);
 }
 
-// Helper function to generate related ideas using Mistral
+// Helper function to generate related ideas using OpenAI
 export async function generateRelatedIdeas(contextualPrompt: string, count: number = 3): Promise<IdeaResponse[]> {
   try {
-    const mistralPrompt = `<s>[INST] You are a creative inspiration assistant. Generate ideas that thoughtfully combine user interests with specific concepts they've shown enthusiasm for. Create ideas that feel like natural extensions bridging multiple creative concepts together. Format as JSON with "ideas" array containing objects with "title" and "description" fields.
-
-${contextualPrompt} [/INST]`;
-
-    const hfResponse = await hf.textGeneration({
-      model: TEXT_MODEL,
-      inputs: mistralPrompt,
-      parameters: {
-        max_new_tokens: 600,
-        temperature: 0.8,
-        top_p: 0.9,
-        stop: ['</s>']
-      }
-    });
-
-    const responseText = hfResponse.generated_text.replace(mistralPrompt, '').trim();
-    
-    try {
-      const parsed = JSON.parse(responseText);
-      if (parsed.ideas && Array.isArray(parsed.ideas)) {
-        return parsed.ideas.slice(0, count).map((idea: any, index: number) => ({
-          id: `mistral-related-${Date.now()}-${index}`,
-          title: idea.title || `Related Idea ${index + 1}`,
-          description: idea.description || 'A related creative concept.',
-          sourceContent: 'Related ideas'
-        }));
-      }
-    } catch (parseError) {
-      console.log('Mistral related ideas response not JSON, parsing text...');
-      return parseTextResponse(responseText, count, 'Related ideas');
-    }
-
-    return [];
-  } catch (error) {
-    console.error('Mistral related ideas generation failed:', error);
-    return [];
-  }
-}
-
-export async function generateIdeasFromText(prompt: string, count: number = 8): Promise<IdeaResponse[]> {
-  try {
-    // Use Mistral for fast and cheap text generation
-    const mistralPrompt = `<s>[INST] You are a creative idea generator. Generate exactly ${count} unique, inspiring creative ideas based on the user prompt. Each idea should be practical and actionable. Format as JSON with "ideas" array containing objects with "title" and "description" fields. Make titles concise (max 5 words) and descriptions detailed but under 100 words.
-
-Generate ${count} creative ideas for: ${prompt} [/INST]`;
-
-    const hfResponse = await hf.textGeneration({
-      model: TEXT_MODEL,
-      inputs: mistralPrompt,
-      parameters: {
-        max_new_tokens: 1000,
-        temperature: 0.8,
-        top_p: 0.9,
-        stop: ['</s>']
-      }
-    });
-
-    const responseText = hfResponse.generated_text.replace(mistralPrompt, '').trim();
-    
-    try {
-      // Try to parse as JSON first
-      const parsed = JSON.parse(responseText);
-      if (parsed.ideas && Array.isArray(parsed.ideas)) {
-        return parsed.ideas.map((idea: any, index: number) => ({
-          id: `mistral-${Date.now()}-${index}`,
-          title: idea.title || `Creative Idea ${index + 1}`,
-          description: idea.description || 'A creative project to explore.',
-          sourceContent: prompt
-        }));
-      }
-    } catch (parseError) {
-      console.log('Mistral response not valid JSON, parsing text format...');
-      
-      // Parse text format responses from Mistral
-      const ideas = parseTextResponse(responseText, count, prompt);
-      if (ideas.length > 0) {
-        return ideas;
-      }
-    }
-
-    // Fallback to OpenAI if Mistral fails
-    console.log('Mistral failed, falling back to OpenAI...');
+    console.log('Using OpenAI for related ideas...');
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -156,7 +75,61 @@ Generate ${count} creative ideas for: ${prompt} [/INST]`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini', // Use mini for speed and cost efficiency
+        messages: [
+          {
+            role: 'system',
+            content: `You are a creative inspiration assistant. Generate ideas that thoughtfully combine user interests with specific concepts they've shown enthusiasm for. Create ideas that feel like natural extensions bridging multiple creative concepts together. Format as JSON with "ideas" array containing objects with "title" and "description" fields.`
+          },
+          {
+            role: 'user',
+            content: contextualPrompt
+          }
+        ],
+        max_tokens: 600,
+        temperature: 0.8,
+        response_format: { type: "json_object" }
+      })
+    });
+
+    if (openaiResponse.ok) {
+      const openaiData = await openaiResponse.json();
+      const content = openaiData.choices[0].message.content;
+      
+      try {
+        const parsed = JSON.parse(content);
+        if (parsed.ideas && Array.isArray(parsed.ideas)) {
+          return parsed.ideas.slice(0, count).map((idea: any, index: number) => ({
+            id: `openai-related-${Date.now()}-${index}`,
+            title: idea.title || `Related Idea ${index + 1}`,
+            description: idea.description || 'A related creative concept.',
+            sourceContent: 'Related ideas'
+          }));
+        }
+      } catch (parseError) {
+        console.error('Failed to parse OpenAI related ideas response:', parseError);
+      }
+    }
+
+    return [];
+  } catch (error) {
+    console.error('OpenAI related ideas generation failed:', error);
+    return [];
+  }
+}
+
+export async function generateIdeasFromText(prompt: string, count: number = 8): Promise<IdeaResponse[]> {
+  try {
+    console.log('Using OpenAI for reliable text generation...');
+    // Use OpenAI directly for reliable results
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini', // Use mini for speed and cost efficiency
         messages: [
           {
             role: 'system',
@@ -181,7 +154,7 @@ Generate ${count} creative ideas for: ${prompt} [/INST]`;
         const parsed = JSON.parse(content);
         if (parsed.ideas && Array.isArray(parsed.ideas)) {
           return parsed.ideas.map((idea: any, index: number) => ({
-            id: `openai-fallback-${Date.now()}-${index}`,
+            id: `openai-${Date.now()}-${index}`,
             title: idea.title || `Creative Idea ${index + 1}`,
             description: idea.description || 'A creative project to explore.',
             sourceContent: prompt
@@ -190,6 +163,8 @@ Generate ${count} creative ideas for: ${prompt} [/INST]`;
       } catch (parseError) {
         console.error('Failed to parse OpenAI response:', parseError);
       }
+    } else {
+      console.error('OpenAI API error:', openaiResponse.status, openaiResponse.statusText);
     }
 
     // Fallback to template-based ideas if OpenAI fails
@@ -323,50 +298,8 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
 
     // Generate ideas based on the image analysis (or generic if analysis failed)
     if (imageDescription.trim()) {
-      // Use Mistral for faster and cheaper idea generation based on image
-      try {
-        const mistralImagePrompt = `<s>[INST] You are a creative idea generator. Generate exactly ${count} unique, inspiring creative ideas based on the image description provided. Each idea should be practical and actionable with completely different approaches. Format as JSON with "ideas" array containing objects with "title" and "description" fields. Make titles concise (max 5 words) and descriptions detailed but under 100 words.
-
-Based on this image: "${imageDescription}" - Generate ${count} completely different creative project ideas that are inspired by what's shown in the image. [/INST]`;
-
-        const hfImageResponse = await hf.textGeneration({
-          model: TEXT_MODEL,
-          inputs: mistralImagePrompt,
-          parameters: {
-            max_new_tokens: 1200,
-            temperature: 0.9,
-            top_p: 0.9,
-            stop: ['</s>']
-          }
-        });
-
-        const imageResponseText = hfImageResponse.generated_text.replace(mistralImagePrompt, '').trim();
-        
-        try {
-          // Try to parse as JSON first
-          const parsed = JSON.parse(imageResponseText);
-          if (parsed.ideas && Array.isArray(parsed.ideas)) {
-            return parsed.ideas.map((idea: any, index: number) => ({
-              id: `mistral-img-${Date.now()}-${index}`,
-              title: idea.title || `Creative Idea ${index + 1}`,
-              description: idea.description || 'A creative project inspired by your image.',
-              sourceContent: `Image: ${imageDescription}`
-            }));
-          }
-        } catch (parseError) {
-          console.log('Mistral image response not valid JSON, parsing text format...');
-          
-          // Parse text format responses from Mistral
-          const ideas = parseTextResponse(imageResponseText, count, `Image: ${imageDescription}`);
-          if (ideas.length > 0) {
-            return ideas;
-          }
-        }
-
-        console.log('Mistral image generation failed, falling back to OpenAI...');
-      } catch (error) {
-        console.log('Mistral image generation error, falling back to OpenAI:', error);
-      }
+      // Use OpenAI directly for reliable idea generation based on image
+      console.log('Using OpenAI for image-based idea generation...');
 
       // Fallback to OpenAI if Llama 3 fails
       try {
