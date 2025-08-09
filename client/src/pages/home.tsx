@@ -83,7 +83,7 @@ export default function HomePage() {
           </div>
           
           {/* Input Section */}
-          <div className="mb-8">
+          <div className="mb-4">
             <InputSection 
               onIdeasGenerated={handleIdeasGeneratedWrapper}
               promptValue={currentPrompt}

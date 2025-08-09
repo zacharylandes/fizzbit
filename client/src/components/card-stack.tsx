@@ -23,6 +23,7 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
   const [swipeUpPrompt, setSwipeUpPrompt] = useState<string>("");
   const cardRefs = useRef<{ [key: string]: HTMLElement }>({});
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const [dragStates, setDragStates] = useState<{ [key: string]: { x: number; y: number; opacity: number; isDragging: boolean } }>({});
   const { toast } = useToast();
 
   // Keyboard navigation - focus on the top card for desktop interaction
@@ -352,12 +353,40 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
       y: touch.clientY,
       time: Date.now()
     };
+    
+    // Initialize drag state
+    setDragStates(prev => ({
+      ...prev,
+      [ideaId]: { x: 0, y: 0, opacity: 1, isDragging: true }
+    }));
   };
 
   const handleTouchMove = (e: React.TouchEvent, ideaId: string) => {
     // Prevent page scrolling during swipe
     e.preventDefault();
     e.stopPropagation();
+    
+    if (!touchStartRef.current) return;
+    
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+    
+    // Calculate opacity based on distance moved
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    const maxDistance = 150;
+    const opacity = Math.max(0.3, 1 - (distance / maxDistance) * 0.7);
+    
+    // Update drag state for visual feedback
+    setDragStates(prev => ({
+      ...prev,
+      [ideaId]: { 
+        x: deltaX * 0.8, // Slightly dampen movement for more realistic feel
+        y: deltaY * 0.8, 
+        opacity,
+        isDragging: true 
+      }
+    }));
   };
 
   const handleTouchEnd = (e: React.TouchEvent, ideaId: string) => {
@@ -371,6 +400,12 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
     const deltaX = touch.clientX - touchStartRef.current.x;
     const deltaY = touch.clientY - touchStartRef.current.y;
     const deltaTime = Date.now() - touchStartRef.current.time;
+
+    // Reset drag state
+    setDragStates(prev => ({
+      ...prev,
+      [ideaId]: { x: 0, y: 0, opacity: 1, isDragging: false }
+    }));
 
     // Only process quick swipes
     if (deltaTime > 500) {
@@ -408,7 +443,7 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
 
   if (cards.length === 0) {
     return (
-      <div className="relative h-[400px] sm:h-[440px] w-full max-w-[600px] mx-auto">
+      <div className="relative h-[480px] sm:h-[520px] w-full max-w-[600px] mx-auto">
         <div className="bg-card border border-border rounded-xl h-full flex flex-col items-center justify-center p-8 text-center card-shadow relative overflow-hidden">
           <div className="relative z-10 space-y-6">
             {isSwipeUpLoading ? (
@@ -465,7 +500,7 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
   }
 
   return (
-    <div className="relative h-[400px] sm:h-[440px] w-full max-w-[600px] mx-auto z-30">
+    <div className="relative h-[480px] sm:h-[520px] w-full max-w-[600px] mx-auto z-30">
       {/* Touch Card Stack */}
       <div className="relative w-full h-full">
         {/* Show loading card if generating ideas and no cards available */}
@@ -496,6 +531,7 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
           const animation = animatingCards[card.id];
           const isAnimating = animation?.isAnimating;
           const direction = animation?.direction;
+          const dragState = dragStates[card.id];
           
           let animationClass = "";
           if (isAnimating) {
@@ -508,16 +544,25 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
             }
           }
 
+          // Apply real-time drag transform
+          const transform = dragState?.isDragging 
+            ? `translate(${dragState.x}px, ${dragState.y}px) rotate(${dragState.x * 0.1}deg)`
+            : 'none';
+          
+          const opacity = dragState?.isDragging ? dragState.opacity : 1;
+
           return (
             <div
               key={card.id}
               ref={(el) => {
                 if (el) cardRefs.current[card.id] = el;
               }}
-              className={`absolute inset-0 cursor-grab transition-transform duration-300 ease-out ${animationClass}`}
+              className={`absolute inset-0 cursor-grab ${!dragState?.isDragging ? 'transition-transform duration-300 ease-out' : ''} ${animationClass}`}
               style={{
                 zIndex: 3 - index, // Top card has highest z-index
                 touchAction: 'none', // Disable all browser touch behaviors
+                transform,
+                opacity,
               }}
               onTouchStart={(e) => handleTouchStart(e, card.id)}
               onTouchMove={(e) => handleTouchMove(e, card.id)}
