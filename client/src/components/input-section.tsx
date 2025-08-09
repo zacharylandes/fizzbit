@@ -250,7 +250,10 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
         const now = Date.now();
         const elapsed = Math.floor((now - recordingStartTimeRef.current) / 1000);
         console.log('⏰ Timer tick - now:', now, 'start:', recordingStartTimeRef.current, 'elapsed:', elapsed);
-        setRecordingDuration(elapsed);
+        setRecordingDuration(current => {
+          console.log('📊 State update: current =', current, 'new =', elapsed);
+          return elapsed;
+        });
       }, 1000);
       
     } catch (error) {
@@ -285,7 +288,9 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    const formatted = `${mins}:${secs.toString().padStart(2, '0')}`;
+    console.log('⏱️ Formatting duration:', seconds, '→', formatted);
+    return formatted;
   };
 
   const handleGenerateFromText = () => {
@@ -384,7 +389,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
             ) : isRecording ? (
               <>
                 <div className="w-3 h-3 bg-white rounded-sm mr-2"></div>
-                {formatDuration(recordingDuration)}
+                Recording {formatDuration(recordingDuration)}
               </>
             ) : (
               <>
