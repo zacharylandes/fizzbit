@@ -74,6 +74,14 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       
       return response.json();
     },
+    onMutate: () => {
+      // Show immediate processing feedback when recording stops
+      toast({
+        title: "Processing Voice Input",
+        description: "Transcribing your audio and generating ideas...",
+        duration: 2000,
+      });
+    },
     onSuccess: (data) => {
       if (data.ideas) {
         onIdeasGenerated(data.ideas);
@@ -347,14 +355,21 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
             onClick={isRecording ? stopRecording : startRecording}
             className={`w-48 ${
               isRecording 
-                ? 'bg-red-500 hover:bg-red-600 text-white border-red-600 animate-pulse'
+                ? 'bg-red-500 hover:bg-red-600 text-white border-red-500'
+                : generateFromAudioMutation.isPending
+                ? 'bg-blue-500 hover:bg-blue-600 text-white border-blue-500'
                 : 'bg-card-cream-bg border-card-cream/40 hover:bg-card-cream-bg/90 text-card-cream'
             } hover-lift rounded-lg py-3 px-4 font-medium card-shadow touch-target text-center transition-all duration-300`}
-            disabled={isLoading && !isRecording}
+            disabled={(isLoading || generateFromAudioMutation.isPending) && !isRecording}
           >
-            {isRecording ? (
+            {generateFromAudioMutation.isPending ? (
               <>
-                <Square className="mr-2 h-4 w-4" />
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                Processing...
+              </>
+            ) : isRecording ? (
+              <>
+                <div className="w-3 h-3 bg-white rounded-sm mr-2"></div>
                 {formatDuration(recordingDuration)}
               </>
             ) : (
