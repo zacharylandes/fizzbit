@@ -25,6 +25,42 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const { toast } = useToast();
 
+  // Keyboard navigation - focus on the top card for desktop interaction
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle keyboard events if we have cards and not typing in an input
+      if (cards.length === 0 || (e.target as HTMLElement).tagName === 'INPUT' || (e.target as HTMLElement).tagName === 'TEXTAREA') {
+        return;
+      }
+
+      const topCard = cards[0]; // Get the top card (most visible one)
+      if (!topCard) return;
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          handleSwipe(topCard.id, 'left');
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          handleSwipe(topCard.id, 'right');
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          handleSwipe(topCard.id, 'up');
+          break;
+      }
+    };
+
+    // Add global keyboard listener
+    document.addEventListener('keydown', handleKeyDown);
+    
+    // Cleanup
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [cards]); // Re-bind when cards change so we always target the current top card
+
   // No auto-fetching of random ideas - users should start fresh each session
 
   // Removed auto-loading of random ideas - users start fresh each session
