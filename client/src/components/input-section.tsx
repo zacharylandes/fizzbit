@@ -22,6 +22,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const recordingStartTimeRef = useRef<number>(0);
   const { toast } = useToast();
 
   // Text prompt mutation
@@ -240,12 +241,14 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       setIsRecording(true);
       setRecordingDuration(0);
       
-      // Start duration counter
+      // Start duration counter with timestamp approach
+      recordingStartTimeRef.current = Date.now();
+      setRecordingDuration(0);
+      
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingDuration(prev => {
-          console.log('Timer increment:', prev + 1); // Debug log
-          return prev + 1;
-        });
+        const elapsed = Math.floor((Date.now() - recordingStartTimeRef.current) / 1000);
+        console.log('Timer update - elapsed seconds:', elapsed);
+        setRecordingDuration(elapsed);
       }, 1000);
       
     } catch (error) {
