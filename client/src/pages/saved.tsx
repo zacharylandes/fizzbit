@@ -1,18 +1,50 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Image, Type, Trash2 } from "lucide-react";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { type Idea } from "@shared/schema";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
+import { type Idea } from "@shared/schema";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
+interface SavedIdeaPosition {
+  ideaId: string;
+  x: number;
+  y: number;
+}
+
+interface DragState {
+  isDragging: boolean;
+  dragId: string | null;
+  startX: number;
+  startY: number;
+  startScrollX: number;
+  startScrollY: number;
+  offsetX: number;
+  offsetY: number;
+}
+
 export default function SavedPage() {
-  const [animatingCards, setAnimatingCards] = useState<{ [key: string]: boolean }>({});
-  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const [positions, setPositions] = useState<{ [ideaId: string]: { x: number; y: number } }>({});
+  const [dragState, setDragState] = useState<DragState>({
+    isDragging: false,
+    dragId: null,
+    startX: 0,
+    startY: 0,
+    startScrollX: 0,
+    startScrollY: 0,
+    offsetX: 0,
+    offsetY: 0,
+  });
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  
+  const canvasRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
@@ -34,10 +66,31 @@ export default function SavedPage() {
   // Fetch saved ideas
   const { data: savedIdeasData, isLoading } = useQuery({
     queryKey: ["/api/ideas/saved"],
-    enabled: isAuthenticated, // Only fetch if authenticated
+    enabled: isAuthenticated,
   }) as { data: { ideas: Idea[] } | undefined; isLoading: boolean };
 
   const savedIdeas = savedIdeasData?.ideas || [];
+
+  // Initialize positions for new ideas
+  useEffect(() => {
+    if (savedIdeas.length > 0) {
+      setPositions(prev => {
+        const newPositions = { ...prev };
+        savedIdeas.forEach((idea, index) => {
+          if (!newPositions[idea.id]) {
+            // Arrange in a grid pattern initially
+            const col = index % 4;
+            const row = Math.floor(index / 4);
+            newPositions[idea.id] = {
+              x: col * 200 + 50,
+              y: row * 180 + 50,
+            };
+          }
+        });
+        return newPositions;
+      });
+    }
+  }, [savedIdeas]);
 
   // Unsave idea mutation
   const unsaveIdeaMutation = useMutation({
@@ -75,61 +128,182 @@ export default function SavedPage() {
     },
   });
 
-  const handleSwipeLeft = (ideaId: string) => {
-    // Start animation
-    setAnimatingCards(prev => ({ ...prev, [ideaId]: true }));
-    
-    // After animation, remove the idea
-    setTimeout(() => {
-      unsaveIdeaMutation.mutate(ideaId);
-      setAnimatingCards(prev => {
-        const newState = { ...prev };
-        delete newState[ideaId];
-        return newState;
-      });
-    }, 300);
-  };
+  // Mouse/Touch handlers for dragging cards
+  const handleMouseDown = useCallback((e: React.MouseEvent, ideaId: string) => {
+    e.preventDefault();
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
 
-  const handleTouchStart = (e: React.TouchEvent, ideaId: string) => {
+    setDragState({
+      isDragging: true,
+      dragId: ideaId,
+      startX: e.clientX,
+      startY: e.clientY,
+      startScrollX: pan.x,
+      startScrollY: pan.y,
+      offsetX: e.clientX - rect.left - (positions[ideaId]?.x || 0) * zoom - pan.x,
+      offsetY: e.clientY - rect.top - (positions[ideaId]?.y || 0) * zoom - pan.y,
+    });
+  }, [positions, zoom, pan]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (dragState.isDragging && dragState.dragId && canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const newX = (e.clientX - rect.left - dragState.offsetX - pan.x) / zoom;
+      const newY = (e.clientY - rect.top - dragState.offsetY - pan.y) / zoom;
+
+      setPositions(prev => ({
+        ...prev,
+        [dragState.dragId!]: { x: newX, y: newY }
+      }));
+    }
+  }, [dragState, zoom, pan]);
+
+  const handleMouseUp = useCallback(() => {
+    setDragState({
+      isDragging: false,
+      dragId: null,
+      startX: 0,
+      startY: 0,
+      startScrollX: 0,
+      startScrollY: 0,
+      offsetX: 0,
+      offsetY: 0,
+    });
+  }, []);
+
+  // Touch handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent, ideaId: string) => {
+    e.preventDefault();
     const touch = e.touches[0];
-    touchStartRef.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-      time: Date.now()
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    setDragState({
+      isDragging: true,
+      dragId: ideaId,
+      startX: touch.clientX,
+      startY: touch.clientY,
+      startScrollX: pan.x,
+      startScrollY: pan.y,
+      offsetX: touch.clientX - rect.left - (positions[ideaId]?.x || 0) * zoom - pan.x,
+      offsetY: touch.clientY - rect.top - (positions[ideaId]?.y || 0) * zoom - pan.y,
+    });
+  }, [positions, zoom, pan]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (dragState.isDragging && dragState.dragId && canvasRef.current) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const rect = canvasRef.current.getBoundingClientRect();
+      const newX = (touch.clientX - rect.left - dragState.offsetX - pan.x) / zoom;
+      const newY = (touch.clientY - rect.top - dragState.offsetY - pan.y) / zoom;
+
+      setPositions(prev => ({
+        ...prev,
+        [dragState.dragId!]: { x: newX, y: newY }
+      }));
+    }
+  }, [dragState, zoom, pan]);
+
+  const handleTouchEnd = useCallback(() => {
+    setDragState({
+      isDragging: false,
+      dragId: null,
+      startX: 0,
+      startY: 0,
+      startScrollX: 0,
+      startScrollY: 0,
+      offsetX: 0,
+      offsetY: 0,
+    });
+  }, []);
+
+  // Canvas panning
+  const handleCanvasMouseDown = useCallback((e: React.MouseEvent) => {
+    if (e.target === canvasRef.current) {
+      setIsPanning(true);
+      setDragState(prev => ({
+        ...prev,
+        startX: e.clientX,
+        startY: e.clientY,
+        startScrollX: pan.x,
+        startScrollY: pan.y,
+      }));
+    }
+  }, [pan]);
+
+  const handleCanvasMouseMove = useCallback((e: React.MouseEvent) => {
+    if (isPanning) {
+      const deltaX = e.clientX - dragState.startX;
+      const deltaY = e.clientY - dragState.startY;
+      setPan({
+        x: dragState.startScrollX + deltaX,
+        y: dragState.startScrollY + deltaY,
+      });
+    }
+  }, [isPanning, dragState]);
+
+  const handleCanvasMouseUp = useCallback(() => {
+    setIsPanning(false);
+  }, []);
+
+  // Global mouse event listeners
+  useEffect(() => {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      if (dragState.isDragging && dragState.dragId && canvasRef.current) {
+        const rect = canvasRef.current.getBoundingClientRect();
+        const newX = (e.clientX - rect.left - dragState.offsetX - pan.x) / zoom;
+        const newY = (e.clientY - rect.top - dragState.offsetY - pan.y) / zoom;
+
+        setPositions(prev => ({
+          ...prev,
+          [dragState.dragId!]: { x: newX, y: newY }
+        }));
+      } else if (isPanning) {
+        const deltaX = e.clientX - dragState.startX;
+        const deltaY = e.clientY - dragState.startY;
+        setPan({
+          x: dragState.startScrollX + deltaX,
+          y: dragState.startScrollY + deltaY,
+        });
+      }
     };
-  };
 
-  const handleTouchEnd = (e: React.TouchEvent, ideaId: string) => {
-    if (!touchStartRef.current) return;
+    const handleGlobalMouseUp = () => {
+      setDragState({
+        isDragging: false,
+        dragId: null,
+        startX: 0,
+        startY: 0,
+        startScrollX: 0,
+        startScrollY: 0,
+        offsetX: 0,
+        offsetY: 0,
+      });
+      setIsPanning(false);
+    };
 
-    const touch = e.changedTouches[0];
-    const deltaX = touch.clientX - touchStartRef.current.x;
-    const deltaY = touch.clientY - touchStartRef.current.y;
-    const deltaTime = Date.now() - touchStartRef.current.time;
-
-    // Only process quick swipes
-    if (deltaTime > 500) {
-      touchStartRef.current = null;
-      return;
+    if (dragState.isDragging || isPanning) {
+      document.addEventListener('mousemove', handleGlobalMouseMove);
+      document.addEventListener('mouseup', handleGlobalMouseUp);
     }
 
-    const threshold = 80;
-    const absX = Math.abs(deltaX);
-    const absY = Math.abs(deltaY);
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [dragState, isPanning, zoom, pan]);
 
-    // Check for left swipe
-    if (deltaX < -threshold && absX > absY) {
-      handleSwipeLeft(ideaId);
-    }
-
-    touchStartRef.current = null;
-  };
+  // Zoom controls
+  const handleZoomIn = () => setZoom(prev => Math.min(prev * 1.2, 3));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev / 1.2, 0.3));
 
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 border-4 border-card-purple-gray border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-16 h-16 mx-auto mb-4 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -137,103 +311,165 @@ export default function SavedPage() {
   }
 
   if (!isAuthenticated) {
-    return null; // Will redirect to login
+    return null;
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative">
-      {/* Page Header */}
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, serif' }}>Saved Ideas</h1>
-          <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {savedIdeas.length} {savedIdeas.length === 1 ? 'idea' : 'ideas'} saved
-          </p>
+    <div className="min-h-screen flex flex-col relative bg-background">
+      {/* Fixed Header */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-crimson font-semibold text-foreground">Saved Ideas</h1>
+            <p className="text-muted-foreground text-sm font-inter">
+              {savedIdeas.length} {savedIdeas.length === 1 ? 'idea' : 'ideas'} • Drag to organize
+            </p>
+          </div>
+          
+          {/* Zoom Controls */}
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleZoomOut}
+              className="h-8 w-8 p-0"
+            >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <span className="text-sm text-muted-foreground min-w-[3rem] text-center">
+              {Math.round(zoom * 100)}%
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleZoomIn}
+              className="h-8 w-8 p-0"
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Content - with proper bottom spacing for footer */}
-      <div className="flex-1 max-w-7xl mx-auto px-6" style={{ paddingBottom: '120px' }}>
+      {/* Infinite Canvas */}
+      <div className="flex-1 pt-20 relative overflow-hidden">
         {isLoading ? (
-          <div className="flex items-center justify-center h-64">
+          <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className="w-8 h-8 mx-auto mb-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
               <p className="text-muted-foreground">Loading your saved ideas...</p>
             </div>
           </div>
         ) : savedIdeas.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="bg-card border border-card-sage/30 rounded-2xl p-12 max-w-md mx-auto shadow-sm">
-              <Heart className="h-12 w-12 mx-auto mb-4 text-card-sage" />
-              <h2 className="text-xl font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, serif' }}>No saved ideas yet</h2>
-              <p className="text-muted-foreground mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
-                Swipe right or up on ideas you love to save them here!
-              </p>
-              <Link href="/">
-                <Button className="bg-card-sage text-white hover:bg-card-sage/90 shadow-sm">
-                  Start Exploring Ideas
-                </Button>
-              </Link>
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center p-8">
+              <div className="bg-card border border-card-sage/30 rounded-2xl p-8 max-w-sm mx-auto shadow-sm">
+                <Heart className="h-12 w-12 mx-auto mb-4 text-card-sage" />
+                <h2 className="text-xl font-crimson font-semibold text-foreground mb-2">No saved ideas yet</h2>
+                <p className="text-muted-foreground mb-6 font-inter text-sm">
+                  Swipe right or up on ideas you love to save them here!
+                </p>
+                <Link href="/">
+                  <Button className="bg-card-sage text-white hover:bg-card-sage/90 shadow-sm">
+                    Start Exploring Ideas
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         ) : (
-          <div className="grid gap-6">
+          <div
+            ref={canvasRef}
+            className="w-full h-full relative cursor-grab active:cursor-grabbing select-none"
+            style={{
+              transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+              transformOrigin: '0 0',
+              minHeight: '200vh',
+              minWidth: '200vw',
+            }}
+            onMouseDown={handleCanvasMouseDown}
+            onMouseMove={handleCanvasMouseMove}
+            onMouseUp={handleCanvasMouseUp}
+          >
+            {/* Grid Background */}
+            <div 
+              className="absolute inset-0 opacity-20"
+              style={{
+                backgroundImage: 'radial-gradient(circle, #94a3b8 1px, transparent 1px)',
+                backgroundSize: '40px 40px',
+                backgroundPosition: `${pan.x}px ${pan.y}px`,
+              }}
+            />
+
+            {/* Draggable Cards */}
             {savedIdeas.map((idea, index) => {
-              const isAnimating = animatingCards[idea.id];
+              const position = positions[idea.id] || { x: 0, y: 0 };
+              const isDragging = dragState.dragId === idea.id;
               
-              // Use same card styles as main page swiping cards
+              // Card styles with mobile-friendly sizing
               const cardStyles = [
-                "bg-card-sage border-card-sage/40 card-shadow hover-lift",
-                "bg-card-blue-gray border-card-blue-gray/40 card-shadow hover-lift", 
-                "bg-card-cream border-card-cream/40 card-shadow hover-lift",
-                "bg-card-light-blue border-card-light-blue/40 card-shadow hover-lift",
-                "bg-card-purple-gray border-card-purple-gray/40 card-shadow hover-lift"
+                "bg-card-sage border-card-sage/40",
+                "bg-card-blue-gray border-card-blue-gray/40", 
+                "bg-card-cream border-card-cream/40",
+                "bg-card-light-blue border-card-light-blue/40",
+                "bg-card-purple-gray border-card-purple-gray/40"
               ];
-              
+
               return (
                 <div
                   key={idea.id}
-                  className={`transition-all duration-300 ${
-                    isAnimating ? 'animate-slide-out-left opacity-0' : ''
+                  className={`absolute cursor-move select-none transition-shadow duration-200 ${
+                    isDragging ? 'shadow-2xl scale-105 z-50' : 'shadow-lg hover:shadow-xl z-10'
                   }`}
+                  style={{
+                    left: position.x,
+                    top: position.y,
+                    width: '160px', // Square blocks, mobile-friendly
+                    height: '160px',
+                  }}
+                  onMouseDown={(e) => handleMouseDown(e, idea.id)}
                   onTouchStart={(e) => handleTouchStart(e, idea.id)}
-                  onTouchEnd={(e) => handleTouchEnd(e, idea.id)}
-                  style={{ touchAction: 'pan-y' }}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
                 >
-                  <Card className={`${cardStyles[index % cardStyles.length]} shadow-lg relative overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border-2`}>
-                    {/* Swipe hint overlay */}
-                    <div className="absolute inset-0 bg-card-peach/20 flex items-center justify-end pr-6 opacity-0 transition-opacity duration-200 hover:opacity-50 rounded-xl">
-                      <Trash2 className="h-6 w-6 text-card-peach" />
+                  <Card className={`${cardStyles[index % cardStyles.length]} w-full h-full border-2 card-shadow hover-lift transition-all duration-300 flex flex-col`}>
+                    {/* Drag Handle */}
+                    <div className="flex-shrink-0 p-2 border-b border-current/20 bg-black/5 rounded-t-lg">
+                      <div className="flex items-center justify-between">
+                        <Move className="h-3 w-3 text-foreground/60" />
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            unsaveIdeaMutation.mutate(idea.id);
+                          }}
+                          className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
                     
-                    <CardHeader className="pb-2">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-base leading-tight mb-1 text-foreground line-clamp-1">
-                            {idea.title}
-                          </CardTitle>
-                          <div className="flex items-center space-x-2 text-xs text-foreground/70">
-                            {idea.source === 'image' ? (
-                              <div className="flex items-center space-x-1">
-                                <Image className="h-3 w-3" />
-                                <span>From image</span>
-                              </div>
-                            ) : (
-                              <div className="flex items-center space-x-1">
-                                <Type className="h-3 w-3" />
-                                <span>From text</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="w-3 h-3 rounded-full flex-shrink-0 ml-3 bg-foreground/80" />
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-0 pb-3">
-                      <CardDescription className="text-foreground/80 leading-relaxed text-sm line-clamp-2">
+                    {/* Content */}
+                    <div className="flex-1 p-3 flex flex-col">
+                      <h3 className="font-medium text-xs leading-tight mb-2 text-foreground line-clamp-2">
+                        {idea.title}
+                      </h3>
+                      
+                      <p className="text-xs text-foreground/70 line-clamp-3 flex-1">
                         {idea.description}
-                      </CardDescription>
-                    </CardContent>
+                      </p>
+                      
+                      {/* Source indicator */}
+                      <div className="flex items-center justify-center mt-2 pt-2 border-t border-current/20">
+                        {idea.source === 'image' ? (
+                          <Image className="h-3 w-3 text-foreground/50" />
+                        ) : (
+                          <Type className="h-3 w-3 text-foreground/50" />
+                        )}
+                      </div>
+                    </div>
                   </Card>
                 </div>
               );

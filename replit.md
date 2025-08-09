@@ -40,9 +40,11 @@ Preferred communication style: Simple, everyday language.
 - **Swipeable Card Interface**: Mobile-first gesture controls for idea exploration
 - **Idea Chaining**: Link related ideas together for inspiration threads
 - **Save System**: Personal collection of favorite creative concepts
+- **Infinite Canvas**: Drag-and-drop organization system for saved ideas with zoom and pan controls
 - **Multi-Modal Input**: Support for text prompts, image uploads, voice recording, and drawing pad
 - **Drawing Pad**: Interactive canvas for sketching ideas that get analyzed by AI
 - **Voice Input**: Real-time speech-to-text with timer display for audio prompts
+- **Keyboard Navigation**: Desktop arrow key controls for card swiping
 - **Responsive Design**: Optimized for mobile and desktop experiences
 
 ## External Dependencies
