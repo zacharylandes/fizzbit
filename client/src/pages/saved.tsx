@@ -434,9 +434,9 @@ export default function SavedPage() {
                 >
                   <Card className={`${cardStyles[index % cardStyles.length]} w-full h-full border-2 card-shadow hover-lift transition-all duration-300 flex flex-col`}>
                     {/* Drag Handle */}
-                    <div className="flex-shrink-0 p-2 border-b border-current/20 bg-black/5 rounded-t-lg">
+                    <div className="flex-shrink-0 p-2 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50 rounded-t-lg">
                       <div className="flex items-center justify-between">
-                        <Move className="h-3 w-3 text-foreground/60" />
+                        <Move className="h-3 w-3 text-gray-600 dark:text-gray-300" />
                         <Button
                           size="sm"
                           variant="ghost"
@@ -444,7 +444,7 @@ export default function SavedPage() {
                             e.stopPropagation();
                             unsaveIdeaMutation.mutate(idea.id);
                           }}
-                          className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600"
+                          className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600 text-gray-600 dark:text-gray-300"
                         >
                           <Trash2 className="h-3 w-3" />
                         </Button>
@@ -453,20 +453,20 @@ export default function SavedPage() {
                     
                     {/* Content */}
                     <div className="flex-1 p-3 flex flex-col">
-                      <h3 className="font-medium text-xs leading-tight mb-2 text-foreground line-clamp-2">
+                      <h3 className="font-medium text-xs leading-tight mb-2 text-gray-800 dark:text-gray-100 line-clamp-2">
                         {idea.title}
                       </h3>
                       
-                      <p className="text-xs text-foreground/70 line-clamp-3 flex-1">
+                      <p className="text-xs text-gray-700 dark:text-gray-200 line-clamp-3 flex-1">
                         {idea.description}
                       </p>
                       
                       {/* Source indicator */}
-                      <div className="flex items-center justify-center mt-2 pt-2 border-t border-current/20">
+                      <div className="flex items-center justify-center mt-2 pt-2 border-t border-gray-400/30">
                         {idea.source === 'image' ? (
-                          <Image className="h-3 w-3 text-foreground/50" />
+                          <Image className="h-3 w-3 text-gray-600 dark:text-gray-300" />
                         ) : (
-                          <Type className="h-3 w-3 text-foreground/50" />
+                          <Type className="h-3 w-3 text-gray-600 dark:text-gray-300" />
                         )}
                       </div>
                     </div>
