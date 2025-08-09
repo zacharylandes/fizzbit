@@ -30,9 +30,11 @@ Preferred communication style: Simple, everyday language.
 - **Database Ready**: Schema defined for ideas, saved ideas, and metadata storage
 
 ## AI Integration
-- **OpenAI GPT-4**: Text-based creative idea generation
-- **Image Analysis**: Prepared for AI-powered image content analysis
-- **Structured Responses**: JSON-formatted AI outputs for consistent data handling
+- **Mistral 7B**: Primary model for fast and cost-effective text-based creative idea generation via Hugging Face
+- **OpenAI GPT-4o**: Fallback for text generation and primary for vision/image analysis
+- **OpenAI Whisper**: Audio transcription for voice input processing
+- **Hugging Face BLIP**: Image-to-text analysis for uploaded images
+- **Structured Responses**: JSON-formatted AI outputs with text parsing fallbacks
 
 ## Key Features
 - **Swipeable Card Interface**: Mobile-first gesture controls for idea exploration
@@ -46,7 +48,8 @@ Preferred communication style: Simple, everyday language.
 ## External Dependencies
 
 - **Neon Database**: Serverless PostgreSQL hosting
-- **OpenAI API**: GPT-4 model for creative content generation
+- **Hugging Face**: Mistral 7B model for primary text generation and BLIP for image analysis
+- **OpenAI API**: GPT-4o for fallback text generation, vision analysis, and Whisper for audio transcription
 - **Google Cloud Storage**: File storage and management (configured)
 - **AWS S3**: Alternative file storage option (via Uppy integration)
 - **Radix UI**: Accessible component primitives

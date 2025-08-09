@@ -13,10 +13,10 @@ export interface IdeaResponse {
   sourceContent?: string;
 }
 
-// Use Llama 3 for fast and cheap text generation
-const TEXT_MODEL = 'meta-llama/Meta-Llama-3-8B-Instruct';
+// Use Mistral as it has excellent provider support and is fast/cheap
+const TEXT_MODEL = 'mistralai/Mistral-7B-Instruct-v0.3';
 
-// Helper function to parse text-based responses from Llama 3
+// Helper function to parse text-based responses from Mistral
 function parseTextResponse(text: string, count: number, prompt: string): IdeaResponse[] {
   const ideas: IdeaResponse[] = [];
   
@@ -31,7 +31,7 @@ function parseTextResponse(text: string, count: number, prompt: string): IdeaRes
     if (trimmed.match(/^\d+\.|^-|^\*|^Title:|^Idea \d+:/i)) {
       if (currentIdea.title && currentIdea.description) {
         ideas.push({
-          id: `llama3-parsed-${Date.now()}-${ideas.length}`,
+          id: `mistral-parsed-${Date.now()}-${ideas.length}`,
           title: currentIdea.title,
           description: currentIdea.description,
           sourceContent: prompt
@@ -54,7 +54,7 @@ function parseTextResponse(text: string, count: number, prompt: string): IdeaRes
   // Add the last idea if it exists
   if (currentIdea.title && currentIdea.description) {
     ideas.push({
-      id: `llama3-parsed-${Date.now()}-${ideas.length}`,
+      id: `mistral-parsed-${Date.now()}-${ideas.length}`,
       title: currentIdea.title,
       description: currentIdea.description,
       sourceContent: prompt
@@ -64,99 +64,91 @@ function parseTextResponse(text: string, count: number, prompt: string): IdeaRes
   return ideas.slice(0, count);
 }
 
-// Helper function to generate related ideas using Llama 3
+// Helper function to generate related ideas using Mistral
 export async function generateRelatedIdeas(contextualPrompt: string, count: number = 3): Promise<IdeaResponse[]> {
   try {
-    const llama3Prompt = `<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+    const mistralPrompt = `<s>[INST] You are a creative inspiration assistant. Generate ideas that thoughtfully combine user interests with specific concepts they've shown enthusiasm for. Create ideas that feel like natural extensions bridging multiple creative concepts together. Format as JSON with "ideas" array containing objects with "title" and "description" fields.
 
-You are a creative inspiration assistant. Generate ideas that thoughtfully combine user interests with specific concepts they've shown enthusiasm for. Create ideas that feel like natural extensions bridging multiple creative concepts together. Format as JSON with "ideas" array containing objects with "title" and "description" fields.<|eot_id|><|start_header_id|>user<|end_header_id|>
-
-${contextualPrompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
-
-`;
+${contextualPrompt} [/INST]`;
 
     const hfResponse = await hf.textGeneration({
       model: TEXT_MODEL,
-      inputs: llama3Prompt,
+      inputs: mistralPrompt,
       parameters: {
         max_new_tokens: 600,
         temperature: 0.8,
         top_p: 0.9,
-        stop: ['<|eot_id|>']
+        stop: ['</s>']
       }
     });
 
-    const responseText = hfResponse.generated_text.replace(llama3Prompt, '').trim();
+    const responseText = hfResponse.generated_text.replace(mistralPrompt, '').trim();
     
     try {
       const parsed = JSON.parse(responseText);
       if (parsed.ideas && Array.isArray(parsed.ideas)) {
         return parsed.ideas.slice(0, count).map((idea: any, index: number) => ({
-          id: `llama3-related-${Date.now()}-${index}`,
+          id: `mistral-related-${Date.now()}-${index}`,
           title: idea.title || `Related Idea ${index + 1}`,
           description: idea.description || 'A related creative concept.',
           sourceContent: 'Related ideas'
         }));
       }
     } catch (parseError) {
-      console.log('Llama 3 related ideas response not JSON, parsing text...');
+      console.log('Mistral related ideas response not JSON, parsing text...');
       return parseTextResponse(responseText, count, 'Related ideas');
     }
 
     return [];
   } catch (error) {
-    console.error('Llama 3 related ideas generation failed:', error);
+    console.error('Mistral related ideas generation failed:', error);
     return [];
   }
 }
 
 export async function generateIdeasFromText(prompt: string, count: number = 8): Promise<IdeaResponse[]> {
   try {
-    // Use Hugging Face Llama 3 for fast and cheap text generation
-    const llama3Prompt = `<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+    // Use Mistral for fast and cheap text generation
+    const mistralPrompt = `<s>[INST] You are a creative idea generator. Generate exactly ${count} unique, inspiring creative ideas based on the user prompt. Each idea should be practical and actionable. Format as JSON with "ideas" array containing objects with "title" and "description" fields. Make titles concise (max 5 words) and descriptions detailed but under 100 words.
 
-You are a creative idea generator. Generate exactly ${count} unique, inspiring creative ideas based on the user prompt. Each idea should be practical and actionable. Format as JSON with "ideas" array containing objects with "title" and "description" fields. Make titles concise (max 5 words) and descriptions detailed but under 100 words.<|eot_id|><|start_header_id|>user<|end_header_id|>
-
-Generate ${count} creative ideas for: ${prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
-
-`;
+Generate ${count} creative ideas for: ${prompt} [/INST]`;
 
     const hfResponse = await hf.textGeneration({
       model: TEXT_MODEL,
-      inputs: llama3Prompt,
+      inputs: mistralPrompt,
       parameters: {
         max_new_tokens: 1000,
         temperature: 0.8,
         top_p: 0.9,
-        stop: ['<|eot_id|>']
+        stop: ['</s>']
       }
     });
 
-    const responseText = hfResponse.generated_text.replace(llama3Prompt, '').trim();
+    const responseText = hfResponse.generated_text.replace(mistralPrompt, '').trim();
     
     try {
       // Try to parse as JSON first
       const parsed = JSON.parse(responseText);
       if (parsed.ideas && Array.isArray(parsed.ideas)) {
         return parsed.ideas.map((idea: any, index: number) => ({
-          id: `llama3-${Date.now()}-${index}`,
+          id: `mistral-${Date.now()}-${index}`,
           title: idea.title || `Creative Idea ${index + 1}`,
           description: idea.description || 'A creative project to explore.',
           sourceContent: prompt
         }));
       }
     } catch (parseError) {
-      console.log('Llama 3 response not valid JSON, parsing text format...');
+      console.log('Mistral response not valid JSON, parsing text format...');
       
-      // Parse text format responses from Llama 3
+      // Parse text format responses from Mistral
       const ideas = parseTextResponse(responseText, count, prompt);
       if (ideas.length > 0) {
         return ideas;
       }
     }
 
-    // Fallback to OpenAI if Llama 3 fails
-    console.log('Llama 3 failed, falling back to OpenAI...');
+    // Fallback to OpenAI if Mistral fails
+    console.log('Mistral failed, falling back to OpenAI...');
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -331,53 +323,49 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
 
     // Generate ideas based on the image analysis (or generic if analysis failed)
     if (imageDescription.trim()) {
-      // Use Llama 3 for faster and cheaper idea generation based on image
+      // Use Mistral for faster and cheaper idea generation based on image
       try {
-        const llama3ImagePrompt = `<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+        const mistralImagePrompt = `<s>[INST] You are a creative idea generator. Generate exactly ${count} unique, inspiring creative ideas based on the image description provided. Each idea should be practical and actionable with completely different approaches. Format as JSON with "ideas" array containing objects with "title" and "description" fields. Make titles concise (max 5 words) and descriptions detailed but under 100 words.
 
-You are a creative idea generator. Generate exactly ${count} unique, inspiring creative ideas based on the image description provided. Each idea should be practical and actionable with completely different approaches. Format as JSON with "ideas" array containing objects with "title" and "description" fields. Make titles concise (max 5 words) and descriptions detailed but under 100 words.<|eot_id|><|start_header_id|>user<|end_header_id|>
-
-Based on this image: "${imageDescription}" - Generate ${count} completely different creative project ideas that are inspired by what's shown in the image.<|eot_id|><|start_header_id|>assistant<|end_header_id|>
-
-`;
+Based on this image: "${imageDescription}" - Generate ${count} completely different creative project ideas that are inspired by what's shown in the image. [/INST]`;
 
         const hfImageResponse = await hf.textGeneration({
           model: TEXT_MODEL,
-          inputs: llama3ImagePrompt,
+          inputs: mistralImagePrompt,
           parameters: {
             max_new_tokens: 1200,
             temperature: 0.9,
             top_p: 0.9,
-            stop: ['<|eot_id|>']
+            stop: ['</s>']
           }
         });
 
-        const imageResponseText = hfImageResponse.generated_text.replace(llama3ImagePrompt, '').trim();
+        const imageResponseText = hfImageResponse.generated_text.replace(mistralImagePrompt, '').trim();
         
         try {
           // Try to parse as JSON first
           const parsed = JSON.parse(imageResponseText);
           if (parsed.ideas && Array.isArray(parsed.ideas)) {
             return parsed.ideas.map((idea: any, index: number) => ({
-              id: `llama3-img-${Date.now()}-${index}`,
+              id: `mistral-img-${Date.now()}-${index}`,
               title: idea.title || `Creative Idea ${index + 1}`,
               description: idea.description || 'A creative project inspired by your image.',
               sourceContent: `Image: ${imageDescription}`
             }));
           }
         } catch (parseError) {
-          console.log('Llama 3 image response not valid JSON, parsing text format...');
+          console.log('Mistral image response not valid JSON, parsing text format...');
           
-          // Parse text format responses from Llama 3
+          // Parse text format responses from Mistral
           const ideas = parseTextResponse(imageResponseText, count, `Image: ${imageDescription}`);
           if (ideas.length > 0) {
             return ideas;
           }
         }
 
-        console.log('Llama 3 image generation failed, falling back to OpenAI...');
+        console.log('Mistral image generation failed, falling back to OpenAI...');
       } catch (error) {
-        console.log('Llama 3 image generation error, falling back to OpenAI:', error);
+        console.log('Mistral image generation error, falling back to OpenAI:', error);
       }
 
       // Fallback to OpenAI if Llama 3 fails

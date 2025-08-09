@@ -444,11 +444,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       contextualPrompt += ` Respond with JSON containing an array of ideas, each with 'title' and 'description' fields.`;
 
       // Use gpt-4o-mini for faster response times in explore/swipe up actions
-      // Use Llama 3 for faster and cheaper related idea generation
-      const llamaIdeas = await generateRelatedIdeas(contextualPrompt, 3);
+      // Use Mistral for faster and cheaper related idea generation
+      const mistralIdeas = await generateRelatedIdeas(contextualPrompt, 3);
       
-      if (llamaIdeas.length > 0) {
-        const aiResponse = { ideas: llamaIdeas };
+      if (mistralIdeas.length > 0) {
+        const aiResponse = { ideas: mistralIdeas };
         const relatedIdeas = aiResponse.ideas?.slice(0, 3) || [];
         
         const createdIdeas = [];
@@ -470,8 +470,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ ideas: createdIdeas });
       }
 
-      // Fallback to OpenAI if Llama 3 fails
-      console.log('Llama 3 explore failed, falling back to OpenAI...');
+      // Fallback to OpenAI if Mistral fails
+      console.log('Mistral explore failed, falling back to OpenAI...');
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
