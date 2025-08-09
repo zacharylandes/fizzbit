@@ -1,8 +1,14 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut, Pencil, Eraser } from "lucide-react";
+import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut, Pencil, Eraser, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -43,6 +49,7 @@ interface DrawingState {
 
 export default function SavedPage() {
   const [positions, setPositions] = useState<{ [ideaId: string]: { x: number; y: number } }>({});
+  const [cardColors, setCardColors] = useState<{ [ideaId: string]: number }>({});
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
     dragId: null,
@@ -93,7 +100,7 @@ export default function SavedPage() {
 
   const savedIdeas = savedIdeasData?.ideas || [];
 
-  // Initialize positions for new ideas
+  // Initialize positions and colors for new ideas
   useEffect(() => {
     if (savedIdeas.length > 0) {
       setPositions(prev => {
@@ -110,6 +117,16 @@ export default function SavedPage() {
           }
         });
         return newPositions;
+      });
+
+      setCardColors(prev => {
+        const newColors = { ...prev };
+        savedIdeas.forEach((idea, index) => {
+          if (newColors[idea.id] === undefined) {
+            newColors[idea.id] = index % 5; // Cycle through 5 color options
+          }
+        });
+        return newColors;
       });
     }
   }, [savedIdeas]);
@@ -377,6 +394,14 @@ export default function SavedPage() {
     setDrawingState(prev => ({ ...prev, paths: [] }));
   };
 
+  // Change card color
+  const changeCardColor = (ideaId: string, colorIndex: number) => {
+    setCardColors(prev => ({
+      ...prev,
+      [ideaId]: colorIndex
+    }));
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -553,14 +578,29 @@ export default function SavedPage() {
             {savedIdeas.map((idea, index) => {
               const position = positions[idea.id] || { x: 0, y: 0 };
               const isDragging = dragState.dragId === idea.id;
+              const colorIndex = cardColors[idea.id] ?? index % 5;
               
-              // Card styles with mobile-friendly sizing
+              // Card styles with all pastel colors
               const cardStyles = [
                 "bg-card-sage border-card-sage/40",
                 "bg-card-blue-gray border-card-blue-gray/40", 
                 "bg-card-cream border-card-cream/40",
                 "bg-card-light-blue border-card-light-blue/40",
-                "bg-card-purple-gray border-card-purple-gray/40"
+                "bg-card-purple-gray border-card-purple-gray/40",
+                "bg-card-peach border-card-peach/40",
+                "bg-card-lavender border-card-lavender/40",
+                "bg-card-mint border-card-mint/40"
+              ];
+              
+              const colorNames = [
+                "Sage Green",
+                "Blue Gray", 
+                "Cream",
+                "Light Blue",
+                "Purple Gray",
+                "Peach",
+                "Lavender",
+                "Mint"
               ];
 
               return (
@@ -580,42 +620,75 @@ export default function SavedPage() {
                   onTouchMove={!isDrawingMode ? handleTouchMove : undefined}
                   onTouchEnd={!isDrawingMode ? handleTouchEnd : undefined}
                 >
-                  <Card className={`${cardStyles[index % cardStyles.length]} w-full h-full border-2 card-shadow hover-lift transition-all duration-300 flex flex-col`}>
-                    {/* Drag Handle - Smaller */}
-                    <div className="flex-shrink-0 p-1.5 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50 rounded-t-lg">
+                  <Card className={`${cardStyles[colorIndex]} w-full h-full border-2 card-shadow hover-lift transition-all duration-300 flex flex-col`}>
+                    {/* Drag Handle - Even Smaller */}
+                    <div className="flex-shrink-0 p-1 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50 rounded-t-lg">
                       <div className="flex items-center justify-between">
-                        <Move className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            unsaveIdeaMutation.mutate(idea.id);
-                          }}
-                          className="h-5 w-5 p-0 hover:bg-red-100 hover:text-red-600 text-gray-500 dark:text-gray-400"
-                        >
-                          <Trash2 className="h-2.5 w-2.5" />
-                        </Button>
+                        <Move className="h-2 w-2 text-gray-400 dark:text-gray-500" />
+                        <div className="flex items-center gap-1">
+                          {/* Color Picker Dropdown */}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-4 w-4 p-0 hover:bg-gray-200 text-gray-400 dark:text-gray-500"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <ChevronDown className="h-2 w-2" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-32">
+                              {cardStyles.map((style, idx) => (
+                                <DropdownMenuItem
+                                  key={idx}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    changeCardColor(idea.id, idx);
+                                  }}
+                                  className="flex items-center gap-2"
+                                >
+                                  <div className={`w-3 h-3 rounded-full ${style}`} />
+                                  <span className="text-xs">{colorNames[idx]}</span>
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                          
+                          {/* Delete Button */}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              unsaveIdeaMutation.mutate(idea.id);
+                            }}
+                            className="h-4 w-4 p-0 hover:bg-red-100 hover:text-red-600 text-gray-400 dark:text-gray-500"
+                          >
+                            <Trash2 className="h-2 w-2" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                     
                     {/* Content */}
                     <div className="flex-1 p-3 flex flex-col">
-                      {/* Title - Larger and Centered */}
-                      <h3 className="font-semibold text-sm leading-tight mb-3 text-gray-800 dark:text-gray-100 line-clamp-2 text-center">
+                      {/* Title - Much Larger and Centered */}
+                      <h3 className="font-bold text-base leading-tight mb-2 text-gray-800 dark:text-gray-100 line-clamp-2 text-center">
                         {idea.title}
                       </h3>
                       
-                      <p className="text-xs text-gray-700 dark:text-gray-200 line-clamp-3 flex-1 text-center">
+                      {/* Description - Smaller */}
+                      <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-4 flex-1 text-center leading-relaxed">
                         {idea.description}
                       </p>
                       
-                      {/* Source indicator */}
-                      <div className="flex items-center justify-center mt-2 pt-2 border-t border-gray-400/30">
+                      {/* Source indicator - Smaller */}
+                      <div className="flex items-center justify-center mt-1 pt-1 border-t border-gray-400/20">
                         {idea.source === 'image' ? (
-                          <Image className="h-3 w-3 text-gray-600 dark:text-gray-300" />
+                          <Image className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
                         ) : (
-                          <Type className="h-3 w-3 text-gray-600 dark:text-gray-300" />
+                          <Type className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
                         )}
                       </div>
                     </div>

@@ -93,6 +93,8 @@ input, textarea {
   --card-lavender-bg: hsl(280, 35%, 92%); /* Light lavender background */
   --card-peach: hsl(15, 40%, 70%);       /* Soft peach */
   --card-peach-bg: hsl(15, 45%, 92%);    /* Light peach background */
+  --card-mint: hsl(160, 30%, 70%);       /* Soft mint green */
+  --card-mint-bg: hsl(160, 35%, 92%);    /* Light mint background */
   
   /* Professional Primary Colors */
   --primary-blue: hsl(210, 20%, 55%);
