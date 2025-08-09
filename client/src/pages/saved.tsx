@@ -209,10 +209,10 @@ export default function SavedPage() {
                       <Trash2 className="h-6 w-6 text-white" />
                     </div>
                     
-                    <CardHeader className="pb-3">
+                    <CardHeader className="pb-2">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <CardTitle className="text-lg leading-tight mb-2 text-foreground">
+                          <CardTitle className="text-base leading-tight mb-1 text-foreground line-clamp-1">
                             {idea.title}
                           </CardTitle>
                           <div className="flex items-center space-x-2 text-xs text-foreground/70">
@@ -227,24 +227,15 @@ export default function SavedPage() {
                                 <span>From text</span>
                               </div>
                             )}
-                            {idea.parentIdeaId && (
-                              <span className="text-electric-yellow">• Explored idea</span>
-                            )}
                           </div>
                         </div>
                         <div className="w-3 h-3 rounded-full flex-shrink-0 ml-3 bg-foreground/80" />
                       </div>
                     </CardHeader>
-                    <CardContent className="pt-0">
-                      <CardDescription className="text-foreground/80 leading-relaxed">
+                    <CardContent className="pt-0 pb-3">
+                      <CardDescription className="text-foreground/80 leading-relaxed text-sm line-clamp-2">
                         {idea.description}
                       </CardDescription>
-                      {idea.sourceContent && idea.sourceContent !== "uploaded_image" && (
-                        <div className="mt-3 p-3 bg-muted border border-border rounded-lg">
-                          <p className="text-xs text-muted-foreground font-medium mb-1">Original inspiration:</p>
-                          <p className="text-xs text-muted-foreground italic">"{idea.sourceContent}"</p>
-                        </div>
-                      )}
                     </CardContent>
                   </Card>
                 </div>

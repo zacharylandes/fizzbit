@@ -103,7 +103,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="max-w-4xl mx-auto px-6 py-8 pb-32">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">
           <span className="bg-gradient-to-r from-electric-cyan to-electric-green bg-clip-text text-transparent">
@@ -168,8 +168,8 @@ export default function HistoryPage() {
                 className={`${cardStyles[index % cardStyles.length]} cursor-pointer hover:scale-[1.02] transition-all duration-300 relative overflow-hidden shadow-lg border-2 hover:shadow-xl`}
                 onClick={() => handlePromptClick(prompt)}
               >
-                <div className="absolute inset-0 bg-gradient-aurora opacity-10 animate-pulse"></div>
-                <div className="relative z-10">
+
+                <div>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">

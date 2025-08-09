@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Lightbulb, Home, Bookmark, Settings, History, LogOut, LogIn } from "lucide-react";
 import { Link, useLocation } from "wouter";
@@ -12,12 +12,57 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
   const [location] = useLocation();
+  const [showFooter, setShowFooter] = useState(true);
+  const [lastTouchY, setLastTouchY] = useState(0);
+  const [swipeStartY, setSwipeStartY] = useState(0);
 
   // Fetch saved ideas count for the bookmark badge
   const { data: savedIdeasData } = useQuery({
     queryKey: ["/api/ideas/saved"],
     enabled: isAuthenticated,
   }) as { data: { ideas: any[] } | undefined };
+
+  // Handle swipe down gesture to show footer
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      setSwipeStartY(touch.clientY);
+      setLastTouchY(touch.clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      const currentY = touch.clientY;
+      
+      // Check if user is swiping down from the top third of screen
+      if (swipeStartY < window.innerHeight / 3) {
+        const swipeDistance = currentY - swipeStartY;
+        
+        // If swiping down more than 50px, show footer
+        if (swipeDistance > 50) {
+          setShowFooter(true);
+        }
+      }
+      
+      setLastTouchY(currentY);
+    };
+
+    const handleTouchEnd = () => {
+      setSwipeStartY(0);
+      setLastTouchY(0);
+    };
+
+    // Add touch event listeners
+    document.addEventListener('touchstart', handleTouchStart);
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [swipeStartY]);
 
   const navItems = [
     { href: "/", icon: Home, label: "Home", badge: null },
@@ -88,7 +133,9 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Footer Navigation */}
       {isAuthenticated && (
-        <div className="border-t border-border bg-card/80 backdrop-blur-sm">
+        <div className={`fixed bottom-0 left-0 right-0 border-t border-border bg-card/90 backdrop-blur-sm transition-transform duration-300 z-50 ${
+          showFooter ? 'translate-y-0' : 'translate-y-full'
+        }`}>
           <div className="max-w-7xl mx-auto px-6 py-4">
             <nav className="flex items-center justify-center space-x-8">
               {navItems.map((item) => {
@@ -118,6 +165,11 @@ export default function Layout({ children }: LayoutProps) {
                 );
               })}
             </nav>
+          </div>
+          
+          {/* Swipe indicator */}
+          <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
+            <div className="w-8 h-1 bg-muted-foreground/30 rounded-full"></div>
           </div>
         </div>
       )}
