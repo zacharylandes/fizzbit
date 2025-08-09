@@ -242,7 +242,10 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       
       // Start duration counter
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingDuration(prev => prev + 1);
+        setRecordingDuration(prev => {
+          console.log('Timer increment:', prev + 1); // Debug log
+          return prev + 1;
+        });
       }, 1000);
       
     } catch (error) {
@@ -265,6 +268,9 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
         clearInterval(recordingIntervalRef.current);
         recordingIntervalRef.current = null;
       }
+      
+      // Reset duration
+      setRecordingDuration(0);
     }
   };
 
@@ -355,11 +361,11 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
             onClick={isRecording ? stopRecording : startRecording}
             className={`w-48 ${
               isRecording 
-                ? 'bg-red-500 hover:bg-red-600 text-white border-red-500'
+                ? 'bg-red-500 hover:bg-red-600 text-white border-red-500 shadow-md'
                 : generateFromAudioMutation.isPending
-                ? 'bg-blue-500 hover:bg-blue-600 text-white border-blue-500'
-                : 'bg-card-cream-bg border-card-cream/40 hover:bg-card-cream-bg/90 text-card-cream'
-            } hover-lift rounded-lg py-3 px-4 font-medium card-shadow touch-target text-center transition-all duration-300`}
+                ? 'bg-blue-500 hover:bg-blue-600 text-white border-blue-500 shadow-md'
+                : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 shadow-sm'
+            } rounded-xl py-4 px-6 font-medium text-center transition-all duration-200 ease-in-out`}
             disabled={(isLoading || generateFromAudioMutation.isPending) && !isRecording}
           >
             {generateFromAudioMutation.isPending ? (
