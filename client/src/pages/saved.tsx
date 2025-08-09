@@ -623,67 +623,69 @@ export default function SavedPage() {
                   <Card className={`${cardStyles[colorIndex]} w-full h-full border-2 card-shadow hover-lift transition-all duration-300 flex flex-col`}>
                     {/* Drag Handle - Even Smaller */}
                     <div className="flex-shrink-0 p-1 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50 rounded-t-lg">
-                      <div className="flex items-center justify-end">
-                        <div className="flex items-center gap-1">
-                          {/* Color Picker Dropdown */}
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-4 w-4 p-0 hover:bg-gray-200 text-gray-400 dark:text-gray-500"
-                                onClick={(e) => e.stopPropagation()}
+                      <div className="flex items-center justify-between">
+                        {/* Color Picker Dropdown - Left Side */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-4 w-4 p-0 hover:bg-gray-200 text-gray-400 dark:text-gray-500"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <ChevronDown className="h-2 w-2" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start" className="w-32">
+                            {cardStyles.map((style, idx) => (
+                              <DropdownMenuItem
+                                key={idx}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  changeCardColor(idea.id, idx);
+                                }}
+                                className="flex items-center gap-2"
                               >
-                                <ChevronDown className="h-2 w-2" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-32">
-                              {cardStyles.map((style, idx) => (
-                                <DropdownMenuItem
-                                  key={idx}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    changeCardColor(idea.id, idx);
-                                  }}
-                                  className="flex items-center gap-2"
-                                >
-                                  <div className={`w-3 h-3 rounded-full ${style}`} />
-                                  <span className="text-xs">{colorNames[idx]}</span>
-                                </DropdownMenuItem>
-                              ))}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                          
-                          {/* Delete Button */}
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              unsaveIdeaMutation.mutate(idea.id);
-                            }}
-                            className="h-4 w-4 p-0 hover:bg-red-100 hover:text-red-600 text-gray-400 dark:text-gray-500"
-                          >
-                            <Trash2 className="h-2 w-2" />
-                          </Button>
-                        </div>
+                                <div className={`w-3 h-3 rounded-full ${style}`} />
+                                <span className="text-xs">{colorNames[idx]}</span>
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        
+                        {/* Delete Button - Right Side */}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            unsaveIdeaMutation.mutate(idea.id);
+                          }}
+                          className="h-4 w-4 p-0 hover:bg-red-100 hover:text-red-600 text-gray-400 dark:text-gray-500"
+                        >
+                          <Trash2 className="h-2 w-2" />
+                        </Button>
                       </div>
                     </div>
                     
                     {/* Content */}
-                    <div className="flex-1 p-3 flex flex-col">
+                    <div className="flex-1 p-2 flex flex-col overflow-hidden">
                       {/* Title - Much Larger and Centered */}
-                      <h3 className="font-bold text-base leading-tight mb-2 text-gray-800 dark:text-gray-100 line-clamp-2 text-center">
+                      <h3 className="font-bold text-base leading-tight mb-2 text-gray-800 dark:text-gray-100 line-clamp-2 text-center overflow-hidden">
                         {idea.title}
                       </h3>
                       
-                      {/* Description - Smaller with proper overflow handling */}
-                      <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-3 flex-1 text-center leading-relaxed overflow-hidden break-words">
-                        {idea.description}
-                      </p>
+                      {/* Description - Smaller with strict overflow handling */}
+                      <div className="flex-1 overflow-hidden">
+                        <p className="text-xs text-gray-600 dark:text-gray-300 text-center leading-relaxed overflow-hidden break-words h-full">
+                          <span className="line-clamp-2">
+                            {idea.description}
+                          </span>
+                        </p>
+                      </div>
                       
                       {/* Source indicator - Smaller */}
-                      <div className="flex items-center justify-center mt-1 pt-1 border-t border-gray-400/20">
+                      <div className="flex items-center justify-center mt-1 pt-1 border-t border-gray-400/20 flex-shrink-0">
                         {idea.source === 'image' ? (
                           <Image className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
                         ) : (
