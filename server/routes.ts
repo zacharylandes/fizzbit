@@ -209,17 +209,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('📢 Processing audio file:', req.file.filename);
       
-      // Use audio-inspired prompt and generate ideas using same system as text input
-      // This ensures consistency with Llama 3/OpenAI for all input types
-      const audioPrompt = "creative ideas inspired by voice and audio expression";
+      // Transcribe audio using OpenAI Whisper to get actual spoken content
+      if (!openai) {
+        throw new Error("OpenAI client not available - audio transcription disabled");
+      }
       
-      console.log('📝 Using audio-inspired prompt:', audioPrompt);
+      const audioReadStream = fs.createReadStream(req.file.path);
+      const transcription = await openai.audio.transcriptions.create({
+        file: audioReadStream,
+        model: "whisper-1",
+      });
+
+      console.log('📝 Transcription result:', transcription.text);
       
       // Clean up uploaded file
       fs.unlinkSync(req.file.path);
+      
+      if (!transcription.text || transcription.text.trim().length === 0) {
+        return res.status(400).json({ error: "Could not transcribe audio. Please try speaking more clearly." });
+      }
 
-      // Generate ideas using Hugging Face Llama 3 (same as text input)
-      const ideas = await generateIdeasFromText(audioPrompt);
+      // Generate ideas from the actual transcribed text
+      const ideas = await generateIdeasFromText(transcription.text);
 
       // Store generated ideas
       const createdIdeas = [];
@@ -228,11 +239,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           title: ideaData.title,
           description: ideaData.description,
           source: "audio",
-          sourceContent: audioPrompt,
+          sourceContent: transcription.text,
           isSaved: 0,
           metadata: { 
             generatedAt: new Date().toISOString(),
-            audioInspired: true,
+            transcribedText: transcription.text,
             inputType: "voice"
           }
         }, userId);
@@ -241,7 +252,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ 
         ideas: createdIdeas,
-        transcription: "Voice input received - generating audio-inspired ideas!" 
+        transcription: transcription.text 
       });
     } catch (error) {
       console.error("Error processing audio:", error);
