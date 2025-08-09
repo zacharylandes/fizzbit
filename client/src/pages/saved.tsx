@@ -291,6 +291,41 @@ export default function SavedPage() {
     setIsPanning(false);
   }, []);
 
+  // Canvas touch handlers for mobile panning
+  const handleCanvasTouchStart = useCallback((e: React.TouchEvent) => {
+    const target = e.target as HTMLElement;
+    const isCard = target.closest('[data-card-id]');
+    
+    if (!isCard && e.touches.length === 1) {
+      const touch = e.touches[0];
+      setIsPanning(true);
+      setDragState(prev => ({
+        ...prev,
+        startX: touch.clientX,
+        startY: touch.clientY,
+        startScrollX: pan.x,
+        startScrollY: pan.y,
+      }));
+    }
+  }, [pan]);
+
+  const handleCanvasTouchMove = useCallback((e: React.TouchEvent) => {
+    if (isPanning && e.touches.length === 1) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - dragState.startX;
+      const deltaY = touch.clientY - dragState.startY;
+      setPan({
+        x: dragState.startScrollX + deltaX,
+        y: dragState.startScrollY + deltaY,
+      });
+    }
+  }, [isPanning, dragState]);
+
+  const handleCanvasTouchEnd = useCallback(() => {
+    setIsPanning(false);
+  }, []);
+
   // Global mouse event listeners
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
@@ -541,9 +576,9 @@ export default function SavedPage() {
             onMouseDown={isDrawingMode ? handleDrawingStart : handleCanvasMouseDown}
             onMouseMove={isDrawingMode ? handleDrawingMove : handleCanvasMouseMove}
             onMouseUp={isDrawingMode ? handleDrawingEnd : handleCanvasMouseUp}
-            onTouchStart={isDrawingMode ? handleDrawingStart : undefined}
-            onTouchMove={isDrawingMode ? handleDrawingMove : undefined}
-            onTouchEnd={isDrawingMode ? handleDrawingEnd : undefined}
+            onTouchStart={isDrawingMode ? handleDrawingStart : handleCanvasTouchStart}
+            onTouchMove={isDrawingMode ? handleDrawingMove : handleCanvasTouchMove}
+            onTouchEnd={isDrawingMode ? handleDrawingEnd : handleCanvasTouchEnd}
           >
             {/* Grid Background */}
             <div 
