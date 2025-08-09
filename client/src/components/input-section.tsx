@@ -484,7 +484,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
             ) : isRecording ? (
               <>
                 <div className="w-3 h-3 bg-white rounded-sm mr-2"></div>
-                {recordingDuration}s
+                {formatDuration(recordingDuration)}
               </>
             ) : (
               <>
