@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertIdeaSchema } from "@shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import OpenAI from "openai";
+import { generateIdeasFromText, generateIdeasFromImage } from "./huggingface";
 
 // Initialize OpenAI with error handling
 let openai: OpenAI | null = null;
@@ -32,7 +33,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       Promise.resolve(fn(req, res, next)).catch(next);
     };
   
-  // Generate ideas from text prompt
+  // Generate ideas from text prompt using Hugging Face Llama 3
   app.post("/api/ideas/generate-from-text", asyncHandler(async (req: any, res) => {
     const { prompt } = req.body;
     const userId = req.user?.claims?.sub; // Get user ID if authenticated
@@ -42,30 +43,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      // Check if OpenAI client is available
-      if (!openai) {
-        throw new Error("OpenAI client not initialized");
-      }
-
-      // Use gpt-4o-mini for faster response times in idea generation
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: "You are a creative inspiration assistant. Generate unique, actionable creative ideas based on user prompts. Respond with JSON containing an array of 5 ideas, each with 'title' and 'description' fields. Make descriptions engaging and specific."
-          },
-          {
-            role: "user",
-            content: `Generate 5 creative ideas inspired by: ${prompt}`
-          }
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 800  // Limit tokens for faster response
-      });
-
-      const aiResponse = JSON.parse(response.choices[0].message.content || "{}");
-      const ideas = aiResponse.ideas || [];
+      // Use Hugging Face Llama 3 for fast and cheap idea generation
+      const ideas = await generateIdeasFromText(prompt);
 
       // Store generated ideas in database with user ID if authenticated
       const createdIdeas = [];
@@ -130,47 +109,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }));
 
-  // Generate ideas from image
-  app.post("/api/ideas/generate-from-image", async (req: any, res) => {
+  // Generate ideas from image using Hugging Face
+  app.post("/api/ideas/generate-from-image", asyncHandler(async (req: any, res) => {
+    const { imageBase64 } = req.body;
+    const userId = req.user?.claims?.sub; // Get user ID if authenticated
+    
+    if (!imageBase64) {
+      return res.status(400).json({ error: "Image data is required" });
+    }
+
     try {
-      const { imageBase64 } = req.body;
-      const userId = req.user?.claims?.sub; // Get user ID if authenticated
-      
-      if (!imageBase64) {
-        return res.status(400).json({ error: "Image data is required" });
-      }
-
-      // Check if OpenAI client is available
-      if (!openai) {
-        throw new Error("OpenAI client not initialized");
-      }
-
-      // Analyze image with OpenAI Vision - use gpt-4o-mini for vision tasks
-      const visionResponse = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: "Analyze this image and generate 10 creative ideas inspired by what you see. Focus on colors, objects, themes, and mood. Respond with JSON containing an array of ideas, each with 'title' and 'description' fields."
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:image/jpeg;base64,${imageBase64}`
-                }
-              }
-            ],
-          },
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 1000,
-      });
-
-      const aiResponse = JSON.parse(visionResponse.choices[0].message.content || "{}");
-      const ideas = aiResponse.ideas || [];
+      // Use Hugging Face for image analysis and idea generation
+      const ideas = await generateIdeasFromImage(imageBase64);
 
       // Store generated ideas
       const createdIdeas = [];
@@ -192,9 +142,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ ideas: createdIdeas });
     } catch (error) {
       console.error("Error generating ideas from image:", error);
-      res.status(500).json({ error: "Failed to analyze image and generate ideas" });
+      
+      // Fallback ideas for image processing errors
+      const fallbackIdeas = [
+        {
+          title: "Visual Art Inspiration",
+          description: "Create artwork inspired by the visual elements you uploaded. Experiment with colors, shapes, and themes you observed."
+        },
+        {
+          title: "Photography Project",
+          description: "Start a photography series exploring similar themes, compositions, or subjects as in your image."
+        },
+        {
+          title: "Creative Story",
+          description: "Write a story or poem inspired by the mood and elements in your image. Let your imagination fill in the details."
+        }
+      ];
+
+      const createdIdeas = [];
+      for (const ideaData of fallbackIdeas) {
+        const idea = await storage.createIdea({
+          title: ideaData.title,
+          description: ideaData.description,
+          source: "image",
+          sourceContent: "uploaded_image",
+          isSaved: 0,
+          metadata: { 
+            generatedAt: new Date().toISOString(),
+            type: "fallback"
+          }
+        }, userId);
+        createdIdeas.push(idea);
+      }
+
+      res.json({ ideas: createdIdeas });
     }
-  });
+  }));
 
   // Get random ideas for initial card stack
   app.get("/api/ideas/random", async (req, res) => {
