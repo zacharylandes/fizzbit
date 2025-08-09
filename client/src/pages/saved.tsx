@@ -184,12 +184,13 @@ export default function SavedPage() {
             {savedIdeas.map((idea, index) => {
               const isAnimating = animatingCards[idea.id];
               
-              // Dynamic card styles that cycle through different gradients
+              // Use same card styles as main page swiping cards
               const cardStyles = [
-                "bg-gradient-electric border-electric-blue/30 glow-electric-blue",
-                "bg-gradient-neon border-electric-pink/30 glow-electric-pink", 
-                "bg-gradient-cyber border-electric-cyan/30 glow-electric-purple",
-                "bg-gradient-sunset border-electric-orange/30 glow-electric-orange"
+                "bg-card-sage border-card-sage/40 card-shadow hover-lift",
+                "bg-card-blue-gray border-card-blue-gray/40 card-shadow hover-lift", 
+                "bg-card-cream border-card-cream/40 card-shadow hover-lift",
+                "bg-card-light-blue border-card-light-blue/40 card-shadow hover-lift",
+                "bg-card-purple-gray border-card-purple-gray/40 card-shadow hover-lift"
               ];
               
               return (
@@ -211,10 +212,10 @@ export default function SavedPage() {
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <CardTitle className="text-lg leading-tight mb-2 text-white">
+                          <CardTitle className="text-lg leading-tight mb-2 text-foreground">
                             {idea.title}
                           </CardTitle>
-                          <div className="flex items-center space-x-2 text-xs text-white/70">
+                          <div className="flex items-center space-x-2 text-xs text-foreground/70">
                             {idea.source === 'image' ? (
                               <div className="flex items-center space-x-1">
                                 <Image className="h-3 w-3" />
@@ -231,17 +232,17 @@ export default function SavedPage() {
                             )}
                           </div>
                         </div>
-                        <div className="w-3 h-3 rounded-full flex-shrink-0 ml-3 bg-white glow-electric-blue" />
+                        <div className="w-3 h-3 rounded-full flex-shrink-0 ml-3 bg-foreground/80" />
                       </div>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <CardDescription className="text-white/80 leading-relaxed">
+                      <CardDescription className="text-foreground/80 leading-relaxed">
                         {idea.description}
                       </CardDescription>
                       {idea.sourceContent && idea.sourceContent !== "uploaded_image" && (
-                        <div className="mt-3 p-3 glass border border-white/20 rounded-lg">
-                          <p className="text-xs text-white/70 font-medium mb-1">Original inspiration:</p>
-                          <p className="text-xs text-white italic">"{idea.sourceContent}"</p>
+                        <div className="mt-3 p-3 bg-muted border border-border rounded-lg">
+                          <p className="text-xs text-muted-foreground font-medium mb-1">Original inspiration:</p>
+                          <p className="text-xs text-muted-foreground italic">"{idea.sourceContent}"</p>
                         </div>
                       )}
                     </CardContent>

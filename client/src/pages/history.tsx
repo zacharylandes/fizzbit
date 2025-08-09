@@ -155,10 +155,11 @@ export default function HistoryPage() {
         ) : (
           filteredHistory.map((prompt: PromptHistory, index: number) => {
             const cardStyles = [
-              "bg-gradient-electric border-electric-blue/30 glow-electric-blue",
-              "bg-gradient-neon border-electric-pink/30 glow-electric-pink", 
-              "bg-gradient-cyber border-electric-cyan/30 glow-electric-purple",
-              "bg-gradient-sunset border-electric-orange/30 glow-electric-orange"
+              "bg-card-sage border-card-sage/40 card-shadow hover-lift",
+              "bg-card-blue-gray border-card-blue-gray/40 card-shadow hover-lift", 
+              "bg-card-cream border-card-cream/40 card-shadow hover-lift",
+              "bg-card-light-blue border-card-light-blue/40 card-shadow hover-lift",
+              "bg-card-purple-gray border-card-purple-gray/40 card-shadow hover-lift"
             ];
             
             return (
@@ -172,18 +173,18 @@ export default function HistoryPage() {
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <div className="p-2 glass rounded-lg">
+                        <div className="p-2 bg-white/80 border border-border rounded-lg">
                           {prompt.type === "image" ? (
-                            <Image className="h-5 w-5 text-white" />
+                            <Image className="h-5 w-5 text-foreground" />
                           ) : (
-                            <Type className="h-5 w-5 text-white" />
+                            <Type className="h-5 w-5 text-foreground" />
                           )}
                         </div>
                         <div>
-                          <CardTitle className="text-white text-lg">
+                          <CardTitle className="text-foreground text-lg">
                             {prompt.type === "image" ? "Image Upload" : "Text Prompt"}
                           </CardTitle>
-                          <div className="flex items-center space-x-2 text-xs text-white/70">
+                          <div className="flex items-center space-x-2 text-xs text-foreground/70">
                             <Clock className="h-3 w-3" />
                             <span>{formatTimeAgo(prompt.timestamp)}</span>
                             <span>•</span>
@@ -194,7 +195,7 @@ export default function HistoryPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="glass border border-white/20 text-white hover:bg-white/10"
+                        className="bg-white/60 border border-border text-foreground hover:bg-white/80"
                       >
                         <RefreshCw className="h-4 w-4 mr-2" />
                         Reuse
@@ -202,7 +203,7 @@ export default function HistoryPage() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-white/80">
+                    <CardDescription className="text-foreground/80">
                       {prompt.type === "image" ? (
                         <span className="italic">Image prompt uploaded</span>
                       ) : (
