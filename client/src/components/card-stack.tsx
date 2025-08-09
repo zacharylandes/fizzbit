@@ -199,13 +199,19 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
     },
   });
 
-  // Smart prefetching logic - check when cards get low
+  // Smart prefetching logic - check when cards get low and ensure continuous flow
   const checkAndPrefetch = () => {
-    console.log('🔄 Checking prefetch - Cards remaining:', cards.length, 'Has context:', !!currentExploreContext);
+    console.log('🔄 Checking prefetch - Cards remaining:', cards.length, 'Has context:', !!currentExploreContext, 'Is pending:', prefetchMoreIdeasMutation.isPending);
     
-    if (cards.length <= 3 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
+    // More aggressive prefetching - trigger when 5 or fewer cards remain
+    if (cards.length <= 5 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
       console.log('🔄 TRIGGERING PREFETCH for prompt:', currentExploreContext.originalPrompt);
       prefetchMoreIdeasMutation.mutate();
+    } else if (cards.length <= 2 && !currentExploreContext && !getRandomIdeasMutation.isPending) {
+      // Emergency fallback to random ideas if no context and very low cards
+      console.log('🔄 EMERGENCY PREFETCH - Getting random ideas');
+      const existingIds = cards.map(c => c.id);
+      getRandomIdeasMutation.mutate(existingIds);
     }
   };
 
@@ -277,7 +283,11 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
         console.log('🎯 CARDS AFTER SWIPE - Remaining:', newCards.length);
         
         // Trigger smart prefetching check after state update
-        setTimeout(() => checkAndPrefetch(), 100);
+        setTimeout(() => {
+          checkAndPrefetch();
+          // Also check again after cards state has fully updated
+          setTimeout(() => checkAndPrefetch(), 500);
+        }, 100);
         
         return newCards;
       });

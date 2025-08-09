@@ -192,39 +192,87 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
 
     // Generate ideas based on the image analysis (or generic if analysis failed)
     if (imageDescription.trim()) {
-      // Use actual image content for personalized ideas - expand to 8 variations
+      // Use OpenAI to generate diverse, unique ideas based on the actual image content
+      try {
+        const openaiIdeaResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o',
+            messages: [
+              {
+                role: 'system',
+                content: `You are a creative idea generator. Generate exactly ${count} unique, inspiring creative ideas based on the image description provided. Each idea should be practical and actionable with completely different approaches. Format as JSON with "ideas" array containing objects with "title" and "description" fields. Make titles concise (max 5 words) and descriptions detailed but under 100 words. Ensure each idea is completely unique and diverse.`
+              },
+              {
+                role: 'user',
+                content: `Based on this image: "${imageDescription}" - Generate ${count} completely different creative project ideas that are inspired by what's shown in the image.`
+              }
+            ],
+            max_tokens: 1200,
+            temperature: 0.9,
+            response_format: { type: "json_object" }
+          })
+        });
+
+        if (openaiIdeaResponse.ok) {
+          const openaiIdeaData = await openaiIdeaResponse.json();
+          const content = openaiIdeaData.choices[0].message.content;
+          
+          try {
+            const parsed = JSON.parse(content);
+            if (parsed.ideas && Array.isArray(parsed.ideas)) {
+              return parsed.ideas.map((idea: any, index: number) => ({
+                id: `ai-img-${Date.now()}-${index}`,
+                title: idea.title || `Creative Idea ${index + 1}`,
+                description: idea.description || 'A creative project inspired by your image.',
+                sourceContent: `Image: ${imageDescription}`
+              }));
+            }
+          } catch (parseError) {
+            console.error('Failed to parse OpenAI idea response:', parseError);
+          }
+        }
+      } catch (error) {
+        console.error('OpenAI idea generation failed:', error);
+      }
+
+      // Fallback to template-based unique ideas if OpenAI fails
       const personalizedTemplates = [
         {
-          title: "Recreate This Scene",
-          description: `${imageDescription} - Recreate this scene in a different artistic medium like watercolor, digital art, or sculpture. Focus on capturing the same mood and atmosphere.`
+          title: "Artistic Recreation",
+          description: `Recreate this scene using watercolor, oil paint, or digital art. Focus on capturing the mood and lighting you see.`
         },
         {
-          title: "Story Inspired by This Image",
-          description: `${imageDescription} - Write a short story or create a narrative inspired by what you see here. What happened before this moment? What happens next?`
+          title: "Story Writing",
+          description: `Write a short story or screenplay inspired by this moment. What led to this scene? What happens next?`
         },
         {
-          title: "Color and Mood Study",
-          description: `${imageDescription} - Extract the colors and emotional tone from this image to inspire a new creative project - whether it's interior design, fashion, or another artwork.`
+          title: "Color Palette Design",
+          description: `Extract the dominant colors and create a design project - room decor, fashion collection, or brand identity.`
         },
         {
-          title: "Photo Series Extension",
-          description: `${imageDescription} - Create a series of related images that tell a bigger story. Capture different angles, times of day, or emotional moments in the same theme.`
+          title: "Photography Series",
+          description: `Shoot a series of photos exploring the same theme, location type, or emotional tone as this image.`
         },
         {
-          title: "Mixed Media Interpretation",
-          description: `${imageDescription} - Combine multiple art forms to reinterpret this image - photography with text, digital art with physical elements, or music with visuals.`
+          title: "Mixed Media Art",
+          description: `Combine photography, painting, and text to create a layered artwork that expands on this visual concept.`
         },
         {
-          title: "Minimalist Version",
-          description: `${imageDescription} - Reduce this image to its essential elements. Create a simplified, minimalist interpretation focusing on the core composition and feeling.`
+          title: "Minimalist Interpretation",
+          description: `Reduce this scene to its essential elements using simple shapes, lines, and limited colors.`
         },
         {
-          title: "Different Perspective",
-          description: `${imageDescription} - Reimagine this scene from a completely different viewpoint or time period. How would it look from above, from inside, or 100 years ago?`
+          title: "Different Time Period",
+          description: `Reimagine this scene in a different era - how would it look 50 years ago or 50 years from now?`
         },
         {
-          title: "Interactive Installation",
-          description: `${imageDescription} - Design an interactive art installation or experience that lets others step into and engage with the world depicted in your image.`
+          title: "Interactive Experience",
+          description: `Design an immersive installation or digital experience that lets people step into this world.`
         }
       ].slice(0, count);
 
