@@ -623,8 +623,7 @@ export default function SavedPage() {
                   <Card className={`${cardStyles[colorIndex]} w-full h-full border-2 card-shadow hover-lift transition-all duration-300 flex flex-col`}>
                     {/* Drag Handle - Even Smaller */}
                     <div className="flex-shrink-0 p-1 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50 rounded-t-lg">
-                      <div className="flex items-center justify-between">
-                        <Move className="h-2 w-2 text-gray-400 dark:text-gray-500" />
+                      <div className="flex items-center justify-end">
                         <div className="flex items-center gap-1">
                           {/* Color Picker Dropdown */}
                           <DropdownMenu>
@@ -678,8 +677,8 @@ export default function SavedPage() {
                         {idea.title}
                       </h3>
                       
-                      {/* Description - Smaller */}
-                      <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-4 flex-1 text-center leading-relaxed">
+                      {/* Description - Smaller with proper overflow handling */}
+                      <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-3 flex-1 text-center leading-relaxed overflow-hidden break-words">
                         {idea.description}
                       </p>
                       
