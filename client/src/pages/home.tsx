@@ -75,11 +75,11 @@ export default function HomePage() {
       {/* Content Section */}
       {isAuthenticated ? (
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2 text-foreground">
+          <div className="mb-8 text-center">
+            <h2 className="text-2xl font-crimson font-semibold mb-2 text-foreground">
               Generate Ideas
             </h2>
-            <p className="text-muted-foreground text-lg">Upload a photo or describe your interests to get personalized creative inspiration.</p>
+            <p className="text-muted-foreground text-base font-inter">Upload a photo or describe your interests to get personalized creative inspiration.</p>
           </div>
           
           {/* Input Section */}

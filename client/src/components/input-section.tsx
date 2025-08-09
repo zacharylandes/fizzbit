@@ -464,16 +464,16 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
         </div>
 
         {/* Voice Input and Drawing Buttons - Side by Side */}
-        <div className="mt-3 flex justify-center gap-3">
+        <div className="mt-3 flex gap-3">
           <Button
             onClick={isRecording ? stopRecording : startRecording}
-            className={`flex-1 max-w-[140px] ${
+            className={`flex-1 ${
               isRecording 
                 ? 'bg-card-peach hover:bg-card-peach/90 text-white border-card-peach shadow-md'
                 : generateFromAudioMutation.isPending
                 ? 'bg-card-light-blue hover:bg-card-light-blue/90 text-white border-card-light-blue shadow-md'
                 : 'bg-card-light-blue-bg border-card-light-blue/40 hover:bg-card-light-blue-bg/90 hover-lift text-card-light-blue card-shadow'
-            } rounded-xl py-4 px-4 font-medium text-center transition-all duration-300`}
+            } rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target`}
             disabled={(isLoading || generateFromAudioMutation.isPending) && !isRecording}
           >
             {generateFromAudioMutation.isPending ? (
@@ -496,11 +496,11 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
 
           <Button
             onClick={() => setShowDrawingPad(!showDrawingPad)}
-            className={`flex-1 max-w-[140px] ${
+            className={`flex-1 ${
               showDrawingPad
                 ? 'bg-card-lavender hover:bg-card-lavender/90 text-white border-card-lavender shadow-md'
                 : 'bg-card-lavender-bg border-card-lavender/40 hover:bg-card-lavender-bg/90 hover-lift text-card-lavender card-shadow'
-            } rounded-xl py-4 px-4 font-medium text-center transition-all duration-300`}
+            } rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target`}
             disabled={isLoading}
           >
             <Paintbrush className="mr-2 h-4 w-4" />
