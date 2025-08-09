@@ -232,8 +232,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           isSaved: 0,
           metadata: { 
             generatedAt: new Date().toISOString(),
-            audioTranscription: true,
-            originalAudioDuration: transcription.duration || 0
+            audioInspired: true,
+            inputType: "voice"
           }
         }, userId);
         createdIdeas.push(idea);
