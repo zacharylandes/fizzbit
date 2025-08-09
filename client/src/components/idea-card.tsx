@@ -33,10 +33,7 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
     <div className={`relative rounded-xl border overflow-hidden w-full h-full cursor-pointer transition-all duration-300 ${cardStyle}`} style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Card Content */}
       <div className="p-6 relative h-full">
-        <div className="flex items-start justify-between mb-4">
-          <div className="bg-white/80 border border-border rounded-lg px-3 py-1 text-sm font-medium text-foreground">
-            Idea #{cardNumber}
-          </div>
+        <div className="flex items-start justify-end mb-4">
           <div className="flex gap-2">
             {[1, 2, 3].map((i) => (
               <div
