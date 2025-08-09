@@ -48,8 +48,9 @@ export default function HomePage() {
     setShouldAutoGenerate(true);
   };
 
-  // Reset auto-generate flag after it's been used
+  // Reset auto-generate flag after it's been used and ensure new ideas replace old ones
   const handleIdeasGeneratedWrapper = (ideas: Idea[]) => {
+    // Always replace current ideas with new ones to ensure top card is from latest prompt
     setCurrentIdeas(ideas);
     setShouldAutoGenerate(false);
   };

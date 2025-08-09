@@ -30,9 +30,11 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     },
     onSuccess: (data) => {
       if (data.ideas) {
+        // Clear existing state and provide fresh ideas
         onIdeasGenerated(data.ideas);
         setTextPrompt("");
         onPromptChange?.("");
+        setShowTextInput(false); // Hide input after generation
         toast({
           title: "Ideas Generated!",
           description: "Fresh creativity from your prompt ✨",
@@ -61,7 +63,9 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     },
     onSuccess: (data) => {
       if (data.ideas) {
+        // Clear existing state and provide fresh ideas 
         onIdeasGenerated(data.ideas);
+        setUploadedImage(null); // Clear uploaded image after generation
         toast({
           title: "Ideas Generated!",
           description: "Creative magic from your image 🎨",

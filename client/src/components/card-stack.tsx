@@ -31,24 +31,27 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps
 
   useEffect(() => {
     if (initialIdeas.length > 0) {
-      setCards(initialIdeas); // Use all initial ideas
-      // Set exploration context from new ideas (photo/text prompt)
-      if (initialIdeas[0]?.sourceContent) {
-        setCurrentExploreContext({
-          originalPrompt: initialIdeas[0].sourceContent,
-          exploredIdea: initialIdeas[0]
-        });
-      }
-      // Assign stable colors to initial cards
+      // COMPLETELY replace existing cards with new ideas from latest prompt
+      setCards(initialIdeas);
+      
+      // RESET exploration context to ensure we start fresh with new prompt
+      // This prevents mixing ideas from different prompts
+      setCurrentExploreContext({
+        originalPrompt: initialIdeas[0]?.sourceContent || "",
+        exploredIdea: initialIdeas[0]
+      });
+      
+      // Assign fresh colors to new cards, clearing old ones
       const newColors: { [key: string]: number } = {};
       initialIdeas.forEach((card, index) => {
         newColors[card.id] = index % 3; // Cycle through 3 color options
       });
-      setCardColors(prev => ({ ...prev, ...newColors }));
+      setCardColors(newColors); // Replace, don't merge
       
-      // Reset swipe up loading state when new ideas arrive
+      // Reset loading states
       setIsSwipeUpLoading(false);
       setSwipeUpPrompt("");
+      setIsGeneratingIdeas(false);
     }
   }, [initialIdeas]);
 
