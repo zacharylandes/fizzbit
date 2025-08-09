@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Camera, Edit, Upload, Sparkles, Mic, MicOff, Square } from "lucide-react";
+import { Camera, Edit, Upload, Sparkles, Mic, MicOff, Square, Paintbrush } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -20,8 +20,11 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
+  const [showDrawingPad, setShowDrawingPad] = useState(false);
+  const [isDrawing, setIsDrawing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { toast } = useToast();
 
   // Text prompt mutation
@@ -130,6 +133,38 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       toast({
         title: "Hmm...",
         description: "Couldn't analyze that image. Try another?",
+        variant: "destructive",
+        duration: 1000,
+      });
+    },
+  });
+
+  // Drawing mutation
+  const generateFromDrawingMutation = useMutation({
+    mutationFn: async (imageBase64: string) => {
+      const response = await apiRequest("POST", "/api/ideas/generate-from-image", {
+        imageBase64,
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.ideas) {
+        onIdeasGenerated(data.ideas);
+        // Clear the drawing after generation
+        clearCanvas();
+        setShowDrawingPad(false);
+        toast({
+          title: "Ideas Generated!",
+          description: "Creative inspiration from your drawing!",
+          duration: 1000,
+          variant: "success",
+        });
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Drawing Analysis Failed",
+        description: "Couldn't analyze your drawing. Try again?",
         variant: "destructive",
         duration: 1000,
       });
@@ -277,6 +312,74 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     }
   };
 
+  // Drawing pad functions
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    setIsDrawing(true);
+    const rect = canvas.getBoundingClientRect();
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let x, y;
+    if ('touches' in e) {
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      x = e.clientX - rect.left;
+      y = e.clientY - rect.top;
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  };
+
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDrawing || !canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let x, y;
+    if ('touches' in e) {
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      x = e.clientX - rect.left;
+      y = e.clientY - rect.top;
+    }
+
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#333';
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  const stopDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const submitDrawing = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    // Convert canvas to base64 image
+    const imageBase64 = canvas.toDataURL('image/png').split(',')[1];
+    generateFromDrawingMutation.mutate(imageBase64);
+  };
+
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -360,17 +463,17 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
           </Button>
         </div>
 
-        {/* Audio Recording Button - Centered Below */}
-        <div className="mt-3 flex justify-center">
+        {/* Voice Input and Drawing Buttons - Side by Side */}
+        <div className="mt-3 flex justify-center gap-3">
           <Button
             onClick={isRecording ? stopRecording : startRecording}
-            className={`w-48 ${
+            className={`flex-1 max-w-[140px] ${
               isRecording 
                 ? 'bg-red-500 hover:bg-red-600 text-white border-red-500 shadow-md'
                 : generateFromAudioMutation.isPending
                 ? 'bg-blue-500 hover:bg-blue-600 text-white border-blue-500 shadow-md'
                 : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 shadow-sm'
-            } rounded-xl py-4 px-6 font-medium text-center transition-all duration-200 ease-in-out`}
+            } rounded-xl py-4 px-4 font-medium text-center transition-all duration-200 ease-in-out`}
             disabled={(isLoading || generateFromAudioMutation.isPending) && !isRecording}
           >
             {generateFromAudioMutation.isPending ? (
@@ -381,7 +484,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
             ) : isRecording ? (
               <>
                 <div className="w-3 h-3 bg-white rounded-sm mr-2"></div>
-                Recording {recordingDuration}s
+                {recordingDuration}s
               </>
             ) : (
               <>
@@ -390,7 +493,69 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
               </>
             )}
           </Button>
+
+          <Button
+            onClick={() => setShowDrawingPad(!showDrawingPad)}
+            className={`flex-1 max-w-[140px] ${
+              showDrawingPad
+                ? 'bg-purple-500 hover:bg-purple-600 text-white border-purple-500 shadow-md'
+                : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 shadow-sm'
+            } rounded-xl py-4 px-4 font-medium text-center transition-all duration-200 ease-in-out`}
+            disabled={isLoading}
+          >
+            <Paintbrush className="mr-2 h-4 w-4" />
+            Draw
+          </Button>
         </div>
+
+        {/* Drawing Pad */}
+        {showDrawingPad && (
+          <div className="mt-4 p-4 bg-background border border-input rounded-lg">
+            <div className="flex flex-col items-center space-y-3">
+              <canvas
+                ref={canvasRef}
+                width={300}
+                height={200}
+                className="border border-input rounded-lg cursor-crosshair touch-none"
+                style={{ touchAction: 'none' }}
+                onMouseDown={startDrawing}
+                onMouseMove={draw}
+                onMouseUp={stopDrawing}
+                onMouseLeave={stopDrawing}
+                onTouchStart={startDrawing}
+                onTouchMove={draw}
+                onTouchEnd={stopDrawing}
+              />
+              <div className="flex gap-2">
+                <Button
+                  onClick={clearCanvas}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                >
+                  Clear
+                </Button>
+                <Button
+                  onClick={submitDrawing}
+                  disabled={generateFromDrawingMutation.isPending}
+                  className="bg-card-purple-gray-bg border-card-purple-gray/40 hover:bg-card-purple-gray-bg/90 text-card-purple-gray text-xs"
+                >
+                  {generateFromDrawingMutation.isPending ? (
+                    <>
+                      <div className="w-3 h-3 mr-1 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-1 h-3 w-3" />
+                      Generate Ideas
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Text Input Area */}
         {showTextInput && (
