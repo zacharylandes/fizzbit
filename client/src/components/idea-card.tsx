@@ -30,7 +30,7 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
   const accentColor = accentColors[colorIndex % accentColors.length];
 
   return (
-    <div className={`relative rounded-xl border overflow-hidden w-full h-full cursor-pointer transition-all duration-300 ${cardStyle}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className={`relative rounded-xl border overflow-hidden w-full h-full cursor-pointer transition-all duration-300 ${cardStyle}`} style={{ fontFamily: 'Crimson Text, serif' }}>
       {/* Card Content */}
       <div className="p-6 relative h-full">
         <div className="flex items-start justify-end mb-4">
@@ -47,7 +47,7 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
         </div>
         
         <h3 className={`text-xl font-bold mb-3 leading-tight ${accentColor}`}>{idea.title}</h3>
-        <p className="text-foreground/80 leading-relaxed text-sm overflow-y-auto max-h-56 pr-2">
+        <p className="text-foreground/80 leading-relaxed text-sm overflow-y-auto max-h-56 pr-2" style={{ fontFamily: 'Inter, sans-serif' }}>
           {idea.description}
         </p>
         

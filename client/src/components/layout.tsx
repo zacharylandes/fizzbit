@@ -94,7 +94,7 @@ export default function Layout({ children }: LayoutProps) {
                 <div className="p-2 bg-card-sage-bg border border-card-sage/40 rounded-lg card-shadow">
                   <Lightbulb className="h-6 w-6 text-card-sage" />
                 </div>
-                <h1 className="text-xl font-bold text-primary">
+                <h1 className="text-xl font-bold text-primary" style={{ fontFamily: 'Crimson Text, serif' }}>
                   SWIVL
                 </h1>
               </div>
