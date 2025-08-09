@@ -174,25 +174,29 @@ input, textarea {
   .bg-primary-pink { background-color: var(--primary-pink); }
   .border-primary-pink { border-color: var(--primary-pink); }
   
-  /* Pastel Card Utility Classes */
-  .bg-card-sage { background-color: var(--card-sage-bg); }
-  .text-card-sage { color: var(--card-sage); }
+  /* Pastel Card Utility Classes - with !important to override button defaults */
+  .bg-card-sage { background-color: var(--card-sage-bg) !important; }
+  .bg-card-sage-bg { background-color: var(--card-sage-bg) !important; }
+  .text-card-sage { color: var(--card-sage) !important; }
   .border-card-sage { border-color: var(--card-sage); }
   
-  .bg-card-blue-gray { background-color: var(--card-blue-gray-bg); }
-  .text-card-blue-gray { color: var(--card-blue-gray); }
+  .bg-card-blue-gray { background-color: var(--card-blue-gray-bg) !important; }
+  .bg-card-blue-gray-bg { background-color: var(--card-blue-gray-bg) !important; }
+  .text-card-blue-gray { color: var(--card-blue-gray) !important; }
   .border-card-blue-gray { border-color: var(--card-blue-gray); }
   
-  .bg-card-cream { background-color: var(--card-cream); }
-  .text-card-cream { color: var(--card-cream-text); }
+  .bg-card-cream { background-color: var(--card-cream) !important; }
+  .text-card-cream { color: var(--card-cream-text) !important; }
   .border-card-cream { border-color: var(--card-cream-text); }
   
-  .bg-card-light-blue { background-color: var(--card-light-blue-bg); }
-  .text-card-light-blue { color: var(--card-light-blue); }
+  .bg-card-light-blue { background-color: var(--card-light-blue-bg) !important; }
+  .bg-card-light-blue-bg { background-color: var(--card-light-blue-bg) !important; }
+  .text-card-light-blue { color: var(--card-light-blue) !important; }
   .border-card-light-blue { border-color: var(--card-light-blue); }
   
-  .bg-card-purple-gray { background-color: var(--card-purple-gray-bg); }
-  .text-card-purple-gray { color: var(--card-purple-gray); }
+  .bg-card-purple-gray { background-color: var(--card-purple-gray-bg) !important; }
+  .bg-card-purple-gray-bg { background-color: var(--card-purple-gray-bg) !important; }
+  .text-card-purple-gray { color: var(--card-purple-gray) !important; }
   .border-card-purple-gray { border-color: var(--card-purple-gray); }
   
   /* Accent Colors */
