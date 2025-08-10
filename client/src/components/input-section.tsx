@@ -333,7 +333,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
   };
 
   // Drawing pad functions
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>): void => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -355,7 +355,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     ctx.moveTo(x, y);
   };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>): void => {
     if (!isDrawing || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
@@ -444,7 +444,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     };
   }, []); // Empty dependency array - only run on unmount
 
-  const isLoading = generateFromTextMutation.isPending || generateFromImageMutation.isPending || generateFromAudioMutation.isPending;
+  const isLoading = generateFromTextMutation.isPending || generateFromImageMutation.isPending || generateFromDrawingMutation.isPending;
 
   return (
     <div className="mb-3 relative z-10">
@@ -504,24 +504,11 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
             // Normal voice input button
             <Button
               onClick={startRecording}
-              className={`flex-1 ${
-                generateFromAudioMutation.isPending
-                  ? 'bg-card-light-blue hover:bg-card-light-blue/90 text-card-light-blue border-card-light-blue shadow-md'
-                  : 'bg-card-light-blue-bg border-card-light-blue/40 hover:bg-card-light-blue-bg/90 hover-lift text-card-light-blue card-shadow'
-              } rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target`}
-              disabled={isLoading || generateFromAudioMutation.isPending}
+              className="flex-1 bg-card-light-blue-bg border-card-light-blue/40 hover:bg-card-light-blue-bg/90 hover-lift text-card-light-blue card-shadow rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target"
+              disabled={isLoading}
             >
-              {generateFromAudioMutation.isPending ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-card-light-blue border-t-transparent mr-2"></div>
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <Mic className="mr-2 h-4 w-4" />
-                  Voice Input
-                </>
-              )}
+              <Mic className="mr-2 h-4 w-4" />
+              Voice Input
             </Button>
           )}
 
