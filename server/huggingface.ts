@@ -121,6 +121,11 @@ export async function generateRelatedIdeas(contextualPrompt: string, count: numb
 export async function generateIdeasFromText(prompt: string, count: number = 8): Promise<IdeaResponse[]> {
   try {
     console.log('Using OpenAI for reliable text generation...');
+    
+    // Detect if user is asking for a list format
+    const isListRequest = /\b(list|names?|titles?|suggestions?|options?)\b/i.test(prompt) && 
+                         !/\b(idea|project|concept|activity|exercise)\b/i.test(prompt);
+    
     // Use OpenAI directly for reliable results
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -133,14 +138,18 @@ export async function generateIdeasFromText(prompt: string, count: number = 8): 
         messages: [
           {
             role: 'system',
-            content: `You are a creative idea generator. Generate exactly ${count} unique, inspiring creative ideas based on the user prompt. Each idea should be practical and actionable. Format as JSON with "ideas" array containing objects with "title" and "description" fields. Make titles concise (max 5 words) and descriptions detailed but under 100 words.`
+            content: isListRequest 
+              ? `You are a creative brainstorming assistant. Generate exactly ${count} concise, creative suggestions based on the user's request. Each suggestion should be a simple name or title, not a detailed explanation. Format as JSON with "ideas" array containing objects with "title" and "description" fields. The title should be the main suggestion (max 4 words), and the description should be very brief - just one short phrase or sentence (max 15 words).`
+              : `You are a creative idea generator. Generate exactly ${count} unique, inspiring creative ideas based on the user prompt. Each idea should be practical and actionable. Format as JSON with "ideas" array containing objects with "title" and "description" fields. Make titles concise (max 5 words) and descriptions detailed but under 100 words.`
           },
           {
             role: 'user',
-            content: `Generate ${count} creative ideas for: ${prompt}`
+            content: isListRequest 
+              ? `Generate ${count} suggestions for: ${prompt}`
+              : `Generate ${count} creative ideas for: ${prompt}`
           }
         ],
-        max_tokens: 1000,
+        max_tokens: isListRequest ? 600 : 1000,
         temperature: 0.8,
         response_format: { type: "json_object" }
       })
