@@ -765,8 +765,25 @@ export default function SavedPage() {
                   const colorIndex = cardColors[idea.id] ?? index % 8;
                   const isBeingInteracted = swipeState.ideaId === idea.id;
                   const isDeleting = isBeingInteracted && swipeState.isDeleting;
+                  const isDragging = isBeingInteracted && swipeState.isDragging;
                   const swipeOffsetX = isBeingInteracted && !swipeState.isVerticalDrag ? swipeState.currentX - swipeState.startX : 0;
                   const swipeOffsetY = isBeingInteracted && swipeState.isVerticalDrag ? swipeState.currentY - swipeState.startY : 0;
+                  
+                  // Calculate smooth reordering offset for other cards
+                  let reorderOffsetY = 0;
+                  if (swipeState.isDragging && swipeState.isVerticalDrag && swipeState.dragIndex !== null && !isBeingInteracted) {
+                    const draggedIndex = swipeState.dragIndex;
+                    const draggedY = swipeState.currentY - swipeState.startY;
+                    const cardHeight = 80; // Height of each card including spacing
+                    const newPosition = Math.round(draggedY / cardHeight);
+                    const targetIndex = Math.max(0, Math.min(mobileOrder.length - 1, draggedIndex + newPosition));
+                    
+                    if (draggedIndex < targetIndex && index > draggedIndex && index <= targetIndex) {
+                      reorderOffsetY = -cardHeight; // Move up
+                    } else if (draggedIndex > targetIndex && index >= targetIndex && index < draggedIndex) {
+                      reorderOffsetY = cardHeight; // Move down
+                    }
+                  }
                   
                   const cardStyles = [
                     "bg-card-sage border-card-sage/40",
@@ -789,8 +806,8 @@ export default function SavedPage() {
                       key={idea.id}
                       className="relative"
                       style={{
-                        transform: `translate(${swipeOffsetX}px, ${swipeOffsetY}px)`,
-                        transition: (swipeState.isDragging && !isDeleting) ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                        transform: `translate(${swipeOffsetX}px, ${swipeOffsetY + reorderOffsetY}px)`,
+                        transition: isDragging && isBeingInteracted ? 'none' : 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease',
                         zIndex: isBeingInteracted ? 10 : 1,
                         opacity: isDeleting ? 0 : 1,
                       }}
