@@ -231,12 +231,19 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     
     recognition.onresult = (event: any): void => {
       const transcript = event.results[0][0].transcript;
-      console.log('Web Speech Recognition result:', transcript);
+      console.log('🎤 Web Speech Recognition result:', transcript);
       
-      // Generate ideas directly from the transcript
-      const enhancedPrompt = `give me unique ideas that avoid the obvious for ${transcript}`;
-      console.log('Enhanced prompt being sent:', enhancedPrompt);
-      generateFromTextMutation.mutate(enhancedPrompt);
+      // Set the transcript as the current text prompt
+      setTextPrompt(transcript);
+      
+      // Update the parent component with the prompt
+      if (onPromptChange) {
+        onPromptChange(transcript);
+      }
+      
+      // Generate ideas with the exact transcript
+      console.log('🎤 Generating ideas from voice transcript:', transcript);
+      generateFromTextMutation.mutate(transcript);
       
       toast({
         title: "Speech Recognized!",
