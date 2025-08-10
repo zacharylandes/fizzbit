@@ -64,116 +64,91 @@ function parseTextResponse(text: string, count: number, prompt: string): IdeaRes
   return ideas.slice(0, count);
 }
 
-// Helper function to generate related ideas using OpenAI
+// Helper function to generate related ideas using Hugging Face models
 export async function generateRelatedIdeas(contextualPrompt: string, count: number = 3): Promise<IdeaResponse[]> {
   try {
-    console.log('Using OpenAI for related ideas...');
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini', // Use mini for speed and cost efficiency
-        messages: [
-          {
-            role: 'system',
-            content: `You are a creative inspiration assistant. Generate ideas that thoughtfully combine user interests with specific concepts they've shown enthusiasm for. Create ideas that feel like natural extensions bridging multiple creative concepts together. Format as JSON with "ideas" array containing objects with "title" and "description" fields.`
-          },
-          {
-            role: 'user',
-            content: contextualPrompt
-          }
-        ],
-        max_tokens: 600,
-        temperature: 0.8,
-        response_format: { type: "json_object" }
-      })
+    console.log('Using Hugging Face for related ideas...');
+    
+    const prompt = `Generate ${count} related creative ideas for: ${contextualPrompt}\n\nHere are ${count} related creative ideas:\n\n`;
+    
+    const result = await hf.textGeneration({
+      model: 'mistralai/Mistral-7B-Instruct-v0.1',
+      inputs: prompt,
+      parameters: {
+        max_new_tokens: 300,
+        temperature: 0.7,
+        top_p: 0.9,
+        return_full_text: false
+      }
     });
-
-    if (openaiResponse.ok) {
-      const openaiData = await openaiResponse.json();
-      const content = openaiData.choices[0].message.content;
-      
-      try {
-        const parsed = JSON.parse(content);
-        if (parsed.ideas && Array.isArray(parsed.ideas)) {
-          return parsed.ideas.slice(0, count).map((idea: any, index: number) => ({
-            id: `openai-related-${Date.now()}-${index}`,
-            title: idea.title || `Related Idea ${index + 1}`,
-            description: idea.description || 'A related creative concept.',
-            sourceContent: 'Related ideas'
-          }));
-        }
-      } catch (parseError) {
-        console.error('Failed to parse OpenAI related ideas response:', parseError);
+    
+    if (result.generated_text) {
+      const ideas = parseTextResponse(result.generated_text, count, contextualPrompt);
+      if (ideas.length > 0) {
+        return ideas.map(idea => ({
+          ...idea,
+          id: `hf-related-${Date.now()}-${ideas.indexOf(idea)}`,
+          sourceContent: 'Related ideas'
+        }));
       }
     }
 
     return [];
   } catch (error) {
-    console.error('OpenAI related ideas generation failed:', error);
+    console.error('Hugging Face related ideas generation failed:', error);
     return [];
   }
 }
 
 export async function generateIdeasFromText(prompt: string, count: number = 8): Promise<IdeaResponse[]> {
   try {
-    console.log('Using OpenAI for reliable text generation...');
+    console.log('Using Hugging Face models for free text generation...');
     
     // Detect if user is asking for a list format
     const isListRequest = /\b(list|names?|titles?|suggestions?|options?)\b/i.test(prompt) && 
                          !/\b(idea|project|concept|activity|exercise)\b/i.test(prompt);
     
-    // Use OpenAI directly for reliable results
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini', // Use mini for speed and cost efficiency
-        messages: [
-          {
-            role: 'system',
-            content: isListRequest 
-              ? `You are a creative brainstorming assistant. Generate exactly ${count} concise, creative suggestions based on the user's request. Each suggestion should be a simple name or title, not a detailed explanation. Format as JSON with "ideas" array containing objects with "title" and "description" fields. The title should be the main suggestion (max 4 words), and the description should be very brief - just one short phrase or sentence (max 15 words).`
-              : `You are a creative idea generator. Generate exactly ${count} unique, inspiring creative ideas based on the user prompt. Each idea should be practical and actionable. Format as JSON with "ideas" array containing objects with "title" and "description" fields. Make titles concise (max 5 words) and descriptions detailed but under 100 words.`
-          },
-          {
-            role: 'user',
-            content: isListRequest 
-              ? `Generate ${count} suggestions for: ${prompt}`
-              : `Generate ${count} creative ideas for: ${prompt}`
-          }
-        ],
-        max_tokens: isListRequest ? 600 : 1000,
-        temperature: 0.8,
-        response_format: { type: "json_object" }
-      })
-    });
-
-    if (openaiResponse.ok) {
-      const openaiData = await openaiResponse.json();
-      const content = openaiData.choices[0].message.content;
-      
+    // Try multiple Hugging Face models for reliable results
+    const models = [
+      'mistralai/Mistral-7B-Instruct-v0.1',
+      'microsoft/DialoGPT-medium',
+      'meta-llama/Llama-2-7b-chat-hf'
+    ];
+    
+    for (const model of models) {
       try {
-        const parsed = JSON.parse(content);
-        if (parsed.ideas && Array.isArray(parsed.ideas)) {
-          return parsed.ideas.map((idea: any, index: number) => ({
-            id: `openai-${Date.now()}-${index}`,
-            title: idea.title || `Creative Idea ${index + 1}`,
-            description: idea.description || 'A creative project to explore.',
-            sourceContent: prompt
-          }));
+        const systemPrompt = isListRequest 
+          ? `Generate exactly ${count} concise, creative suggestions. Format as a numbered list with brief descriptions.`
+          : `Generate exactly ${count} unique, inspiring creative ideas. Each should be practical and actionable with a clear title and detailed description.`;
+        
+        const userPrompt = isListRequest 
+          ? `Generate ${count} suggestions for: ${prompt}`
+          : `Generate ${count} creative ideas for: ${prompt}`;
+          
+        const fullPrompt = `${systemPrompt}\n\nUser: ${userPrompt}\n\nAssistant: I'll generate ${count} creative ideas:\n\n`;
+        
+        const result = await hf.textGeneration({
+          model,
+          inputs: fullPrompt,
+          parameters: {
+            max_new_tokens: isListRequest ? 400 : 800,
+            temperature: 0.8,
+            top_p: 0.9,
+            return_full_text: false
+          }
+        });
+        
+        if (result.generated_text) {
+          const ideas = parseTextResponse(result.generated_text, count, prompt);
+          if (ideas.length > 0) {
+            console.log(`Successfully generated ${ideas.length} ideas using ${model}`);
+            return ideas;
+          }
         }
-      } catch (parseError) {
-        console.error('Failed to parse OpenAI response:', parseError);
+      } catch (modelError) {
+        console.error(`Model ${model} failed:`, modelError);
+        continue; // Try next model
       }
-    } else {
-      console.error('OpenAI API error:', openaiResponse.status, openaiResponse.statusText);
     }
 
     // Fallback to template-based ideas if OpenAI fails

@@ -3,27 +3,18 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertIdeaSchema } from "@shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import OpenAI from "openai";
 import { generateIdeasFromText, generateIdeasFromImage, generateRelatedIdeas } from "./huggingface";
+import { HfInference } from '@huggingface/inference';
 import multer from "multer";
 import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
 
-// Initialize OpenAI with error handling
-let openai: OpenAI | null = null;
+// Initialize Hugging Face client for free AI models
+const hf = new HfInference(process.env.HUGGINGFACE_TOKEN);
 
-try {
-  if (process.env.OPENAI_API_KEY) {
-    openai = new OpenAI({ 
-      apiKey: process.env.OPENAI_API_KEY
-    });
-  } else {
-    console.warn("Warning: OPENAI_API_KEY not found - AI features will use fallback responses");
-  }
-} catch (error) {
-  console.error("Failed to initialize OpenAI client:", error);
-  console.warn("AI features will use fallback responses");
+if (!process.env.HUGGINGFACE_TOKEN) {
+  console.warn("Warning: HUGGINGFACE_TOKEN not found - AI features will use fallback responses");
 }
 
 // Function to convert audio to WAV format using FFmpeg
@@ -243,37 +234,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('📢 Processing audio file:', req.file.filename);
       
-      // Transcribe audio using OpenAI Whisper to get actual spoken content
-      if (!openai) {
-        throw new Error("OpenAI client not available - audio transcription disabled");
+      // Transcribe audio using Hugging Face Whisper model (free alternative)
+      let transcriptionText = '';
+      
+      try {
+        // Convert audio to WAV format for better compatibility
+        const wavPath = req.file.path + '.wav';
+        await convertAudioToWav(req.file.path, wavPath);
+        
+        // Read the audio file as buffer for Hugging Face
+        const audioBuffer = fs.readFileSync(wavPath);
+        
+        // Use Hugging Face Whisper model for transcription
+        const transcriptionResult = await hf.automaticSpeechRecognition({
+          data: audioBuffer,
+          model: 'openai/whisper-small', // Free Whisper model on HF
+        });
+        
+        transcriptionText = transcriptionResult.text || '';
+        
+        // Clean up files
+        if (fs.existsSync(wavPath)) {
+          fs.unlinkSync(wavPath);
+        }
+        fs.unlinkSync(req.file.path);
+        
+        console.log('📝 Transcription result:', transcriptionText);
+        
+      } catch (transcriptionError) {
+        console.error('Hugging Face transcription failed:', transcriptionError);
+        
+        // Clean up files on error
+        if (req.file && fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+        
+        // Use a fallback transcription or ask user to try again
+        return res.status(400).json({ 
+          error: "Could not transcribe audio. Please try speaking more clearly or check your microphone." 
+        });
       }
       
-      // Convert audio to WAV format for Whisper compatibility
-      const wavPath = req.file.path + '.wav';
-      await convertAudioToWav(req.file.path, wavPath);
-      
-      const audioReadStream = fs.createReadStream(wavPath);
-      const transcription = await openai.audio.transcriptions.create({
-        file: audioReadStream,
-        model: "whisper-1",
-      });
-      
-      // Clean up converted file
-      if (fs.existsSync(wavPath)) {
-        fs.unlinkSync(wavPath);
-      }
-
-      console.log('📝 Transcription result:', transcription.text);
-      
-      // Clean up uploaded file
-      fs.unlinkSync(req.file.path);
-      
-      if (!transcription.text || transcription.text.trim().length === 0) {
+      if (!transcriptionText || transcriptionText.trim().length === 0) {
         return res.status(400).json({ error: "Could not transcribe audio. Please try speaking more clearly." });
       }
 
       // Generate ideas from the actual transcribed text with enhanced prompt
-      const enhancedPrompt = `give me unique ideas that avoid the obvious for ${transcription.text}`;
+      const enhancedPrompt = `give me unique ideas that avoid the obvious for ${transcriptionText}`;
       const ideas = await generateIdeasFromText(enhancedPrompt);
 
       // Store generated ideas
@@ -283,11 +290,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           title: ideaData.title,
           description: ideaData.description,
           source: "audio",
-          sourceContent: transcription.text,
+          sourceContent: transcriptionText,
           isSaved: 0,
           metadata: { 
             generatedAt: new Date().toISOString(),
-            transcribedText: transcription.text,
+            transcribedText: transcriptionText,
             inputType: "voice"
           }
         }, userId);
@@ -296,7 +303,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ 
         ideas: createdIdeas,
-        transcription: transcription.text 
+        transcription: transcriptionText 
       });
     } catch (error) {
       console.error("Error processing audio:", error);
@@ -432,10 +439,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      // Check if OpenAI client is available
-      if (!openai) {
-        throw new Error("OpenAI client not initialized");
-      }
+      // Use Hugging Face models for idea exploration
 
       // Create a more targeted prompt by combining original user intent with the specific idea they're interested in
       let contextualPrompt = `Generate 5 new creative ideas inspired by this existing idea: "${parentIdea.title}" - ${parentIdea.description}.`;
@@ -448,7 +452,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       contextualPrompt += ` Respond with JSON containing an array of ideas, each with 'title' and 'description' fields.`;
 
       // Use gpt-4o-mini for faster response times in explore/swipe up actions
-      // Use OpenAI for reliable related idea generation
+      // Use Hugging Face for reliable related idea generation
       const relatedIdeas = await generateRelatedIdeas(contextualPrompt, 3);
       
       if (relatedIdeas.length > 0) {
@@ -471,30 +475,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ ideas: createdIdeas });
       }
 
-      // Manual fallback if OpenAI also fails
-      console.log('OpenAI related ideas failed, using manual approach...');
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: "You are a creative inspiration assistant. Generate ideas that thoughtfully combine user interests with specific concepts they've shown enthusiasm for. Create ideas that feel like natural extensions bridging multiple creative concepts together."
-          },
-          {
-            role: "user",
-            content: contextualPrompt
-          }
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 600  // Limit tokens for faster response
-      });
-
-      const aiResponse = JSON.parse(response.choices[0].message.content || "{}");
-      const ideas = aiResponse.ideas || [];
+      // Fallback to template-based ideas if Hugging Face fails
+      console.log('Hugging Face related ideas failed, using template fallback...');
+      const templateIdeas = [
+        {
+          title: `${parentIdea.title} Remix`,
+          description: `Take the core concept of "${parentIdea.title}" and apply it to a completely different medium or context.`
+        },
+        {
+          title: `Interactive ${parentIdea.title}`,
+          description: `Transform "${parentIdea.title}" into an interactive experience that engages multiple senses.`
+        },
+        {
+          title: `Collaborative ${parentIdea.title}`,
+          description: `Reimagine "${parentIdea.title}" as a community-driven project that brings people together.`
+        }
+      ];
 
       // Store generated ideas with parent reference
       const createdIdeas = [];
-      for (const ideaData of ideas) {
+      for (const ideaData of templateIdeas) {
         const idea = await storage.createIdea({
           title: ideaData.title,
           description: ideaData.description,
@@ -631,7 +631,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
         services: {
-          openai: openai ? 'available' : 'fallback_mode',
+          huggingface: process.env.HUGGINGFACE_TOKEN ? 'available' : 'fallback_mode',
           storage: 'available',
           degraded_mode: process.env.DEGRADED_MODE === 'true'
         }

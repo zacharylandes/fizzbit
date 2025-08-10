@@ -30,12 +30,13 @@ Preferred communication style: Simple, everyday language.
 - **Database Implementation**: Full schema with ideas, saved ideas, user authentication, and metadata storage
 
 ## AI Integration
-- **Mistral 7B**: Primary model for fast and cost-effective text-based creative idea generation via Hugging Face
-- **OpenAI GPT-4o**: Fallback for text generation and primary for vision/image analysis
-- **OpenAI Whisper**: Audio transcription for voice input processing
-- **Hugging Face BLIP**: Image-to-text analysis for uploaded images
-- **Structured Responses**: JSON-formatted AI outputs with text parsing fallbacks
+- **Mistral 7B**: Primary model for fast and cost-effective text-based creative idea generation via Hugging Face (FREE)
+- **Hugging Face Whisper**: Free speech-to-text transcription for voice input processing (replaces OpenAI Whisper)
+- **Hugging Face BLIP**: Image-to-text analysis for uploaded images (FREE)
+- **Llama 2**: Alternative text generation model for fallback scenarios (FREE)
+- **Structured Responses**: Text parsing with template fallbacks for reliable outputs
 - **Enhanced Prompts**: All AI requests use "give me unique ideas that avoid the obvious for..." prefix for better creativity
+- **Cost-Effective**: All AI models use free/open-source alternatives via Hugging Face API
 
 ## Key Features
 - **Swipeable Card Interface**: Mobile-first gesture controls for idea exploration
@@ -51,8 +52,7 @@ Preferred communication style: Simple, everyday language.
 ## External Dependencies
 
 - **Neon Database**: Serverless PostgreSQL hosting
-- **Hugging Face**: Mistral 7B model for primary text generation and BLIP for image analysis
-- **OpenAI API**: GPT-4o for fallback text generation, vision analysis, and Whisper for audio transcription
+- **Hugging Face**: Complete AI infrastructure - Mistral 7B for text generation, Whisper for speech-to-text, BLIP for image analysis (all FREE)
 - **Google Cloud Storage**: File storage and management (configured)
 - **AWS S3**: Alternative file storage option (via Uppy integration)
 - **Radix UI**: Accessible component primitives
