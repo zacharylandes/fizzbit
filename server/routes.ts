@@ -245,13 +245,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Read the audio file as buffer for Hugging Face
         const audioBuffer = fs.readFileSync(wavPath);
         
-        // Use Hugging Face Whisper model for transcription
-        const transcriptionResult = await hf.automaticSpeechRecognition({
-          data: audioBuffer,
-          model: 'openai/whisper-small', // Free Whisper model on HF
-        });
+        // Try multiple Hugging Face speech-to-text models
+        let transcriptionResult;
+        const speechModels = [
+          'facebook/wav2vec2-base-960h',
+          'facebook/wav2vec2-large-960h-lv60-self',
+          'openai/whisper-tiny'
+        ];
         
-        transcriptionText = transcriptionResult.text || '';
+        for (const model of speechModels) {
+          try {
+            transcriptionResult = await hf.automaticSpeechRecognition({
+              data: audioBuffer,
+              model: model,
+            });
+            console.log(`Successfully transcribed using ${model}`);
+            break;
+          } catch (modelError) {
+            console.log(`Model ${model} failed, trying next...`);
+            continue;
+          }
+        }
+        
+        transcriptionText = transcriptionResult?.text || '';
+        
+        // If no model worked, provide a helpful fallback
+        if (!transcriptionResult) {
+          throw new Error('All speech-to-text models unavailable');
+        }
         
         // Clean up files
         if (fs.existsSync(wavPath)) {
@@ -269,9 +290,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           fs.unlinkSync(req.file.path);
         }
         
-        // Use a fallback transcription or ask user to try again
-        return res.status(400).json({ 
-          error: "Could not transcribe audio. Please try speaking more clearly or check your microphone." 
+        // Return a helpful error suggesting client-side alternatives
+        return res.status(503).json({ 
+          error: "Speech-to-text service temporarily unavailable. Please try typing your idea or try again later.",
+          fallback: "text_input_suggested" 
         });
       }
       

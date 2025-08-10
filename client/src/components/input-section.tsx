@@ -99,12 +99,23 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     },
     onError: (error) => {
       console.error('Audio generation error:', error);
-      toast({
-        title: "Voice Processing Failed",
-        description: "Couldn't understand the audio. Try speaking clearly.",
-        variant: "destructive",
-        duration: 2000,
-      });
+      
+      // Check if it's a service unavailable error
+      if (error.message.includes('503') || error.message.includes('unavailable')) {
+        toast({
+          title: "Speech Service Temporarily Unavailable",
+          description: "Please type your idea in the text box above instead.",
+          variant: "destructive",
+          duration: 4000,
+        });
+      } else {
+        toast({
+          title: "Voice Processing Failed",
+          description: "Couldn't understand the audio. Try speaking clearly or use text input.",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
     },
   });
 
