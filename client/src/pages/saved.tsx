@@ -605,10 +605,15 @@ export default function SavedPage() {
 
   // Change card color
   const changeCardColor = (ideaId: string, colorIndex: number) => {
-    setCardColors(prev => ({
-      ...prev,
-      [ideaId]: colorIndex
-    }));
+    console.log('🎨 Changing card color:', { ideaId, colorIndex });
+    setCardColors(prev => {
+      const newColors = {
+        ...prev,
+        [ideaId]: colorIndex
+      };
+      console.log('🎨 New card colors state:', newColors);
+      return newColors;
+    });
   };
 
   // Mobile interaction start handler
@@ -626,6 +631,7 @@ export default function SavedPage() {
       isDragging: true,
       isVerticalDrag: false,
       dragIndex: index,
+      isDeleting: false,
     });
   };
 
@@ -763,6 +769,7 @@ export default function SavedPage() {
                 .filter((idea): idea is Idea => Boolean(idea))
                 .map((idea, index) => {
                   const colorIndex = cardColors[idea.id] ?? index % 8;
+                  console.log('🎨 Mobile card render:', { ideaId: idea.id, colorIndex, cardColorsState: cardColors[idea.id] });
                   const isBeingInteracted = swipeState.ideaId === idea.id;
                   const isDeleting = isBeingInteracted && swipeState.isDeleting;
                   const isDragging = isBeingInteracted && swipeState.isDragging;
