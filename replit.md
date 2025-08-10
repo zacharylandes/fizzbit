@@ -19,7 +19,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Backend Architecture
 - **Express.js Server**: RESTful API with middleware for request logging and error handling
-- **In-Memory Storage**: Simple storage layer with interface for future database migration
+- **PostgreSQL Database**: Full database integration with Drizzle ORM and Neon hosting
 - **File Upload Support**: Integration ready for cloud storage services like Google Cloud Storage and AWS S3
 - **Development Hot Reload**: Vite integration for seamless full-stack development
 
@@ -27,7 +27,7 @@ Preferred communication style: Simple, everyday language.
 - **Drizzle ORM**: Type-safe database operations with PostgreSQL support
 - **Shared Schema**: Common TypeScript types between frontend and backend
 - **Zod Validation**: Runtime type checking and input validation
-- **Database Ready**: Schema defined for ideas, saved ideas, and metadata storage
+- **Database Implementation**: Full schema with ideas, saved ideas, user authentication, and metadata storage
 
 ## AI Integration
 - **Mistral 7B**: Primary model for fast and cost-effective text-based creative idea generation via Hugging Face
@@ -35,6 +35,7 @@ Preferred communication style: Simple, everyday language.
 - **OpenAI Whisper**: Audio transcription for voice input processing
 - **Hugging Face BLIP**: Image-to-text analysis for uploaded images
 - **Structured Responses**: JSON-formatted AI outputs with text parsing fallbacks
+- **Enhanced Prompts**: All AI requests use "give me unique ideas that avoid the obvious for..." prefix for better creativity
 
 ## Key Features
 - **Swipeable Card Interface**: Mobile-first gesture controls for idea exploration

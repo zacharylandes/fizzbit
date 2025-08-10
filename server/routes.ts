@@ -93,8 +93,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
+      // Add default prefix to enhance AI response quality
+      const enhancedPrompt = `give me unique ideas that avoid the obvious for ${prompt}`;
+      
       // Use Hugging Face Llama 3 for fast and cheap idea generation
-      const ideas = await generateIdeasFromText(prompt);
+      const ideas = await generateIdeasFromText(enhancedPrompt);
 
       // Store generated ideas in database with user ID if authenticated
       const createdIdeas = [];
@@ -269,8 +272,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Could not transcribe audio. Please try speaking more clearly." });
       }
 
-      // Generate ideas from the actual transcribed text
-      const ideas = await generateIdeasFromText(transcription.text);
+      // Generate ideas from the actual transcribed text with enhanced prompt
+      const enhancedPrompt = `give me unique ideas that avoid the obvious for ${transcription.text}`;
+      const ideas = await generateIdeasFromText(enhancedPrompt);
 
       // Store generated ideas
       const createdIdeas = [];

@@ -327,7 +327,7 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
               },
               {
                 role: 'user',
-                content: `Based on this image: "${imageDescription}" - Generate ${count} completely different creative project ideas that are inspired by what's shown in the image.`
+                content: `Based on this image: "${imageDescription}" - Give me unique ideas that avoid the obvious for ${count} completely different creative project ideas that are inspired by what's shown in the image.`
               }
             ],
             max_tokens: 1200,

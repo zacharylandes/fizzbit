@@ -276,32 +276,19 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       setIsRecording(true);
       setRecordingDuration(0);
       
-      console.log('🎬 MediaRecorder started, setting up timer...');
-      
       // Fix timer increment - use useRef for persistent counter
       recordingCounterRef.current = 0;
-      console.log('🔢 Counter reset to:', recordingCounterRef.current);
       
       // Clear any existing interval first
       if (recordingIntervalRef.current) {
-        console.log('🧹 Clearing existing interval');
         clearInterval(recordingIntervalRef.current);
         recordingIntervalRef.current = null;
       }
       
       recordingIntervalRef.current = setInterval(() => {
         recordingCounterRef.current++;
-        console.log('⏰ Timer tick:', recordingCounterRef.current, 'seconds');
-        console.log('📊 Setting duration to:', recordingCounterRef.current);
         setRecordingDuration(recordingCounterRef.current);
       }, 1000);
-      
-      console.log('✅ Timer interval created:', !!recordingIntervalRef.current);
-      
-      // Test the interval immediately
-      setTimeout(() => {
-        console.log('🧪 Testing interval after 100ms - is it still there?', !!recordingIntervalRef.current);
-      }, 100);
       
     } catch (error) {
       console.error('Error accessing microphone:', error);
@@ -436,9 +423,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    const formatted = `${mins}:${secs.toString().padStart(2, '0')}`;
-    console.log('⏱️ Formatting duration:', seconds, '→', formatted);
-    return formatted;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   const handleGenerateFromText = () => {
