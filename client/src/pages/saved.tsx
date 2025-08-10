@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut, Pencil, Eraser, ChevronDown } from "lucide-react";
+import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut, Pencil, Eraser, ChevronDown, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -72,6 +72,18 @@ export default function SavedPage() {
   });
   const [isDrawingMode, setIsDrawingMode] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [mobileOrder, setMobileOrder] = useState<string[]>([]);
+  const [swipeState, setSwipeState] = useState<{
+    ideaId: string | null;
+    startX: number;
+    currentX: number;
+    isDragging: boolean;
+  }>({
+    ideaId: null,
+    startX: 0,
+    currentX: 0,
+    isDragging: false,
+  });
   
   const canvasRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -136,13 +148,25 @@ export default function SavedPage() {
         const newColors = { ...prev };
         savedIdeas.forEach((idea, index) => {
           if (newColors[idea.id] === undefined) {
-            newColors[idea.id] = index % 5; // Cycle through 5 color options
+            newColors[idea.id] = index % 8; // Cycle through 8 color options
           }
         });
         return newColors;
       });
+
+      // Initialize mobile order
+      setMobileOrder(prev => {
+        const currentIds = savedIdeas.map(idea => idea.id);
+        const newOrder = [...prev.filter(id => currentIds.includes(id))];
+        currentIds.forEach(id => {
+          if (!newOrder.includes(id)) {
+            newOrder.push(id);
+          }
+        });
+        return newOrder;
+      });
     }
-  }, [savedIdeas]);
+  }, [savedIdeas, isMobile]);
 
   // Unsave idea mutation
   const unsaveIdeaMutation = useMutation({
@@ -454,6 +478,55 @@ export default function SavedPage() {
     }));
   };
 
+  // Mobile swipe handlers
+  const handleMobileSwipeStart = (e: React.TouchEvent | React.MouseEvent, ideaId: string) => {
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    setSwipeState({
+      ideaId,
+      startX: clientX,
+      currentX: clientX,
+      isDragging: true,
+    });
+  };
+
+  const handleMobileSwipeMove = (e: React.TouchEvent | React.MouseEvent) => {
+    if (!swipeState.isDragging || !swipeState.ideaId) return;
+    
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    setSwipeState(prev => ({
+      ...prev,
+      currentX: clientX,
+    }));
+  };
+
+  const handleMobileSwipeEnd = () => {
+    if (!swipeState.isDragging || !swipeState.ideaId) return;
+    
+    const deltaX = swipeState.currentX - swipeState.startX;
+    
+    // If swiped left more than 100px, delete the idea
+    if (deltaX < -100) {
+      unsaveIdeaMutation.mutate(swipeState.ideaId);
+    }
+    
+    setSwipeState({
+      ideaId: null,
+      startX: 0,
+      currentX: 0,
+      isDragging: false,
+    });
+  };
+
+  // Mobile drag to reorder
+  const moveMobileIdea = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    
+    const newOrder = [...mobileOrder];
+    const [movedItem] = newOrder.splice(fromIndex, 1);
+    newOrder.splice(toIndex, 0, movedItem);
+    setMobileOrder(newOrder);
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -482,8 +555,9 @@ export default function SavedPage() {
             </p>
           </div>
           
-          {/* Drawing and Zoom Controls - Centered Below Header */}
-          <div className="flex items-center justify-center gap-2">
+          {/* Drawing and Zoom Controls - Centered Below Header (Desktop Only) */}
+          {!isMobile && (
+            <div className="flex items-center justify-center gap-2">
             {/* Drawing Mode Toggle */}
             <Button
               size="sm"
@@ -545,12 +619,13 @@ export default function SavedPage() {
             >
               <ZoomIn className="h-4 w-4" />
             </Button>
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Infinite Canvas */}
-      <div className="flex-1 pt-24 relative overflow-hidden">
+      {/* Content Area */}
+      <div className={`flex-1 ${isMobile ? 'pt-20' : 'pt-24'} relative overflow-hidden`}>
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -575,7 +650,130 @@ export default function SavedPage() {
               </div>
             </div>
           </div>
+        ) : isMobile ? (
+          // Mobile: Vertical scrollable list
+          <div className="h-full overflow-y-auto px-4 pb-4">
+            <div className="space-y-3">
+              {mobileOrder
+                .map(ideaId => savedIdeas.find(idea => idea.id === ideaId))
+                .filter((idea): idea is Idea => Boolean(idea))
+                .map((idea, index) => {
+                  const colorIndex = cardColors[idea.id] ?? index % 8;
+                  const isBeingSwiped = swipeState.ideaId === idea.id;
+                  const swipeOffset = isBeingSwiped ? swipeState.currentX - swipeState.startX : 0;
+                  
+                  const cardStyles = [
+                    "bg-card-sage border-card-sage/40",
+                    "bg-card-blue-gray border-card-blue-gray/40", 
+                    "bg-card-cream border-card-cream/40",
+                    "bg-card-light-blue border-card-light-blue/40",
+                    "bg-card-purple-gray border-card-purple-gray/40",
+                    "bg-card-peach border-card-peach/40",
+                    "bg-card-lavender border-card-lavender/40",
+                    "bg-card-mint border-card-mint/40"
+                  ];
+                  
+                  const colorNames = [
+                    "Sage Green", "Blue Gray", "Cream", "Light Blue",
+                    "Purple Gray", "Peach", "Lavender", "Mint"
+                  ];
+
+                  return (
+                    <div
+                      key={idea.id}
+                      className="relative"
+                      style={{
+                        transform: `translateX(${swipeOffset}px)`,
+                        transition: isBeingSwiped ? 'none' : 'transform 0.2s ease-out',
+                      }}
+                    >
+                      {/* Delete indicator when swiping left */}
+                      {swipeOffset < -50 && (
+                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-500 z-10">
+                          <Trash2 className="h-6 w-6" />
+                        </div>
+                      )}
+                      
+                      <Card 
+                        className={`${cardStyles[colorIndex]} border-2 card-shadow transition-all duration-200 ${
+                          swipeOffset < -50 ? 'bg-red-50' : ''
+                        }`}
+                        onTouchStart={(e) => handleMobileSwipeStart(e, idea.id)}
+                        onTouchMove={handleMobileSwipeMove}
+                        onTouchEnd={handleMobileSwipeEnd}
+                        onMouseDown={(e) => handleMobileSwipeStart(e, idea.id)}
+                        onMouseMove={handleMobileSwipeMove}
+                        onMouseUp={handleMobileSwipeEnd}
+                      >
+                        <div className="p-3 flex items-center gap-3">
+                          {/* Drag Handle */}
+                          <div className="flex-shrink-0">
+                            <GripVertical className="h-5 w-5 text-gray-400" />
+                          </div>
+                          
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-sm text-gray-800 dark:text-gray-100 truncate mb-1">
+                              {idea.title}
+                            </h3>
+                            <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
+                              {idea.description}
+                            </p>
+                          </div>
+                          
+                          {/* Controls */}
+                          <div className="flex-shrink-0 flex items-center gap-2">
+                            {/* Color Picker */}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-6 w-6 p-0 hover:bg-gray-200"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <ChevronDown className="h-3 w-3" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-32">
+                                {cardStyles.map((style, idx) => (
+                                  <DropdownMenuItem
+                                    key={idx}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      changeCardColor(idea.id, idx);
+                                    }}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <div className={`w-3 h-3 rounded-full ${style}`} />
+                                    <span className="text-xs">{colorNames[idx]}</span>
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                            
+                            {/* Delete Button */}
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                unsaveIdeaMutation.mutate(idea.id);
+                              }}
+                              className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600 text-gray-400"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
         ) : (
+          // Desktop: Infinite canvas
           <div
             ref={canvasRef}
             className={`w-full h-full relative select-none ${
