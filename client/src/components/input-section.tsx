@@ -62,62 +62,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
   });
 
   // Audio transcription and idea generation mutation
-  const generateFromAudioMutation = useMutation({
-    mutationFn: async (audioBlob: Blob) => {
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.webm');
-      
-      const response = await fetch('/api/ideas/generate-from-audio', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (!response.ok) {
-        throw new Error(`${response.status}: ${response.statusText}`);
-      }
-      
-      return response.json();
-    },
-    onMutate: () => {
-      // Show immediate processing feedback when recording stops
-      toast({
-        title: "Processing Voice Input",
-        description: "Transcribing your audio and generating ideas...",
-        duration: 2000,
-      });
-    },
-    onSuccess: (data) => {
-      if (data.ideas) {
-        onIdeasGenerated(data.ideas);
-        toast({
-          title: "Ideas Generated!",
-          description: `From your voice: "${data.transcription?.slice(0, 50)}${data.transcription?.length > 50 ? '...' : ''}"`,
-          duration: 3000,
-          variant: "success",
-        });
-      }
-    },
-    onError: (error) => {
-      console.error('Audio generation error:', error);
-      
-      // Check if it's a service unavailable error
-      if (error.message.includes('503') || error.message.includes('unavailable')) {
-        toast({
-          title: "Speech Service Temporarily Unavailable",
-          description: "Please type your idea in the text box above instead.",
-          variant: "destructive",
-          duration: 4000,
-        });
-      } else {
-        toast({
-          title: "Voice Processing Failed",
-          description: "Couldn't understand the audio. Try speaking clearly or use text input.",
-          variant: "destructive",
-          duration: 3000,
-        });
-      }
-    },
-  });
+  // No longer needed - using Web Speech API directly
 
   // Image analysis mutation
   const generateFromImageMutation = useMutation({
@@ -241,59 +186,35 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
 
 
 
-  // Audio recording functions
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: 44100,
-        } 
+  // Web Speech API for client-side speech recognition
+  const startWebSpeechRecognition = () => {
+    // Check if Web Speech API is supported
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      toast({
+        title: "Speech Recognition Not Supported",
+        description: "Please use the text input instead.",
+        variant: "destructive",
+        duration: 3000,
       });
-      
-      // Try different MIME types for better compatibility
-      let mimeType = 'audio/webm;codecs=opus';
-      if (!MediaRecorder.isTypeSupported(mimeType)) {
-        mimeType = 'audio/webm';
-        if (!MediaRecorder.isTypeSupported(mimeType)) {
-          mimeType = 'audio/mp4';
-          if (!MediaRecorder.isTypeSupported(mimeType)) {
-            mimeType = ''; // Let browser choose
-          }
-        }
-      }
-      
-      const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
-      
-      const audioChunks: Blob[] = [];
-      
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunks.push(event.data);
-        }
-      };
-      
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunks, { type: mimeType || 'audio/webm' });
-        generateFromAudioMutation.mutate(audioBlob);
-        
-        // Stop all tracks to release microphone
-        stream.getTracks().forEach(track => track.stop());
-      };
-      
-      mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start();
+      return;
+    }
+
+    // @ts-ignore - Web Speech API types
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    
+    recognition.onstart = () => {
       setIsRecording(true);
       setRecordingDuration(0);
-      
-      // Fix timer increment - use useRef for persistent counter
       recordingCounterRef.current = 0;
       
-      // Clear any existing interval first
+      // Start timer
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
-        recordingIntervalRef.current = null;
       }
       
       recordingIntervalRef.current = setInterval(() => {
@@ -301,58 +222,106 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
         setRecordingDuration(recordingCounterRef.current);
       }, 1000);
       
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
       toast({
-        title: "Microphone Access Required",
-        description: "Please allow microphone access to record voice prompts.",
+        title: "Listening...",
+        description: "Speak your idea now",
+        duration: 1000,
+      });
+    };
+    
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      console.log('Web Speech Recognition result:', transcript);
+      
+      // Generate ideas directly from the transcript
+      const enhancedPrompt = `give me unique ideas that avoid the obvious for ${transcript}`;
+      generateFromTextMutation.mutate(enhancedPrompt);
+      
+      toast({
+        title: "Processing Your Idea",
+        description: `"${transcript.slice(0, 50)}${transcript.length > 50 ? '...' : ''}"`,
+        duration: 2000,
+      });
+    };
+    
+    recognition.onerror = (event) => {
+      console.error('Web Speech Recognition error:', event.error);
+      setIsRecording(false);
+      
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
+      }
+      
+      let errorMessage = "Speech recognition failed. Try typing your idea instead.";
+      if (event.error === 'no-speech') {
+        errorMessage = "No speech detected. Try speaking louder or typing your idea.";
+      } else if (event.error === 'not-allowed') {
+        errorMessage = "Microphone access denied. Please allow microphone access or type your idea.";
+      }
+      
+      toast({
+        title: "Voice Input Failed",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 4000,
+      });
+    };
+    
+    recognition.onend = () => {
+      setIsRecording(false);
+      setRecordingDuration(0);
+      
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
+      }
+    };
+    
+    try {
+      recognition.start();
+    } catch (error) {
+      console.error('Error starting recognition:', error);
+      toast({
+        title: "Speech Recognition Error",
+        description: "Please type your idea instead.",
         variant: "destructive",
         duration: 3000,
       });
     }
   };
 
+  // Audio recording functions (kept as fallback)
+  const startRecording = startWebSpeechRecognition;
+
   const stopRecording = () => {
-    console.log('🛑 Stop recording called, current state:', { isRecording, hasRecorder: !!mediaRecorderRef.current });
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
+    // For Web Speech API, we can't manually stop - it auto-stops when speech ends
+    if (isRecording) {
       setIsRecording(false);
-      console.log('⏹️ Recording stopped, clearing interval');
+      setRecordingDuration(0);
       
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
         recordingIntervalRef.current = null;
-        console.log('✅ Interval cleared');
       }
       
-      // Keep duration visible until processing starts, then reset
-      setTimeout(() => setRecordingDuration(0), 500);
+      toast({
+        title: "Voice Input Stopped",
+        description: "Processing your speech...",
+        duration: 1000,
+      });
     }
   };
 
   const cancelRecording = () => {
-    console.log('🗑️ Cancel recording called');
-    if (mediaRecorderRef.current && isRecording) {
-      // Stop the recorder without processing the audio
-      mediaRecorderRef.current.ondataavailable = null;
-      mediaRecorderRef.current.onstop = null;
-      mediaRecorderRef.current.stop();
+    if (isRecording) {
       setIsRecording(false);
+      setRecordingDuration(0);
       
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
         recordingIntervalRef.current = null;
       }
-      
-      // Reset duration immediately
-      setRecordingDuration(0);
-      
-      // Stop all microphone tracks
-      navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-          stream.getTracks().forEach(track => track.stop());
-        })
-        .catch(() => {/* ignore cleanup errors */});
       
       toast({
         title: "Recording Cancelled",

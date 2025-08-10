@@ -31,12 +31,12 @@ Preferred communication style: Simple, everyday language.
 
 ## AI Integration
 - **Mistral 7B**: Primary model for fast and cost-effective text-based creative idea generation via Hugging Face (FREE)
-- **Hugging Face Whisper**: Free speech-to-text transcription for voice input processing (replaces OpenAI Whisper)
+- **Web Speech API**: Client-side browser speech-to-text - completely free and works offline (replaces server-side transcription)
 - **Hugging Face BLIP**: Image-to-text analysis for uploaded images (FREE)
 - **Llama 2**: Alternative text generation model for fallback scenarios (FREE)
 - **Structured Responses**: Text parsing with template fallbacks for reliable outputs
 - **Enhanced Prompts**: All AI requests use "give me unique ideas that avoid the obvious for..." prefix for better creativity
-- **Cost-Effective**: All AI models use free/open-source alternatives via Hugging Face API
+- **Zero-Cost Voice Input**: Browser-native speech recognition eliminates need for external speech-to-text APIs
 
 ## Key Features
 - **Swipeable Card Interface**: Mobile-first gesture controls for idea exploration
@@ -45,7 +45,7 @@ Preferred communication style: Simple, everyday language.
 - **Infinite Canvas**: Drag-and-drop organization system for saved ideas with zoom and pan controls
 - **Multi-Modal Input**: Support for text prompts, image uploads, voice recording, and drawing pad
 - **Drawing Pad**: Interactive canvas for sketching ideas that get analyzed by AI
-- **Voice Input**: Real-time speech-to-text with timer display for audio prompts
+- **Voice Input**: Browser-native Web Speech API with real-time transcription and timer display
 - **Keyboard Navigation**: Desktop arrow key controls for card swiping
 - **Responsive Design**: Optimized for mobile and desktop experiences
 
