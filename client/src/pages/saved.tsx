@@ -851,7 +851,11 @@ export default function SavedPage() {
                           </div>
                           
                           {/* Controls */}
-                          <div className="flex-shrink-0 flex items-center gap-2">
+                          <div 
+                            className="flex-shrink-0 flex items-center gap-2"
+                            onTouchStart={(e) => e.stopPropagation()}
+                            onMouseDown={(e) => e.stopPropagation()}
+                          >
                             {/* Color Picker */}
                             <DropdownMenu modal={false}>
                               <DropdownMenuTrigger asChild>
@@ -860,7 +864,6 @@ export default function SavedPage() {
                                   variant="ghost"
                                   className="h-8 w-8 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 touch-manipulation"
                                   onClick={(e) => e.stopPropagation()}
-                                  onTouchStart={(e) => e.stopPropagation()}
                                 >
                                   <ChevronDown className="h-4 w-4" />
                                 </Button>
@@ -873,7 +876,6 @@ export default function SavedPage() {
                                       e.stopPropagation();
                                       changeCardColor(idea.id, idx);
                                     }}
-                                    onTouchStart={(e) => e.stopPropagation()}
                                     className="flex items-center gap-3 py-3 px-3 touch-manipulation cursor-pointer hover:bg-accent"
                                   >
                                     <div className={`w-4 h-4 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')} border border-gray-300`} />
@@ -891,7 +893,6 @@ export default function SavedPage() {
                                 e.stopPropagation();
                                 unsaveIdeaMutation.mutate(idea.id);
                               }}
-                              onTouchStart={(e) => e.stopPropagation()}
                               className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600 text-gray-400 touch-manipulation"
                             >
                               <Trash2 className="h-4 w-4" />
