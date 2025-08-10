@@ -71,11 +71,20 @@ export default function SavedPage() {
     paths: [],
   });
   const [isDrawingMode, setIsDrawingMode] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
   const canvasRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const { toast } = useToast();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+  // Check mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -107,12 +116,16 @@ export default function SavedPage() {
         const newPositions = { ...prev };
         savedIdeas.forEach((idea, index) => {
           if (!newPositions[idea.id]) {
-            // Arrange in a grid pattern initially
-            const col = index % 4;
-            const row = Math.floor(index / 4);
+            // Arrange in a grid pattern initially - responsive for mobile
+            const cols = isMobile ? 3 : 4; // 3 columns on mobile, 4 on desktop
+            const cardSize = isMobile ? 110 : 160;
+            const spacing = isMobile ? 120 : 200;
+            
+            const col = index % cols;
+            const row = Math.floor(index / cols);
             newPositions[idea.id] = {
-              x: col * 200 + 50,
-              y: row * 180 + 50,
+              x: col * spacing + 20,
+              y: row * (cardSize + 20) + 50,
             };
           }
         });
@@ -460,16 +473,17 @@ export default function SavedPage() {
     <div className="min-h-screen flex flex-col relative bg-background">
       {/* Fixed Header */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div>
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          {/* Header Text - Vertically Aligned Above Toolbar */}
+          <div className="mb-3">
             <h1 className="text-xl font-crimson font-semibold text-foreground">Saved Ideas</h1>
             <p className="text-muted-foreground text-sm font-inter">
               {savedIdeas.length} {savedIdeas.length === 1 ? 'idea' : 'ideas'} • Drag to organize
             </p>
           </div>
           
-          {/* Drawing and Zoom Controls */}
-          <div className="flex items-center gap-2">
+          {/* Drawing and Zoom Controls - Centered Below Header */}
+          <div className="flex items-center justify-center gap-2">
             {/* Drawing Mode Toggle */}
             <Button
               size="sm"
@@ -536,7 +550,7 @@ export default function SavedPage() {
       </div>
 
       {/* Infinite Canvas */}
-      <div className="flex-1 pt-20 relative overflow-hidden">
+      <div className="flex-1 pt-24 relative overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -652,8 +666,8 @@ export default function SavedPage() {
                   style={{
                     left: position.x,
                     top: position.y,
-                    width: '160px', // Square blocks, mobile-friendly
-                    height: '160px',
+                    width: isMobile ? '110px' : '160px', // Smaller on mobile for 3 across
+                    height: isMobile ? '110px' : '160px',
                   }}
                   onMouseDown={(e) => !isDrawingMode && handleMouseDown(e, idea.id)}
                   onTouchStart={(e) => !isDrawingMode && handleTouchStart(e, idea.id)}
@@ -718,19 +732,10 @@ export default function SavedPage() {
                       {/* Description - Smaller with strict overflow handling */}
                       <div className="flex-1 overflow-hidden">
                         <p className="text-xs text-gray-600 dark:text-gray-300 text-center leading-relaxed overflow-hidden break-words h-full">
-                          <span className="line-clamp-2">
+                          <span className="line-clamp-3">
                             {idea.description}
                           </span>
                         </p>
-                      </div>
-                      
-                      {/* Source indicator - Smaller */}
-                      <div className="flex items-center justify-center mt-1 pt-1 border-t border-gray-400/20 flex-shrink-0">
-                        {idea.source === 'image' ? (
-                          <Image className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
-                        ) : (
-                          <Type className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
-                        )}
                       </div>
                     </div>
                   </Card>
