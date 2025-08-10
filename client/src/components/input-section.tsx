@@ -275,15 +275,12 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       setIsRecording(true);
       setRecordingDuration(0);
       
-      // Use functional state update to avoid closure issues
-      const startTime = Date.now();
+      // Fix timer increment with useRef to avoid closure issues
+      const startTimeRef = { current: Date.now() };
       recordingIntervalRef.current = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
         console.log('⏰ Timer tick:', elapsed, 'seconds');
-        setRecordingDuration(prev => {
-          console.log('⏰ Setting duration from', prev, 'to', elapsed);
-          return elapsed;
-        });
+        setRecordingDuration(elapsed);
       }, 1000);
       
     } catch (error) {

@@ -121,7 +121,7 @@ export default function Layout({ children }: LayoutProps) {
               <a href="/api/logout">
                 <Button
                   size="sm"
-                  className="bg-card-purple-gray-bg border-card-purple-gray/40 hover:bg-card-purple-gray-bg/90 hover-lift text-card-purple-gray transition-all duration-300 px-4 py-2 card-shadow"
+                  className="bg-card-purple-gray-bg border-card-purple-gray/40 hover:bg-card-purple-gray-bg/90 hover-lift text-card-purple-gray transition-all duration-300 px-4 py-2 card-shadow font-medium"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
@@ -131,7 +131,7 @@ export default function Layout({ children }: LayoutProps) {
               <a href="/api/login">
                 <Button
                   size="sm"
-                  className="bg-card-blue-gray-bg border-card-blue-gray/40 hover:bg-card-blue-gray-bg/90 hover-lift text-card-blue-gray transition-all duration-300 px-4 py-2 card-shadow"
+                  className="bg-card-blue-gray-bg border-card-blue-gray/40 hover:bg-card-blue-gray-bg/90 hover-lift text-card-blue-gray transition-all duration-300 px-4 py-2 card-shadow font-medium"
                 >
                   <LogIn className="h-4 w-4 mr-2" />
                   Login
@@ -165,8 +165,8 @@ export default function Layout({ children }: LayoutProps) {
                       size="sm"
                       className={`flex flex-col items-center space-y-1 p-3 h-auto transition-all duration-300 relative rounded-lg ${
                         isActive
-                          ? "bg-card-sage text-white card-shadow"
-                          : "text-muted-foreground hover:text-card-sage hover:bg-card-sage-bg hover-lift"
+                          ? "bg-card-sage text-white card-shadow font-semibold"
+                          : "text-gray-600 dark:text-gray-300 hover:text-card-sage hover:bg-card-sage-bg hover-lift font-medium"
                       }`}
                     >
                       <Icon className="h-5 w-5" />

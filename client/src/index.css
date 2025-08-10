@@ -78,22 +78,22 @@ input, textarea {
   --ring: hsl(240, 5%, 64.9%);
   --radius: 0.5rem;
   
-  /* Pastel Card Colors from Athos 2.0 */
-  --card-sage: hsl(85, 20%, 60%);        /* Muted sage green like Continental card */
+  /* Pastel Card Colors from Athos 2.0 - Enhanced for better contrast */
+  --card-sage: hsl(85, 35%, 45%);        /* Darker sage green for better contrast */
   --card-sage-bg: hsl(85, 25%, 90%);     /* Light sage background */
-  --card-blue-gray: hsl(210, 20%, 55%);  /* Blue-gray like 3Lateral card */
+  --card-blue-gray: hsl(210, 30%, 40%);  /* Darker blue-gray for better contrast */
   --card-blue-gray-bg: hsl(210, 25%, 88%); /* Light blue-gray background */
-  --card-cream: hsl(45, 40%, 85%);       /* Warm cream like 7x card */
-  --card-cream-text: hsl(35, 45%, 45%);  /* Brown text for cream cards */
-  --card-light-blue: hsl(200, 30%, 75%); /* Soft light blue */
+  --card-cream: hsl(45, 50%, 70%);       /* Adjusted cream */
+  --card-cream-text: hsl(35, 60%, 30%);  /* Much darker brown text for cream cards */
+  --card-light-blue: hsl(200, 45%, 50%); /* Darker light blue for better contrast */
   --card-light-blue-bg: hsl(200, 35%, 92%); /* Light blue background */
-  --card-purple-gray: hsl(270, 15%, 50%); /* Muted purple-gray */
+  --card-purple-gray: hsl(270, 25%, 35%); /* Darker purple-gray for better contrast */
   --card-purple-gray-bg: hsl(270, 20%, 90%); /* Light purple background */
-  --card-lavender: hsl(280, 30%, 70%);   /* Soft lavender */
+  --card-lavender: hsl(280, 40%, 50%);   /* Darker lavender for better contrast */
   --card-lavender-bg: hsl(280, 35%, 92%); /* Light lavender background */
-  --card-peach: hsl(15, 40%, 70%);       /* Soft peach */
+  --card-peach: hsl(15, 50%, 50%);       /* Darker peach for better contrast */
   --card-peach-bg: hsl(15, 45%, 92%);    /* Light peach background */
-  --card-mint: hsl(160, 30%, 70%);       /* Soft mint green */
+  --card-mint: hsl(160, 40%, 45%);       /* Darker mint green for better contrast */
   --card-mint-bg: hsl(160, 35%, 92%);    /* Light mint background */
   
   /* Professional Primary Colors */
