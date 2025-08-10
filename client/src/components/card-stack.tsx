@@ -305,10 +305,16 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
         setIsSwipeUpLoading(true);
         setSwipeUpPrompt(idea.title);
         
-        // Use the idea's title as the new prompt and clear current cards
-        if (onSwipeUpPrompt) {
-          onSwipeUpPrompt(idea.title);
-          // Clear current cards to start fresh with new prompt
+        // Combine the current prompt with the swiped idea for enhanced creativity
+        if (onSwipeUpPrompt && currentPrompt) {
+          const combinedPrompt = `${currentPrompt} + ideas inspired by "${idea.title}"`;
+          onSwipeUpPrompt(combinedPrompt);
+          // Clear current cards to start fresh with combined prompt
+          setCards([]);
+          setCurrentExploreContext(null);
+        } else if (onSwipeUpPrompt) {
+          // If no current prompt, just use the idea title
+          onSwipeUpPrompt(`ideas inspired by "${idea.title}"`);
           setCards([]);
           setCurrentExploreContext(null);
         } else {

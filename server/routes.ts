@@ -93,7 +93,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('🚀 Enhanced prompt being processed:', enhancedPrompt);
       
-      // Use Hugging Face Llama 3 for fast and cheap idea generation
+      // Use OpenAI for reliable idea generation
       const ideas = await generateIdeasFromText(enhancedPrompt);
 
       // Store generated ideas in database with user ID if authenticated
@@ -123,39 +123,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Fallback to predefined creative ideas when AI is unavailable
-      const fallbackIdeas = [
-        {
-          title: "Create a Colorful Reading Nook",
-          description: "Transform a corner of your room into a cozy reading space with bright cushions, fairy lights, and floating bookshelves painted in vibrant colors."
-        },
-        {
-          title: "Design a Rainbow Garden Wall",
-          description: "Paint a gradient rainbow mural on one wall and add hanging plants at different heights to create a living rainbow garden effect."
-        },
-        {
-          title: "Build a Creative Workspace",
-          description: "Set up an inspiring workspace with a cork board gallery wall, colorful desk accessories, and motivational quotes in beautiful typography."
-        }
-      ];
-
-      const createdIdeas = [];
-      for (const ideaData of fallbackIdeas) {
-        const idea = await storage.createIdea({
-          title: ideaData.title,
-          description: ideaData.description,
-          source: "text",
-          sourceContent: prompt,
-          isSaved: 0,
-          metadata: { 
-            generatedAt: new Date().toISOString(),
-            type: "fallback"
-          }
-        }, userId);
-        createdIdeas.push(idea);
-      }
-
-      res.json({ ideas: createdIdeas });
+      // Return error instead of falling back to generic templates
+      return res.status(500).json({ 
+        error: "Failed to generate relevant ideas. Please try again.", 
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   }));
 

@@ -155,19 +155,25 @@ export async function generateIdeasFromText(prompt: string, count: number = 8): 
           description: idea.description || idea.content || 'Creative idea generated for you.'
         }));
 
-        console.log(`Successfully generated ${formattedIdeas.length} ideas using OpenAI`);
-        return formattedIdeas;
+        if (formattedIdeas.length > 0) {
+          console.log(`Successfully generated ${formattedIdeas.length} ideas using OpenAI`);
+          return formattedIdeas;
+        }
       } catch (parseError) {
         console.error('Failed to parse OpenAI JSON response:', parseError);
+        console.error('Raw response:', responseText);
         // Fall back to text parsing if JSON parsing fails
         const ideas = parseTextResponse(responseText, count, prompt);
         if (ideas.length > 0) {
+          console.log(`Fallback: Generated ${ideas.length} ideas using text parsing`);
           return ideas;
         }
       }
     }
 
-    // Fallback to template-based ideas if OpenAI fails
+    // Only throw an error if OpenAI completely fails - don't use template fallbacks
+    console.error('OpenAI text generation failed completely');
+    throw new Error('Failed to generate ideas from OpenAI - no fallback to generic templates');
     const ideaTemplates = [
       {
         titlePrefix: "Creative Workshop:",
