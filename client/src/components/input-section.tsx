@@ -276,13 +276,20 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       setIsRecording(true);
       setRecordingDuration(0);
       
+      console.log('🎬 MediaRecorder started, setting up timer...');
+      
       // Fix timer increment - use useRef for persistent counter
       recordingCounterRef.current = 0;
+      console.log('🔢 Counter reset to:', recordingCounterRef.current);
+      
       recordingIntervalRef.current = setInterval(() => {
         recordingCounterRef.current++;
         console.log('⏰ Timer tick:', recordingCounterRef.current, 'seconds');
+        console.log('📊 Setting duration to:', recordingCounterRef.current);
         setRecordingDuration(recordingCounterRef.current);
       }, 1000);
+      
+      console.log('✅ Timer interval created:', !!recordingIntervalRef.current);
       
     } catch (error) {
       console.error('Error accessing microphone:', error);
