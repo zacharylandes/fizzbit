@@ -165,12 +165,12 @@ export default function Layout({ children }: LayoutProps) {
                       size="sm"
                       className={`flex flex-col items-center space-y-1 p-3 h-auto transition-all duration-300 relative rounded-lg ${
                         isActive
-                          ? "bg-card-sage text-white card-shadow font-semibold"
-                          : "text-gray-600 dark:text-gray-300 hover:text-card-sage hover:bg-card-sage-bg hover-lift font-medium"
+                          ? "bg-card-sage card-shadow font-semibold"
+                          : "hover:text-card-sage hover:bg-card-sage-bg hover-lift font-medium"
                       }`}
                     >
-                      <Icon className={`h-5 w-5 ${isActive ? 'text-white' : 'text-gray-700 dark:text-gray-200'}`} />
-                      <span className="text-xs font-medium">{item.label}</span>
+                      <Icon className={`h-5 w-5 ${isActive ? 'text-white' : 'text-card-sage'}`} />
+                      <span className={`text-xs font-medium ${isActive ? 'text-white' : 'text-card-sage'}`}>{item.label}</span>
                       {item.badge && item.badge > 0 && (
                         <span className="absolute -top-1 -right-1 bg-card-sage-bg border border-card-sage/40 text-card-sage text-xs rounded-full h-5 w-5 flex items-center justify-center card-shadow">
                           {item.badge}
