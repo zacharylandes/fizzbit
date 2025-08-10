@@ -807,7 +807,7 @@ export default function SavedPage() {
                       className="relative"
                       style={{
                         transform: `translate(${swipeOffsetX}px, ${swipeOffsetY + reorderOffsetY}px)`,
-                        transition: isDragging && isBeingInteracted ? 'none' : 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease',
+                        transition: isDragging && isBeingInteracted ? 'none' : 'transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.15s ease',
                         zIndex: isBeingInteracted ? 10 : 1,
                         opacity: isDeleting ? 0 : 1,
                       }}
@@ -821,8 +821,8 @@ export default function SavedPage() {
                       
                       <Card 
                         className={`${cardStyles[colorIndex]} border-2 card-shadow transition-all duration-200 ${
-                          swipeOffsetX < -50 ? 'bg-red-50' : ''
-                        } ${isBeingInteracted ? 'shadow-lg scale-105' : ''}`}
+                          swipeOffsetX < -50 ? 'bg-red-50 dark:bg-red-900/20' : ''
+                        } ${isBeingInteracted ? 'shadow-lg scale-[1.02] ring-2 ring-primary/20' : ''}`}
                         onTouchStart={(e) => handleMobileInteractionStart(e, idea.id, index)}
                         onMouseDown={(e) => handleMobileInteractionStart(e, idea.id, index)}
                       >
