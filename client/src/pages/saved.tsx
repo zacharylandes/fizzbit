@@ -76,13 +76,21 @@ export default function SavedPage() {
   const [swipeState, setSwipeState] = useState<{
     ideaId: string | null;
     startX: number;
+    startY: number;
     currentX: number;
+    currentY: number;
     isDragging: boolean;
+    isVerticalDrag: boolean;
+    dragIndex: number | null;
   }>({
     ideaId: null,
     startX: 0,
+    startY: 0,
     currentX: 0,
+    currentY: 0,
     isDragging: false,
+    isVerticalDrag: false,
+    dragIndex: null,
   });
   
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -97,6 +105,78 @@ export default function SavedPage() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Global event listeners for mobile interactions
+  useEffect(() => {
+    if (!isMobile || !swipeState.isDragging) return;
+
+    const handleGlobalMove = (e: TouchEvent | MouseEvent) => {
+      e.preventDefault();
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      
+      const deltaX = clientX - swipeState.startX;
+      const deltaY = clientY - swipeState.startY;
+      
+      // Determine if this is vertical drag or horizontal swipe
+      if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 10) {
+        setSwipeState(prev => ({ ...prev, isVerticalDrag: true }));
+      }
+      
+      setSwipeState(prev => ({
+        ...prev,
+        currentX: clientX,
+        currentY: clientY,
+      }));
+    };
+
+    const handleGlobalEnd = (e: TouchEvent | MouseEvent) => {
+      e.preventDefault();
+      
+      const deltaX = swipeState.currentX - swipeState.startX;
+      const deltaY = swipeState.currentY - swipeState.startY;
+      
+      if (swipeState.isVerticalDrag) {
+        // Handle vertical reorder
+        const cardHeight = 80; // Approximate height of each card
+        const moveDistance = Math.round(deltaY / cardHeight);
+        if (swipeState.dragIndex !== null && Math.abs(moveDistance) > 0) {
+          const newIndex = Math.max(0, Math.min(mobileOrder.length - 1, swipeState.dragIndex + moveDistance));
+          if (newIndex !== swipeState.dragIndex) {
+            moveMobileIdea(swipeState.dragIndex, newIndex);
+          }
+        }
+      } else if (deltaX < -100) {
+        // Handle horizontal swipe to delete
+        if (swipeState.ideaId) {
+          unsaveIdeaMutation.mutate(swipeState.ideaId);
+        }
+      }
+      
+      setSwipeState({
+        ideaId: null,
+        startX: 0,
+        startY: 0,
+        currentX: 0,
+        currentY: 0,
+        isDragging: false,
+        isVerticalDrag: false,
+        dragIndex: null,
+      });
+    };
+
+    document.addEventListener('touchmove', handleGlobalMove, { passive: false });
+    document.addEventListener('touchend', handleGlobalEnd, { passive: false });
+    document.addEventListener('mousemove', handleGlobalMove);
+    document.addEventListener('mouseup', handleGlobalEnd);
+
+    return () => {
+      document.removeEventListener('touchmove', handleGlobalMove);
+      document.removeEventListener('touchend', handleGlobalEnd);
+      document.removeEventListener('mousemove', handleGlobalMove);
+      document.removeEventListener('mouseup', handleGlobalEnd);
+    };
+  }, [isMobile, swipeState.isDragging, swipeState.startX, swipeState.startY, swipeState.currentX, swipeState.currentY, swipeState.isVerticalDrag, swipeState.dragIndex, swipeState.ideaId, mobileOrder.length, moveMobileIdea, unsaveIdeaMutation]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -120,6 +200,51 @@ export default function SavedPage() {
   }) as { data: { ideas: Idea[] } | undefined; isLoading: boolean };
 
   const savedIdeas = savedIdeasData?.ideas || [];
+
+  // Unsave idea mutation
+  const unsaveIdeaMutation = useMutation({
+    mutationFn: async (ideaId: string) => {
+      const response = await apiRequest("DELETE", `/api/ideas/${ideaId}/save`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/ideas/saved"] });
+      toast({
+        title: "Idea Removed",
+        description: "Moved to trash 🗑️",
+        duration: 2000,
+        variant: "info",
+      });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to remove idea. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mobile drag to reorder
+  const moveMobileIdea = useCallback((fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    
+    const newOrder = [...mobileOrder];
+    const [movedItem] = newOrder.splice(fromIndex, 1);
+    newOrder.splice(toIndex, 0, movedItem);
+    setMobileOrder(newOrder);
+  }, [mobileOrder]);
 
   // Initialize positions and colors for new ideas
   useEffect(() => {
@@ -167,42 +292,6 @@ export default function SavedPage() {
       });
     }
   }, [savedIdeas, isMobile]);
-
-  // Unsave idea mutation
-  const unsaveIdeaMutation = useMutation({
-    mutationFn: async (ideaId: string) => {
-      const response = await apiRequest("DELETE", `/api/ideas/${ideaId}/save`);
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/ideas/saved"] });
-      toast({
-        title: "Idea Removed",
-        description: "Moved to trash 🗑️",
-        duration: 2000,
-        variant: "info",
-      });
-    },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
-      toast({
-        title: "Oops!",
-        description: "Couldn't remove that idea. Try again?",
-        variant: "destructive",
-        duration: 2000,
-      });
-    },
-  });
 
   // Mouse/Touch handlers for dragging cards
   const handleMouseDown = useCallback((e: React.MouseEvent, ideaId: string) => {
@@ -478,54 +567,25 @@ export default function SavedPage() {
     }));
   };
 
-  // Mobile swipe handlers
-  const handleMobileSwipeStart = (e: React.TouchEvent | React.MouseEvent, ideaId: string) => {
+  // Mobile interaction start handler
+  const handleMobileInteractionStart = (e: React.TouchEvent | React.MouseEvent, ideaId: string, index: number) => {
+    e.preventDefault();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
     setSwipeState({
       ideaId,
       startX: clientX,
+      startY: clientY,
       currentX: clientX,
+      currentY: clientY,
       isDragging: true,
+      isVerticalDrag: false,
+      dragIndex: index,
     });
   };
 
-  const handleMobileSwipeMove = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!swipeState.isDragging || !swipeState.ideaId) return;
-    
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    setSwipeState(prev => ({
-      ...prev,
-      currentX: clientX,
-    }));
-  };
 
-  const handleMobileSwipeEnd = () => {
-    if (!swipeState.isDragging || !swipeState.ideaId) return;
-    
-    const deltaX = swipeState.currentX - swipeState.startX;
-    
-    // If swiped left more than 100px, delete the idea
-    if (deltaX < -100) {
-      unsaveIdeaMutation.mutate(swipeState.ideaId);
-    }
-    
-    setSwipeState({
-      ideaId: null,
-      startX: 0,
-      currentX: 0,
-      isDragging: false,
-    });
-  };
-
-  // Mobile drag to reorder
-  const moveMobileIdea = (fromIndex: number, toIndex: number) => {
-    if (fromIndex === toIndex) return;
-    
-    const newOrder = [...mobileOrder];
-    const [movedItem] = newOrder.splice(fromIndex, 1);
-    newOrder.splice(toIndex, 0, movedItem);
-    setMobileOrder(newOrder);
-  };
 
   if (authLoading) {
     return (
@@ -659,8 +719,9 @@ export default function SavedPage() {
                 .filter((idea): idea is Idea => Boolean(idea))
                 .map((idea, index) => {
                   const colorIndex = cardColors[idea.id] ?? index % 8;
-                  const isBeingSwiped = swipeState.ideaId === idea.id;
-                  const swipeOffset = isBeingSwiped ? swipeState.currentX - swipeState.startX : 0;
+                  const isBeingInteracted = swipeState.ideaId === idea.id;
+                  const swipeOffsetX = isBeingInteracted && !swipeState.isVerticalDrag ? swipeState.currentX - swipeState.startX : 0;
+                  const swipeOffsetY = isBeingInteracted && swipeState.isVerticalDrag ? swipeState.currentY - swipeState.startY : 0;
                   
                   const cardStyles = [
                     "bg-card-sage border-card-sage/40",
@@ -683,12 +744,13 @@ export default function SavedPage() {
                       key={idea.id}
                       className="relative"
                       style={{
-                        transform: `translateX(${swipeOffset}px)`,
-                        transition: isBeingSwiped ? 'none' : 'transform 0.2s ease-out',
+                        transform: `translate(${swipeOffsetX}px, ${swipeOffsetY}px)`,
+                        transition: isBeingInteracted ? 'none' : 'transform 0.2s ease-out',
+                        zIndex: isBeingInteracted ? 10 : 1,
                       }}
                     >
                       {/* Delete indicator when swiping left */}
-                      {swipeOffset < -50 && (
+                      {swipeOffsetX < -50 && (
                         <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-500 z-10">
                           <Trash2 className="h-6 w-6" />
                         </div>
@@ -696,14 +758,10 @@ export default function SavedPage() {
                       
                       <Card 
                         className={`${cardStyles[colorIndex]} border-2 card-shadow transition-all duration-200 ${
-                          swipeOffset < -50 ? 'bg-red-50' : ''
-                        }`}
-                        onTouchStart={(e) => handleMobileSwipeStart(e, idea.id)}
-                        onTouchMove={handleMobileSwipeMove}
-                        onTouchEnd={handleMobileSwipeEnd}
-                        onMouseDown={(e) => handleMobileSwipeStart(e, idea.id)}
-                        onMouseMove={handleMobileSwipeMove}
-                        onMouseUp={handleMobileSwipeEnd}
+                          swipeOffsetX < -50 ? 'bg-red-50' : ''
+                        } ${isBeingInteracted ? 'shadow-lg scale-105' : ''}`}
+                        onTouchStart={(e) => handleMobileInteractionStart(e, idea.id, index)}
+                        onMouseDown={(e) => handleMobileInteractionStart(e, idea.id, index)}
                       >
                         <div className="p-3 flex items-center gap-3">
                           {/* Drag Handle */}
