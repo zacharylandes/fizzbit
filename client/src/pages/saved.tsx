@@ -810,7 +810,7 @@ export default function SavedPage() {
 
                   return (
                     <div
-                      key={idea.id}
+                      key={`${idea.id}-${colorIndex}`}
                       className="relative"
                       style={{
                         transform: `translate(${swipeOffsetX}px, ${swipeOffsetY + reorderOffsetY}px)`,
@@ -827,6 +827,7 @@ export default function SavedPage() {
                       )}
                       
                       <Card 
+                        key={`card-${idea.id}-${colorIndex}`}
                         className={`${cardStyles[colorIndex]} border-2 card-shadow transition-all duration-200 ${
                           swipeOffsetX < -50 ? 'bg-red-50 dark:bg-red-900/20' : ''
                         } ${isBeingInteracted ? 'shadow-lg scale-[1.02] ring-2 ring-primary/20' : ''}`}
