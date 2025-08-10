@@ -149,7 +149,7 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Footer Navigation */}
       {isAuthenticated && (
-        <div className={`fixed bottom-0 left-0 right-0 border-t border-border bg-card/90 backdrop-blur-sm transition-transform duration-300 z-50 ${
+        <div className={`fixed bottom-0 left-0 right-0 border-t border-border bg-background transition-transform duration-300 z-50 ${
           showFooter ? 'translate-y-0' : 'translate-y-full'
         }`}>
           <div className="max-w-7xl mx-auto px-6 py-4">
@@ -169,7 +169,7 @@ export default function Layout({ children }: LayoutProps) {
                           : "text-gray-600 dark:text-gray-300 hover:text-card-sage hover:bg-card-sage-bg hover-lift font-medium"
                       }`}
                     >
-                      <Icon className="h-5 w-5" />
+                      <Icon className={`h-5 w-5 ${isActive ? 'text-white' : 'text-gray-700 dark:text-gray-200'}`} />
                       <span className="text-xs font-medium">{item.label}</span>
                       {item.badge && item.badge > 0 && (
                         <span className="absolute -top-1 -right-1 bg-card-sage-bg border border-card-sage/40 text-card-sage text-xs rounded-full h-5 w-5 flex items-center justify-center card-shadow">
