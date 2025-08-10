@@ -248,6 +248,12 @@ export default function SavedPage() {
         duration: 2000,
         variant: "info",
       });
+      
+      // Update mobile order to remove the deleted item
+      if (swipeState.ideaId) {
+        setMobileOrder(prev => prev.filter(id => id !== swipeState.ideaId));
+      }
+      
       // Reset swipe state after successful deletion
       setSwipeState({
         ideaId: null,
@@ -314,16 +320,19 @@ export default function SavedPage() {
         return newColors;
       });
 
-      // Initialize mobile order
+      // Initialize mobile order - preserve existing order and only add new items
       setMobileOrder(prev => {
         const currentIds = savedIdeas.map(idea => idea.id);
-        const newOrder = [...prev.filter(id => currentIds.includes(id))];
+        const filteredOrder = prev.filter(id => currentIds.includes(id));
+        
+        // Add any new ideas to the end
         currentIds.forEach(id => {
-          if (!newOrder.includes(id)) {
-            newOrder.push(id);
+          if (!filteredOrder.includes(id)) {
+            filteredOrder.push(id);
           }
         });
-        return newOrder;
+        
+        return filteredOrder;
       });
     }
   }, [savedIdeas, isMobile]);
