@@ -24,6 +24,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
   const [isDrawing, setIsDrawing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const recordingCounterRef = useRef<number>(0);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { toast } = useToast();
 
@@ -275,12 +276,12 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       setIsRecording(true);
       setRecordingDuration(0);
       
-      // Fix timer increment - use a counter approach instead of time calculation
-      let counter = 0;
+      // Fix timer increment - use useRef for persistent counter
+      recordingCounterRef.current = 0;
       recordingIntervalRef.current = setInterval(() => {
-        counter++;
-        console.log('⏰ Timer tick:', counter, 'seconds');
-        setRecordingDuration(counter);
+        recordingCounterRef.current++;
+        console.log('⏰ Timer tick:', recordingCounterRef.current, 'seconds');
+        setRecordingDuration(recordingCounterRef.current);
       }, 1000);
       
     } catch (error) {
