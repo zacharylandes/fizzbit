@@ -82,6 +82,7 @@ export default function SavedPage() {
     isDragging: boolean;
     isVerticalDrag: boolean;
     dragIndex: number | null;
+    isDeleting: boolean;
   }>({
     ideaId: null,
     startX: 0,
@@ -91,6 +92,7 @@ export default function SavedPage() {
     isDragging: false,
     isVerticalDrag: false,
     dragIndex: null,
+    isDeleting: false,
   });
   
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -157,43 +159,33 @@ export default function SavedPage() {
             ...prev,
             currentX: swipeState.startX - 400, // Slide completely off screen
             isDragging: false, // This will enable transition
-            isVerticalDrag: false
+            isVerticalDrag: false,
+            isDeleting: true // Mark as deleting to prevent state reset
           }));
           
           // Remove after animation completes
           setTimeout(() => {
             const currentUnsaveIdea = unsaveIdeaMutation;
             currentUnsaveIdea.mutate(swipeState.ideaId!);
-            
-            // Reset state after removal
-            setTimeout(() => {
-              setSwipeState({
-                ideaId: null,
-                startX: 0,
-                startY: 0,
-                currentX: 0,
-                currentY: 0,
-                isDragging: false,
-                isVerticalDrag: false,
-                dragIndex: null,
-              });
-            }, 100);
-          }, 250); // Wait for slide animation
+          }, 300); // Wait for slide animation to complete
           return;
         }
       }
       
-      // Reset state for non-delete swipes
-      setSwipeState({
-        ideaId: null,
-        startX: 0,
-        startY: 0,
-        currentX: 0,
-        currentY: 0,
-        isDragging: false,
-        isVerticalDrag: false,
-        dragIndex: null,
-      });
+      // Reset state for non-delete swipes (only if not deleting)
+      if (!swipeState.isDeleting) {
+        setSwipeState({
+          ideaId: null,
+          startX: 0,
+          startY: 0,
+          currentX: 0,
+          currentY: 0,
+          isDragging: false,
+          isVerticalDrag: false,
+          dragIndex: null,
+          isDeleting: false,
+        });
+      }
     };
 
     document.addEventListener('touchmove', handleGlobalMove, { passive: false });
@@ -255,6 +247,18 @@ export default function SavedPage() {
         description: "Moved to trash 🗑️",
         duration: 2000,
         variant: "info",
+      });
+      // Reset swipe state after successful deletion
+      setSwipeState({
+        ideaId: null,
+        startX: 0,
+        startY: 0,
+        currentX: 0,
+        currentY: 0,
+        isDragging: false,
+        isVerticalDrag: false,
+        dragIndex: null,
+        isDeleting: false,
       });
     },
     onError: (error) => {
@@ -751,6 +755,7 @@ export default function SavedPage() {
                 .map((idea, index) => {
                   const colorIndex = cardColors[idea.id] ?? index % 8;
                   const isBeingInteracted = swipeState.ideaId === idea.id;
+                  const isDeleting = isBeingInteracted && swipeState.isDeleting;
                   const swipeOffsetX = isBeingInteracted && !swipeState.isVerticalDrag ? swipeState.currentX - swipeState.startX : 0;
                   const swipeOffsetY = isBeingInteracted && swipeState.isVerticalDrag ? swipeState.currentY - swipeState.startY : 0;
                   
@@ -776,8 +781,9 @@ export default function SavedPage() {
                       className="relative"
                       style={{
                         transform: `translate(${swipeOffsetX}px, ${swipeOffsetY}px)`,
-                        transition: swipeState.isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                        transition: (swipeState.isDragging && !isDeleting) ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                         zIndex: isBeingInteracted ? 10 : 1,
+                        opacity: isDeleting ? 0 : 1,
                       }}
                     >
                       {/* Delete indicator when swiping left */}
