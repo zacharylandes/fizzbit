@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut, Pencil, Eraser, ChevronDown, GripVertical } from "lucide-react";
+import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut, Pencil, Eraser, ChevronDown, GripVertical, Menu, Edit2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -73,6 +73,12 @@ export default function SavedPage() {
   const [isDrawingMode, setIsDrawingMode] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileOrder, setMobileOrder] = useState<string[]>([]);
+  
+  // Sidebar state
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [selectedColorGroup, setSelectedColorGroup] = useState<number | null>(null);
+  const [groupTitles, setGroupTitles] = useState<{ [colorIndex: number]: string }>({});
+  const [editingGroup, setEditingGroup] = useState<number | null>(null);
   const [swipeState, setSwipeState] = useState<{
     ideaId: string | null;
     startX: number;
@@ -652,16 +658,159 @@ export default function SavedPage() {
     return null;
   }
 
+  // Get available color groups from saved ideas
+  const availableColorGroups = Array.from(new Set(Object.values(cardColors)))
+    .sort((a, b) => a - b);
+  
+  // Get default group title
+  const getGroupTitle = (colorIndex: number) => {
+    return groupTitles[colorIndex] || `Group ${colorIndex + 1}`;
+  };
+  
+  // Handle group title editing
+  const handleEditGroupTitle = (colorIndex: number, newTitle: string) => {
+    setGroupTitles(prev => ({
+      ...prev,
+      [colorIndex]: newTitle
+    }));
+    setEditingGroup(null);
+  };
+  
+  // Filter ideas by selected color group
+  const filteredIdeas = selectedColorGroup !== null 
+    ? savedIdeas.filter(idea => cardColors[idea.id] === selectedColorGroup)
+    : savedIdeas;
+
   return (
-    <div className="min-h-screen flex flex-col relative bg-background">
+    <div className="min-h-screen flex relative bg-background">
+      {/* Collapsible Sidebar */}
+      <div className={`fixed top-0 left-0 h-full z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
+        sidebarExpanded ? 'w-64' : 'w-12'
+      }`}>
+        <div className="p-4">
+          {/* Sidebar Header */}
+          <div className="flex items-center gap-3 mb-6">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setSidebarExpanded(!sidebarExpanded)}
+              className="h-8 w-8 p-0"
+            >
+              <Menu className="h-4 w-4" />
+            </Button>
+            {sidebarExpanded && (
+              <h2 className="font-semibold text-sm">Groups</h2>
+            )}
+          </div>
+          
+          {/* Color Groups */}
+          {sidebarExpanded && (
+            <div className="space-y-3">
+              {/* All Ideas Option */}
+              <button
+                onClick={() => setSelectedColorGroup(null)}
+                className={`w-full p-3 rounded-lg border text-left transition-colors ${
+                  selectedColorGroup === null 
+                    ? 'bg-primary text-primary-foreground border-primary' 
+                    : 'bg-card border-border hover:bg-accent'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400" />
+                  <span className="text-sm font-medium">All Ideas</span>
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    {savedIdeas.length}
+                  </span>
+                </div>
+              </button>
+              
+              {/* Color Group Options */}
+              {availableColorGroups.map(colorIndex => {
+                const ideaCount = savedIdeas.filter(idea => cardColors[idea.id] === colorIndex).length;
+                if (ideaCount === 0) return null;
+                
+                const cardStyles = [
+                  "bg-card-sage border-card-sage/40",
+                  "bg-card-blue border-card-blue/40", 
+                  "bg-card-cream border-card-cream/40",
+                  "bg-card-lightblue border-card-lightblue/40",
+                  "bg-card-purple border-card-purple/40",
+                  "bg-card-peach border-card-peach/40",
+                  "bg-card-lavender border-card-lavender/40",
+                  "bg-card-mint border-card-mint/40"
+                ];
+                
+                return (
+                  <button
+                    key={colorIndex}
+                    onClick={() => setSelectedColorGroup(colorIndex)}
+                    className={`w-full p-3 rounded-lg border text-left transition-colors ${
+                      selectedColorGroup === colorIndex 
+                        ? 'bg-primary text-primary-foreground border-primary' 
+                        : 'bg-card border-border hover:bg-accent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-4 h-4 rounded-full ${cardStyles[colorIndex]?.split(' ')[0] || 'bg-gray-400'}`} />
+                      <div className="flex-1 min-w-0">
+                        {editingGroup === colorIndex ? (
+                          <input
+                            type="text"
+                            defaultValue={getGroupTitle(colorIndex)}
+                            className="w-full text-sm font-medium bg-transparent border-none outline-none"
+                            onBlur={(e) => handleEditGroupTitle(colorIndex, e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleEditGroupTitle(colorIndex, e.currentTarget.value);
+                              } else if (e.key === 'Escape') {
+                                setEditingGroup(null);
+                              }
+                            }}
+                            autoFocus
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        ) : (
+                          <span className="text-sm font-medium truncate">
+                            {getGroupTitle(colorIndex)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground">{ideaCount}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingGroup(colorIndex);
+                          }}
+                          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:opacity-100"
+                        >
+                          <Edit2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Fixed Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+      <div className={`fixed top-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border transition-all duration-300 ${
+        sidebarExpanded ? 'left-64' : 'left-12'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 py-3">
-          {/* Header Text - Vertically Aligned Above Toolbar */}
+          {/* Header Text */}
           <div className="mb-3">
-            <h1 className="text-xl font-crimson font-semibold text-foreground">Saved Ideas</h1>
+            <h1 className="text-xl font-crimson font-semibold text-foreground">
+              {selectedColorGroup !== null ? getGroupTitle(selectedColorGroup) : 'Saved Ideas'}
+            </h1>
             <p className="text-muted-foreground text-sm font-inter">
-              {savedIdeas.length} {savedIdeas.length === 1 ? 'idea' : 'ideas'} • Drag to organize
+              {filteredIdeas.length} {filteredIdeas.length === 1 ? 'idea' : 'ideas'} 
+              {selectedColorGroup !== null ? ` in this group` : ''} • Drag to organize
             </p>
           </div>
           
@@ -735,7 +884,9 @@ export default function SavedPage() {
       </div>
 
       {/* Content Area */}
-      <div className={`flex-1 ${isMobile ? 'pt-20' : 'pt-24'} relative overflow-hidden`}>
+      <div className={`flex-1 ${isMobile ? 'pt-20' : 'pt-24'} relative overflow-hidden transition-all duration-300 ${
+        sidebarExpanded ? 'ml-64' : 'ml-12'
+      }`}>
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -743,14 +894,19 @@ export default function SavedPage() {
               <p className="text-muted-foreground">Loading your saved ideas...</p>
             </div>
           </div>
-        ) : savedIdeas.length === 0 ? (
+        ) : filteredIdeas.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center p-8">
               <div className="bg-card border border-card-sage/30 rounded-2xl p-8 max-w-sm mx-auto shadow-sm">
                 <Heart className="h-12 w-12 mx-auto mb-4 text-card-sage" />
-                <h2 className="text-xl font-crimson font-semibold text-foreground mb-2">No saved ideas yet</h2>
+                <h2 className="text-xl font-crimson font-semibold text-foreground mb-2">
+                  {selectedColorGroup !== null ? 'No ideas in this group' : 'No saved ideas yet'}
+                </h2>
                 <p className="text-muted-foreground mb-6 font-inter text-sm">
-                  Swipe right or up on ideas you love to save them here!
+                  {selectedColorGroup !== null 
+                    ? 'Save more ideas and assign them to this group!'
+                    : 'Swipe right or up on ideas you love to save them here!'
+                  }
                 </p>
                 <Link href="/">
                   <Button className="bg-card-sage text-white hover:bg-card-sage/90 shadow-sm">
@@ -767,6 +923,7 @@ export default function SavedPage() {
               {mobileOrder
                 .map(ideaId => savedIdeas.find(idea => idea.id === ideaId))
                 .filter((idea): idea is Idea => Boolean(idea))
+                .filter(idea => selectedColorGroup === null || cardColors[idea.id] === selectedColorGroup)
                 .map((idea, index) => {
                   const colorIndex = cardColors[idea.id] ?? index % 8;
                   console.log('🎨 Mobile card render:', { ideaId: idea.id, colorIndex, cardColorsState: cardColors[idea.id] });
@@ -959,7 +1116,7 @@ export default function SavedPage() {
             </svg>
 
             {/* Draggable Cards */}
-            {savedIdeas.map((idea, index) => {
+            {filteredIdeas.map((idea, index) => {
               const position = positions[idea.id] || { x: 0, y: 0 };
               const isDragging = dragState.dragId === idea.id;
               const colorIndex = cardColors[idea.id] ?? index % 5;
