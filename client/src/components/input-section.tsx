@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Camera, Edit, Upload, Sparkles, Mic, MicOff, Square, Paintbrush } from "lucide-react";
+import { Camera, Edit, Upload, Sparkles, Mic, MicOff, Square, Paintbrush, Trash2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -279,8 +279,11 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       const startTime = Date.now();
       recordingIntervalRef.current = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        console.log('⏰ Timer tick:', elapsed);
-        setRecordingDuration(elapsed);
+        console.log('⏰ Timer tick:', elapsed, 'seconds');
+        setRecordingDuration(prev => {
+          console.log('⏰ Setting duration from', prev, 'to', elapsed);
+          return elapsed;
+        });
       }, 1000);
       
     } catch (error) {
@@ -309,6 +312,39 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       
       // Keep duration visible until processing starts, then reset
       setTimeout(() => setRecordingDuration(0), 500);
+    }
+  };
+
+  const cancelRecording = () => {
+    console.log('🗑️ Cancel recording called');
+    if (mediaRecorderRef.current && isRecording) {
+      // Stop the recorder without processing the audio
+      mediaRecorderRef.current.ondataavailable = null;
+      mediaRecorderRef.current.onstop = null;
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
+      }
+      
+      // Reset duration immediately
+      setRecordingDuration(0);
+      
+      // Stop all microphone tracks
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          stream.getTracks().forEach(track => track.stop());
+        })
+        .catch(() => {/* ignore cleanup errors */});
+      
+      toast({
+        title: "Recording Cancelled",
+        description: "Voice input was discarded",
+        duration: 1000,
+        variant: "info",
+      });
     }
   };
 
@@ -465,34 +501,47 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
 
         {/* Voice Input and Drawing Buttons - Side by Side */}
         <div className="mt-3 flex gap-3">
-          <Button
-            onClick={isRecording ? stopRecording : startRecording}
-            className={`flex-1 ${
-              isRecording 
-                ? 'bg-card-peach hover:bg-card-peach/90 text-white border-card-peach shadow-md'
-                : generateFromAudioMutation.isPending
-                ? 'bg-card-light-blue hover:bg-card-light-blue/90 text-white border-card-light-blue shadow-md'
-                : 'bg-card-light-blue-bg border-card-light-blue/40 hover:bg-card-light-blue-bg/90 hover-lift text-card-light-blue card-shadow'
-            } rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target`}
-            disabled={(isLoading || generateFromAudioMutation.isPending) && !isRecording}
-          >
-            {generateFromAudioMutation.isPending ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                Processing...
-              </>
-            ) : isRecording ? (
-              <>
+          {isRecording ? (
+            // Recording controls - Stop and Cancel
+            <>
+              <Button
+                onClick={stopRecording}
+                className="flex-1 bg-card-peach hover:bg-card-peach/90 text-white border-card-peach shadow-md rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target"
+              >
                 <div className="w-3 h-3 bg-white rounded-sm mr-2"></div>
                 {formatDuration(recordingDuration)}
-              </>
-            ) : (
-              <>
-                <Mic className="mr-2 h-4 w-4" />
-                Voice Input
-              </>
-            )}
-          </Button>
+              </Button>
+              <Button
+                onClick={cancelRecording}
+                className="bg-red-500 hover:bg-red-600 text-white border-red-500 shadow-md rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            // Normal voice input button
+            <Button
+              onClick={startRecording}
+              className={`flex-1 ${
+                generateFromAudioMutation.isPending
+                  ? 'bg-card-light-blue hover:bg-card-light-blue/90 text-white border-card-light-blue shadow-md'
+                  : 'bg-card-light-blue-bg border-card-light-blue/40 hover:bg-card-light-blue-bg/90 hover-lift text-card-light-blue card-shadow'
+              } rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target`}
+              disabled={isLoading || generateFromAudioMutation.isPending}
+            >
+              {generateFromAudioMutation.isPending ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Mic className="mr-2 h-4 w-4" />
+                  Voice Input
+                </>
+              )}
+            </Button>
+          )}
 
           <Button
             onClick={() => setShowDrawingPad(!showDrawingPad)}
