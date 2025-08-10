@@ -143,13 +143,18 @@ export default function SavedPage() {
         if (swipeState.dragIndex !== null && Math.abs(moveDistance) > 0) {
           const newIndex = Math.max(0, Math.min(mobileOrder.length - 1, swipeState.dragIndex + moveDistance));
           if (newIndex !== swipeState.dragIndex) {
-            moveMobileIdea(swipeState.dragIndex, newIndex);
+            // Using callback to access latest functions
+            const currentMobileIdea = moveMobileIdea;
+            const currentUnsaveIdea = unsaveIdeaMutation;
+            currentMobileIdea(swipeState.dragIndex, newIndex);
           }
         }
       } else if (deltaX < -100) {
         // Handle horizontal swipe to delete
         if (swipeState.ideaId) {
-          unsaveIdeaMutation.mutate(swipeState.ideaId);
+          // Using callback to access latest mutation
+          const currentUnsaveIdea = unsaveIdeaMutation;
+          currentUnsaveIdea.mutate(swipeState.ideaId);
         }
       }
       
@@ -176,7 +181,7 @@ export default function SavedPage() {
       document.removeEventListener('mousemove', handleGlobalMove);
       document.removeEventListener('mouseup', handleGlobalEnd);
     };
-  }, [isMobile, swipeState.isDragging, swipeState.startX, swipeState.startY, swipeState.currentX, swipeState.currentY, swipeState.isVerticalDrag, swipeState.dragIndex, swipeState.ideaId, mobileOrder.length, moveMobileIdea, unsaveIdeaMutation]);
+  }, [isMobile, swipeState.isDragging, swipeState.startX, swipeState.startY, swipeState.currentX, swipeState.currentY, swipeState.isVerticalDrag, swipeState.dragIndex, swipeState.ideaId, mobileOrder.length]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -201,7 +206,17 @@ export default function SavedPage() {
 
   const savedIdeas = savedIdeasData?.ideas || [];
 
-  // Unsave idea mutation
+  // Mobile drag to reorder - declared before useEffect
+  const moveMobileIdea = useCallback((fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    
+    const newOrder = [...mobileOrder];
+    const [movedItem] = newOrder.splice(fromIndex, 1);
+    newOrder.splice(toIndex, 0, movedItem);
+    setMobileOrder(newOrder);
+  }, [mobileOrder]);
+
+  // Unsave idea mutation - declared before useEffect
   const unsaveIdeaMutation = useMutation({
     mutationFn: async (ideaId: string) => {
       const response = await apiRequest("DELETE", `/api/ideas/${ideaId}/save`);
@@ -235,16 +250,6 @@ export default function SavedPage() {
       });
     },
   });
-
-  // Mobile drag to reorder
-  const moveMobileIdea = useCallback((fromIndex: number, toIndex: number) => {
-    if (fromIndex === toIndex) return;
-    
-    const newOrder = [...mobileOrder];
-    const [movedItem] = newOrder.splice(fromIndex, 1);
-    newOrder.splice(toIndex, 0, movedItem);
-    setMobileOrder(newOrder);
-  }, [mobileOrder]);
 
   // Initialize positions and colors for new ideas
   useEffect(() => {
