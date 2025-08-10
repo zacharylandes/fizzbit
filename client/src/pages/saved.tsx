@@ -150,14 +150,37 @@ export default function SavedPage() {
           }
         }
       } else if (deltaX < -100) {
-        // Handle horizontal swipe to delete
+        // Handle horizontal swipe to delete - animate slide away before removing
         if (swipeState.ideaId) {
-          // Using callback to access latest mutation
-          const currentUnsaveIdea = unsaveIdeaMutation;
-          currentUnsaveIdea.mutate(swipeState.ideaId);
+          // Continue the swipe animation to completion
+          setSwipeState(prev => ({
+            ...prev,
+            currentX: swipeState.startX - 300, // Slide further left
+            isDragging: false
+          }));
+          
+          // Remove after animation completes
+          setTimeout(() => {
+            const currentUnsaveIdea = unsaveIdeaMutation;
+            currentUnsaveIdea.mutate(swipeState.ideaId);
+            
+            // Reset state after removal
+            setSwipeState({
+              ideaId: null,
+              startX: 0,
+              startY: 0,
+              currentX: 0,
+              currentY: 0,
+              isDragging: false,
+              isVerticalDrag: false,
+              dragIndex: null,
+            });
+          }, 300); // Wait for slide animation
+          return;
         }
       }
       
+      // Reset state for non-delete swipes
       setSwipeState({
         ideaId: null,
         startX: 0,
