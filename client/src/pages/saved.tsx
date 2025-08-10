@@ -152,30 +152,33 @@ export default function SavedPage() {
       } else if (deltaX < -100) {
         // Handle horizontal swipe to delete - animate slide away before removing
         if (swipeState.ideaId) {
-          // Continue the swipe animation to completion
+          // Set state to animate the card sliding away
           setSwipeState(prev => ({
             ...prev,
-            currentX: swipeState.startX - 300, // Slide further left
-            isDragging: false
+            currentX: swipeState.startX - 400, // Slide completely off screen
+            isDragging: false, // This will enable transition
+            isVerticalDrag: false
           }));
           
           // Remove after animation completes
           setTimeout(() => {
             const currentUnsaveIdea = unsaveIdeaMutation;
-            currentUnsaveIdea.mutate(swipeState.ideaId);
+            currentUnsaveIdea.mutate(swipeState.ideaId!);
             
             // Reset state after removal
-            setSwipeState({
-              ideaId: null,
-              startX: 0,
-              startY: 0,
-              currentX: 0,
-              currentY: 0,
-              isDragging: false,
-              isVerticalDrag: false,
-              dragIndex: null,
-            });
-          }, 300); // Wait for slide animation
+            setTimeout(() => {
+              setSwipeState({
+                ideaId: null,
+                startX: 0,
+                startY: 0,
+                currentX: 0,
+                currentY: 0,
+                isDragging: false,
+                isVerticalDrag: false,
+                dragIndex: null,
+              });
+            }, 100);
+          }, 250); // Wait for slide animation
           return;
         }
       }
@@ -773,7 +776,7 @@ export default function SavedPage() {
                       className="relative"
                       style={{
                         transform: `translate(${swipeOffsetX}px, ${swipeOffsetY}px)`,
-                        transition: isBeingInteracted ? 'none' : 'transform 0.2s ease-out',
+                        transition: swipeState.isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                         zIndex: isBeingInteracted ? 10 : 1,
                       }}
                     >
