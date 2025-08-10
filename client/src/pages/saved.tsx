@@ -845,18 +845,18 @@ export default function SavedPage() {
                           {/* Controls */}
                           <div className="flex-shrink-0 flex items-center gap-2">
                             {/* Color Picker */}
-                            <DropdownMenu>
+                            <DropdownMenu modal={false}>
                               <DropdownMenuTrigger asChild>
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  className="h-6 w-6 p-0 hover:bg-gray-200"
+                                  className="h-6 w-6 p-0 hover:bg-gray-200 dark:hover:bg-gray-700"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   <ChevronDown className="h-3 w-3" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-32">
+                              <DropdownMenuContent align="end" className="w-32" onCloseAutoFocus={(e) => e.preventDefault()}>
                                 {cardStyles.map((style, idx) => (
                                   <DropdownMenuItem
                                     key={idx}
@@ -866,7 +866,7 @@ export default function SavedPage() {
                                     }}
                                     className="flex items-center gap-2"
                                   >
-                                    <div className={`w-3 h-3 rounded-full ${style}`} />
+                                    <div className={`w-3 h-3 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')}`} />
                                     <span className="text-xs">{colorNames[idx]}</span>
                                   </DropdownMenuItem>
                                 ))}
@@ -998,18 +998,18 @@ export default function SavedPage() {
                     <div className="flex-shrink-0 p-1 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50 rounded-t-lg">
                       <div className="flex items-center justify-between">
                         {/* Color Picker Dropdown - Left Side */}
-                        <DropdownMenu>
+                        <DropdownMenu modal={false}>
                           <DropdownMenuTrigger asChild>
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="h-4 w-4 p-0 hover:bg-gray-200 text-gray-400 dark:text-gray-500"
+                              className="h-4 w-4 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-500"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <ChevronDown className="h-2 w-2" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="w-32">
+                          <DropdownMenuContent align="start" className="w-32" onCloseAutoFocus={(e) => e.preventDefault()}>
                             {cardStyles.map((style, idx) => (
                               <DropdownMenuItem
                                 key={idx}
@@ -1019,7 +1019,7 @@ export default function SavedPage() {
                                 }}
                                 className="flex items-center gap-2"
                               >
-                                <div className={`w-3 h-3 rounded-full ${style}`} />
+                                <div className={`w-3 h-3 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')}`} />
                                 <span className="text-xs">{colorNames[idx]}</span>
                               </DropdownMenuItem>
                             ))}
