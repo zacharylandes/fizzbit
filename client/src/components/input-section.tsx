@@ -526,14 +526,14 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
               onClick={startRecording}
               className={`flex-1 ${
                 generateFromAudioMutation.isPending
-                  ? 'bg-card-light-blue hover:bg-card-light-blue/90 text-white border-card-light-blue shadow-md'
+                  ? 'bg-card-light-blue hover:bg-card-light-blue/90 text-card-light-blue border-card-light-blue shadow-md'
                   : 'bg-card-light-blue-bg border-card-light-blue/40 hover:bg-card-light-blue-bg/90 hover-lift text-card-light-blue card-shadow'
               } rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target`}
               disabled={isLoading || generateFromAudioMutation.isPending}
             >
               {generateFromAudioMutation.isPending ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-card-light-blue border-t-transparent mr-2"></div>
                   Processing...
                 </>
               ) : (
