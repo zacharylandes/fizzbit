@@ -683,8 +683,8 @@ export default function SavedPage() {
 
   return (
     <div className="min-h-screen flex relative bg-background">
-      {/* Collapsible Sidebar */}
-      <div className={`fixed top-0 left-0 h-full z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
+      {/* Collapsible Sidebar - Positioned below header */}
+      <div className={`fixed top-16 left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
         sidebarExpanded ? 'w-64' : 'w-12'
       }`}>
         <div className="p-4">
@@ -798,8 +798,8 @@ export default function SavedPage() {
         </div>
       </div>
 
-      {/* Fixed Header */}
-      <div className={`fixed top-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border transition-all duration-300 ${
+      {/* Page Title Section - Below main header */}
+      <div className={`fixed top-16 right-0 z-50 bg-background border-b border-border transition-all duration-300 ${
         sidebarExpanded ? 'left-64' : 'left-12'
       }`}>
         <div className="max-w-7xl mx-auto px-4 py-3">
@@ -884,7 +884,7 @@ export default function SavedPage() {
       </div>
 
       {/* Content Area */}
-      <div className={`flex-1 ${isMobile ? 'pt-20' : 'pt-24'} relative overflow-hidden transition-all duration-300 ${
+      <div className={`flex-1 ${isMobile ? 'pt-32' : 'pt-36'} relative overflow-hidden transition-all duration-300 ${
         sidebarExpanded ? 'ml-64' : 'ml-12'
       }`}>
         {isLoading ? (
