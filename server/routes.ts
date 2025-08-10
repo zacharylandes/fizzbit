@@ -83,9 +83,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(400).json({ error: "Prompt is required" });
     }
 
+    console.log('📝 Received prompt from client:', prompt);
+
     try {
-      // Add default prefix to enhance AI response quality
-      const enhancedPrompt = `give me unique ideas that avoid the obvious for ${prompt}`;
+      // Don't add prefix again if it's already there (from voice input)
+      const enhancedPrompt = prompt.startsWith('give me unique ideas that avoid the obvious for') 
+        ? prompt 
+        : `give me unique ideas that avoid the obvious for ${prompt}`;
+      
+      console.log('🚀 Enhanced prompt being processed:', enhancedPrompt);
       
       // Use Hugging Face Llama 3 for fast and cheap idea generation
       const ideas = await generateIdeasFromText(enhancedPrompt);

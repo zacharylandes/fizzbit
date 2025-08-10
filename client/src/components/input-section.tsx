@@ -207,7 +207,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     recognition.interimResults = false;
     recognition.lang = 'en-US';
     
-    recognition.onstart = () => {
+    recognition.onstart = (): void => {
       setIsRecording(true);
       setRecordingDuration(0);
       recordingCounterRef.current = 0;
@@ -229,22 +229,24 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       });
     };
     
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: any): void => {
       const transcript = event.results[0][0].transcript;
       console.log('Web Speech Recognition result:', transcript);
       
       // Generate ideas directly from the transcript
       const enhancedPrompt = `give me unique ideas that avoid the obvious for ${transcript}`;
+      console.log('Enhanced prompt being sent:', enhancedPrompt);
       generateFromTextMutation.mutate(enhancedPrompt);
       
       toast({
-        title: "Processing Your Idea",
-        description: `"${transcript.slice(0, 50)}${transcript.length > 50 ? '...' : ''}"`,
-        duration: 2000,
+        title: "Speech Recognized!",
+        description: `"${transcript}"`,
+        duration: 3000,
+        variant: "success",
       });
     };
     
-    recognition.onerror = (event) => {
+    recognition.onerror = (event: any): void => {
       console.error('Web Speech Recognition error:', event.error);
       setIsRecording(false);
       
@@ -268,7 +270,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       });
     };
     
-    recognition.onend = () => {
+    recognition.onend = (): void => {
       setIsRecording(false);
       setRecordingDuration(0);
       
