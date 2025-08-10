@@ -1,10 +1,16 @@
 import { HfInference } from '@huggingface/inference';
+import OpenAI from 'openai';
 
 if (!process.env.HUGGINGFACE_TOKEN) {
   throw new Error('HUGGINGFACE_TOKEN is required');
 }
 
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error('OPENAI_API_KEY is required');
+}
+
 const hf = new HfInference(process.env.HUGGINGFACE_TOKEN);
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export interface IdeaResponse {
   id: string;
@@ -102,52 +108,62 @@ export async function generateRelatedIdeas(contextualPrompt: string, count: numb
 
 export async function generateIdeasFromText(prompt: string, count: number = 8): Promise<IdeaResponse[]> {
   try {
-    console.log('Using Hugging Face models for free text generation...');
+    console.log('Using OpenAI for reliable text generation...');
     
     // Detect if user is asking for a list format
     const isListRequest = /\b(list|names?|titles?|suggestions?|options?)\b/i.test(prompt) && 
                          !/\b(idea|project|concept|activity|exercise)\b/i.test(prompt);
     
-    // Try multiple Hugging Face models for reliable results
-    const models = [
-      'mistralai/Mistral-7B-Instruct-v0.1',
-      'microsoft/DialoGPT-medium',
-      'meta-llama/Llama-2-7b-chat-hf'
-    ];
+    // Use OpenAI for reliable text generation since Hugging Face models are unavailable
+    const systemPrompt = isListRequest 
+      ? `Generate exactly ${count} concise, creative suggestions. Each should be unique and practical. Format as a JSON array with objects containing "title" and "description" fields.`
+      : `Generate exactly ${count} unique, inspiring creative ideas. Each should be practical and actionable with a clear title and detailed description. Format as a JSON array with objects containing "title" and "description" fields.`;
     
-    for (const model of models) {
+    const userPrompt = isListRequest 
+      ? `Generate ${count} suggestions for: ${prompt}`
+      : `Generate ${count} creative ideas for: ${prompt}`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini", // Fast and cost-effective
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.8,
+      max_tokens: 1000
+    });
+
+    const responseText = completion.choices[0].message.content;
+    if (responseText) {
       try {
-        const systemPrompt = isListRequest 
-          ? `Generate exactly ${count} concise, creative suggestions. Format as a numbered list with brief descriptions.`
-          : `Generate exactly ${count} unique, inspiring creative ideas. Each should be practical and actionable with a clear title and detailed description.`;
+        const jsonResponse = JSON.parse(responseText);
+        let ideas: any[] = [];
         
-        const userPrompt = isListRequest 
-          ? `Generate ${count} suggestions for: ${prompt}`
-          : `Generate ${count} creative ideas for: ${prompt}`;
-          
-        const fullPrompt = `${systemPrompt}\n\nUser: ${userPrompt}\n\nAssistant: I'll generate ${count} creative ideas:\n\n`;
-        
-        const result = await hf.textGeneration({
-          model,
-          inputs: fullPrompt,
-          parameters: {
-            max_new_tokens: isListRequest ? 400 : 800,
-            temperature: 0.8,
-            top_p: 0.9,
-            return_full_text: false
-          }
-        });
-        
-        if (result.generated_text) {
-          const ideas = parseTextResponse(result.generated_text, count, prompt);
-          if (ideas.length > 0) {
-            console.log(`Successfully generated ${ideas.length} ideas using ${model}`);
-            return ideas;
-          }
+        // Handle different JSON response formats
+        if (Array.isArray(jsonResponse)) {
+          ideas = jsonResponse;
+        } else if (jsonResponse.ideas && Array.isArray(jsonResponse.ideas)) {
+          ideas = jsonResponse.ideas;
+        } else if (jsonResponse.suggestions && Array.isArray(jsonResponse.suggestions)) {
+          ideas = jsonResponse.suggestions;
         }
-      } catch (modelError) {
-        console.error(`Model ${model} failed:`, modelError);
-        continue; // Try next model
+
+        const formattedIdeas = ideas.slice(0, count).map((idea, index) => ({
+          id: `idea-${Date.now()}-${index}`,
+          title: idea.title || `Idea ${index + 1}`,
+          description: idea.description || idea.content || 'Creative idea generated for you.'
+        }));
+
+        console.log(`Successfully generated ${formattedIdeas.length} ideas using OpenAI`);
+        return formattedIdeas;
+      } catch (parseError) {
+        console.error('Failed to parse OpenAI JSON response:', parseError);
+        // Fall back to text parsing if JSON parsing fails
+        const ideas = parseTextResponse(responseText, count, prompt);
+        if (ideas.length > 0) {
+          return ideas;
+        }
       }
     }
 
