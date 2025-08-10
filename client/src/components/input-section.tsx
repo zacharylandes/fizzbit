@@ -282,6 +282,13 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       recordingCounterRef.current = 0;
       console.log('🔢 Counter reset to:', recordingCounterRef.current);
       
+      // Clear any existing interval first
+      if (recordingIntervalRef.current) {
+        console.log('🧹 Clearing existing interval');
+        clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
+      }
+      
       recordingIntervalRef.current = setInterval(() => {
         recordingCounterRef.current++;
         console.log('⏰ Timer tick:', recordingCounterRef.current, 'seconds');
@@ -290,6 +297,11 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       }, 1000);
       
       console.log('✅ Timer interval created:', !!recordingIntervalRef.current);
+      
+      // Test the interval immediately
+      setTimeout(() => {
+        console.log('🧪 Testing interval after 100ms - is it still there?', !!recordingIntervalRef.current);
+      }, 100);
       
     } catch (error) {
       console.error('Error accessing microphone:', error);
@@ -455,17 +467,17 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     }
   }, [shouldAutoGenerate, promptValue]);
 
-  // Cleanup recording on unmount
+  // Cleanup recording on unmount only
   useEffect(() => {
     return () => {
-      if (isRecording && mediaRecorderRef.current) {
+      if (mediaRecorderRef.current) {
         mediaRecorderRef.current.stop();
       }
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
       }
     };
-  }, [isRecording]);
+  }, []); // Empty dependency array - only run on unmount
 
   const isLoading = generateFromTextMutation.isPending || generateFromImageMutation.isPending || generateFromAudioMutation.isPending;
 
