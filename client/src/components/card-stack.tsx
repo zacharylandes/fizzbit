@@ -197,12 +197,23 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
     onSuccess: (data) => {
       if (data.ideas && data.ideas.length > 0) {
         console.log('🔄 PREFETCH SUCCESS - Adding', data.ideas.length, 'more ideas from original prompt');
-        // Add new ideas to the end of the stack
+        // Add new ideas to the end of the stack with deduplication
         setCards(prev => {
-          const newCards = [...prev, ...data.ideas];
+          // Create a set of existing titles for deduplication
+          const existingTitles = new Set(prev.map(card => card.title.toLowerCase().trim()));
+          
+          // Filter out duplicate ideas based on title similarity
+          const uniqueNewIdeas = data.ideas.filter((newIdea: Idea) => {
+            const normalizedTitle = newIdea.title.toLowerCase().trim();
+            return !existingTitles.has(normalizedTitle);
+          });
+          
+          console.log('🔍 DEDUP: Filtered', data.ideas.length - uniqueNewIdeas.length, 'duplicate ideas');
+          
+          const newCards = [...prev, ...uniqueNewIdeas];
           // Assign colors to new cards
           const newColors: { [key: string]: number } = {};
-          data.ideas.forEach((card: Idea, index: number) => {
+          uniqueNewIdeas.forEach((card: Idea, index: number) => {
             newColors[card.id] = (prev.length + index) % 3;
           });
           setCardColors(prevColors => ({ ...prevColors, ...newColors }));
@@ -240,15 +251,15 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
     },
   });
 
-  // Smart prefetching logic - check when cards get low and ensure continuous flow
+  // Smart prefetching logic - check when cards get low and ensure continuous flow with deduplication
   const checkAndPrefetch = () => {
     console.log('🔄 Checking prefetch - Cards remaining:', cards.length, 'Has context:', !!currentExploreContext, 'Is pending:', prefetchMoreIdeasMutation.isPending);
     
-    // VERY aggressive prefetching - trigger when 8 or fewer cards remain
-    if (cards.length <= 8 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
+    // Less aggressive prefetching to avoid repetition - trigger when 5 or fewer cards remain
+    if (cards.length <= 5 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
       console.log('🔄 TRIGGERING PREFETCH for prompt:', currentExploreContext.originalPrompt);
       prefetchMoreIdeasMutation.mutate();
-    } else if (cards.length <= 3 && !currentExploreContext && !getRandomIdeasMutation.isPending) {
+    } else if (cards.length <= 2 && !currentExploreContext && !getRandomIdeasMutation.isPending) {
       // Emergency fallback to random ideas if no context and very low cards
       console.log('🔄 EMERGENCY PREFETCH - Getting random ideas');
       const existingIds = cards.map(c => c.id);

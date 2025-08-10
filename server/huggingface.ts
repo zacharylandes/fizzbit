@@ -114,10 +114,14 @@ export async function generateIdeasFromText(prompt: string, count: number = 8): 
     const isListRequest = /\b(list|names?|titles?|suggestions?|options?)\b/i.test(prompt) && 
                          !/\b(idea|project|concept|activity|exercise)\b/i.test(prompt);
     
+    // Add timestamp to ensure unique requests and increase temperature for more variety
+    const timestamp = Date.now();
+    const randomSeed = Math.floor(Math.random() * 1000);
+    
     // Use OpenAI for reliable text generation since Hugging Face models are unavailable
     const systemPrompt = isListRequest 
-      ? `Generate exactly ${count} concise, creative suggestions. Each should be unique and practical. Format as a JSON array with objects containing "title" and "description" fields.`
-      : `Generate exactly ${count} unique, inspiring creative ideas. Each should be practical and actionable with a clear title and detailed description. Format as a JSON array with objects containing "title" and "description" fields.`;
+      ? `Generate exactly ${count} concise, creative suggestions. Each must be completely unique and different. Use varied approaches, styles, and perspectives. Avoid repetition. Format as a JSON object with an "ideas" array containing objects with "title" and "description" fields. Request ID: ${timestamp}-${randomSeed}`
+      : `Generate exactly ${count} unique, inspiring creative ideas. Each must be completely different with varied approaches and perspectives. Explore different styles, angles, and unexpected directions. Format as a JSON object with an "ideas" array containing objects with "title" and "description" fields. Request ID: ${timestamp}-${randomSeed}`;
     
     const userPrompt = isListRequest 
       ? `Generate ${count} suggestions for: ${prompt}`
@@ -130,7 +134,7 @@ export async function generateIdeasFromText(prompt: string, count: number = 8): 
         { role: "user", content: userPrompt }
       ],
       response_format: { type: "json_object" },
-      temperature: 0.8,
+      temperature: 0.9, // Higher temperature for more variation
       max_tokens: 1000
     });
 
