@@ -684,8 +684,8 @@ export default function SavedPage() {
   return (
     <div className="min-h-screen flex relative bg-background">
       {/* Collapsible Sidebar - Positioned below header */}
-      <div className={`fixed top-16 left-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
-        sidebarExpanded ? 'w-64 bottom-0' : 'w-12 h-20'
+      <div className={`fixed top-16 left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
+        sidebarExpanded ? 'w-64' : 'w-12'
       }`}>
         <div className="p-4">
           {/* Sidebar Header */}
