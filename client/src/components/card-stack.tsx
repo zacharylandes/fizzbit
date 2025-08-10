@@ -10,9 +10,10 @@ import { Sparkles, Image, Type, ArrowUp } from "lucide-react";
 interface CardStackProps {
   initialIdeas?: Idea[];
   onSwipeUpPrompt?: (ideaContent: string) => void;
+  currentPrompt?: string; // Add current prompt to preserve context for chaining
 }
 
-export function CardStack({ initialIdeas = [], onSwipeUpPrompt }: CardStackProps) {
+export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = "" }: CardStackProps) {
   const [cards, setCards] = useState<Idea[]>(initialIdeas);
   const [animatingCards, setAnimatingCards] = useState<{ [key: string]: { direction: string; isAnimating: boolean } }>({});
   const [refreshKey, setRefreshKey] = useState(0);

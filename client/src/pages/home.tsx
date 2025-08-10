@@ -43,8 +43,12 @@ export default function HomePage() {
   };
 
   const handleSwipeUpPrompt = (ideaContent: string) => {
-    // Set the swiped idea as the new prompt and trigger auto-generation
-    setCurrentPrompt(ideaContent);
+    // Combine the current prompt with the swiped idea to create a chained prompt
+    const chainedPrompt = currentPrompt 
+      ? `${currentPrompt} + ${ideaContent}` 
+      : ideaContent;
+    
+    setCurrentPrompt(chainedPrompt);
     setShouldAutoGenerate(true);
   };
 
@@ -100,6 +104,7 @@ export default function HomePage() {
           <CardStack 
             initialIdeas={currentIdeas} 
             onSwipeUpPrompt={handleSwipeUpPrompt}
+            currentPrompt={currentPrompt}
           />
         </div>
       )}
