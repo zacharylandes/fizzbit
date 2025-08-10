@@ -858,13 +858,14 @@ export default function SavedPage() {
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  className="h-6 w-6 p-0 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                  className="h-8 w-8 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 touch-manipulation"
                                   onClick={(e) => e.stopPropagation()}
+                                  onTouchStart={(e) => e.stopPropagation()}
                                 >
-                                  <ChevronDown className="h-3 w-3" />
+                                  <ChevronDown className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-32" onCloseAutoFocus={(e) => e.preventDefault()}>
+                              <DropdownMenuContent align="end" className="w-36" onCloseAutoFocus={(e) => e.preventDefault()}>
                                 {cardStyles.map((style, idx) => (
                                   <DropdownMenuItem
                                     key={idx}
@@ -872,10 +873,11 @@ export default function SavedPage() {
                                       e.stopPropagation();
                                       changeCardColor(idea.id, idx);
                                     }}
-                                    className="flex items-center gap-2"
+                                    onTouchStart={(e) => e.stopPropagation()}
+                                    className="flex items-center gap-3 py-3 px-3 touch-manipulation cursor-pointer hover:bg-accent"
                                   >
-                                    <div className={`w-3 h-3 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')}`} />
-                                    <span className="text-xs">{colorNames[idx]}</span>
+                                    <div className={`w-4 h-4 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')} border border-gray-300`} />
+                                    <span className="text-sm">{colorNames[idx]}</span>
                                   </DropdownMenuItem>
                                 ))}
                               </DropdownMenuContent>
@@ -889,9 +891,10 @@ export default function SavedPage() {
                                 e.stopPropagation();
                                 unsaveIdeaMutation.mutate(idea.id);
                               }}
-                              className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600 text-gray-400"
+                              onTouchStart={(e) => e.stopPropagation()}
+                              className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600 text-gray-400 touch-manipulation"
                             >
-                              <Trash2 className="h-3 w-3" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
