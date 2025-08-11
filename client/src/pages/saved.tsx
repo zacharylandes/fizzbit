@@ -79,6 +79,7 @@ export default function SavedPage() {
   const [selectedColorGroup, setSelectedColorGroup] = useState<number | null>(null);
   const [groupTitles, setGroupTitles] = useState<{ [colorIndex: number]: string }>({});
   const [editingGroup, setEditingGroup] = useState<number | null>(null);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [swipeState, setSwipeState] = useState<{
     ideaId: string | null;
     startX: number;
@@ -113,6 +114,43 @@ export default function SavedPage() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Detect keyboard open/close on mobile
+  useEffect(() => {
+    if (!isMobile) return;
+
+    let initialViewportHeight = window.visualViewport?.height || window.innerHeight;
+    
+    const handleViewportChange = () => {
+      if (window.visualViewport) {
+        const currentHeight = window.visualViewport.height;
+        const heightDifference = initialViewportHeight - currentHeight;
+        // Consider keyboard open if viewport height decreased by more than 150px
+        setIsKeyboardOpen(heightDifference > 150);
+      }
+    };
+
+    // Fallback for browsers without visualViewport support
+    const handleResize = () => {
+      const currentHeight = window.innerHeight;
+      const heightDifference = initialViewportHeight - currentHeight;
+      setIsKeyboardOpen(heightDifference > 150);
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportChange);
+    } else {
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleViewportChange);
+      } else {
+        window.removeEventListener('resize', handleResize);
+      }
+    };
+  }, [isMobile]);
 
   // Global event listeners for mobile interactions
   useEffect(() => {
@@ -718,7 +756,7 @@ export default function SavedPage() {
     : savedIdeas;
 
   return (
-    <div className="min-h-screen flex relative bg-background">
+    <div className="min-h-screen flex relative bg-background" data-keyboard-open={isKeyboardOpen}>
       {/* Collapsible Sidebar - Positioned below title container */}
       <div className={`sidebar-container fixed ${isMobile ? 'top-28' : 'top-32'} left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
         sidebarExpanded ? 'w-1/2 max-w-sm' : 'w-16'

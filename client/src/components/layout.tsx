@@ -15,6 +15,7 @@ export default function Layout({ children }: LayoutProps) {
   const [showFooter, setShowFooter] = useState(true);
   const [lastTouchY, setLastTouchY] = useState(0);
   const [swipeStartY, setSwipeStartY] = useState(0);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
   // Fetch saved ideas count for the bookmark badge
   const { data: savedIdeasData } = useQuery({
@@ -63,6 +64,53 @@ export default function Layout({ children }: LayoutProps) {
       document.removeEventListener('touchend', handleTouchEnd);
     };
   }, [swipeStartY]);
+
+  // Detect keyboard open/close to hide footer
+  useEffect(() => {
+    let initialViewportHeight = window.visualViewport?.height || window.innerHeight;
+    
+    const handleViewportChange = () => {
+      if (window.visualViewport) {
+        const currentHeight = window.visualViewport.height;
+        const heightDifference = initialViewportHeight - currentHeight;
+        // Consider keyboard open if viewport height decreased by more than 150px
+        const keyboardOpen = heightDifference > 150;
+        setIsKeyboardOpen(keyboardOpen);
+        
+        // Hide footer when keyboard is open
+        if (keyboardOpen) {
+          setShowFooter(false);
+        }
+      }
+    };
+
+    // Fallback for browsers without visualViewport support
+    const handleResize = () => {
+      const currentHeight = window.innerHeight;
+      const heightDifference = initialViewportHeight - currentHeight;
+      const keyboardOpen = heightDifference > 150;
+      setIsKeyboardOpen(keyboardOpen);
+      
+      // Hide footer when keyboard is open
+      if (keyboardOpen) {
+        setShowFooter(false);
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportChange);
+    } else {
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleViewportChange);
+      } else {
+        window.removeEventListener('resize', handleResize);
+      }
+    };
+  }, []);
 
   const navItems = [
     { href: "/", icon: Home, label: "Home", badge: null },
@@ -159,7 +207,7 @@ export default function Layout({ children }: LayoutProps) {
       {/* Footer Navigation */}
       {isAuthenticated && (
         <div className={`fixed bottom-0 left-0 right-0 border-t border-border bg-background transition-transform duration-300 z-50 ${
-          showFooter ? 'translate-y-0' : 'translate-y-full'
+          showFooter && !isKeyboardOpen ? 'translate-y-0' : 'translate-y-full'
         }`}>
           <div className="max-w-7xl mx-auto px-6 py-4">
             <nav className="flex items-center justify-center space-x-8">
