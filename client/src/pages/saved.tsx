@@ -804,9 +804,9 @@ export default function SavedPage() {
       }`} style={{ 
         visibility: sidebarExpanded || !isMobile ? 'visible' : 'hidden'
       }}>
-        <div className="p-4 h-full overflow-y-auto pb-24">
+        <div className="p-4 h-full overflow-y-auto">
           {/* Sidebar Header */}
-          <div className="flex items-center justify-center gap-3 mb-6">
+          <div className="flex items-center justify-center mb-6">
             <Button
               size="sm"
               variant="ghost"
@@ -815,9 +815,6 @@ export default function SavedPage() {
             >
               <Menu className="h-4 w-4 text-green-700" />
             </Button>
-            {sidebarExpanded && (
-              <h2 className="font-semibold text-sm">Groups</h2>
-            )}
           </div>
           
           {/* Color Groups */}
@@ -921,11 +918,11 @@ export default function SavedPage() {
       </div>
 
       {/* Page Title Section - Full width below main header */}
-      <div className={`relative bg-background border-b border-border ${isMobile ? 'h-12' : 'h-16'} ${
+      <div className={`relative bg-background border-b border-border ${isMobile ? 'h-16' : 'h-16'} ${
         !isMobile && sidebarExpanded ? 'ml-80' : !isMobile ? 'ml-16' : ''
       }`}>
-        <div className="max-w-7xl mx-auto px-4 py-2">
-          <div className="flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 py-3 h-full">
+          <div className="flex items-center gap-3 h-full">
             {/* Mobile Hamburger Menu */}
             {isMobile && !sidebarExpanded && (
               <Button
