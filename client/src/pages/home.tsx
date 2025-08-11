@@ -75,7 +75,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex flex-col h-full">
       {/* Content Section */}
       {isAuthenticated ? (
         <div className="max-w-7xl mx-auto w-full px-6 pt-4 pb-2">
@@ -100,7 +100,7 @@ export default function HomePage() {
 
       {/* Cards Section */}
       {isAuthenticated && (
-        <div className="flex-1 max-w-7xl mx-auto w-full px-6 pb-4">
+        <div className="flex-1 max-w-7xl mx-auto w-full px-6 pb-20">
           <CardStack 
             initialIdeas={currentIdeas} 
             onSwipeUpPrompt={handleSwipeUpPrompt}
