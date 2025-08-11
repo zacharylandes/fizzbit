@@ -75,11 +75,11 @@ export default function HomePage() {
   }
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       {/* Content Section */}
       {isAuthenticated ? (
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="mb-8 text-center">
+        <div className="max-w-7xl mx-auto w-full px-6 pt-4 pb-2">
+          <div className="mb-4 text-center">
             <h2 className="text-2xl font-crimson font-semibold mb-2 text-foreground">
               Generate Ideas
             </h2>
@@ -87,7 +87,7 @@ export default function HomePage() {
           </div>
           
           {/* Input Section */}
-          <div className="mb-4">
+          <div className="mb-2">
             <InputSection 
               onIdeasGenerated={handleIdeasGeneratedWrapper}
               promptValue={currentPrompt}
@@ -100,7 +100,7 @@ export default function HomePage() {
 
       {/* Cards Section */}
       {isAuthenticated && (
-        <div className="max-w-7xl mx-auto px-6 pb-20">
+        <div className="flex-1 max-w-7xl mx-auto w-full px-6 pb-4">
           <CardStack 
             initialIdeas={currentIdeas} 
             onSwipeUpPrompt={handleSwipeUpPrompt}
@@ -108,6 +108,6 @@ export default function HomePage() {
           />
         </div>
       )}
-    </>
+    </div>
   );
 }
