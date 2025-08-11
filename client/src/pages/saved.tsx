@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut, Pencil, Eraser, ChevronDown, GripVertical, Menu, Edit2, Check } from "lucide-react";
+import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut, Pencil, Eraser, Palette, GripVertical, Menu, Edit2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -687,7 +687,7 @@ export default function SavedPage() {
       <div className={`fixed ${isMobile ? 'top-28' : 'top-32'} left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
         sidebarExpanded ? 'w-1/2 max-w-sm' : 'w-16'
       }`}>
-        <div className="p-4">
+        <div className="p-4 h-full overflow-y-auto">
           {/* Sidebar Header */}
           <div className="flex items-center justify-center gap-3 mb-6">
             <Button
@@ -1010,7 +1010,7 @@ export default function SavedPage() {
                           
                           {/* Controls */}
                           <div 
-                            className="flex-shrink-0 flex items-center gap-2"
+                            className="flex-shrink-0 flex flex-col items-center gap-1"
                             onTouchStart={(e) => e.stopPropagation()}
                             onMouseDown={(e) => e.stopPropagation()}
                           >
@@ -1020,10 +1020,10 @@ export default function SavedPage() {
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  className="h-8 w-8 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 touch-manipulation"
+                                  className="h-6 w-6 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 touch-manipulation"
                                   onClick={(e) => e.stopPropagation()}
                                 >
-                                  <ChevronDown className="h-4 w-4" />
+                                  <Palette className="h-3 w-3" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="w-36" onCloseAutoFocus={(e) => e.preventDefault()}>
@@ -1051,9 +1051,9 @@ export default function SavedPage() {
                                 e.stopPropagation();
                                 unsaveIdeaMutation.mutate(idea.id);
                               }}
-                              className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600 text-gray-400 touch-manipulation"
+                              className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600 text-gray-400 touch-manipulation"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-3 w-3" />
                             </Button>
                           </div>
                         </div>
@@ -1176,7 +1176,7 @@ export default function SavedPage() {
                               className="h-4 w-4 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-500"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <ChevronDown className="h-2 w-2" />
+                              <Palette className="h-2 w-2" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="start" className="w-32" onCloseAutoFocus={(e) => e.preventDefault()}>
