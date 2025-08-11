@@ -748,7 +748,7 @@ export default function SavedPage() {
                       setSelectedColorGroup(colorIndex);
                       setSidebarExpanded(false);
                     }}
-                    className={`w-full p-3 rounded-lg border text-left transition-colors ${
+                    className={`group w-full p-3 rounded-lg border text-left transition-colors ${
                       selectedColorGroup === colorIndex 
                         ? `${cardStyles[colorIndex]} border-2` 
                         : 'bg-card border-border hover:bg-accent'
@@ -788,7 +788,7 @@ export default function SavedPage() {
                             e.stopPropagation();
                             setEditingGroup(colorIndex);
                           }}
-                          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:opacity-100"
+                          className="h-6 w-6 p-0 opacity-70 group-hover:opacity-100 hover:opacity-100 transition-opacity"
                         >
                           <Edit2 className="h-3 w-3" />
                         </Button>
