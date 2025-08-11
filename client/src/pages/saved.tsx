@@ -757,8 +757,8 @@ export default function SavedPage() {
 
   return (
     <div className="min-h-screen flex relative bg-background" data-keyboard-open={isKeyboardOpen}>
-      {/* Collapsible Sidebar - Positioned below title container */}
-      <div className={`sidebar-container fixed ${isMobile ? 'top-28' : 'top-32'} left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
+      {/* Collapsible Sidebar */}
+      <div className={`sidebar-container fixed top-16 left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
         sidebarExpanded ? 'w-1/2 max-w-sm' : 'w-16'
       }`}>
         <div className="p-4 h-full overflow-y-auto pb-24">
@@ -878,7 +878,7 @@ export default function SavedPage() {
       </div>
 
       {/* Page Title Section - Full width below main header */}
-      <div className={`fixed top-16 left-0 right-0 z-50 bg-background border-b border-border ${isMobile ? 'h-12' : 'h-16'}`}>
+      <div className={`relative bg-background border-b border-border ${isMobile ? 'h-12' : 'h-16'}`}>
         <div className="max-w-7xl mx-auto px-4 py-2">
           {/* Header Text */}
           <div className={`${isMobile ? 'mb-1' : 'mb-2'}`}>
@@ -960,7 +960,7 @@ export default function SavedPage() {
       </div>
 
       {/* Content Area */}
-      <div className={`flex-1 ${isMobile ? 'mt-28' : 'mt-32'} relative overflow-hidden transition-all duration-300 ${
+      <div className={`flex-1 relative overflow-hidden transition-all duration-300 ${
         sidebarExpanded ? 'ml-[50vw] sm:ml-80' : 'ml-16'
       }`}>
         {isLoading ? (
