@@ -320,7 +320,7 @@ export default function SavedPage() {
         const newColors = { ...prev };
         savedIdeas.forEach((idea, index) => {
           if (newColors[idea.id] === undefined) {
-            newColors[idea.id] = 0; // Default to light green (sage)
+            newColors[idea.id] = index % 8; // Cycle through 8 color options
           }
         });
         return newColors;
@@ -746,7 +746,7 @@ export default function SavedPage() {
                     onClick={() => setSelectedColorGroup(colorIndex)}
                     className={`w-full p-3 rounded-lg border text-left transition-colors ${
                       selectedColorGroup === colorIndex 
-                        ? 'bg-primary text-primary-foreground border-primary' 
+                        ? 'bg-card-sage text-green-800 border-card-sage' 
                         : 'bg-card border-border hover:bg-accent'
                     }`}
                   >
