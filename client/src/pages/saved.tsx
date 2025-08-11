@@ -90,6 +90,9 @@ export default function SavedPage() {
     isVerticalDrag: boolean;
     dragIndex: number | null;
     isDeleting: boolean;
+    holdTimer: NodeJS.Timeout | null;
+    canDrag: boolean;
+    startTime: number;
   }>({
     ideaId: null,
     startX: 0,
@@ -100,6 +103,9 @@ export default function SavedPage() {
     isVerticalDrag: false,
     dragIndex: null,
     isDeleting: false,
+    holdTimer: null,
+    canDrag: false,
+    startTime: 0,
   });
   
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -218,6 +224,10 @@ export default function SavedPage() {
       
       // Reset state for non-delete swipes (only if not deleting)
       if (!swipeState.isDeleting) {
+        // Clear hold timer if it exists
+        if (swipeState.holdTimer) {
+          clearTimeout(swipeState.holdTimer);
+        }
         setSwipeState({
           ideaId: null,
           startX: 0,
@@ -228,6 +238,9 @@ export default function SavedPage() {
           isVerticalDrag: false,
           dragIndex: null,
           isDeleting: false,
+          holdTimer: null,
+          canDrag: false,
+          startTime: 0,
         });
       }
     };
@@ -309,6 +322,9 @@ export default function SavedPage() {
         isVerticalDrag: false,
         dragIndex: null,
         isDeleting: false,
+        holdTimer: null,
+        canDrag: false,
+        startTime: 0,
       });
     },
     onError: (error) => {
@@ -660,11 +676,25 @@ export default function SavedPage() {
     });
   };
 
-  // Mobile interaction start handler
+  // Mobile interaction start handler with hold delay
   const handleMobileInteractionStart = (e: React.TouchEvent | React.MouseEvent, ideaId: string, index: number) => {
     e.preventDefault();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const startTime = Date.now();
+    
+    // Clear any existing timer
+    if (swipeState.holdTimer) {
+      clearTimeout(swipeState.holdTimer);
+    }
+    
+    // Set a timer to enable drag after 300ms hold
+    const holdTimer = setTimeout(() => {
+      setSwipeState(prev => ({
+        ...prev,
+        canDrag: true
+      }));
+    }, 300);
     
     setSwipeState({
       ideaId,
@@ -676,6 +706,9 @@ export default function SavedPage() {
       isVerticalDrag: false,
       dragIndex: index,
       isDeleting: false,
+      holdTimer,
+      canDrag: false,
+      startTime,
     });
   };
 
@@ -961,7 +994,7 @@ export default function SavedPage() {
 
       {/* Content Area */}
       <div className={`flex-1 relative overflow-hidden transition-all duration-300 ${
-        sidebarExpanded ? 'ml-[50vw] sm:ml-80' : 'ml-16'
+        sidebarExpanded ? 'ml-[50vw] sm:ml-80' : isMobile ? 'ml-0' : 'ml-16'
       }`}>
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
