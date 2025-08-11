@@ -881,7 +881,7 @@ export default function SavedPage() {
       </div>
 
       {/* Content Area */}
-      <div className={`flex-1 ${isMobile ? 'pt-28' : 'pt-32'} relative overflow-hidden transition-all duration-300 ${
+      <div className={`flex-1 ${isMobile ? 'pt-1' : 'pt-2'} relative overflow-hidden transition-all duration-300 ${
         sidebarExpanded ? 'ml-64' : 'ml-16'
       }`}>
         {isLoading ? (
@@ -915,7 +915,7 @@ export default function SavedPage() {
           </div>
         ) : isMobile ? (
           // Mobile: Vertical scrollable list
-          <div className="h-full overflow-y-auto px-4 pb-4">
+          <div className="h-full overflow-y-auto px-4 pb-4 pt-0">
             <div className="space-y-3">
               {mobileOrder
                 .map(ideaId => savedIdeas.find(idea => idea.id === ideaId))
