@@ -675,6 +675,22 @@ export default function SavedPage() {
     }));
     setEditingGroup(null);
   };
+
+  // Scroll editing group into view
+  useEffect(() => {
+    if (editingGroup !== null) {
+      // Find the editing group button and scroll it into view
+      setTimeout(() => {
+        const editingButton = document.querySelector(`[data-group-index="${editingGroup}"]`);
+        if (editingButton) {
+          editingButton.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        }
+      }, 100);
+    }
+  }, [editingGroup]);
   
   // Filter ideas by selected color group
   const filteredIdeas = selectedColorGroup !== null 
@@ -743,6 +759,7 @@ export default function SavedPage() {
                 return (
                   <button
                     key={colorIndex}
+                    data-group-index={colorIndex}
                     onClick={() => setSelectedColorGroup(colorIndex)}
                     onDoubleClick={() => {
                       setSelectedColorGroup(colorIndex);
