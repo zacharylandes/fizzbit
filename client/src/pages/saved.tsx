@@ -746,7 +746,7 @@ export default function SavedPage() {
                     onClick={() => setSelectedColorGroup(colorIndex)}
                     className={`w-full p-3 rounded-lg border text-left transition-colors ${
                       selectedColorGroup === colorIndex 
-                        ? 'bg-card-sage text-green-800 border-card-sage' 
+                        ? `${cardStyles[colorIndex]} border-2` 
                         : 'bg-card border-border hover:bg-accent'
                     }`}
                   >
