@@ -789,7 +789,7 @@ export default function SavedPage() {
     : savedIdeas;
 
   return (
-    <div className="min-h-screen flex relative bg-background" data-keyboard-open={isKeyboardOpen}>
+    <div className="min-h-screen bg-background" data-keyboard-open={isKeyboardOpen}>
       {/* Mobile Overlay */}
       {isMobile && sidebarExpanded && (
         <div 
@@ -921,7 +921,9 @@ export default function SavedPage() {
       </div>
 
       {/* Page Title Section - Full width below main header */}
-      <div className={`relative bg-background border-b border-border ${isMobile ? 'h-12' : 'h-16'}`}>
+      <div className={`relative bg-background border-b border-border ${isMobile ? 'h-12' : 'h-16'} ${
+        isMobile ? 'pl-16' : ''
+      }`}>
         <div className="max-w-7xl mx-auto px-4 py-2">
           {/* Header Text */}
           <div className={`${isMobile ? 'mb-1' : 'mb-2'}`}>
@@ -1002,21 +1004,107 @@ export default function SavedPage() {
         </div>
       </div>
 
-      {/* Floating Hamburger Menu (Mobile Only) */}
-      {isMobile && !sidebarExpanded && (
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => setSidebarExpanded(true)}
-          className="fixed top-20 left-4 z-50 h-10 w-10 p-0 bg-card-sage hover:bg-card-sage/90 shadow-lg rounded-lg"
-        >
-          <Menu className="h-5 w-5 text-green-700" />
-        </Button>
-      )}
+      {/* Page Title Section - Full width below main header */}
+      <div className={`relative bg-background border-b border-border ${isMobile ? 'h-12' : 'h-16'} ${
+        !isMobile && sidebarExpanded ? 'ml-80' : !isMobile ? 'ml-16' : ''
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 py-2">
+          <div className="flex items-center gap-3">
+            {/* Mobile Hamburger Menu */}
+            {isMobile && !sidebarExpanded && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setSidebarExpanded(true)}
+                className="h-8 w-8 p-0 bg-card-sage hover:bg-card-sage/90 rounded-lg"
+              >
+                <Menu className="h-4 w-4 text-green-700" />
+              </Button>
+            )}
+            
+            {/* Header Text */}
+            <div className="flex-1">
+              <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-crimson font-semibold text-foreground`}>
+                {selectedColorGroup !== null 
+                  ? `${getGroupTitle(selectedColorGroup)} (${filteredIdeas.length})`
+                  : `Saved Ideas (${filteredIdeas.length})`
+                }
+              </h1>
+            </div>
+          </div>
+          
+          {/* Drawing and Zoom Controls - Centered Below Header (Desktop Only) */}
+          {!isMobile && (
+            <div className="flex items-center justify-center gap-2">
+            {/* Drawing Mode Toggle */}
+            <Button
+              size="sm"
+              variant={isDrawingMode ? "default" : "outline"}
+              onClick={() => setIsDrawingMode(!isDrawingMode)}
+              className="h-8 px-3"
+            >
+              <Pencil className="h-4 w-4 mr-1" />
+              <span className="text-xs">Draw</span>
+            </Button>
+            
+            {isDrawingMode && (
+              <>
+                {/* Color Picker */}
+                <div className="flex items-center gap-1">
+                  {['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#000000'].map(color => (
+                    <button
+                      key={color}
+                      className={`w-6 h-6 rounded-full border-2 ${
+                        drawingState.color === color ? 'border-gray-800' : 'border-gray-300'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => setDrawingState(prev => ({ ...prev, color }))}
+                    />
+                  ))}
+                </div>
+                
+                {/* Clear Drawings */}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={clearDrawings}
+                  className="h-8 px-2"
+                >
+                  <Eraser className="h-3 w-3" />
+                </Button>
+              </>
+            )}
+            
+            <div className="w-px h-6 bg-border mx-1" />
+            
+            {/* Zoom Controls */}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleZoomOut}
+              className="h-8 w-8 p-0"
+            >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <span className="text-sm text-muted-foreground min-w-[3rem] text-center">
+              {Math.round(zoom * 100)}%
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleZoomIn}
+              className="h-8 w-8 p-0"
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Content Area */}
-      <div className={`flex-1 relative overflow-hidden transition-all duration-300 ${
-        sidebarExpanded ? 'ml-[50vw] sm:ml-80' : isMobile ? 'ml-0' : 'ml-16'
+      <div className={`flex-1 relative overflow-hidden ${
+        !isMobile && sidebarExpanded ? 'ml-80' : !isMobile ? 'ml-16' : ''
       }`}>
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
