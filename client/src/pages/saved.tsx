@@ -790,10 +790,20 @@ export default function SavedPage() {
 
   return (
     <div className="min-h-screen flex relative bg-background" data-keyboard-open={isKeyboardOpen}>
+      {/* Mobile Overlay */}
+      {isMobile && sidebarExpanded && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30"
+          onClick={() => setSidebarExpanded(false)}
+        />
+      )}
+
       {/* Collapsible Sidebar */}
       <div className={`sidebar-container fixed top-16 left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
-        sidebarExpanded ? 'w-1/2 max-w-sm' : 'w-16'
-      }`}>
+        sidebarExpanded ? 'w-1/2 max-w-sm' : isMobile ? 'w-0' : 'w-16'
+      }`} style={{ 
+        visibility: sidebarExpanded || !isMobile ? 'visible' : 'hidden'
+      }}>
         <div className="p-4 h-full overflow-y-auto pb-24">
           {/* Sidebar Header */}
           <div className="flex items-center justify-center gap-3 mb-6">
@@ -991,6 +1001,18 @@ export default function SavedPage() {
           )}
         </div>
       </div>
+
+      {/* Floating Hamburger Menu (Mobile Only) */}
+      {isMobile && !sidebarExpanded && (
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => setSidebarExpanded(true)}
+          className="fixed top-20 left-4 z-50 h-10 w-10 p-0 bg-card-sage hover:bg-card-sage/90 shadow-lg rounded-lg"
+        >
+          <Menu className="h-5 w-5 text-green-700" />
+        </Button>
+      )}
 
       {/* Content Area */}
       <div className={`flex-1 relative overflow-hidden transition-all duration-300 ${
