@@ -685,7 +685,7 @@ export default function SavedPage() {
     <div className="min-h-screen flex relative bg-background">
       {/* Collapsible Sidebar - Positioned below title container */}
       <div className={`fixed ${isMobile ? 'top-28' : 'top-32'} left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
-        sidebarExpanded ? 'w-64' : 'w-16'
+        sidebarExpanded ? 'w-1/2 max-w-sm' : 'w-16'
       }`}>
         <div className="p-4">
           {/* Sidebar Header */}
@@ -744,6 +744,10 @@ export default function SavedPage() {
                   <button
                     key={colorIndex}
                     onClick={() => setSelectedColorGroup(colorIndex)}
+                    onDoubleClick={() => {
+                      setSelectedColorGroup(colorIndex);
+                      setSidebarExpanded(false);
+                    }}
                     className={`w-full p-3 rounded-lg border text-left transition-colors ${
                       selectedColorGroup === colorIndex 
                         ? `${cardStyles[colorIndex]} border-2` 
@@ -882,7 +886,7 @@ export default function SavedPage() {
 
       {/* Content Area */}
       <div className={`flex-1 ${isMobile ? 'mt-28' : 'mt-32'} relative overflow-hidden transition-all duration-300 ${
-        sidebarExpanded ? 'ml-64' : 'ml-16'
+        sidebarExpanded ? 'ml-[50vw] sm:ml-80' : 'ml-16'
       }`}>
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
