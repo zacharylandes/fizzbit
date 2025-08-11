@@ -676,19 +676,39 @@ export default function SavedPage() {
     setEditingGroup(null);
   };
 
-  // Scroll editing group into view
+  // Scroll editing group into view with footer clearance
   useEffect(() => {
     if (editingGroup !== null) {
       // Find the editing group button and scroll it into view
       setTimeout(() => {
         const editingButton = document.querySelector(`[data-group-index="${editingGroup}"]`);
-        if (editingButton) {
-          editingButton.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-          });
+        const sidebar = document.querySelector('.sidebar-container');
+        if (editingButton && sidebar) {
+          // Get element position and sidebar dimensions
+          const buttonRect = editingButton.getBoundingClientRect();
+          const sidebarRect = sidebar.getBoundingClientRect();
+          
+          // Calculate if button is too close to bottom (within footer area)
+          const footerHeight = 80; // Approximate footer height
+          const viewportHeight = window.innerHeight;
+          const isNearBottom = buttonRect.bottom > (viewportHeight - footerHeight);
+          
+          if (isNearBottom) {
+            // Scroll the sidebar to bring the button higher up
+            const scrollOffset = buttonRect.bottom - (viewportHeight - footerHeight - 20);
+            sidebar.scrollBy({
+              top: scrollOffset,
+              behavior: 'smooth'
+            });
+          } else {
+            // Standard center scroll
+            editingButton.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center'
+            });
+          }
         }
-      }, 100);
+      }, 150);
     }
   }, [editingGroup]);
   
@@ -700,10 +720,10 @@ export default function SavedPage() {
   return (
     <div className="min-h-screen flex relative bg-background">
       {/* Collapsible Sidebar - Positioned below title container */}
-      <div className={`fixed ${isMobile ? 'top-28' : 'top-32'} left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
+      <div className={`sidebar-container fixed ${isMobile ? 'top-28' : 'top-32'} left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
         sidebarExpanded ? 'w-1/2 max-w-sm' : 'w-16'
       }`}>
-        <div className="p-4 h-full overflow-y-auto">
+        <div className="p-4 h-full overflow-y-auto pb-24">
           {/* Sidebar Header */}
           <div className="flex items-center justify-center gap-3 mb-6">
             <Button
@@ -936,7 +956,7 @@ export default function SavedPage() {
           </div>
         ) : isMobile ? (
           // Mobile: Vertical scrollable list
-          <div className="h-full overflow-y-auto px-4 pb-4">
+          <div className="h-full overflow-y-auto px-4 pt-4 pb-24">
             <div className="space-y-3">
               {mobileOrder
                 .map(ideaId => savedIdeas.find(idea => idea.id === ideaId))
