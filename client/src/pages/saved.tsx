@@ -881,7 +881,7 @@ export default function SavedPage() {
       </div>
 
       {/* Content Area */}
-      <div className={`flex-1 ${isMobile ? 'pt-1' : 'pt-2'} relative overflow-hidden transition-all duration-300 ${
+      <div className={`flex-1 ${isMobile ? 'mt-28 pt-2' : 'mt-32 pt-2'} relative overflow-hidden transition-all duration-300 ${
         sidebarExpanded ? 'ml-64' : 'ml-16'
       }`}>
         {isLoading ? (
