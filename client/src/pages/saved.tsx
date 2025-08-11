@@ -804,7 +804,7 @@ export default function SavedPage() {
       }`} style={{ 
         visibility: sidebarExpanded || !isMobile ? 'visible' : 'hidden'
       }}>
-        <div className="p-4 h-full overflow-y-auto">
+        <div className="p-4 h-full overflow-y-auto overflow-x-hidden" style={{ WebkitOverflowScrolling: 'touch' }}>
           {/* Sidebar Header */}
           <div className="flex items-center justify-center mb-6">
             <Button
@@ -830,7 +830,7 @@ export default function SavedPage() {
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400" />
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 border border-gray-200" />
                   <span className="text-sm font-medium">All Ideas</span>
                   <span className="ml-auto text-xs text-muted-foreground">
                     {savedIdeas.length}
@@ -853,6 +853,17 @@ export default function SavedPage() {
                   "bg-card-lavender border-card-lavender/40",
                   "bg-card-mint border-card-mint/40"
                 ];
+
+                const colorCircles = [
+                  "bg-green-200",
+                  "bg-blue-200", 
+                  "bg-yellow-100",
+                  "bg-sky-200",
+                  "bg-purple-200",
+                  "bg-orange-200",
+                  "bg-violet-200",
+                  "bg-emerald-200"
+                ];
                 
                 return (
                   <button
@@ -870,7 +881,7 @@ export default function SavedPage() {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-4 h-4 rounded-full ${cardStyles[colorIndex]?.split(' ')[0] || 'bg-gray-400'}`} />
+                      <div className={`w-5 h-5 rounded-full border border-gray-300 ${colorCircles[colorIndex] || 'bg-gray-300'}`} />
                       <div className="flex-1 min-w-0">
                         {editingGroup === colorIndex ? (
                           <input
