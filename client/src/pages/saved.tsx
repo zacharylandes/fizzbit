@@ -922,17 +922,31 @@ export default function SavedPage() {
 
       {/* Page Title Section - Full width below main header */}
       <div className={`relative bg-background border-b border-border ${isMobile ? 'h-12' : 'h-16'} ${
-        isMobile ? 'pl-16' : ''
+        !isMobile && sidebarExpanded ? 'ml-80' : !isMobile ? 'ml-16' : ''
       }`}>
         <div className="max-w-7xl mx-auto px-4 py-2">
-          {/* Header Text */}
-          <div className={`${isMobile ? 'mb-1' : 'mb-2'}`}>
-            <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-crimson font-semibold text-foreground`}>
-              {selectedColorGroup !== null 
-                ? `${getGroupTitle(selectedColorGroup)} (${filteredIdeas.length})`
-                : `Saved Ideas (${filteredIdeas.length})`
-              }
-            </h1>
+          <div className="flex items-center gap-3">
+            {/* Mobile Hamburger Menu */}
+            {isMobile && !sidebarExpanded && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setSidebarExpanded(true)}
+                className="h-8 w-8 p-0 bg-card-sage hover:bg-card-sage/90 rounded-lg"
+              >
+                <Menu className="h-4 w-4 text-green-700" />
+              </Button>
+            )}
+            
+            {/* Header Text */}
+            <div className="flex-1">
+              <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-crimson font-semibold text-foreground`}>
+                {selectedColorGroup !== null 
+                  ? `${getGroupTitle(selectedColorGroup)} (${filteredIdeas.length})`
+                  : `Saved Ideas (${filteredIdeas.length})`
+                }
+              </h1>
+            </div>
           </div>
           
           {/* Drawing and Zoom Controls - Centered Below Header (Desktop Only) */}
