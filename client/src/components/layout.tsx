@@ -92,22 +92,20 @@ export default function Layout({ children }: LayoutProps) {
             <Link href="/">
               <div className="flex items-center space-x-3 cursor-pointer hover-lift transition-all duration-300">
                 <div className="p-2 bg-card-light-blue-bg border border-card-light-blue/40 rounded-lg card-shadow">
-                  <svg className="h-6 w-6 text-card-light-blue" viewBox="0 0 400 400" fill="none">
-                    <g transform="translate(200, 200)">
-                      <circle cx="0" cy="0" r="180" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.9"/>
-                      <circle cx="0" cy="0" r="165" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.8"/>
-                      <circle cx="0" cy="0" r="150" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.75"/>
-                      <circle cx="0" cy="0" r="135" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.7"/>
-                      <circle cx="0" cy="0" r="120" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.65"/>
-                      <circle cx="0" cy="0" r="105" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.6"/>
-                      <circle cx="0" cy="0" r="90" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.55"/>
-                      <circle cx="0" cy="0" r="75" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.5"/>
-                      <circle cx="0" cy="0" r="60" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.45"/>
-                      <circle cx="0" cy="0" r="45" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.4"/>
-                      <circle cx="0" cy="0" r="30" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.35"/>
-                      <circle cx="0" cy="0" r="15" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.3"/>
-                      <circle cx="0" cy="0" r="8" fill="currentColor" opacity="0.8"/>
-                    </g>
+                  <svg className="h-6 w-6" viewBox="0 0 100 100" fill="none">
+                    <circle cx="50" cy="50" r="48" stroke="#3b82f6" strokeWidth="1.5" fill="none" opacity="0.9"/>
+                    <circle cx="50" cy="50" r="44" stroke="#3b82f6" strokeWidth="1.5" fill="none" opacity="0.85"/>
+                    <circle cx="50" cy="50" r="40" stroke="#3b82f6" strokeWidth="1.5" fill="none" opacity="0.8"/>
+                    <circle cx="50" cy="50" r="36" stroke="#3b82f6" strokeWidth="1.5" fill="none" opacity="0.75"/>
+                    <circle cx="50" cy="50" r="32" stroke="#3b82f6" strokeWidth="1.5" fill="none" opacity="0.7"/>
+                    <circle cx="50" cy="50" r="28" stroke="#3b82f6" strokeWidth="1.5" fill="none" opacity="0.65"/>
+                    <circle cx="50" cy="50" r="24" stroke="#3b82f6" strokeWidth="1.5" fill="none" opacity="0.6"/>
+                    <circle cx="50" cy="50" r="20" stroke="#3b82f6" strokeWidth="1.5" fill="none" opacity="0.55"/>
+                    <circle cx="50" cy="50" r="16" stroke="#3b82f6" strokeWidth="1.5" fill="none" opacity="0.5"/>
+                    <circle cx="50" cy="50" r="12" stroke="#3b82f6" strokeWidth="1.5" fill="none" opacity="0.45"/>
+                    <circle cx="50" cy="50" r="8" stroke="#3b82f6" strokeWidth="1.5" fill="none" opacity="0.4"/>
+                    <circle cx="50" cy="50" r="4" stroke="#3b82f6" strokeWidth="1.5" fill="none" opacity="0.35"/>
+                    <circle cx="50" cy="50" r="2" fill="#3b82f6" opacity="0.9"/>
                   </svg>
                 </div>
                 <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
