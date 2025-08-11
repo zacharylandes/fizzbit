@@ -12,12 +12,23 @@ export default function LandingPage() {
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-card-light-blue-bg rounded-lg shadow-sm">
               <svg className="h-6 w-6" viewBox="0 0 100 100" fill="none">
-                <circle cx="50" cy="50" r="45" stroke="#1d4ed8" strokeWidth="3" fill="none"/>
-                <circle cx="50" cy="50" r="37" stroke="#2563eb" strokeWidth="3" fill="none"/>
-                <circle cx="50" cy="50" r="29" stroke="#3b82f6" strokeWidth="3" fill="none"/>
-                <circle cx="50" cy="50" r="21" stroke="#60a5fa" strokeWidth="3" fill="none"/>
-                <circle cx="50" cy="50" r="13" stroke="#93c5fd" strokeWidth="3" fill="none"/>
-                <circle cx="50" cy="50" r="7" fill="#1d4ed8"/>
+                <circle cx="50" cy="50" r="46" stroke="#1e293b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="42" stroke="#334155" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="38" stroke="#475569" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="34" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="30" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="26" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="22" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="18" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="15" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="12" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="10" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="8" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="6" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="4.5" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="3" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="2" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                <circle cx="50" cy="50" r="1" fill="#1e293b"/>
               </svg>
             </div>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
@@ -144,12 +155,23 @@ export default function LandingPage() {
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-card-light-blue-bg rounded-lg shadow-sm">
                 <svg className="h-5 w-5" viewBox="0 0 100 100" fill="none">
-                  <circle cx="50" cy="50" r="45" stroke="#1d4ed8" strokeWidth="3" fill="none"/>
-                  <circle cx="50" cy="50" r="37" stroke="#2563eb" strokeWidth="3" fill="none"/>
-                  <circle cx="50" cy="50" r="29" stroke="#3b82f6" strokeWidth="3" fill="none"/>
-                  <circle cx="50" cy="50" r="21" stroke="#60a5fa" strokeWidth="3" fill="none"/>
-                  <circle cx="50" cy="50" r="13" stroke="#93c5fd" strokeWidth="3" fill="none"/>
-                  <circle cx="50" cy="50" r="7" fill="#1d4ed8"/>
+                  <circle cx="50" cy="50" r="46" stroke="#1e293b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="42" stroke="#334155" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="38" stroke="#475569" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="34" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="30" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="26" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="22" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="18" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="15" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="12" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="10" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="8" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="6" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="4.5" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="3" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="2" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                  <circle cx="50" cy="50" r="1" fill="#1e293b"/>
                 </svg>
               </div>
               <span className="text-lg font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>SWIVL</span>
