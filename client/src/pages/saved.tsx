@@ -689,14 +689,14 @@ export default function SavedPage() {
       }`}>
         <div className="p-4">
           {/* Sidebar Header */}
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center justify-center gap-3 mb-6">
             <Button
               size="sm"
-              variant={sidebarExpanded ? "default" : "default"}
+              variant="ghost"
               onClick={() => setSidebarExpanded(!sidebarExpanded)}
-              className="h-8 w-8 p-0 bg-primary text-primary-foreground hover:bg-primary/90"
+              className="h-8 w-8 p-0 bg-card-sage hover:bg-card-sage/90 mx-auto"
             >
-              <Menu className="h-4 w-4" />
+              <Menu className="h-4 w-4 text-green-700" />
             </Button>
             {sidebarExpanded && (
               <h2 className="font-semibold text-sm">Groups</h2>
@@ -804,12 +804,11 @@ export default function SavedPage() {
           {/* Header Text */}
           <div className={`${isMobile ? 'mb-1' : 'mb-2'}`}>
             <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-crimson font-semibold text-foreground`}>
-              {selectedColorGroup !== null ? getGroupTitle(selectedColorGroup) : 'Saved Ideas'}
+              {selectedColorGroup !== null 
+                ? `${getGroupTitle(selectedColorGroup)} (${filteredIdeas.length})`
+                : `Saved Ideas (${filteredIdeas.length})`
+              }
             </h1>
-            <p className="text-muted-foreground text-sm font-inter">
-              {filteredIdeas.length} {filteredIdeas.length === 1 ? 'idea' : 'ideas'} 
-              {selectedColorGroup !== null ? ` in this group` : ''} {!isMobile && '• Drag to organize'}
-            </p>
           </div>
           
           {/* Drawing and Zoom Controls - Centered Below Header (Desktop Only) */}
