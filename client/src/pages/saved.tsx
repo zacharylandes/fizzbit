@@ -320,7 +320,7 @@ export default function SavedPage() {
         const newColors = { ...prev };
         savedIdeas.forEach((idea, index) => {
           if (newColors[idea.id] === undefined) {
-            newColors[idea.id] = index % 8; // Cycle through 8 color options
+            newColors[idea.id] = 0; // Default to light green (sage)
           }
         });
         return newColors;
@@ -881,7 +881,7 @@ export default function SavedPage() {
       </div>
 
       {/* Content Area */}
-      <div className={`flex-1 ${isMobile ? 'mt-28 pt-2' : 'mt-32 pt-2'} relative overflow-hidden transition-all duration-300 ${
+      <div className={`flex-1 ${isMobile ? 'mt-28' : 'mt-32'} relative overflow-hidden transition-all duration-300 ${
         sidebarExpanded ? 'ml-64' : 'ml-16'
       }`}>
         {isLoading ? (
@@ -915,7 +915,7 @@ export default function SavedPage() {
           </div>
         ) : isMobile ? (
           // Mobile: Vertical scrollable list
-          <div className="h-full overflow-y-auto px-4 pb-4 pt-0">
+          <div className="h-full overflow-y-auto px-4 pb-4">
             <div className="space-y-3">
               {mobileOrder
                 .map(ideaId => savedIdeas.find(idea => idea.id === ideaId))
