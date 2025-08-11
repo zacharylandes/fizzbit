@@ -685,16 +685,16 @@ export default function SavedPage() {
     <div className="min-h-screen flex relative bg-background">
       {/* Collapsible Sidebar - Positioned below title container */}
       <div className={`fixed ${isMobile ? 'top-28' : 'top-32'} left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
-        sidebarExpanded ? 'w-64' : 'w-12'
+        sidebarExpanded ? 'w-64' : 'w-16'
       }`}>
         <div className="p-4">
           {/* Sidebar Header */}
           <div className="flex items-center gap-3 mb-6">
             <Button
               size="sm"
-              variant="ghost"
+              variant={sidebarExpanded ? "default" : "default"}
               onClick={() => setSidebarExpanded(!sidebarExpanded)}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <Menu className="h-4 w-4" />
             </Button>
@@ -800,15 +800,15 @@ export default function SavedPage() {
 
       {/* Page Title Section - Full width below main header */}
       <div className={`fixed top-16 left-0 right-0 z-50 bg-background border-b border-border ${isMobile ? 'h-12' : 'h-16'}`}>
-        <div className="max-w-7xl mx-auto px-4 py-3">
+        <div className="max-w-7xl mx-auto px-4 py-2">
           {/* Header Text */}
-          <div className="mb-3">
-            <h1 className="text-xl font-crimson font-semibold text-foreground">
+          <div className={`${isMobile ? 'mb-1' : 'mb-2'}`}>
+            <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-crimson font-semibold text-foreground`}>
               {selectedColorGroup !== null ? getGroupTitle(selectedColorGroup) : 'Saved Ideas'}
             </h1>
             <p className="text-muted-foreground text-sm font-inter">
               {filteredIdeas.length} {filteredIdeas.length === 1 ? 'idea' : 'ideas'} 
-              {selectedColorGroup !== null ? ` in this group` : ''} • Drag to organize
+              {selectedColorGroup !== null ? ` in this group` : ''} {!isMobile && '• Drag to organize'}
             </p>
           </div>
           
@@ -883,7 +883,7 @@ export default function SavedPage() {
 
       {/* Content Area */}
       <div className={`flex-1 ${isMobile ? 'pt-28' : 'pt-32'} relative overflow-hidden transition-all duration-300 ${
-        sidebarExpanded ? 'ml-64' : 'ml-12'
+        sidebarExpanded ? 'ml-64' : 'ml-16'
       }`}>
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
