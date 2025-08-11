@@ -11,23 +11,11 @@ export default function LandingPage() {
         <nav className="flex items-center justify-between p-6 max-w-7xl mx-auto">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-card-light-blue-bg rounded-lg shadow-sm">
-              <svg className="h-6 w-6 text-card-light-blue" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 2C12 2 8 6 8 12C8 18 12 22 12 22C12 22 16 18 16 12C16 6 12 2 12 2Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  opacity="0.7"
-                />
-                <path
-                  d="M2 12C2 12 6 8 12 8C18 8 22 12 22 12C22 12 18 16 12 16C6 16 2 12 2 12Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  opacity="0.4"
-                />
-                <circle cx="12" cy="12" r="2" fill="currentColor" opacity="0.8" />
-              </svg>
+              <img 
+                src="/attached_assets/Screenshot%202025-08-10%20at%208.27.50%20PM_1754879274303.png" 
+                alt="SWIVL Logo" 
+                className="h-6 w-6 object-contain rounded-full"
+              />
             </div>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
               SWIVL
@@ -152,23 +140,11 @@ export default function LandingPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-card-light-blue-bg rounded-lg shadow-sm">
-                <svg className="h-5 w-5 text-card-light-blue" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M12 2C12 2 8 6 8 12C8 18 12 22 12 22C12 22 16 18 16 12C16 6 12 2 12 2Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    fill="none"
-                    opacity="0.7"
-                  />
-                  <path
-                    d="M2 12C2 12 6 8 12 8C18 8 22 12 22 12C22 12 18 16 12 16C6 16 2 12 2 12Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    fill="none"
-                    opacity="0.4"
-                  />
-                  <circle cx="12" cy="12" r="2" fill="currentColor" opacity="0.8" />
-                </svg>
+                <img 
+                  src="/attached_assets/Screenshot%202025-08-10%20at%208.27.50%20PM_1754879274303.png" 
+                  alt="SWIVL Logo" 
+                  className="h-5 w-5 object-contain rounded-full"
+                />
               </div>
               <span className="text-lg font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>SWIVL</span>
             </div>

@@ -2,6 +2,11 @@
 
 SWIVL is an interactive creative inspiration app that generates personalized ideas from text prompts and images using AI. The application presents ideas in a swipeable card interface, allowing users to explore, save, and chain creative concepts together. Built with a modern full-stack architecture featuring React frontend, Express backend, and AI-powered content generation.
 
+## Recent Updates
+- **Logo Implementation**: Added beautiful concentric circle logo throughout the site (header, landing page, footer)
+- **Sidebar Enhancements**: Implemented scrollable sidebar, vertical button layout for mobile cards, and Palette icons
+- **UI Refinements**: Color selector positioned above trash button in mobile view with smaller, stacked layout
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
