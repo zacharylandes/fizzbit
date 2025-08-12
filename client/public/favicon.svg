@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Concentric circle arcs starting from bottom -->
+  <path d="M 5 50 A 45 45 0 0 1 95 50" stroke="#1e293b" stroke-width="3" fill="none"/>
+  <path d="M 12 50 A 38 38 0 0 1 88 50" stroke="#334155" stroke-width="2.5" fill="none"/>
+  <path d="M 19 50 A 31 31 0 0 1 81 50" stroke="#475569" stroke-width="2" fill="none"/>
+  <path d="M 26 50 A 24 24 0 0 1 74 50" stroke="#64748b" stroke-width="2" fill="none"/>
+  <path d="M 33 50 A 17 17 0 0 1 67 50" stroke="#64748b" stroke-width="1.5" fill="none"/>
+  <circle cx="50" cy="50" r="3" fill="#1e293b"/>
+</svg>
