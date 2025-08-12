@@ -81,7 +81,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto w-full px-6 pt-4 pb-2">
           <div className="mb-4 text-center">
             <h2 className="text-2xl font-crimson font-semibold mb-2 text-foreground">
-              Generate Ideas
+              Get Inspired
             </h2>
             <p className="text-muted-foreground text-base font-inter">Upload a photo or describe your interests to get personalized creative inspiration.</p>
           </div>

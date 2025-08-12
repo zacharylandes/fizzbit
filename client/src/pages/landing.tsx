@@ -44,8 +44,8 @@ export default function LandingPage() {
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
-              Your Creative Partner <br />
-              for Digital Inspiration
+              Swipe Right on <br />
+              Endless Creativity
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
               Transform your ideas, photos, and sketches into endless creative possibilities with AI-powered inspiration that understands your vision.
