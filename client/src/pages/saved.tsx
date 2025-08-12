@@ -170,8 +170,8 @@ export default function SavedPage() {
       const deltaX = clientX - swipeState.startX;
       const deltaY = clientY - swipeState.startY;
       
-      // Determine if this is vertical drag or horizontal swipe
-      if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 10) {
+      // Determine if this is vertical drag or horizontal swipe (higher threshold for less sensitivity)
+      if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 25) {
         setSwipeState(prev => ({ ...prev, isVerticalDrag: true }));
       }
       
@@ -201,8 +201,8 @@ export default function SavedPage() {
             currentMobileIdea(swipeState.dragIndex, newIndex);
           }
         }
-      } else if (deltaX < -100) {
-        // Handle horizontal swipe to delete - animate slide away before removing
+      } else if (deltaX < -150) {
+        // Handle horizontal swipe to delete - animate slide away before removing (higher threshold)
         if (swipeState.ideaId) {
           // Set state to animate the card sliding away
           setSwipeState(prev => ({
@@ -688,13 +688,13 @@ export default function SavedPage() {
       clearTimeout(swipeState.holdTimer);
     }
     
-    // Set a timer to enable drag after 300ms hold
+    // Set a timer to enable drag after 500ms hold (longer hold for less accidental activation)
     const holdTimer = setTimeout(() => {
       setSwipeState(prev => ({
         ...prev,
         canDrag: true
       }));
-    }, 300);
+    }, 500);
     
     setSwipeState({
       ideaId,

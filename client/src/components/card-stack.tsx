@@ -380,26 +380,28 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
   };
 
   const handleTouchMove = (e: React.TouchEvent, ideaId: string) => {
-    // Prevent page scrolling during swipe
-    e.preventDefault();
-    e.stopPropagation();
-    
     if (!touchStartRef.current) return;
     
     const touch = e.touches[0];
     const deltaX = touch.clientX - touchStartRef.current.x;
     const deltaY = touch.clientY - touchStartRef.current.y;
     
-    // Update drag state for visual feedback
-    setDragStates(prev => ({
-      ...prev,
-      [ideaId]: { 
-        x: deltaX * 0.8, // Slightly dampen movement for more realistic feel
-        y: deltaY * 0.8, 
-        opacity: 1, // Keep card fully opaque during drag
-        isDragging: true 
-      }
-    }));
+    // Only prevent default if we detect intentional card interaction (not just scrolling)
+    if (Math.abs(deltaX) > 15 || Math.abs(deltaY) > 15) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Update drag state for visual feedback
+      setDragStates(prev => ({
+        ...prev,
+        [ideaId]: { 
+          x: deltaX * 0.8, // Slightly dampen movement for more realistic feel
+          y: deltaY * 0.8, 
+          opacity: 1, // Keep card fully opaque during drag
+          isDragging: true 
+        }
+      }));
+    }
   };
 
   const handleTouchEnd = (e: React.TouchEvent, ideaId: string) => {
@@ -426,20 +428,20 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
       return;
     }
 
-    const threshold = 80; // Higher threshold for less sensitivity - requires more swipe distance
+    const threshold = 120; // Much higher threshold for less sensitivity - requires more deliberate swipe distance
     const absX = Math.abs(deltaX);
     const absY = Math.abs(deltaY);
 
     // Debug logging
     console.log('Touch end:', { deltaX, deltaY, absX, absY, threshold, deltaTime });
     
-    // Check for upward swipe first with more lenient conditions
-    if (deltaY < -threshold) {
-      // Upward swipe - prioritize this first
+    // Check for upward swipe first with stricter conditions
+    if (deltaY < -threshold && absY > absX * 1.2) {
+      // Upward swipe - only if vertical movement is clearly dominant
       console.log('UP SWIPE DETECTED');
       handleSwipe(ideaId, 'up');
-    } else if (absX > threshold && absX > absY) {
-      // Horizontal swipe - only if horizontal movement is dominant
+    } else if (absX > threshold && absX > absY * 1.3) {
+      // Horizontal swipe - only if horizontal movement is clearly dominant and intentional
       if (deltaX > 0) {
         console.log('RIGHT SWIPE DETECTED');
         handleSwipe(ideaId, 'right');
