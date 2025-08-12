@@ -203,9 +203,14 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     
-    recognition.continuous = false;
-    recognition.interimResults = false;
+    // Improved settings for better listening
+    recognition.continuous = true; // Allow continuous listening for longer phrases
+    recognition.interimResults = true; // Show interim results for better feedback
     recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1; // Only need the best result
+    
+    // Store recognition instance to allow manual stopping
+    const recognitionRef = { current: recognition };
     
     recognition.onstart = (): void => {
       setIsRecording(true);
@@ -230,27 +235,51 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     };
     
     recognition.onresult = (event: any): void => {
-      const transcript = event.results[0][0].transcript;
-      console.log('🎤 Web Speech Recognition result:', transcript);
+      let finalTranscript = '';
+      let interimTranscript = '';
       
-      // Set the transcript as the current text prompt
-      setTextPrompt(transcript);
-      
-      // Update the parent component with the prompt
-      if (onPromptChange) {
-        onPromptChange(transcript);
+      // Process all results
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
+        }
       }
       
-      // Generate ideas with the exact transcript
-      console.log('🎤 Generating ideas from voice transcript:', transcript);
-      generateFromTextMutation.mutate(transcript);
+      console.log('🎤 Web Speech Recognition:', { finalTranscript, interimTranscript });
       
-      toast({
-        title: "Speech Recognized!",
-        description: `"${transcript}"`,
-        duration: 3000,
-        variant: "success",
-      });
+      // Show interim results in real-time
+      if (interimTranscript) {
+        setTextPrompt(interimTranscript);
+        if (onPromptChange) {
+          onPromptChange(interimTranscript);
+        }
+      }
+      
+      // Process final results
+      if (finalTranscript) {
+        setTextPrompt(finalTranscript);
+        
+        if (onPromptChange) {
+          onPromptChange(finalTranscript);
+        }
+        
+        // Stop recognition after getting final result
+        recognition.stop();
+        
+        // Generate ideas with the final transcript
+        console.log('🎤 Generating ideas from voice transcript:', finalTranscript);
+        generateFromTextMutation.mutate(finalTranscript);
+        
+        toast({
+          title: "Speech Recognized!",
+          description: `"${finalTranscript}"`,
+          duration: 3000,
+          variant: "success",
+        });
+      }
     };
     
     recognition.onerror = (event: any): void => {
@@ -263,23 +292,33 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
       }
       
       let errorMessage = "Speech recognition failed. Try typing your idea instead.";
+      let shouldShowError = true;
+      
       if (event.error === 'no-speech') {
-        errorMessage = "No speech detected. Try speaking louder or typing your idea.";
+        errorMessage = "No speech detected. Try speaking louder or closer to your microphone.";
       } else if (event.error === 'not-allowed') {
-        errorMessage = "Microphone access denied. Please allow microphone access or type your idea.";
+        errorMessage = "Microphone access denied. Please allow microphone access in your browser settings.";
+      } else if (event.error === 'network') {
+        errorMessage = "Network error. Please check your internet connection and try again.";
+      } else if (event.error === 'aborted') {
+        // Don't show error for intentional stops
+        shouldShowError = false;
       }
       
-      toast({
-        title: "Voice Input Failed",
-        description: errorMessage,
-        variant: "destructive",
-        duration: 4000,
-      });
+      if (shouldShowError) {
+        toast({
+          title: "Voice Input Issue",
+          description: errorMessage,
+          variant: "destructive",
+          duration: 4000,
+        });
+      }
     };
     
     recognition.onend = (): void => {
       setIsRecording(false);
       setRecordingDuration(0);
+      setCurrentRecognition(null);
       
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
@@ -288,9 +327,20 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     };
     
     try {
+      // Store recognition instance for manual control
+      setCurrentRecognition(recognition);
+      
+      // Auto-stop after 15 seconds if no final result
+      setTimeout(() => {
+        if (recognition && isRecording) {
+          recognition.stop();
+        }
+      }, 15000);
+      
       recognition.start();
     } catch (error) {
       console.error('Error starting recognition:', error);
+      setCurrentRecognition(null);
       toast({
         title: "Speech Recognition Error",
         description: "Please type your idea instead.",
@@ -303,9 +353,13 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
   // Audio recording functions (kept as fallback)
   const startRecording = startWebSpeechRecognition;
 
+  // Store recognition instance globally to allow manual control
+  const [currentRecognition, setCurrentRecognition] = useState<any>(null);
+
   const stopRecording = () => {
-    // For Web Speech API, we can't manually stop - it auto-stops when speech ends
-    if (isRecording) {
+    if (isRecording && currentRecognition) {
+      currentRecognition.stop();
+      setCurrentRecognition(null);
       setIsRecording(false);
       setRecordingDuration(0);
       
