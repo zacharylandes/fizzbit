@@ -1157,7 +1157,7 @@ export default function SavedPage() {
                             onMouseDown={(e) => e.stopPropagation()}
                           >
                             {/* Color Picker */}
-                            <DropdownMenu modal={false}>
+                            <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button
                                   size="sm"
@@ -1168,7 +1168,7 @@ export default function SavedPage() {
                                   <Palette className="h-3 w-3" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-36" onCloseAutoFocus={(e) => e.preventDefault()}>
+                              <DropdownMenuContent align="end" className="w-36">
                                 {cardStyles.map((style, idx) => (
                                   <DropdownMenuItem
                                     key={idx}
@@ -1310,7 +1310,7 @@ export default function SavedPage() {
                     <div className="flex-shrink-0 p-1 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50 rounded-t-lg">
                       <div className="flex items-center justify-between">
                         {/* Color Picker Dropdown - Left Side */}
-                        <DropdownMenu modal={false}>
+                        <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
                               size="sm"
@@ -1321,7 +1321,7 @@ export default function SavedPage() {
                               <Palette className="h-2 w-2" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="w-32" onCloseAutoFocus={(e) => e.preventDefault()}>
+                          <DropdownMenuContent align="start" className="w-32">
                             {cardStyles.map((style, idx) => (
                               <DropdownMenuItem
                                 key={idx}
