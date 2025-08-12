@@ -12,29 +12,30 @@ export default function LandingPage() {
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-card-light-blue-bg rounded-lg shadow-sm">
               <svg className="h-6 w-6" viewBox="0 0 100 100" fill="none">
-                <circle cx="50" cy="50" r="47" stroke="#1e293b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="44" stroke="#1e293b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="41" stroke="#1e293b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="38" stroke="#334155" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="35" stroke="#334155" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="32" stroke="#334155" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="29" stroke="#475569" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="26.5" stroke="#475569" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="24" stroke="#475569" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="21.5" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="19.2" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="17" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="14.8" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="12.8" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="10.9" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="9.2" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="7.6" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="6.2" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="4.9" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="3.8" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="2.8" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="2" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="1.3" stroke="#64748b" strokeWidth="1" fill="none"/>
+                {/* Spiral pattern starting from bottom with compressed ellipses */}
+                <ellipse cx="50" cy="85" rx="47" ry="15" stroke="#1e293b" strokeWidth="1.2" fill="none"/>
+                <ellipse cx="50" cy="82" rx="44" ry="18" stroke="#1e293b" strokeWidth="1.1" fill="none"/>
+                <ellipse cx="50" cy="78" rx="41" ry="22" stroke="#1e293b" strokeWidth="1" fill="none"/>
+                <ellipse cx="50" cy="74" rx="38" ry="26" stroke="#334155" strokeWidth="1" fill="none"/>
+                <ellipse cx="50" cy="69" rx="35" ry="31" stroke="#334155" strokeWidth="1" fill="none"/>
+                <ellipse cx="50" cy="64" rx="32" ry="36" stroke="#334155" strokeWidth="1" fill="none"/>
+                <ellipse cx="50" cy="58" rx="29" ry="42" stroke="#475569" strokeWidth="1" fill="none"/>
+                <ellipse cx="50" cy="52" rx="26.5" ry="48" stroke="#475569" strokeWidth="0.9" fill="none"/>
+                <ellipse cx="50" cy="46" rx="24" ry="54" stroke="#475569" strokeWidth="0.9" fill="none"/>
+                <ellipse cx="50" cy="39" rx="21.5" ry="61" stroke="#64748b" strokeWidth="0.8" fill="none"/>
+                <ellipse cx="50" cy="32" rx="19.2" ry="68" stroke="#64748b" strokeWidth="0.8" fill="none"/>
+                <ellipse cx="50" cy="25" rx="17" ry="75" stroke="#64748b" strokeWidth="0.7" fill="none"/>
+                <ellipse cx="50" cy="18" rx="14.8" ry="82" stroke="#64748b" strokeWidth="0.7" fill="none"/>
+                <ellipse cx="50" cy="12" rx="12.8" ry="88" stroke="#64748b" strokeWidth="0.6" fill="none"/>
+                <ellipse cx="50" cy="7" rx="10.9" ry="93" stroke="#64748b" strokeWidth="0.6" fill="none"/>
+                <ellipse cx="50" cy="3" rx="9.2" ry="97" stroke="#64748b" strokeWidth="0.5" fill="none"/>
+                <ellipse cx="50" cy="1" rx="7.6" ry="99" stroke="#64748b" strokeWidth="0.5" fill="none"/>
+                <circle cx="50" cy="50" r="6.2" stroke="#64748b" strokeWidth="0.4" fill="none"/>
+                <circle cx="50" cy="50" r="4.9" stroke="#64748b" strokeWidth="0.4" fill="none"/>
+                <circle cx="50" cy="50" r="3.8" stroke="#64748b" strokeWidth="0.3" fill="none"/>
+                <circle cx="50" cy="50" r="2.8" stroke="#64748b" strokeWidth="0.3" fill="none"/>
+                <circle cx="50" cy="50" r="2" stroke="#64748b" strokeWidth="0.3" fill="none"/>
+                <circle cx="50" cy="50" r="1.3" stroke="#64748b" strokeWidth="0.2" fill="none"/>
                 <circle cx="50" cy="50" r="0.8" fill="#1e293b"/>
               </svg>
             </div>
@@ -162,29 +163,30 @@ export default function LandingPage() {
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-card-light-blue-bg rounded-lg shadow-sm">
                 <svg className="h-5 w-5" viewBox="0 0 100 100" fill="none">
-                  <circle cx="50" cy="50" r="47" stroke="#1e293b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="44" stroke="#1e293b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="41" stroke="#1e293b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="38" stroke="#334155" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="35" stroke="#334155" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="32" stroke="#334155" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="29" stroke="#475569" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="26.5" stroke="#475569" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="24" stroke="#475569" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="21.5" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="19.2" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="17" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="14.8" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="12.8" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="10.9" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="9.2" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="7.6" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="6.2" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="4.9" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="3.8" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="2.8" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="2" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="1.3" stroke="#64748b" strokeWidth="1" fill="none"/>
+                  {/* Spiral pattern starting from bottom with compressed ellipses */}
+                  <ellipse cx="50" cy="85" rx="47" ry="15" stroke="#1e293b" strokeWidth="1.2" fill="none"/>
+                  <ellipse cx="50" cy="82" rx="44" ry="18" stroke="#1e293b" strokeWidth="1.1" fill="none"/>
+                  <ellipse cx="50" cy="78" rx="41" ry="22" stroke="#1e293b" strokeWidth="1" fill="none"/>
+                  <ellipse cx="50" cy="74" rx="38" ry="26" stroke="#334155" strokeWidth="1" fill="none"/>
+                  <ellipse cx="50" cy="69" rx="35" ry="31" stroke="#334155" strokeWidth="1" fill="none"/>
+                  <ellipse cx="50" cy="64" rx="32" ry="36" stroke="#334155" strokeWidth="1" fill="none"/>
+                  <ellipse cx="50" cy="58" rx="29" ry="42" stroke="#475569" strokeWidth="1" fill="none"/>
+                  <ellipse cx="50" cy="52" rx="26.5" ry="48" stroke="#475569" strokeWidth="0.9" fill="none"/>
+                  <ellipse cx="50" cy="46" rx="24" ry="54" stroke="#475569" strokeWidth="0.9" fill="none"/>
+                  <ellipse cx="50" cy="39" rx="21.5" ry="61" stroke="#64748b" strokeWidth="0.8" fill="none"/>
+                  <ellipse cx="50" cy="32" rx="19.2" ry="68" stroke="#64748b" strokeWidth="0.8" fill="none"/>
+                  <ellipse cx="50" cy="25" rx="17" ry="75" stroke="#64748b" strokeWidth="0.7" fill="none"/>
+                  <ellipse cx="50" cy="18" rx="14.8" ry="82" stroke="#64748b" strokeWidth="0.7" fill="none"/>
+                  <ellipse cx="50" cy="12" rx="12.8" ry="88" stroke="#64748b" strokeWidth="0.6" fill="none"/>
+                  <ellipse cx="50" cy="7" rx="10.9" ry="93" stroke="#64748b" strokeWidth="0.6" fill="none"/>
+                  <ellipse cx="50" cy="3" rx="9.2" ry="97" stroke="#64748b" strokeWidth="0.5" fill="none"/>
+                  <ellipse cx="50" cy="1" rx="7.6" ry="99" stroke="#64748b" strokeWidth="0.5" fill="none"/>
+                  <circle cx="50" cy="50" r="6.2" stroke="#64748b" strokeWidth="0.4" fill="none"/>
+                  <circle cx="50" cy="50" r="4.9" stroke="#64748b" strokeWidth="0.4" fill="none"/>
+                  <circle cx="50" cy="50" r="3.8" stroke="#64748b" strokeWidth="0.3" fill="none"/>
+                  <circle cx="50" cy="50" r="2.8" stroke="#64748b" strokeWidth="0.3" fill="none"/>
+                  <circle cx="50" cy="50" r="2" stroke="#64748b" strokeWidth="0.3" fill="none"/>
+                  <circle cx="50" cy="50" r="1.3" stroke="#64748b" strokeWidth="0.2" fill="none"/>
                   <circle cx="50" cy="50" r="0.8" fill="#1e293b"/>
                 </svg>
               </div>
