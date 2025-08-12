@@ -141,13 +141,15 @@ export default function Layout({ children }: LayoutProps) {
               <div className="flex items-center space-x-3 cursor-pointer hover-lift transition-all duration-300">
                 <div className="p-2 bg-card-light-blue-bg border border-card-light-blue/40 rounded-lg card-shadow">
                   <svg className="h-6 w-6" viewBox="0 0 100 100" fill="none">
-                    {/* Simple clean spiral arcs starting from bottom */}
-                    <path d="M 5 85 Q 50 60, 95 85" stroke="#1e293b" strokeWidth="2" fill="none"/>
-                    <path d="M 15 75 Q 50 55, 85 75" stroke="#334155" strokeWidth="2" fill="none"/>
-                    <path d="M 25 65 Q 50 50, 75 65" stroke="#475569" strokeWidth="2" fill="none"/>
-                    <path d="M 35 55 Q 50 45, 65 55" stroke="#64748b" strokeWidth="2" fill="none"/>
-                    <path d="M 42 48 Q 50 42, 58 48" stroke="#64748b" strokeWidth="1.5" fill="none"/>
-                    <circle cx="50" cy="45" r="2" fill="#1e293b"/>
+                    {/* Concentric circle arcs starting from bottom */}
+                    <path d="M 3 50 A 47 47 0 0 1 97 50" stroke="#1e293b" strokeWidth="1.5" fill="none"/>
+                    <path d="M 8 50 A 42 42 0 0 1 92 50" stroke="#334155" strokeWidth="1.5" fill="none"/>
+                    <path d="M 13 50 A 37 37 0 0 1 87 50" stroke="#475569" strokeWidth="1.5" fill="none"/>
+                    <path d="M 18 50 A 32 32 0 0 1 82 50" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                    <path d="M 23 50 A 27 27 0 0 1 77 50" stroke="#64748b" strokeWidth="1.5" fill="none"/>
+                    <path d="M 28 50 A 22 22 0 0 1 72 50" stroke="#64748b" strokeWidth="1.2" fill="none"/>
+                    <path d="M 33 50 A 17 17 0 0 1 67 50" stroke="#64748b" strokeWidth="1" fill="none"/>
+                    <circle cx="50" cy="50" r="2" fill="#1e293b"/>
                   </svg>
                 </div>
                 <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
