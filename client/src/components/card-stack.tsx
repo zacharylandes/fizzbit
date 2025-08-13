@@ -93,6 +93,9 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
       
       // Trigger immediate prefetch check for new cards
       setTimeout(() => checkAndPrefetch(), 200);
+      // Also check periodically to ensure continuous flow
+      setTimeout(() => checkAndPrefetch(), 1000);
+      setTimeout(() => checkAndPrefetch(), 2000);
     }
   }, [initialIdeas]);
 
@@ -258,14 +261,26 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
   const checkAndPrefetch = () => {
     console.log('🔄 Checking prefetch - Cards remaining:', cards.length, 'Has context:', !!currentExploreContext, 'Is pending:', prefetchMoreIdeasMutation.isPending);
     
-    // When cards get low (5 or fewer), fetch more ideas from the CURRENT prompt context
-    // This ensures endless flow without falling back to old/random ideas
-    if (cards.length <= 5 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
-      console.log('🔄 TRIGGERING PREFETCH for current prompt:', currentExploreContext.originalPrompt);
+    // EARLY prefetch when cards get to 15 or fewer to ensure smooth flow
+    if (cards.length <= 15 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
+      console.log('🔄 EARLY PREFETCH TRIGGERED for current prompt:', currentExploreContext.originalPrompt);
       prefetchMoreIdeasMutation.mutate();
     }
-    
-    // NO fallback to random ideas - users should start new prompts instead
+    // BACKUP prefetch if cards get critically low (3 or fewer) - emergency measure
+    else if (cards.length <= 3 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
+      console.log('🔄 EMERGENCY PREFETCH for current prompt:', currentExploreContext.originalPrompt);
+      prefetchMoreIdeasMutation.mutate();
+    }
+    // ULTIMATE fallback - if we somehow have no cards and no context, trigger emergency generation
+    else if (cards.length === 0 && !currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
+      console.log('🚨 ULTIMATE FALLBACK - Generating emergency ideas');
+      // Create temporary context to generate fresh ideas
+      setCurrentExploreContext({
+        originalPrompt: "creative inspiration and unusual ideas",
+        exploredIdea: null as any
+      });
+      prefetchMoreIdeasMutation.mutate();
+    }
   };
 
   const handleSwipe = (ideaId: string, direction: 'left' | 'right' | 'up') => {
@@ -346,6 +361,8 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
           checkAndPrefetch();
           // Also check again after cards state has fully updated
           setTimeout(() => checkAndPrefetch(), 100);
+          // Final check to be absolutely sure we have enough cards
+          setTimeout(() => checkAndPrefetch(), 500);
         }, 50);
         
         return newCards;
@@ -519,8 +536,8 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
     <div className="relative h-[480px] sm:h-[520px] w-full max-w-[600px] mx-auto z-30">
       {/* Touch Card Stack */}
       <div className="relative w-full h-full">
-        {/* Show loading card if generating ideas and no cards available */}
-        {isGeneratingIdeas && cards.length === 0 && (
+        {/* Show loading card if generating ideas and no cards available OR if we run critically low */}
+        {(isGeneratingIdeas && cards.length === 0) || (cards.length <= 2 && currentExploreContext && prefetchMoreIdeasMutation.isPending) && (
           <div className="absolute inset-0 cursor-default" style={{ zIndex: 10 }}>
             <div className="w-full h-full bg-card border border-card-sage/30 rounded-xl p-6 flex flex-col items-center justify-center card-shadow">
               <div className="w-16 h-16 mb-4 relative">
@@ -539,6 +556,20 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
             <div className="bg-card/80 backdrop-blur-sm border border-border rounded-full p-2 flex items-center space-x-2 card-shadow">
               <div className="w-4 h-4 border-2 border-card-sage border-t-transparent rounded-full animate-spin"></div>
               <span className="text-xs text-card-foreground">Generating...</span>
+            </div>
+          </div>
+        )}
+        
+        {/* Never show completely empty state - always show at least loading */}
+        {cards.length === 0 && !isGeneratingIdeas && !prefetchMoreIdeasMutation.isPending && currentExploreContext && (
+          <div className="absolute inset-0 cursor-default" style={{ zIndex: 10 }}>
+            <div className="w-full h-full bg-card border border-card-sage/30 rounded-xl p-6 flex flex-col items-center justify-center card-shadow">
+              <div className="w-16 h-16 mb-4 relative">
+                <div className="absolute inset-0 border-4 border-card-sage border-t-transparent rounded-full animate-spin"></div>
+                <Sparkles className="absolute inset-0 m-auto h-8 w-8 text-card-sage animate-pulse" />
+              </div>
+              <h3 className="text-xl font-bold text-card-foreground mb-2">Getting More Ideas...</h3>
+              <p className="text-muted-foreground text-center">Endless creativity coming your way!</p>
             </div>
           </div>
         )}
