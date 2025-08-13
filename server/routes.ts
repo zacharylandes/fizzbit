@@ -149,7 +149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           title: ideaData.title,
           description: ideaData.description,
           source: "image",
-          sourceContent: "uploaded_image",
+          sourceContent: `Image uploaded at ${new Date().toISOString()}`,
           isSaved: 0,
           metadata: { 
             generatedAt: new Date().toISOString(),
@@ -185,7 +185,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
           title: ideaData.title,
           description: ideaData.description,
           source: "image",
-          sourceContent: "uploaded_image",
+          sourceContent: `Image fallback at ${new Date().toISOString()}`,
+          isSaved: 0,
+          metadata: { 
+            generatedAt: new Date().toISOString(),
+            type: "fallback"
+          }
+        }, userId);
+        createdIdeas.push(idea);
+      }
+
+      res.json({ ideas: createdIdeas });
+    }
+  }));
+
+  // Generate ideas from drawing using same image analysis but different source tracking
+  app.post("/api/ideas/generate-from-drawing", asyncHandler(async (req: any, res) => {
+    const { imageBase64 } = req.body;
+    const userId = req.user?.claims?.sub; // Get user ID if authenticated
+    
+    if (!imageBase64) {
+      return res.status(400).json({ error: "Drawing data is required" });
+    }
+
+    try {
+      // Use same image processing as uploads but mark as drawing
+      const ideas = await generateIdeasFromImage(imageBase64);
+
+      // Store generated ideas with drawing-specific metadata
+      const createdIdeas = [];
+      for (const ideaData of ideas) {
+        const idea = await storage.createIdea({
+          title: ideaData.title,
+          description: ideaData.description,
+          source: "drawing",
+          sourceContent: `Drawing created at ${new Date().toISOString()}`,
+          isSaved: 0,
+          metadata: { 
+            generatedAt: new Date().toISOString(),
+            inputType: "drawing"
+          }
+        }, userId);
+        createdIdeas.push(idea);
+      }
+
+      res.json({ ideas: createdIdeas });
+    } catch (error) {
+      console.error("Error generating ideas from drawing:", error);
+      
+      // Specific fallback for drawing errors
+      const fallbackIdeas = [
+        {
+          title: "Sketch Development",
+          description: "Develop your sketch into a more detailed artwork using different mediums and techniques."
+        },
+        {
+          title: "Abstract Interpretation",
+          description: "Create an abstract interpretation of your drawing using colors, shapes, and movement."
+        },
+        {
+          title: "Digital Art Project",
+          description: "Transform your sketch into a digital art piece using design software and creative effects."
+        }
+      ];
+
+      const createdIdeas = [];
+      for (const ideaData of fallbackIdeas) {
+        const idea = await storage.createIdea({
+          title: ideaData.title,
+          description: ideaData.description,
+          source: "drawing",
+          sourceContent: `Drawing fallback at ${new Date().toISOString()}`,
           isSaved: 0,
           metadata: { 
             generatedAt: new Date().toISOString(),

@@ -99,7 +99,7 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
   // Drawing mutation
   const generateFromDrawingMutation = useMutation({
     mutationFn: async (imageBase64: string) => {
-      const response = await apiRequest("POST", "/api/ideas/generate-from-image", {
+      const response = await apiRequest("POST", "/api/ideas/generate-from-drawing", {
         imageBase64,
       });
       return response.json();

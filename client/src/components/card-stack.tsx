@@ -253,18 +253,13 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
 
   // Smart prefetching logic - check when cards get low and ensure continuous flow with deduplication
   const checkAndPrefetch = () => {
-    console.log('🔄 Checking prefetch - Cards remaining:', cards.length, 'Has context:', !!currentExploreContext, 'Is pending:', prefetchMoreIdeasMutation.isPending);
+    console.log('🔄 Checking prefetch - Cards remaining:', cards.length, 'Has context:', !!currentExploreContext);
     
-    // Less aggressive prefetching to avoid repetition - trigger when 5 or fewer cards remain
-    if (cards.length <= 5 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
-      console.log('🔄 TRIGGERING PREFETCH for prompt:', currentExploreContext.originalPrompt);
-      prefetchMoreIdeasMutation.mutate();
-    } else if (cards.length <= 2 && !currentExploreContext && !getRandomIdeasMutation.isPending) {
-      // Emergency fallback to random ideas if no context and very low cards
-      console.log('🔄 EMERGENCY PREFETCH - Getting random ideas');
-      const existingIds = cards.map(c => c.id);
-      getRandomIdeasMutation.mutate(existingIds);
-    }
+    // DISABLED: No more prefetching old prompts or random fallbacks
+    // Each new prompt generates 25 fresh ideas - users should start new prompts when they run out
+    // This prevents mixing old and new ideas which was causing confusion
+    
+    console.log('🔄 Prefetch disabled - users will generate fresh ideas with new prompts');
   };
 
   const handleSwipe = (ideaId: string, direction: 'left' | 'right' | 'up') => {
