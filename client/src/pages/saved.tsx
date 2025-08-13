@@ -121,6 +121,27 @@ export default function SavedPage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Load group titles from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedGroupTitles = localStorage.getItem('swivl-group-titles');
+      if (savedGroupTitles) {
+        setGroupTitles(JSON.parse(savedGroupTitles));
+      }
+    } catch (error) {
+      console.error('Failed to load group titles from localStorage:', error);
+    }
+  }, []);
+
+  // Save group titles to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('swivl-group-titles', JSON.stringify(groupTitles));
+    } catch (error) {
+      console.error('Failed to save group titles to localStorage:', error);
+    }
+  }, [groupTitles]);
+
   // Detect keyboard open/close on mobile
   useEffect(() => {
     if (!isMobile) return;
