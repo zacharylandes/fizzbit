@@ -106,7 +106,7 @@ export async function generateRelatedIdeas(contextualPrompt: string, count: numb
   }
 }
 
-export async function generateIdeasFromText(prompt: string, count: number = 8): Promise<IdeaResponse[]> {
+export async function generateIdeasFromText(prompt: string, count: number = 9): Promise<IdeaResponse[]> {
   try {
     console.log('Using OpenAI for reliable text generation...');
     
@@ -118,14 +118,10 @@ export async function generateIdeasFromText(prompt: string, count: number = 8): 
     const timestamp = Date.now();
     const randomSeed = Math.floor(Math.random() * 1000);
     
-    // Use OpenAI for reliable text generation since Hugging Face models are unavailable
-    const systemPrompt = isListRequest 
-      ? `Generate exactly ${count} concise, creative suggestions. Each must be completely unique and different. Use varied approaches, styles, and perspectives. Avoid repetition. Format as a JSON object with an "ideas" array containing objects with "title" and "description" fields. Request ID: ${timestamp}-${randomSeed}`
-      : `Generate exactly ${count} unique, inspiring creative ideas. Each must be completely different with varied approaches and perspectives. Explore different styles, angles, and unexpected directions. Format as a JSON object with an "ideas" array containing objects with "title" and "description" fields. Request ID: ${timestamp}-${randomSeed}`;
+    // Use new structured prompt format
+    const systemPrompt = `You are a creative idea generator. Parse the user's request for specific categories and generate exactly 9 ideas total: 3 unusual business concepts, 2 creative plays/sitcoms, 2 food recipes, and 2 fine art projects. Present them in random order. Format as JSON with "ideas" array containing objects with "title", "description", and "category" fields. Make titles concise (max 6 words) and descriptions detailed but under 100 words.`;
     
-    const userPrompt = isListRequest 
-      ? `Generate ${count} suggestions for: ${prompt}`
-      : `Generate ${count} creative ideas for: ${prompt}`;
+    const userPrompt = prompt; // Use the prompt directly as it already has the new format
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini", // Fast and cost-effective
@@ -251,7 +247,7 @@ export async function generateIdeasFromText(prompt: string, count: number = 8): 
   }
 }
 
-export async function generateIdeasFromImage(imageBase64: string, count: number = 8): Promise<IdeaResponse[]> {
+export async function generateIdeasFromImage(imageBase64: string, count: number = 9): Promise<IdeaResponse[]> {
   try {
     // First try Hugging Face image analysis
     let imageDescription = '';
@@ -324,14 +320,14 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
             messages: [
               {
                 role: 'system',
-                content: `You are a creative idea generator. Generate exactly ${count} unique, inspiring creative ideas based on the image description provided. Each idea should be practical and actionable with completely different approaches. Format as JSON with "ideas" array containing objects with "title" and "description" fields. Make titles concise (max 5 words) and descriptions detailed but under 100 words. Ensure each idea is completely unique and diverse.`
+                content: `You are a creative idea generator. Parse the user's request for specific categories and generate exactly 9 ideas total: 3 unusual business concepts, 2 creative plays/sitcoms, 2 food recipes, and 2 fine art projects. Present them in random order. Format as JSON with "ideas" array containing objects with "title", "description", and "category" fields. Make titles concise (max 6 words) and descriptions detailed but under 100 words.`
               },
               {
                 role: 'user',
-                content: `Based on this image: "${imageDescription}" - Give me unique ideas that avoid the obvious for ${count} completely different creative project ideas that are inspired by what's shown in the image.`
+                content: `using the prompt "${imageDescription}" as inspiration, provide me 3 ideas for an unusual business concept, 2 ideas for a creative and unusual play or sitcom, 2 ideas for a food recipe, and 2 ideas for a fine art project, the ideas will be sorted randomly`
               }
             ],
-            max_tokens: 1200,
+            max_tokens: 1400,
             temperature: 0.9,
             response_format: { type: "json_object" }
           })

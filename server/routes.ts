@@ -86,10 +86,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('📝 Received prompt from client:', prompt);
 
     try {
-      // Don't add prefix again if it's already there (from voice input)
-      const enhancedPrompt = prompt.startsWith('give me unique ideas that avoid the obvious for') 
-        ? prompt 
-        : `give me unique ideas that avoid the obvious for ${prompt}`;
+      // Create new structured prompt format
+      const enhancedPrompt = `using the prompt "${prompt}" as inspiration, provide me 3 ideas for an unusual business concept, 2 ideas for a creative and unusual play or sitcom, 2 ideas for a food recipe, and 2 ideas for a fine art project, the ideas will be sorted randomly`;
       
       console.log('🚀 Enhanced prompt being processed:', enhancedPrompt);
       
