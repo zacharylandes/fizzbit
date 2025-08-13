@@ -75,7 +75,7 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
       // RESET exploration context to ensure we start fresh with new prompt
       // This prevents mixing ideas from different prompts
       setCurrentExploreContext({
-        originalPrompt: initialIdeas[0]?.sourceContent || "",
+        originalPrompt: initialIdeas[0]?.sourceContent || currentPrompt || "",
         exploredIdea: initialIdeas[0]
       });
       
@@ -172,18 +172,21 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
   const prefetchMoreIdeasMutation = useMutation({
     mutationFn: async () => {
       if (!currentExploreContext?.originalPrompt) {
+        console.log('❌ No context for prefetch');
         return { ideas: [] };
       }
 
-      // Check if the original prompt was from an image or text
-      const isImagePrompt = currentExploreContext.originalPrompt.startsWith('Image:');
+      console.log('🔄 Prefetching from prompt:', currentExploreContext.originalPrompt);
+
+      // Check if the original prompt was from an image/drawing upload
+      const isImagePrompt = currentExploreContext.originalPrompt.includes('uploaded at') || 
+                           currentExploreContext.originalPrompt.includes('Image:') ||
+                           currentExploreContext.originalPrompt.includes('Drawing created');
       
       if (isImagePrompt) {
-        // For image prompts, we can't regenerate from the same image, 
-        // so we generate related visual ideas using the description
-        const imageDescription = currentExploreContext.originalPrompt.replace('Image: ', '');
+        // For image/drawing prompts, generate more visual creative ideas
         const response = await apiRequest("POST", "/api/ideas/generate-from-text", {
-          prompt: `Visual creative projects inspired by: ${imageDescription}`
+          prompt: `creative visual projects and artistic ideas`
         });
         return response.json();
       } else {
@@ -253,13 +256,16 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
 
   // Smart prefetching logic - check when cards get low and ensure continuous flow with deduplication
   const checkAndPrefetch = () => {
-    console.log('🔄 Checking prefetch - Cards remaining:', cards.length, 'Has context:', !!currentExploreContext);
+    console.log('🔄 Checking prefetch - Cards remaining:', cards.length, 'Has context:', !!currentExploreContext, 'Is pending:', prefetchMoreIdeasMutation.isPending);
     
-    // DISABLED: No more prefetching old prompts or random fallbacks
-    // Each new prompt generates 25 fresh ideas - users should start new prompts when they run out
-    // This prevents mixing old and new ideas which was causing confusion
+    // When cards get low (5 or fewer), fetch more ideas from the CURRENT prompt context
+    // This ensures endless flow without falling back to old/random ideas
+    if (cards.length <= 5 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
+      console.log('🔄 TRIGGERING PREFETCH for current prompt:', currentExploreContext.originalPrompt);
+      prefetchMoreIdeasMutation.mutate();
+    }
     
-    console.log('🔄 Prefetch disabled - users will generate fresh ideas with new prompts');
+    // NO fallback to random ideas - users should start new prompts instead
   };
 
   const handleSwipe = (ideaId: string, direction: 'left' | 'right' | 'up') => {
