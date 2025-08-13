@@ -800,7 +800,7 @@ export default function SavedPage() {
 
       {/* Collapsible Sidebar */}
       <div className={`sidebar-container fixed top-16 left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
-        sidebarExpanded ? 'w-1/2 max-w-lg rounded-tr-xl' : isMobile ? 'w-0' : 'w-16'
+        sidebarExpanded ? 'w-1/2 max-w-xl rounded-tr-xl' : isMobile ? 'w-0' : 'w-16'
       }`} style={{ 
         visibility: sidebarExpanded || !isMobile ? 'visible' : 'hidden'
       }}>
@@ -930,7 +930,7 @@ export default function SavedPage() {
 
       {/* Page Title Section - Full width below main header */}
       <div className={`relative bg-background border-b border-border ${isMobile ? 'h-16' : 'h-16'} ${
-        !isMobile && sidebarExpanded ? 'ml-[512px]' : !isMobile ? 'ml-16' : ''
+        !isMobile && sidebarExpanded ? 'ml-[576px]' : !isMobile ? 'ml-16' : ''
       }`}>
         <div className="max-w-7xl mx-auto px-4 py-3 h-full">
           <div className="flex items-center gap-3 h-full">
@@ -1028,7 +1028,7 @@ export default function SavedPage() {
 
       {/* Content Area */}
       <div className={`flex-1 relative overflow-hidden ${
-        !isMobile && sidebarExpanded ? 'ml-[512px]' : !isMobile ? 'ml-16' : ''
+        !isMobile && sidebarExpanded ? 'ml-[576px]' : !isMobile ? 'ml-16' : ''
       }`}>
         {isLoading ? (
           <div className="flex items-center justify-center h-full">

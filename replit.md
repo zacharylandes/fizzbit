@@ -6,7 +6,7 @@ SWIVL is an interactive creative inspiration app that generates personalized ide
 - **Endless Idea Flow**: Fixed continuous idea generation system with early prefetch at 15 cards (prevents running out), emergency prefetch at 3 cards, increased batch size to 25 ideas per prompt, multiple safety checks to ensure truly endless flow, disabled fallbacks to old/random ideas
 - **AI Prompt Structure**: Updated all input types (text, voice, image, drawing) to generate structured 9-idea responses with specific categories: 3 unusual business concepts, 2 creative plays/sitcoms, 2 food recipes, 2 fine art projects - presented in random order
 - **Logo Implementation**: Added beautiful concentric circle logo throughout the site (header, landing page, footer) 
-- **Sidebar Enhancements**: Widened sidebar to max-w-lg (512px) with rounded top-right corner, scrollable content, vertical button layout for mobile cards, and Palette icons
+- **Sidebar Enhancements**: Widened sidebar to max-w-xl (576px) with rounded top-right corner, scrollable content, vertical button layout for mobile cards, and Palette icons
 - **UI Refinements**: Color selector positioned above trash button in mobile view with smaller, stacked layout, color dropdowns show group names instead of color names (e.g., "Group 2" instead of "Seafoam Green")
 
 # User Preferences
