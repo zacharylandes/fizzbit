@@ -800,7 +800,7 @@ export default function SavedPage() {
 
       {/* Collapsible Sidebar */}
       <div className={`sidebar-container fixed top-16 left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
-        sidebarExpanded ? 'w-1/2 max-w-xl rounded-tr-xl' : isMobile ? 'w-0' : 'w-16'
+        sidebarExpanded ? 'w-[576px] rounded-tr-xl' : isMobile ? 'w-0' : 'w-16'
       }`} style={{ 
         visibility: sidebarExpanded || !isMobile ? 'visible' : 'hidden'
       }}>
