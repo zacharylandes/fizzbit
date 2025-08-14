@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut, Pencil, Eraser, Palette, GripVertical, Menu, Edit2, Check } from "lucide-react";
+import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut, Pencil, Eraser, Palette, GripVertical, Menu, Edit2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -79,6 +79,12 @@ export default function SavedPage() {
   const [selectedColorGroup, setSelectedColorGroup] = useState<number | null>(null);
   const [groupTitles, setGroupTitles] = useState<{ [colorIndex: number]: string }>({});
   const [editingGroup, setEditingGroup] = useState<number | null>(null);
+  
+  // Card expansion and editing state
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [editingCard, setEditingCard] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [swipeState, setSwipeState] = useState<{
     ideaId: string | null;
@@ -768,6 +774,56 @@ export default function SavedPage() {
     setEditingGroup(null);
   };
 
+  // Handle card expansion and editing
+  const handleCardClick = (idea: Idea) => {
+    if (expandedCard === idea.id) {
+      setExpandedCard(null);
+      setEditingCard(null);
+    } else {
+      setExpandedCard(idea.id);
+      setEditTitle(idea.title);
+      setEditDescription(idea.description);
+    }
+  };
+
+  const handleStartEditing = (ideaId: string) => {
+    setEditingCard(ideaId);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingCard) return;
+    
+    try {
+      // Here you would make API call to update the idea
+      // For now, we'll just close the editing state
+      setEditingCard(null);
+      setExpandedCard(null);
+      
+      toast({
+        title: "Idea Updated",
+        description: "Your changes have been saved",
+        duration: 2000,
+        variant: "default",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save changes. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCard(null);
+    // Reset edit values to original
+    const idea = savedIdeas.find(i => i.id === expandedCard);
+    if (idea) {
+      setEditTitle(idea.title);
+      setEditDescription(idea.description);
+    }
+  };
+
   // Scroll editing group into view with footer clearance
   useEffect(() => {
     if (editingGroup !== null) {
@@ -1151,9 +1207,18 @@ export default function SavedPage() {
                         key={`card-${idea.id}-${colorIndex}`}
                         className={`${cardStyles[colorIndex]} border-2 card-shadow transition-all duration-200 ${
                           swipeOffsetX < -50 ? 'bg-red-50 dark:bg-red-900/20' : ''
-                        } ${isBeingInteracted ? 'shadow-lg scale-[1.02] ring-2 ring-primary/20' : ''}`}
+                        } ${isBeingInteracted ? 'shadow-lg scale-[1.02] ring-2 ring-primary/20' : ''} ${
+                          expandedCard === idea.id ? 'ring-2 ring-primary/30' : ''
+                        }`}
                         onTouchStart={(e) => handleMobileInteractionStart(e, idea.id, index)}
                         onMouseDown={(e) => handleMobileInteractionStart(e, idea.id, index)}
+                        onClick={(e) => {
+                          // Only handle click if it's not a swipe/drag interaction
+                          if (!swipeState.isDragging && !isBeingInteracted) {
+                            e.stopPropagation();
+                            handleCardClick(idea);
+                          }
+                        }}
                       >
                         <div className="p-3 flex items-center gap-3">
                           {/* Drag Handle */}
@@ -1163,12 +1228,77 @@ export default function SavedPage() {
                           
                           {/* Content */}
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-sm text-gray-800 dark:text-gray-100 truncate mb-1">
-                              {idea.title}
-                            </h3>
-                            <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
-                              {idea.description}
-                            </p>
+                            {editingCard === idea.id ? (
+                              // Editing mode
+                              <div className="space-y-2">
+                                <input
+                                  type="text"
+                                  value={editTitle}
+                                  onChange={(e) => setEditTitle(e.target.value)}
+                                  className="w-full text-sm font-bold bg-transparent border-b border-gray-300 dark:border-gray-600 focus:border-primary focus:outline-none"
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <textarea
+                                  value={editDescription}
+                                  onChange={(e) => setEditDescription(e.target.value)}
+                                  className="w-full text-xs bg-transparent border border-gray-300 dark:border-gray-600 rounded px-2 py-1 focus:border-primary focus:outline-none resize-none"
+                                  rows={expandedCard === idea.id ? 4 : 2}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <div className="flex gap-1 pt-1">
+                                  <Button
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleSaveEdit();
+                                    }}
+                                    className="h-6 px-2 text-xs bg-primary hover:bg-primary/90"
+                                  >
+                                    Save
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCancelEdit();
+                                    }}
+                                    className="h-6 px-2 text-xs"
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              // Display mode
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h3 className={`font-bold text-sm text-gray-800 dark:text-gray-100 ${
+                                    expandedCard === idea.id ? '' : 'truncate'
+                                  }`}>
+                                    {idea.title}
+                                  </h3>
+                                  {expandedCard === idea.id && (
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleStartEditing(idea.id);
+                                      }}
+                                      className="h-5 w-5 p-0 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                    >
+                                      <Pencil className="h-3 w-3" />
+                                    </Button>
+                                  )}
+                                </div>
+                                <p className={`text-xs text-gray-600 dark:text-gray-300 ${
+                                  expandedCard === idea.id ? '' : 'line-clamp-2'
+                                }`}>
+                                  {idea.description}
+                                </p>
+                              </div>
+                            )}
                           </div>
                           
                           {/* Controls */}
@@ -1326,7 +1456,17 @@ export default function SavedPage() {
                   onTouchMove={!isDrawingMode ? handleTouchMove : undefined}
                   onTouchEnd={!isDrawingMode ? handleTouchEnd : undefined}
                 >
-                  <Card className={`${cardStyles[colorIndex]} w-full h-full border-2 card-shadow hover-lift transition-all duration-300 flex flex-col`}>
+                  <Card 
+                    className={`${cardStyles[colorIndex]} w-full h-full border-2 card-shadow hover-lift transition-all duration-300 flex flex-col cursor-pointer ${
+                      expandedCard === idea.id ? 'ring-2 ring-primary/30' : ''
+                    }`}
+                    onClick={(e) => {
+                      if (!isDragging) {
+                        e.stopPropagation();
+                        handleCardClick(idea);
+                      }
+                    }}
+                  >
                     {/* Drag Handle - Even Smaller */}
                     <div className="flex-shrink-0 p-1 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50 rounded-t-lg">
                       <div className="flex items-center justify-between">
@@ -1397,6 +1537,85 @@ export default function SavedPage() {
           </div>
         )}
       </div>
+
+      {/* Desktop Card Expansion Modal */}
+      {expandedCard && !isMobile && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-background border border-border rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <h2 className="text-lg font-bold text-foreground">
+                  {editingCard === expandedCard ? 'Edit Idea' : 'Idea Details'}
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setExpandedCard(null);
+                    setEditingCard(null);
+                  }}
+                  className="h-8 w-8 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {editingCard === expandedCard ? (
+                // Editing mode
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Title</label>
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Description</label>
+                    <textarea
+                      value={editDescription}
+                      onChange={(e) => setEditDescription(e.target.value)}
+                      className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                      rows={6}
+                    />
+                  </div>
+                  <div className="flex gap-2 pt-2">
+                    <Button onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
+                      Save Changes
+                    </Button>
+                    <Button variant="outline" onClick={handleCancelEdit}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                // Display mode
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between">
+                    <h3 className="text-xl font-bold text-foreground leading-tight">
+                      {savedIdeas.find(i => i.id === expandedCard)?.title}
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleStartEditing(expandedCard)}
+                      className="ml-2"
+                    >
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Edit
+                    </Button>
+                  </div>
+                  <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                    {savedIdeas.find(i => i.id === expandedCard)?.description}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
