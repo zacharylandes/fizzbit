@@ -187,7 +187,7 @@ export default function SavedPage() {
 
   // Global event listeners for mobile interactions
   useEffect(() => {
-    if (!isMobile || !swipeState.isDragging) return;
+    if (!isMobile || !swipeState.ideaId) return;
 
     const handleGlobalMove = (e: TouchEvent | MouseEvent) => {
       e.preventDefault();
@@ -196,10 +196,19 @@ export default function SavedPage() {
       
       const deltaX = clientX - swipeState.startX;
       const deltaY = clientY - swipeState.startY;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      // Determine if this is vertical drag or horizontal swipe (higher threshold for less sensitivity)
-      if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 25) {
-        setSwipeState(prev => ({ ...prev, isVerticalDrag: true }));
+      // Only start dragging if movement exceeds threshold (10px)
+      if (!swipeState.isDragging && distance > 10) {
+        setSwipeState(prev => ({ ...prev, isDragging: true }));
+      }
+      
+      // Only set drag direction if we're actually dragging
+      if (swipeState.isDragging || distance > 10) {
+        // Determine if this is vertical drag or horizontal swipe (higher threshold for less sensitivity)
+        if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 25) {
+          setSwipeState(prev => ({ ...prev, isVerticalDrag: true }));
+        }
       }
       
       setSwipeState(prev => ({
@@ -214,6 +223,16 @@ export default function SavedPage() {
       
       const deltaX = swipeState.currentX - swipeState.startX;
       const deltaY = swipeState.currentY - swipeState.startY;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      
+      // If no significant movement occurred, treat as a click
+      if (distance < 10 && swipeState.ideaId) {
+        const idea = savedIdeas.find(idea => idea.id === swipeState.ideaId);
+        if (idea) {
+          console.log('Treating as click - no drag movement detected');
+          handleCardClick(idea);
+        }
+      }
       
       if (swipeState.isVerticalDrag) {
         // Handle vertical reorder
@@ -283,7 +302,7 @@ export default function SavedPage() {
       document.removeEventListener('mousemove', handleGlobalMove);
       document.removeEventListener('mouseup', handleGlobalEnd);
     };
-  }, [isMobile, swipeState.isDragging, swipeState.startX, swipeState.startY, swipeState.currentX, swipeState.currentY, swipeState.isVerticalDrag, swipeState.dragIndex, swipeState.ideaId, mobileOrder.length]);
+  }, [isMobile, swipeState.ideaId, swipeState.startX, swipeState.startY, swipeState.currentX, swipeState.currentY, swipeState.isVerticalDrag, swipeState.dragIndex, swipeState.isDragging, mobileOrder.length, savedIdeas]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -723,13 +742,14 @@ export default function SavedPage() {
       }));
     }, 500);
     
+    // Don't set isDragging immediately - wait for actual movement
     setSwipeState({
       ideaId,
       startX: clientX,
       startY: clientY,
       currentX: clientX,
       currentY: clientY,
-      isDragging: true,
+      isDragging: false, // Changed to false - only set to true when actual dragging starts
       isVerticalDrag: false,
       dragIndex: index,
       isDeleting: false,
@@ -776,6 +796,7 @@ export default function SavedPage() {
 
   // Handle card expansion and editing
   const handleCardClick = (idea: Idea) => {
+    console.log('Card click triggered for:', idea.id, { expandedCard, swipeState });
     if (expandedCard === idea.id) {
       setExpandedCard(null);
       setEditingCard(null);
@@ -1213,6 +1234,12 @@ export default function SavedPage() {
                         onTouchStart={(e) => handleMobileInteractionStart(e, idea.id, index)}
                         onMouseDown={(e) => handleMobileInteractionStart(e, idea.id, index)}
                         onClick={(e) => {
+                          console.log('Card click attempt:', {
+                            isDragging: swipeState.isDragging,
+                            isBeingInteracted,
+                            canDrag: swipeState.canDrag,
+                            ideaId: idea.id
+                          });
                           // Only handle click if it's not a swipe/drag interaction
                           if (!swipeState.isDragging && !isBeingInteracted) {
                             e.stopPropagation();
