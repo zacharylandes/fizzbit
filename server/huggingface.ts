@@ -107,12 +107,75 @@ export async function generateRelatedIdeas(contextualPrompt: string, count: numb
 }
 
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
-  // Retry with multiple strategies
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      console.log(`Using OpenAI for reliable text generation... (attempt ${attempt}/3)`);
+  // FIRST: Try Hugging Face Mistral 7B (FREE and should be primary)
+  try {
+    console.log('🤗 Attempting Hugging Face Mistral 7B for cost-effective text generation...');
     
-      // Enhanced system prompt that maintains context relevance while generating diverse categories
+    const enhancedPrompt = `Generate ${count} creative ideas inspired by: "${prompt}". Include diverse categories: unusual business concepts, creative plays/sitcoms, food recipes, and fine art projects. Format each idea with a short title and detailed description.`;
+    
+    const result = await hf.textGeneration({
+      model: 'mistralai/Mistral-7B-Instruct-v0.1',
+      inputs: enhancedPrompt,
+      parameters: {
+        max_new_tokens: 800,
+        temperature: 0.8,
+        top_p: 0.9,
+        return_full_text: false,
+        stop: ["</s>"]
+      }
+    });
+
+    if (result.generated_text) {
+      console.log('🤗 Hugging Face response received, parsing...');
+      const ideas = parseTextResponse(result.generated_text, count, prompt);
+      if (ideas.length > 0) {
+        console.log(`✅ Successfully generated ${ideas.length} ideas using Hugging Face Mistral 7B`);
+        return ideas.map(idea => ({
+          ...idea,
+          id: `hf-mistral-${Date.now()}-${ideas.indexOf(idea)}`,
+          sourceContent: prompt
+        }));
+      }
+    }
+  } catch (hfError) {
+    console.warn('🤗 Hugging Face Mistral 7B failed:', hfError.message);
+    
+    // Try alternative free HF model
+    try {
+      console.log('🤗 Trying Google Flan-T5-Large as HF fallback...');
+      const result = await hf.textGeneration({
+        model: TEXT_MODEL, // google/flan-t5-large
+        inputs: `Generate creative ideas for: ${prompt}`,
+        parameters: {
+          max_new_tokens: 300,
+          temperature: 0.7,
+          top_p: 0.9,
+          return_full_text: false
+        }
+      });
+      
+      if (result.generated_text) {
+        const ideas = parseTextResponse(result.generated_text, count, prompt);
+        if (ideas.length > 0) {
+          console.log(`✅ Generated ${ideas.length} ideas using Hugging Face Flan-T5`);
+          return ideas.map(idea => ({
+            ...idea,
+            id: `hf-flan-${Date.now()}-${ideas.indexOf(idea)}`,
+            sourceContent: prompt
+          }));
+        }
+      }
+    } catch (flanError) {
+      console.warn('🤗 Hugging Face Flan-T5 also failed:', flanError.message);
+    }
+  }
+
+  // SECOND: Only fall back to OpenAI if Hugging Face fails
+  console.log('⚠️ Hugging Face models failed, falling back to OpenAI...');
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      console.log(`🤖 Using OpenAI GPT-4o-mini as backup... (attempt ${attempt}/2)`);
+      
       const systemPrompt = `You are a creative idea generator. Using the user's specific prompt as your foundation, generate exactly ${count} diverse creative ideas that are directly related to their interest. Generate ideas across these categories: unusual business concepts, creative plays/sitcoms, food recipes, and fine art projects. All ideas must be clearly connected to and inspired by the user's specific prompt. Format as JSON with "ideas" array containing objects with "title", "description", and "category" fields. Make titles concise (max 6 words) and descriptions detailed but under 100 words.`;
       
       const completion = await openai.chat.completions.create({
@@ -122,8 +185,8 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
           { role: "user", content: prompt }
         ],
         response_format: { type: "json_object" },
-        temperature: 0.9,
-        max_tokens: 1500
+        temperature: 0.8,
+        max_tokens: 1200
       });
 
       const responseText = completion.choices[0].message.content;
@@ -141,32 +204,29 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
           }
 
           const formattedIdeas = ideas.slice(0, count).map((idea, index) => ({
-            id: `idea-${Date.now()}-${index}`,
+            id: `openai-${Date.now()}-${index}`,
             title: idea.title || `Idea ${index + 1}`,
             description: idea.description || idea.content || 'Creative idea generated for you.'
           }));
 
           if (formattedIdeas.length > 0) {
-            console.log(`Successfully generated ${formattedIdeas.length} ideas using OpenAI (attempt ${attempt})`);
+            console.log(`✅ Generated ${formattedIdeas.length} ideas using OpenAI GPT-4o-mini (backup)`);
             return formattedIdeas;
           }
         } catch (parseError) {
           console.error('Failed to parse OpenAI JSON response:', parseError);
           const ideas = parseTextResponse(responseText, count, prompt);
           if (ideas.length > 0) {
-            console.log(`Fallback: Generated ${ideas.length} ideas using text parsing (attempt ${attempt})`);
+            console.log(`✅ Generated ${ideas.length} ideas using OpenAI text parsing fallback`);
             return ideas;
           }
         }
       }
     } catch (error) {
       console.error(`OpenAI generation attempt ${attempt} failed:`, error);
-      
-      if (attempt === 3) {
-        break;
+      if (attempt < 2) {
+        await new Promise(resolve => setTimeout(resolve, attempt * 1000));
       }
-      
-      await new Promise(resolve => setTimeout(resolve, attempt * 1000));
     }
   }
 
