@@ -86,13 +86,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('📝 Received prompt from client:', prompt);
 
     try {
-      // Create new structured prompt format
-      const enhancedPrompt = `using the prompt "${prompt}" as inspiration, provide me 3 ideas for an unusual business concept, 2 ideas for a creative and unusual play or sitcom, 2 ideas for a food recipe, and 2 ideas for a fine art project, the ideas will be sorted randomly`;
+      // Pass the original prompt directly to preserve context and maintain relevance
+      console.log('🚀 Processing original prompt directly:', prompt);
       
-      console.log('🚀 Enhanced prompt being processed:', enhancedPrompt);
-      
-      // Use OpenAI for reliable idea generation
-      const ideas = await generateIdeasFromText(enhancedPrompt);
+      // Use OpenAI for reliable idea generation with the original prompt
+      const ideas = await generateIdeasFromText(prompt);
 
       // Store generated ideas in database with user ID if authenticated
       const createdIdeas = [];

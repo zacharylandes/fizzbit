@@ -112,7 +112,8 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
     try {
       console.log(`Using OpenAI for reliable text generation... (attempt ${attempt}/3)`);
     
-      const systemPrompt = `You are a creative idea generator. Parse the user's request for specific categories and generate exactly ${count} ideas total (repeat the pattern): 3 unusual business concepts, 2 creative plays/sitcoms, 2 food recipes, 2 fine art projects, then repeat this pattern until you reach ${count} total ideas. Present them in random order. Format as JSON with "ideas" array containing objects with "title", "description", and "category" fields. Make titles concise (max 6 words) and descriptions detailed but under 100 words.`;
+      // Enhanced system prompt that maintains context relevance while generating diverse categories
+      const systemPrompt = `You are a creative idea generator. Using the user's specific prompt as your foundation, generate exactly ${count} diverse creative ideas that are directly related to their interest. Generate ideas across these categories: unusual business concepts, creative plays/sitcoms, food recipes, and fine art projects. All ideas must be clearly connected to and inspired by the user's specific prompt. Format as JSON with "ideas" array containing objects with "title", "description", and "category" fields. Make titles concise (max 6 words) and descriptions detailed but under 100 words.`;
       
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",

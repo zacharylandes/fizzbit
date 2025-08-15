@@ -181,24 +181,13 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
 
       console.log('🔄 Prefetching from prompt:', currentExploreContext.originalPrompt);
 
-      // Check if the original prompt was from an image/drawing upload
-      const isImagePrompt = currentExploreContext.originalPrompt.includes('uploaded at') || 
-                           currentExploreContext.originalPrompt.includes('Image:') ||
-                           currentExploreContext.originalPrompt.includes('Drawing created');
+      // Always use the EXACT original prompt to maintain context and relevance
+      console.log('🎯 Generating more ideas using original prompt context:', currentExploreContext.originalPrompt);
       
-      if (isImagePrompt) {
-        // For image/drawing prompts, generate more visual creative ideas
-        const response = await apiRequest("POST", "/api/ideas/generate-from-text", {
-          prompt: `creative visual projects and artistic ideas`
-        });
-        return response.json();
-      } else {
-        // For text prompts, generate more ideas from the same prompt
-        const response = await apiRequest("POST", "/api/ideas/generate-from-text", {
-          prompt: currentExploreContext.originalPrompt
-        });
-        return response.json();
-      }
+      const response = await apiRequest("POST", "/api/ideas/generate-from-text", {
+        prompt: currentExploreContext.originalPrompt
+      });
+      return response.json();
     },
     onSuccess: (data) => {
       if (data.ideas && data.ideas.length > 0) {
