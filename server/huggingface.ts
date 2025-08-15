@@ -107,71 +107,52 @@ export async function generateRelatedIdeas(contextualPrompt: string, count: numb
 }
 
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
-  // FIRST: Try Hugging Face Mistral 7B (FREE and should be primary)
-  try {
-    console.log('🤗 Attempting Hugging Face Mistral 7B for cost-effective text generation...');
-    
-    const enhancedPrompt = `Generate ${count} creative ideas inspired by: "${prompt}". Include diverse categories: unusual business concepts, creative plays/sitcoms, food recipes, and fine art projects. Format each idea with a short title and detailed description.`;
-    
-    const result = await hf.textGeneration({
-      model: 'mistralai/Mistral-7B-Instruct-v0.1',
-      inputs: enhancedPrompt,
-      parameters: {
-        max_new_tokens: 800,
-        temperature: 0.8,
-        top_p: 0.9,
-        return_full_text: false,
-        stop: ["</s>"]
-      }
-    });
+  // FIRST: Try Hugging Face models that are actually available on free tier
+  const availableModels = [
+    'microsoft/DialoGPT-large',
+    'gpt2',
+    'facebook/blenderbot-400M-distill',
+    'microsoft/DialoGPT-medium'
+  ];
 
-    if (result.generated_text) {
-      console.log('🤗 Hugging Face response received, parsing...');
-      const ideas = parseTextResponse(result.generated_text, count, prompt);
-      if (ideas.length > 0) {
-        console.log(`✅ Successfully generated ${ideas.length} ideas using Hugging Face Mistral 7B`);
-        return ideas.map(idea => ({
-          ...idea,
-          id: `hf-mistral-${Date.now()}-${ideas.indexOf(idea)}`,
-          sourceContent: prompt
-        }));
-      }
-    }
-  } catch (hfError) {
-    console.warn('🤗 Hugging Face Mistral 7B failed:', hfError.message);
-    
-    // Try alternative free HF model
+  for (const modelName of availableModels) {
     try {
-      console.log('🤗 Trying Google Flan-T5-Large as HF fallback...');
+      console.log(`🤗 Attempting Hugging Face model: ${modelName}`);
+      
+      const enhancedPrompt = `Creative ideas for "${prompt}": Generate ${Math.min(count, 15)} diverse ideas including business concepts, creative projects, recipes, and art ideas. Keep each idea concise.`;
+      
       const result = await hf.textGeneration({
-        model: TEXT_MODEL, // google/flan-t5-large
-        inputs: `Generate creative ideas for: ${prompt}`,
+        model: modelName,
+        inputs: enhancedPrompt,
         parameters: {
-          max_new_tokens: 300,
-          temperature: 0.7,
+          max_new_tokens: 400,
+          temperature: 0.8,
           top_p: 0.9,
-          return_full_text: false
+          return_full_text: false,
+          do_sample: true
         }
       });
-      
-      if (result.generated_text) {
+
+      if (result.generated_text && result.generated_text.trim()) {
+        console.log(`🤗 ${modelName} response received, parsing...`);
         const ideas = parseTextResponse(result.generated_text, count, prompt);
         if (ideas.length > 0) {
-          console.log(`✅ Generated ${ideas.length} ideas using Hugging Face Flan-T5`);
-          return ideas.map(idea => ({
+          console.log(`✅ Successfully generated ${ideas.length} ideas using ${modelName}`);
+          return ideas.map((idea, index) => ({
             ...idea,
-            id: `hf-flan-${Date.now()}-${ideas.indexOf(idea)}`,
+            id: `hf-${modelName.split('/')[1] || modelName}-${Date.now()}-${index}`,
             sourceContent: prompt
           }));
         }
       }
-    } catch (flanError) {
-      console.warn('🤗 Hugging Face Flan-T5 also failed:', flanError.message);
+    } catch (error: unknown) {
+      console.warn(`🤗 ${modelName} failed:`, (error as Error).message);
+      continue; // Try next model
     }
   }
 
   // SECOND: Only fall back to OpenAI if Hugging Face fails
-  console.log('⚠️ Hugging Face models failed, falling back to OpenAI...');
+  console.log('⚠️ All Hugging Face models failed, falling back to OpenAI...');
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
       console.log(`🤖 Using OpenAI GPT-4o-mini as backup... (attempt ${attempt}/2)`);
