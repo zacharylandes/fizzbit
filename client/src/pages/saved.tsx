@@ -302,7 +302,15 @@ export default function SavedPage() {
       document.removeEventListener('mousemove', handleGlobalMove);
       document.removeEventListener('mouseup', handleGlobalEnd);
     };
-  }, [isMobile, swipeState.ideaId, swipeState.startX, swipeState.startY, swipeState.currentX, swipeState.currentY, swipeState.isVerticalDrag, swipeState.dragIndex, swipeState.isDragging, mobileOrder.length, savedIdeas]);
+  }, [isMobile, swipeState.ideaId, swipeState.startX, swipeState.startY, swipeState.currentX, swipeState.currentY, swipeState.isVerticalDrag, swipeState.dragIndex, swipeState.isDragging, mobileOrder.length]);
+
+  // Fetch saved ideas - moved before useEffect that uses savedIdeas
+  const { data: savedIdeasData, isLoading } = useQuery({
+    queryKey: ["/api/ideas/saved"],
+    enabled: isAuthenticated,
+  }) as { data: { ideas: Idea[] } | undefined; isLoading: boolean };
+
+  const savedIdeas = savedIdeasData?.ideas || [];
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -318,14 +326,6 @@ export default function SavedPage() {
       return;
     }
   }, [isAuthenticated, authLoading, toast]);
-
-  // Fetch saved ideas
-  const { data: savedIdeasData, isLoading } = useQuery({
-    queryKey: ["/api/ideas/saved"],
-    enabled: isAuthenticated,
-  }) as { data: { ideas: Idea[] } | undefined; isLoading: boolean };
-
-  const savedIdeas = savedIdeasData?.ideas || [];
 
   // Mobile drag to reorder - declared before useEffect
   const moveMobileIdea = useCallback((fromIndex: number, toIndex: number) => {
