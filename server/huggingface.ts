@@ -107,49 +107,9 @@ export async function generateRelatedIdeas(contextualPrompt: string, count: numb
 }
 
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
-  // FIRST: Try Hugging Face models that are actually available on free tier
-  const availableModels = [
-    'microsoft/DialoGPT-large',
-    'gpt2',
-    'facebook/blenderbot-400M-distill',
-    'microsoft/DialoGPT-medium'
-  ];
-
-  for (const modelName of availableModels) {
-    try {
-      console.log(`🤗 Attempting Hugging Face model: ${modelName}`);
-      
-      const enhancedPrompt = `Creative ideas for "${prompt}": Generate ${Math.min(count, 15)} diverse ideas including business concepts, creative projects, recipes, and art ideas. Keep each idea concise.`;
-      
-      const result = await hf.textGeneration({
-        model: modelName,
-        inputs: enhancedPrompt,
-        parameters: {
-          max_new_tokens: 400,
-          temperature: 0.8,
-          top_p: 0.9,
-          return_full_text: false,
-          do_sample: true
-        }
-      });
-
-      if (result.generated_text && result.generated_text.trim()) {
-        console.log(`🤗 ${modelName} response received, parsing...`);
-        const ideas = parseTextResponse(result.generated_text, count, prompt);
-        if (ideas.length > 0) {
-          console.log(`✅ Successfully generated ${ideas.length} ideas using ${modelName}`);
-          return ideas.map((idea, index) => ({
-            ...idea,
-            id: `hf-${modelName.split('/')[1] || modelName}-${Date.now()}-${index}`,
-            sourceContent: prompt
-          }));
-        }
-      }
-    } catch (error: unknown) {
-      console.warn(`🤗 ${modelName} failed:`, (error as Error).message);
-      continue; // Try next model
-    }
-  }
+  // NOTE: Temporarily skipping Hugging Face due to "No Inference Provider available" errors
+  // This appears to be a Hugging Face API issue where no models have available inference providers
+  console.log('⚠️ Skipping Hugging Face due to provider availability issues, using OpenAI for reliable service...');
 
   // SECOND: Only fall back to OpenAI if Hugging Face fails
   console.log('⚠️ All Hugging Face models failed, falling back to OpenAI...');

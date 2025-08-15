@@ -3,7 +3,7 @@
 SWIVL is an interactive creative inspiration app that generates personalized ideas from text prompts and images using AI. The application presents ideas in a swipeable card interface, allowing users to explore, save, and chain creative concepts together. Built with a modern full-stack architecture featuring React frontend, Express backend, and AI-powered content generation.
 
 ## Recent Updates
-- **Hugging Face Priority Fix (Aug 15, 2025)**: Fixed AI model hierarchy to prioritize FREE Hugging Face models (Mistral 7B, Flan-T5) over OpenAI for cost-effectiveness, with proper fallback chain from HF → OpenAI → templates
+- **Hugging Face Issue (Aug 15, 2025)**: Discovered Hugging Face Inference API is currently unavailable ("No Inference Provider available" for all models). Temporarily using OpenAI GPT-4o-mini as primary model until HF service is restored
 - **Context Retention Fix (Aug 15, 2025)**: Fixed major issue where continuous idea generation lost original prompt context after several swipes. System now preserves exact original prompt (including image descriptions, voice transcripts, drawing analysis) throughout entire session, ensuring all generated ideas remain relevant to user's initial input
 - **Robust Fallback System**: Implemented multi-tier fallback: Hugging Face Mistral 7B → Flan-T5 → OpenAI → template-based ideas, with proper error handling throughout the pipeline
 - **Endless Idea Flow**: Fixed continuous idea generation system with early prefetch at 15 cards (prevents running out), emergency prefetch at 3 cards, increased batch size to 25 ideas per prompt, multiple safety checks to ensure truly endless flow
