@@ -107,144 +107,121 @@ export async function generateRelatedIdeas(contextualPrompt: string, count: numb
 }
 
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
-  try {
-    console.log('Using OpenAI for reliable text generation...');
+  // Retry with multiple strategies
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      console.log(`Using OpenAI for reliable text generation... (attempt ${attempt}/3)`);
     
-    // Detect if user is asking for a list format
-    const isListRequest = /\b(list|names?|titles?|suggestions?|options?)\b/i.test(prompt) && 
-                         !/\b(idea|project|concept|activity|exercise)\b/i.test(prompt);
-    
-    // Add timestamp to ensure unique requests and increase temperature for more variety
-    const timestamp = Date.now();
-    const randomSeed = Math.floor(Math.random() * 1000);
-    
-    // Use new structured prompt format - generate more ideas per batch
-    const systemPrompt = `You are a creative idea generator. Parse the user's request for specific categories and generate exactly ${count} ideas total (repeat the pattern): 3 unusual business concepts, 2 creative plays/sitcoms, 2 food recipes, 2 fine art projects, then repeat this pattern until you reach ${count} total ideas. Present them in random order. Format as JSON with "ideas" array containing objects with "title", "description", and "category" fields. Make titles concise (max 6 words) and descriptions detailed but under 100 words.`;
-    
-    const userPrompt = prompt; // Use the prompt directly as it already has the new format
+      const systemPrompt = `You are a creative idea generator. Parse the user's request for specific categories and generate exactly ${count} ideas total (repeat the pattern): 3 unusual business concepts, 2 creative plays/sitcoms, 2 food recipes, 2 fine art projects, then repeat this pattern until you reach ${count} total ideas. Present them in random order. Format as JSON with "ideas" array containing objects with "title", "description", and "category" fields. Make titles concise (max 6 words) and descriptions detailed but under 100 words.`;
+      
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: prompt }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.9,
+        max_tokens: 1500
+      });
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Fast and cost-effective
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.9, // Higher temperature for more variation
-      max_tokens: 1000
-    });
+      const responseText = completion.choices[0].message.content;
+      if (responseText) {
+        try {
+          const jsonResponse = JSON.parse(responseText);
+          let ideas: any[] = [];
+          
+          if (Array.isArray(jsonResponse)) {
+            ideas = jsonResponse;
+          } else if (jsonResponse.ideas && Array.isArray(jsonResponse.ideas)) {
+            ideas = jsonResponse.ideas;
+          } else if (jsonResponse.suggestions && Array.isArray(jsonResponse.suggestions)) {
+            ideas = jsonResponse.suggestions;
+          }
 
-    const responseText = completion.choices[0].message.content;
-    if (responseText) {
-      try {
-        const jsonResponse = JSON.parse(responseText);
-        let ideas: any[] = [];
-        
-        // Handle different JSON response formats
-        if (Array.isArray(jsonResponse)) {
-          ideas = jsonResponse;
-        } else if (jsonResponse.ideas && Array.isArray(jsonResponse.ideas)) {
-          ideas = jsonResponse.ideas;
-        } else if (jsonResponse.suggestions && Array.isArray(jsonResponse.suggestions)) {
-          ideas = jsonResponse.suggestions;
-        }
+          const formattedIdeas = ideas.slice(0, count).map((idea, index) => ({
+            id: `idea-${Date.now()}-${index}`,
+            title: idea.title || `Idea ${index + 1}`,
+            description: idea.description || idea.content || 'Creative idea generated for you.'
+          }));
 
-        const formattedIdeas = ideas.slice(0, count).map((idea, index) => ({
-          id: `idea-${Date.now()}-${index}`,
-          title: idea.title || `Idea ${index + 1}`,
-          description: idea.description || idea.content || 'Creative idea generated for you.'
-        }));
-
-        if (formattedIdeas.length > 0) {
-          console.log(`Successfully generated ${formattedIdeas.length} ideas using OpenAI`);
-          return formattedIdeas;
-        }
-      } catch (parseError) {
-        console.error('Failed to parse OpenAI JSON response:', parseError);
-        console.error('Raw response:', responseText);
-        // Fall back to text parsing if JSON parsing fails
-        const ideas = parseTextResponse(responseText, count, prompt);
-        if (ideas.length > 0) {
-          console.log(`Fallback: Generated ${ideas.length} ideas using text parsing`);
-          return ideas;
+          if (formattedIdeas.length > 0) {
+            console.log(`Successfully generated ${formattedIdeas.length} ideas using OpenAI (attempt ${attempt})`);
+            return formattedIdeas;
+          }
+        } catch (parseError) {
+          console.error('Failed to parse OpenAI JSON response:', parseError);
+          const ideas = parseTextResponse(responseText, count, prompt);
+          if (ideas.length > 0) {
+            console.log(`Fallback: Generated ${ideas.length} ideas using text parsing (attempt ${attempt})`);
+            return ideas;
+          }
         }
       }
+    } catch (error) {
+      console.error(`OpenAI generation attempt ${attempt} failed:`, error);
+      
+      if (attempt === 3) {
+        break;
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, attempt * 1000));
     }
-
-    // Only throw an error if OpenAI completely fails - don't use template fallbacks
-    console.error('OpenAI text generation failed completely');
-    throw new Error('Failed to generate ideas from OpenAI - no fallback to generic templates');
-    const ideaTemplates = [
-      {
-        titlePrefix: "Creative Workshop:",
-        descriptionTemplate: "Design an interactive workshop about {topic}. Include hands-on activities, group collaboration, and skill-building exercises that inspire participants to explore new creative techniques."
-      },
-      {
-        titlePrefix: "Digital Project:",
-        descriptionTemplate: "Create a multimedia experience around {topic}. Combine storytelling, technology, and user interaction to build something engaging that brings your concept to life."
-      },
-      {
-        titlePrefix: "Community Initiative:",
-        descriptionTemplate: "Start a community project focused on {topic}. Bring people together through challenges, shared goals, and collaborative creation that builds connections and inspires action."
-      },
-      {
-        titlePrefix: "Art Series:",
-        descriptionTemplate: "Create a collection of artworks exploring {topic}. Use different mediums and techniques to express various aspects and emotions related to your theme."
-      },
-      {
-        titlePrefix: "Interactive Experience:",
-        descriptionTemplate: "Design an immersive experience around {topic} that engages multiple senses and invites participation from your audience."
-      },
-      {
-        titlePrefix: "Storytelling Project:",
-        descriptionTemplate: "Develop a narrative-driven project about {topic} using your preferred medium - writing, video, podcast, or visual storytelling."
-      },
-      {
-        titlePrefix: "Learning Journey:",
-        descriptionTemplate: "Create an educational pathway that teaches others about {topic} through engaging activities, challenges, and hands-on exploration."
-      },
-      {
-        titlePrefix: "Social Impact:",
-        descriptionTemplate: "Design a project that uses {topic} to make a positive difference in your community or address a meaningful cause."
-      }
-    ];
-
-    // Take first 'count' templates and generate ideas
-    const selectedTemplates = ideaTemplates.slice(0, count);
-    const ideas = selectedTemplates.map((template, index) => {
-      const topic = prompt.toLowerCase();
-      return {
-        id: `template-${Date.now()}-${index}`,
-        title: template.titlePrefix.replace(':', ''),
-        description: template.descriptionTemplate.replace('{topic}', topic),
-        sourceContent: prompt
-      };
-    });
-
-    return ideas;
-
-  } catch (error) {
-    console.error('Hugging Face API error:', error);
-    
-    // Fallback response if API fails
-    return [
-      {
-        id: `fallback-${Date.now()}-1`,
-        title: "Creative Workshop",
-        description: "Organize a hands-on workshop where participants explore creative techniques related to your interest. Include interactive activities and collaborative projects."
-      },
-      {
-        id: `fallback-${Date.now()}-2`, 
-        title: "Digital Storytelling Project",
-        description: "Create a multimedia storytelling experience that combines your passion with modern technology. Use videos, interactive elements, and user participation."
-      },
-      {
-        id: `fallback-${Date.now()}-3`,
-        title: "Community Challenge",
-        description: "Design a creative challenge that brings people together around your interest. Include social sharing, progress tracking, and celebration of achievements."
-      }
-    ];
   }
+
+  // Fall back to creative templates when OpenAI fails completely
+  console.log('OpenAI text generation failed, falling back to creative templates');
+  
+  const ideaTemplates = [
+    {
+      titlePrefix: "Unusual Business:",
+      descriptionTemplate: "Launch a unique service where customers pay to {topic} in unexpected ways. Think subscription boxes for niche interests, reverse marketplaces, or services that solve problems people didn't know they had."
+    },
+    {
+      titlePrefix: "Pop-Up Experience:",
+      descriptionTemplate: "Create temporary experiences around {topic} - popup restaurants with themed menus, nomadic workshops, or traveling installations that bring unusual concepts directly to communities."
+    },
+    {
+      titlePrefix: "Comedy Series:",
+      descriptionTemplate: "A sitcom where characters must navigate daily life while dealing with {topic} in the most ridiculous ways. Each episode features misunderstandings, mishaps, and heartwarming moments."
+    },
+    {
+      titlePrefix: "Fusion Dish:",
+      descriptionTemplate: "Combine unexpected flavors inspired by {topic} to create a dish that surprises and delights. Use unconventional ingredients, unique cooking methods, or creative presentation."
+    },
+    {
+      titlePrefix: "Mixed Media Installation:",
+      descriptionTemplate: "Create an immersive art piece using {topic} as inspiration. Combine traditional materials with technology, found objects, or interactive elements that invite viewer participation."
+    },
+    {
+      titlePrefix: "Interactive Workshop:",
+      descriptionTemplate: "Design a hands-on workshop around {topic} that includes collaborative activities, skill-building exercises, and creative exploration for participants."
+    },
+    {
+      titlePrefix: "Community Project:",
+      descriptionTemplate: "Start a community initiative focused on {topic}. Bring people together through shared goals, creative challenges, and collaborative creation."
+    },
+    {
+      titlePrefix: "Digital Experience:",
+      descriptionTemplate: "Create a multimedia project around {topic} that combines technology, storytelling, and user interaction to build an engaging experience."
+    }
+  ];
+
+  const shuffledTemplates = [...ideaTemplates].sort(() => Math.random() - 0.5);
+  const selectedTemplates = shuffledTemplates.slice(0, count);
+  
+  const ideas = selectedTemplates.map((template, index) => {
+    const topic = prompt.toLowerCase();
+    return {
+      id: `template-${Date.now()}-${index}`,
+      title: template.titlePrefix.replace(':', ''),
+      description: template.descriptionTemplate.replace(/\{topic\}/g, topic),
+      sourceContent: prompt
+    };
+  });
+
+  console.log(`Fallback: Generated ${ideas.length} template-based ideas`);
+  return ideas;
 }
 
 export async function generateIdeasFromImage(imageBase64: string, count: number = 25): Promise<IdeaResponse[]> {
