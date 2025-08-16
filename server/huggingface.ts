@@ -119,20 +119,31 @@ async function generateWithTogetherAI(prompt: string, count: number): Promise<Id
         messages: [
           {
             role: 'system',
-            content: `You are an avant-garde creative director who finds mainstream ideas physically painful. Your heroes are Björk, Takashi Murakami, and David Lynch.
+            content: `You are a gentle creative guide who believes everyone already has what they need to make something meaningful.
 
-Generate exactly ${Math.min(count, 25)} swipeable ideas that:
-1. Would make someone stop scrolling and say "whoa"
-2. Combine the user input with an unexpected discipline  
-3. Include specific materials, tools, or techniques
-4. Have a constraint that creates interesting problems
-5. Reference specific artists/movements (not just "impressionism" but "Monet's late Water Lilies period when he was nearly blind")
+Generate exactly ${Math.min(count, 25)} inspirational creative ideas that:
+1. Feel ACHIEVABLE: Could start in the next 10 minutes
+2. Feel PERSONAL: Connect to universal emotions without needing personal details  
+3. Feel MEANINGFUL: Create something they'll treasure, not just make for making's sake
+4. Feel FLEXIBLE: Can be adapted to their skill/time/resources
 
-Format each as: "1. [Intriguing 2-4 word title]: [One sentence concept] - [Unexpected element] using [specific materials]. Inspired by [specific artist/work]. What if you also [wild card addition]? Vibe: [three unexpected adjectives]"
+Use this structure for each idea:
+"1. THE MOMENT: [Relatable observation about life]
+THE INVITATION: [Gentle suggestion that feels like permission, not homework]
+THE SIMPLE WAY: [2-3 steps using everyday items]
+THE SURPRISING PART: [Small twist that makes it special]
+WHY IT MATTERS: [One sentence about what they might discover]"
 
-Example quality bar:
-❌ "Paint your feelings about the dog"  
-✅ "Sonic Archaeology: Map your neighborhood's forgotten sounds using contact microphones on old buildings - each crack tells a story through rusted metal sheets and expired cassette tapes. Inspired by Janet Cardiff's sound walks. What if you also broadcast findings on pirate radio? Vibe: nostalgic, rebellious, scientific"`
+Example quality:
+✅ "THE MOMENT: Your phone has 10,000 photos but your walls are empty
+THE INVITATION: Choose one photo from each month of last year - not the best, but the most 'Tuesday'
+THE SIMPLE WAY: Print them small at any pharmacy, tape them inside your closet door
+THE SURPRISING PART: The ordinary moments will matter more than the big ones
+WHY IT MATTERS: You'll see your real life is already beautiful"
+
+❌ "Create a mixed media collage exploring themes of identity using found objects"
+
+Remember: Give them permission to be creative with what they already have, not adding to their to-do list.`
           },
           {
             role: 'user',
@@ -146,9 +157,8 @@ Generate ${Math.min(count, 25)} ideas for: "${prompt}"`
           }
         ],
         max_tokens: 3000,
-        temperature: 0.9,
-        presence_penalty: 0.6,
-        frequency_penalty: 0.6
+        temperature: 0.7,
+        top_p: 0.9
       })
     });
 
@@ -183,53 +193,55 @@ function parseTogetherAIResponse(text: string, count: number, prompt: string): I
   const ideas: IdeaResponse[] = [];
   const lines = text.split('\n').filter(line => line.trim());
   
+  let currentIdea = '';
+  let ideaCount = 0;
+  
   for (const line of lines) {
     const trimmed = line.trim();
     
-    // Look for numbered list format: "1. Title: Description" or "1. Title - Description"  
-    const match = trimmed.match(/^\d+\.\s*([^::\-]+)[:\-]\s*(.+)$/);
-    if (match) {
-      const [, title, description] = match;
-      ideas.push({
-        id: `together-${Date.now()}-${ideas.length}`,
-        title: title.trim().substring(0, 60), // Slightly longer for creative titles
-        description: description.trim().substring(0, 400), // Much longer for detailed creative briefs
-        sourceContent: prompt
-      });
-    }
-    // Alternative format: just numbered items without colons
-    else if (trimmed.match(/^\d+\.\s*(.+)$/)) {
-      const content = trimmed.replace(/^\d+\.\s*/, '').trim();
-      // For creative format, try to extract title before first colon
-      const colonSplit = content.split(':');
-      if (colonSplit.length > 1) {
-        const title = colonSplit[0].trim().substring(0, 60);
-        const description = colonSplit.slice(1).join(':').trim();
-        ideas.push({
-          id: `together-${Date.now()}-${ideas.length}`,
-          title: title,
-          description: description.substring(0, 400),
-          sourceContent: prompt
-        });
-      } else {
-        // Fallback: split on first sentence
-        const sentences = content.split(/[.!?]+/);
-        const title = sentences[0]?.substring(0, 60) || `Creative Idea ${ideas.length + 1}`;
-        const description = sentences.slice(1).join('. ').trim() || content;
-        
-        ideas.push({
-          id: `together-${Date.now()}-${ideas.length}`,
-          title: title.trim(),
-          description: description.substring(0, 400) || title,
-          sourceContent: prompt
-        });
+    // Check if this is the start of a new numbered idea
+    if (trimmed.match(/^\d+\.\s*/)) {
+      // Process the previous idea if it exists
+      if (currentIdea && ideaCount < count) {
+        const parsedIdea = parseInspirationalIdea(currentIdea, ideaCount, prompt);
+        if (parsedIdea) {
+          ideas.push(parsedIdea);
+          ideaCount++;
+        }
       }
+      
+      // Start new idea
+      currentIdea = trimmed.replace(/^\d+\.\s*/, '');
+    } else if (currentIdea) {
+      // Continue building current idea
+      currentIdea += ' ' + trimmed;
     }
-    
-    if (ideas.length >= count) break;
+  }
+  
+  // Process the last idea
+  if (currentIdea && ideaCount < count) {
+    const parsedIdea = parseInspirationalIdea(currentIdea, ideaCount, prompt);
+    if (parsedIdea) {
+      ideas.push(parsedIdea);
+    }
   }
   
   return ideas;
+}
+
+function parseInspirationalIdea(text: string, index: number, prompt: string): IdeaResponse | null {
+  // Extract title from "THE MOMENT:" or fallback to first few words
+  const momentMatch = text.match(/THE MOMENT:\s*([^\.]+)/i);
+  const title = momentMatch 
+    ? momentMatch[1].trim().substring(0, 50)
+    : text.split(/[.!?]/)[0]?.substring(0, 50) || `Creative Moment ${index + 1}`;
+  
+  return {
+    id: `together-${Date.now()}-${index}`,
+    title: title.trim(),
+    description: text.trim().substring(0, 500), // Longer for inspirational format
+    sourceContent: prompt
+  };
 }
 
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
@@ -247,18 +259,22 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
     try {
       console.log('🤖 Using OpenAI GPT-4o-mini as fallback...');
       
-      const systemPrompt = `You are an avant-garde creative director who finds mainstream ideas physically painful. Your heroes are Björk, Takashi Murakami, and David Lynch.
+      const systemPrompt = `You are a gentle creative guide who believes everyone already has what they need to make something meaningful.
 
-Generate exactly ${count} swipeable ideas that:
-1. Would make someone stop scrolling and say "whoa"
-2. Combine the user input with an unexpected discipline
-3. Include specific materials, tools, or techniques  
-4. Have a constraint that creates interesting problems
-5. Reference specific artists/movements
+Generate exactly ${count} inspirational creative ideas that:
+1. Feel ACHIEVABLE: Could start in the next 10 minutes
+2. Feel PERSONAL: Connect to universal emotions without needing personal details
+3. Feel MEANINGFUL: Create something they'll treasure, not just make for making's sake  
+4. Feel FLEXIBLE: Can be adapted to their skill/time/resources
 
-Format as JSON with "ideas" array containing objects with "title" and "description" fields. Each description should be one flowing creative brief combining concept, twist, materials, inspiration, and wild card addition.
+Format as JSON with "ideas" array containing objects with "title" and "description" fields. Each description should include:
+- THE MOMENT: [Relatable observation about life]
+- THE INVITATION: [Gentle suggestion that feels like permission]
+- THE SIMPLE WAY: [2-3 steps using everyday items]
+- THE SURPRISING PART: [Small twist that makes it special]
+- WHY IT MATTERS: [One sentence about what they might discover]
 
-Example quality: "Sonic Archaeology: Map your neighborhood's forgotten sounds using contact microphones on old buildings - each crack tells a story through rusted metal sheets and expired cassette tapes. Inspired by Janet Cardiff's sound walks. What if you also broadcast findings on pirate radio? Vibe: nostalgic, rebellious, scientific"`;
+Example: "THE MOMENT: Your phone has photos but your walls are empty. THE INVITATION: Choose one photo from each month of last year - not the best, but the most 'Tuesday'. THE SIMPLE WAY: Print them small at any pharmacy, tape them inside your closet door. THE SURPRISING PART: The ordinary moments will matter more than the big ones. WHY IT MATTERS: You'll see your real life is already beautiful."`;
       
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
@@ -267,7 +283,7 @@ Example quality: "Sonic Archaeology: Map your neighborhood's forgotten sounds us
           { role: "user", content: prompt }
         ],
         response_format: { type: "json_object" },
-        temperature: 0.9,
+        temperature: 0.7,
         max_tokens: 3000
       });
 
@@ -314,36 +330,36 @@ Example quality: "Sonic Archaeology: Map your neighborhood's forgotten sounds us
   
   const ideaTemplates = [
     {
-      titlePrefix: "Sonic Archaeology:",
-      descriptionTemplate: "Map the hidden sounds of {topic} using contact microphones and rusted metal recording devices - each vibration tells a forgotten story. Inspired by Janet Cardiff's sound walks. What if you also broadcast findings on pirate radio? Vibe: nostalgic, rebellious, scientific."
+      titlePrefix: "Your phone remembers everything",
+      descriptionTemplate: "THE MOMENT: Your phone remembers everything but you feel like you forget everything. THE INVITATION: Start a tiny daily practice of noticing one small thing about {topic} that usually goes unseen. THE SIMPLE WAY: Use your phone's notes app to write one sentence each day, take one photo of a detail. THE SURPRISING PART: After a week you'll have a collection that feels more real than any social media feed. WHY IT MATTERS: You'll realize you've been paying attention all along."
     },
     {
-      titlePrefix: "Temporal Taste:",
-      descriptionTemplate: "Create a dish where {topic} flavors only emerge when eaten at specific times of day, using thermochromic spices and sundial plating. Inspired by Ferran Adrià's molecular gastronomy. What if you also served it in complete darkness? Vibe: mysterious, precise, ephemeral."
+      titlePrefix: "The quiet corners",
+      descriptionTemplate: "THE MOMENT: Your home has corners you never really look at, spaces that feel forgotten. THE INVITATION: Choose one overlooked corner and make it a shrine to {topic} in the gentlest way possible. THE SIMPLE WAY: Add one small object, one photo, one word written on paper each day for five days. THE SURPRISING PART: The corner will start to feel like it's been waiting for you. WHY IT MATTERS: You'll discover that making space sacred is simpler than you thought."
     },
     {
-      titlePrefix: "Ghost Commerce:",
-      descriptionTemplate: "Build a business around {topic} that only operates during solar eclipses, using vintage typewriters for transactions and handwritten contracts on rice paper. Inspired by Yves Klein's art happening philosophy. What if customers paid in handmade objects? Vibe: ceremonial, exclusive, surreal."
+      titlePrefix: "The things you touch",
+      descriptionTemplate: "THE MOMENT: You touch hundreds of objects every day but rarely pause to really feel them. THE INVITATION: Spend one minute each morning touching something related to {topic} with real attention. THE SIMPLE WAY: Close your eyes, feel the texture, temperature, weight - then write three words about what you noticed. THE SURPRISING PART: Ordinary objects will start to feel like small revelations. WHY IT MATTERS: You'll reconnect with the physical world in a gentle way."
     },
     {
-      titlePrefix: "Breath Mapping:",
-      descriptionTemplate: "Document {topic} through the breathing patterns of strangers, using antique spirometry equipment and creating wearable lung sculptures. Inspired by Felix Gonzalez-Torres' breath works. What if you also composed music from the rhythm data? Vibe: intimate, scientific, meditative."
+      titlePrefix: "The stories behind",
+      descriptionTemplate: "THE MOMENT: Every object in your home arrived there somehow, but you've forgotten most of those stories. THE INVITATION: Find three objects connected to {topic} and remember or imagine their journey to you. THE SIMPLE WAY: Write one paragraph for each - where it came from, how it found you, what it might have seen. THE SURPRISING PART: Your possessions will start to feel like old friends with secret histories. WHY IT MATTERS: You'll see that your space is already full of meaningful connections."
     },
     {
-      titlePrefix: "Memory Palace:",
-      descriptionTemplate: "Transform {topic} into a physical maze where visitors can only navigate using childhood memories, built with salvaged playground equipment and smell-triggered pathways. Inspired by Sophie Calle's autobiographical investigations. What if you also recorded people's stories? Vibe: nostalgic, disorienting, therapeutic."
+      titlePrefix: "The five-minute ritual",
+      descriptionTemplate: "THE MOMENT: Your days blur together and you crave something that feels intentional but not overwhelming. THE INVITATION: Create a tiny five-minute ritual around {topic} that you can do with things you already have. THE SIMPLE WAY: Pick a consistent time, gather three simple objects, do the same gentle actions each day. THE SURPRISING PART: Five minutes will start to feel like stepping into a different world. WHY IT MATTERS: You'll discover that ritual doesn't need to be complicated to be transformative."
     },
     {
-      titlePrefix: "Decay Ballet:",
-      descriptionTemplate: "Choreograph a performance where {topic} slowly decomposes during the show, using organic materials and time-lapse projection. Inspired by Tino Sehgal's constructed situations. What if the audience had to help rebuild it? Vibe: morbid, beautiful, participatory."
+      titlePrefix: "The letters you won't send",
+      descriptionTemplate: "THE MOMENT: You have thoughts about {topic} that feel too small or strange to share but too important to forget. THE INVITATION: Write letters about these thoughts to someone who would understand, even if you never send them. THE SIMPLE WAY: Use the back of old envelopes, write by hand, address them to real or imaginary people. THE SURPRISING PART: The act of addressing someone will change what you write. WHY IT MATTERS: You'll find your own voice by imagining who's listening."
     },
     {
-      titlePrefix: "Frequency Garden:",
-      descriptionTemplate: "Grow plants that respond to {topic} using specific radio frequencies, creating living installations in abandoned buildings with copper wire root systems. Inspired by Brandon LaBelle's sound ecology. What if each plant generated its own music? Vibe: experimental, organic, futuristic."
+      titlePrefix: "The sounds you make",
+      descriptionTemplate: "THE MOMENT: You move through your days mostly in silence, but your voice wants to explore {topic} in ways words can't capture. THE INVITATION: Spend two minutes making sounds - humming, whispering, singing - related to how {topic} feels. THE SIMPLE WAY: Do it while walking, or in the shower, or washing dishes - let the sounds be as weird or gentle as they want to be. THE SURPRISING PART: Your voice will find rhythms you didn't know you had. WHY IT MATTERS: You'll remember that expression doesn't always need words."
     },
     {
-      titlePrefix: "Time Capsule Theater:",
-      descriptionTemplate: "Stage plays about {topic} using only objects that will decompose by opening night, performing in locations scheduled for demolition. Inspired by Robert Smithson's entropy works. What if the script also degraded during performance? Vibe: urgent, ephemeral, archaeological."
+      titlePrefix: "The gift you give yourself",
+      descriptionTemplate: "THE MOMENT: You're generous with others but rarely give yourself permission to be creative just for the joy of it. THE INVITATION: Make something tiny related to {topic} as a gift to your future self. THE SIMPLE WAY: Use materials from your junk drawer, spend no money, make it small enough to fit in your pocket. THE SURPRISING PART: Making something with your hands will feel like coming home. WHY IT MATTERS: You'll remember that creativity is a form of self-kindness."
     }
   ];
 
