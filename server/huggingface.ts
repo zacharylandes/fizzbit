@@ -119,20 +119,17 @@ async function generateWithTogetherAI(prompt: string, count: number): Promise<Id
         messages: [
           {
             role: 'system',
-            content: `You are an avant-garde creative director who finds mainstream ideas physically painful. Your heroes are Björk, Takashi Murakami, and David Lynch.
+            content: `You're an avant-garde creative director who thinks mainstream ideas are physically painful. Generate ${Math.min(count, 25)} wild, specific ideas that combine unexpected disciplines and reference real artists/techniques by name.
 
-Generate exactly ${Math.min(count, 25)} swipeable ideas that:
-1. Would make someone stop scrolling and say "whoa"
-2. Combine the user input with an unexpected discipline  
-3. Include specific materials, tools, or techniques
-4. Have a constraint that creates interesting problems
-5. Reference specific artists/movements (not just "impressionism" but "Monet's late Water Lilies period when he was nearly blind")
+Format each as:
+1. TITLE: [2-4 intriguing words]
+IDEA: [One vivid sentence with specific materials/techniques]
+TWIST: [Unexpected element in 5 words]
 
-Format each as: "1. [Intriguing 2-4 word title]: [One sentence concept] - [Unexpected element] using [specific materials]. Inspired by [specific artist/work]. What if you also [wild card addition]? Vibe: [three unexpected adjectives]"
-
-Example quality bar:
-❌ "Paint your feelings about the dog"  
-✅ "Sonic Archaeology: Map your neighborhood's forgotten sounds using contact microphones on old buildings - each crack tells a story through rusted metal sheets and expired cassette tapes. Inspired by Janet Cardiff's sound walks. What if you also broadcast findings on pirate radio? Vibe: nostalgic, rebellious, scientific"`
+Example:
+1. TITLE: Sonic Archaeology
+IDEA: Map neighborhood sounds using contact microphones on rusted buildings, creating vinyl records from concrete vibrations
+TWIST: Broadcast findings on pirate radio`
           },
           {
             role: 'user',
@@ -183,50 +180,65 @@ function parseTogetherAIResponse(text: string, count: number, prompt: string): I
   const ideas: IdeaResponse[] = [];
   const lines = text.split('\n').filter(line => line.trim());
   
+  let currentIdea: { title?: string; idea?: string; twist?: string } = {};
+  let ideaCount = 0;
+  
   for (const line of lines) {
     const trimmed = line.trim();
     
-    // Look for numbered list format: "1. Title: Description" or "1. Title - Description"  
-    const match = trimmed.match(/^\d+\.\s*([^::\-]+)[:\-]\s*(.+)$/);
-    if (match) {
-      const [, title, description] = match;
-      ideas.push({
-        id: `together-${Date.now()}-${ideas.length}`,
-        title: title.trim().substring(0, 60), // Slightly longer for creative titles
-        description: description.trim().substring(0, 400), // Much longer for detailed creative briefs
-        sourceContent: prompt
-      });
-    }
-    // Alternative format: just numbered items without colons
-    else if (trimmed.match(/^\d+\.\s*(.+)$/)) {
-      const content = trimmed.replace(/^\d+\.\s*/, '').trim();
-      // For creative format, try to extract title before first colon
-      const colonSplit = content.split(':');
-      if (colonSplit.length > 1) {
-        const title = colonSplit[0].trim().substring(0, 60);
-        const description = colonSplit.slice(1).join(':').trim();
+    // Check for numbered start (reset current idea)
+    if (trimmed.match(/^\d+\.\s*/)) {
+      // Process previous idea if complete
+      if (currentIdea.title && currentIdea.idea && ideaCount < count) {
+        const description = `${currentIdea.idea}${currentIdea.twist ? ` - ${currentIdea.twist}` : ''}`;
         ideas.push({
-          id: `together-${Date.now()}-${ideas.length}`,
-          title: title,
+          id: `together-${Date.now()}-${ideaCount}`,
+          title: currentIdea.title.substring(0, 60),
           description: description.substring(0, 400),
           sourceContent: prompt
         });
-      } else {
-        // Fallback: split on first sentence
-        const sentences = content.split(/[.!?]+/);
-        const title = sentences[0]?.substring(0, 60) || `Creative Idea ${ideas.length + 1}`;
-        const description = sentences.slice(1).join('. ').trim() || content;
-        
-        ideas.push({
-          id: `together-${Date.now()}-${ideas.length}`,
-          title: title.trim(),
-          description: description.substring(0, 400) || title,
-          sourceContent: prompt
-        });
+        ideaCount++;
+      }
+      
+      // Start new idea
+      currentIdea = {};
+      const content = trimmed.replace(/^\d+\.\s*/, '');
+      
+      // Check if TITLE is on the same line
+      const titleMatch = content.match(/TITLE:\s*(.+)/i);
+      if (titleMatch) {
+        currentIdea.title = titleMatch[1].trim();
       }
     }
-    
-    if (ideas.length >= count) break;
+    // Look for TITLE, IDEA, TWIST sections
+    else if (trimmed.match(/^TITLE:\s*/i)) {
+      currentIdea.title = trimmed.replace(/^TITLE:\s*/i, '').trim();
+    }
+    else if (trimmed.match(/^IDEA:\s*/i)) {
+      currentIdea.idea = trimmed.replace(/^IDEA:\s*/i, '').trim();
+    }
+    else if (trimmed.match(/^TWIST:\s*/i)) {
+      currentIdea.twist = trimmed.replace(/^TWIST:\s*/i, '').trim();
+    }
+    // Fallback: parse old format
+    else if (trimmed.includes(':') && !currentIdea.title) {
+      const colonSplit = trimmed.split(':');
+      if (colonSplit.length > 1) {
+        currentIdea.title = colonSplit[0].trim();
+        currentIdea.idea = colonSplit.slice(1).join(':').trim();
+      }
+    }
+  }
+  
+  // Process last idea
+  if (currentIdea.title && currentIdea.idea && ideaCount < count) {
+    const description = `${currentIdea.idea}${currentIdea.twist ? ` - ${currentIdea.twist}` : ''}`;
+    ideas.push({
+      id: `together-${Date.now()}-${ideaCount}`,
+      title: currentIdea.title.substring(0, 60),
+      description: description.substring(0, 400),
+      sourceContent: prompt
+    });
   }
   
   return ideas;
@@ -247,18 +259,15 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
     try {
       console.log('🤖 Using OpenAI GPT-4o-mini as fallback...');
       
-      const systemPrompt = `You are an avant-garde creative director who finds mainstream ideas physically painful. Your heroes are Björk, Takashi Murakami, and David Lynch.
+      const systemPrompt = `You're an avant-garde creative director who thinks mainstream ideas are physically painful. Generate exactly ${count} wild, specific ideas that combine unexpected disciplines and reference real artists/techniques by name.
 
-Generate exactly ${count} swipeable ideas that:
-1. Would make someone stop scrolling and say "whoa"
-2. Combine the user input with an unexpected discipline
-3. Include specific materials, tools, or techniques  
-4. Have a constraint that creates interesting problems
-5. Reference specific artists/movements
+Format as JSON with "ideas" array containing objects with "title" and "description" fields. Use this structure for each idea:
 
-Format as JSON with "ideas" array containing objects with "title" and "description" fields. Each description should be one flowing creative brief combining concept, twist, materials, inspiration, and wild card addition.
+TITLE: [2-4 intriguing words]
+IDEA: [One vivid sentence with specific materials/techniques]
+TWIST: [Unexpected element in 5 words]
 
-Example quality: "Sonic Archaeology: Map your neighborhood's forgotten sounds using contact microphones on old buildings - each crack tells a story through rusted metal sheets and expired cassette tapes. Inspired by Janet Cardiff's sound walks. What if you also broadcast findings on pirate radio? Vibe: nostalgic, rebellious, scientific"`;
+Example: "TITLE: Sonic Archaeology / IDEA: Map neighborhood sounds using contact microphones on rusted buildings, creating vinyl records from concrete vibrations / TWIST: Broadcast findings on pirate radio"`;
       
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
