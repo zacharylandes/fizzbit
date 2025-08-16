@@ -119,17 +119,17 @@ async function generateWithTogetherAI(prompt: string, count: number): Promise<Id
         messages: [
           {
             role: 'system',
-            content: `You're a creative director who hates generic ideas. Generate ${Math.min(count, 25)} unusual but actionable ideas that directly explore the user input through unexpected angles - each idea must clearly center on the user input but approach it through weird materials, techniques, or artist references.
+            content: `Generate ${Math.min(count, 25)} compelling creative ideas. If it's a story/character concept, give plot and dramatic scenarios. If it's visual, give art projects. If it's abstract, give creative exercises. Always make the ideas directly about the user input - be imaginative but clear and actionable.
 
 Format each as:
 1. TITLE: [2-4 intriguing words]
-IDEA: [One vivid sentence that obviously relates to the user input]
-TWIST: [Unexpected element in 5 words]
+IDEA: [One clear sentence that directly explores the user input]
+HOOK: [What makes this interesting]
 
-Example for "metal sculpture":
-1. TITLE: Magnetic Memory
-IDEA: Create metal sculptures that record and replay the sounds of their own forging process using embedded contact microphones
-TWIST: Only audible during thunderstorms`
+Example for "play about old man from future":
+1. TITLE: Timeline Confusion
+IDEA: The old man's "future memories" start coming true in real time during the performance, confusing both characters and audience about what's scripted
+HOOK: Blurs line between theater and reality`
           },
           {
             role: 'user',
@@ -180,7 +180,7 @@ function parseTogetherAIResponse(text: string, count: number, prompt: string): I
   const ideas: IdeaResponse[] = [];
   const lines = text.split('\n').filter(line => line.trim());
   
-  let currentIdea: { title?: string; idea?: string; twist?: string } = {};
+  let currentIdea: { title?: string; idea?: string; hook?: string } = {};
   let ideaCount = 0;
   
   for (const line of lines) {
@@ -190,7 +190,7 @@ function parseTogetherAIResponse(text: string, count: number, prompt: string): I
     if (trimmed.match(/^\d+\.\s*/)) {
       // Process previous idea if complete
       if (currentIdea.title && currentIdea.idea && ideaCount < count) {
-        const description = `${currentIdea.idea}${currentIdea.twist ? ` - ${currentIdea.twist}` : ''}`;
+        const description = `${currentIdea.idea}${currentIdea.hook ? ` - ${currentIdea.hook}` : ''}`;
         ideas.push({
           id: `together-${Date.now()}-${ideaCount}`,
           title: currentIdea.title.substring(0, 60),
@@ -210,15 +210,19 @@ function parseTogetherAIResponse(text: string, count: number, prompt: string): I
         currentIdea.title = titleMatch[1].trim();
       }
     }
-    // Look for TITLE, IDEA, TWIST sections
+    // Look for TITLE, IDEA, HOOK sections
     else if (trimmed.match(/^TITLE:\s*/i)) {
       currentIdea.title = trimmed.replace(/^TITLE:\s*/i, '').trim();
     }
     else if (trimmed.match(/^IDEA:\s*/i)) {
       currentIdea.idea = trimmed.replace(/^IDEA:\s*/i, '').trim();
     }
+    else if (trimmed.match(/^HOOK:\s*/i)) {
+      currentIdea.hook = trimmed.replace(/^HOOK:\s*/i, '').trim();
+    }
+    // Support legacy TWIST format
     else if (trimmed.match(/^TWIST:\s*/i)) {
-      currentIdea.twist = trimmed.replace(/^TWIST:\s*/i, '').trim();
+      currentIdea.hook = trimmed.replace(/^TWIST:\s*/i, '').trim();
     }
     // Fallback: parse old format
     else if (trimmed.includes(':') && !currentIdea.title) {
@@ -232,7 +236,7 @@ function parseTogetherAIResponse(text: string, count: number, prompt: string): I
   
   // Process last idea
   if (currentIdea.title && currentIdea.idea && ideaCount < count) {
-    const description = `${currentIdea.idea}${currentIdea.twist ? ` - ${currentIdea.twist}` : ''}`;
+    const description = `${currentIdea.idea}${currentIdea.hook ? ` - ${currentIdea.hook}` : ''}`;
     ideas.push({
       id: `together-${Date.now()}-${ideaCount}`,
       title: currentIdea.title.substring(0, 60),
@@ -259,15 +263,15 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
     try {
       console.log('🤖 Using OpenAI GPT-4o-mini as fallback...');
       
-      const systemPrompt = `You're a creative director who hates generic ideas. Generate exactly ${count} unusual but actionable ideas that directly explore the prompt through unexpected angles - each idea must clearly center on the prompt but approach it through weird materials, techniques, or artist references.
+      const systemPrompt = `Generate exactly ${count} compelling creative ideas. If it's a story/character concept, give plot and dramatic scenarios. If it's visual, give art projects. If it's abstract, give creative exercises. Always make the ideas directly about the prompt - be imaginative but clear and actionable.
 
 Format as JSON with "ideas" array containing objects with "title" and "description" fields. Use this structure for each idea:
 
 TITLE: [2-4 intriguing words]
-IDEA: [One vivid sentence that obviously relates to the prompt]
-TWIST: [Unexpected element in 5 words]
+IDEA: [One clear sentence that directly explores the prompt]
+HOOK: [What makes this interesting]
 
-Example for "metal sculpture": "TITLE: Magnetic Memory / IDEA: Create metal sculptures that record and replay the sounds of their own forging process using embedded contact microphones / TWIST: Only audible during thunderstorms"`;
+Example for "play about old man from future": "TITLE: Timeline Confusion / IDEA: The old man's 'future memories' start coming true in real time during the performance, confusing both characters and audience about what's scripted / HOOK: Blurs line between theater and reality"`;
       
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",

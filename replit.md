@@ -3,7 +3,7 @@
 SWIVL is an interactive creative inspiration app that generates personalized ideas from text prompts and images using AI. The application presents ideas in a swipeable card interface, allowing users to explore, save, and chain creative concepts together. Built with a modern full-stack architecture featuring React frontend, Express backend, and AI-powered content generation.
 
 ## Recent Updates
-- **Focused Creative Format (Aug 16, 2025)**: Updated idea generation to ensure direct relevance to user input. Creative director now produces unusual but actionable ideas that clearly center on the user's prompt while exploring it through unexpected materials, techniques, and artist references with TITLE/IDEA/TWIST structure
+- **Adaptive Creative Format (Aug 16, 2025)**: Refined idea generation to be contextually appropriate - generates plot/dramatic scenarios for stories, art projects for visual concepts, creative exercises for abstract ideas. Uses TITLE/IDEA/HOOK structure with clear relevance to user input and actionable suggestions
 - **Together.ai Integration (Aug 15, 2025)**: Switched primary AI service to Together.ai using Llama-3.2-3B-Instruct-Turbo for cost-effective idea generation. This provides significant cost savings compared to OpenAI while maintaining high quality output
 - **Context Retention Fix (Aug 15, 2025)**: Fixed major issue where continuous idea generation lost original prompt context after several swipes. System now preserves exact original prompt (including image descriptions, voice transcripts, drawing analysis) throughout entire session, ensuring all generated ideas remain relevant to user's initial input
 - **Robust Fallback System**: Implemented multi-tier fallback: Hugging Face Mistral 7B → Flan-T5 → OpenAI → template-based ideas, with proper error handling throughout the pipeline
@@ -47,7 +47,7 @@ Preferred communication style: Simple, everyday language.
 - **OpenAI GPT-4o-mini**: Fallback model for text generation when Together.ai fails
 - **OpenAI GPT-4o**: Fallback vision model for image analysis when Together.ai vision fails
 - **Structured Responses**: Text parsing with template fallbacks for reliable outputs
-- **Focused Creative Format**: AI generates ideas that directly explore user input through unusual angles, ensuring clear relevance while maintaining creativity through unexpected materials, techniques, and 5-word twists
+- **Adaptive Creative Format**: AI adapts idea type to input context (plots for stories, art projects for visuals, exercises for abstract concepts) using TITLE/IDEA/HOOK structure for clear, actionable suggestions directly related to user input
 - **Zero-Cost Voice Input**: Browser-native speech recognition eliminates need for external speech-to-text APIs
 
 ## Key Features
