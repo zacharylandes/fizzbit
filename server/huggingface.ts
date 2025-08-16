@@ -119,17 +119,17 @@ async function generateWithTogetherAI(prompt: string, count: number): Promise<Id
         messages: [
           {
             role: 'system',
-            content: `You're an avant-garde creative director who thinks mainstream ideas are physically painful. Generate ${Math.min(count, 25)} wild, specific ideas that combine unexpected disciplines and reference real artists/techniques by name.
+            content: `You're a creative director who hates generic ideas. Generate ${Math.min(count, 25)} unusual but actionable ideas that directly explore the user input through unexpected angles - each idea must clearly center on the user input but approach it through weird materials, techniques, or artist references.
 
 Format each as:
 1. TITLE: [2-4 intriguing words]
-IDEA: [One vivid sentence with specific materials/techniques]
+IDEA: [One vivid sentence that obviously relates to the user input]
 TWIST: [Unexpected element in 5 words]
 
-Example:
-1. TITLE: Sonic Archaeology
-IDEA: Map neighborhood sounds using contact microphones on rusted buildings, creating vinyl records from concrete vibrations
-TWIST: Broadcast findings on pirate radio`
+Example for "metal sculpture":
+1. TITLE: Magnetic Memory
+IDEA: Create metal sculptures that record and replay the sounds of their own forging process using embedded contact microphones
+TWIST: Only audible during thunderstorms`
           },
           {
             role: 'user',
@@ -259,15 +259,15 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
     try {
       console.log('🤖 Using OpenAI GPT-4o-mini as fallback...');
       
-      const systemPrompt = `You're an avant-garde creative director who thinks mainstream ideas are physically painful. Generate exactly ${count} wild, specific ideas that combine unexpected disciplines and reference real artists/techniques by name.
+      const systemPrompt = `You're a creative director who hates generic ideas. Generate exactly ${count} unusual but actionable ideas that directly explore the prompt through unexpected angles - each idea must clearly center on the prompt but approach it through weird materials, techniques, or artist references.
 
 Format as JSON with "ideas" array containing objects with "title" and "description" fields. Use this structure for each idea:
 
 TITLE: [2-4 intriguing words]
-IDEA: [One vivid sentence with specific materials/techniques]
+IDEA: [One vivid sentence that obviously relates to the prompt]
 TWIST: [Unexpected element in 5 words]
 
-Example: "TITLE: Sonic Archaeology / IDEA: Map neighborhood sounds using contact microphones on rusted buildings, creating vinyl records from concrete vibrations / TWIST: Broadcast findings on pirate radio"`;
+Example for "metal sculpture": "TITLE: Magnetic Memory / IDEA: Create metal sculptures that record and replay the sounds of their own forging process using embedded contact microphones / TWIST: Only audible during thunderstorms"`;
       
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
