@@ -321,23 +321,59 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
 
 export async function generateIdeasFromImage(imageBase64: string, count: number = 25): Promise<IdeaResponse[]> {
   try {
-    // First try Hugging Face image analysis
     let imageDescription = '';
     
+    // PRIMARY: Try Together.ai vision model for cost-effectiveness
     try {
-      const imageBuffer = Buffer.from(imageBase64, 'base64');
-      if (!hf) {
-        throw new Error('Hugging Face not available');
-      }
-      const hfResult = await hf.imageToText({
-        data: imageBuffer,
-        model: 'Salesforce/blip-image-captioning-large',
-      });
-      imageDescription = hfResult.generated_text || '';
-    } catch (hfError) {
-      console.log('Hugging Face image analysis failed, trying OpenAI vision...');
+      console.log('🚀 Using Together.ai vision model for image analysis...');
       
-      // Fallback to OpenAI vision model
+      const response = await fetch('https://api.together.xyz/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.TOGETHER_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'meta-llama/Llama-Vision-Free',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: 'Describe this image in 2-3 sentences, focusing on the main subject, colors, mood, setting, and any creative elements that could inspire ideas.'
+                },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: `data:image/jpeg;base64,${imageBase64}`
+                  }
+                }
+              ]
+            }
+          ],
+          max_tokens: 150,
+          temperature: 0.7
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Together.ai vision API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      imageDescription = data.choices?.[0]?.message?.content || '';
+      
+      if (imageDescription.trim()) {
+        console.log('✅ Together.ai vision analysis successful');
+      } else {
+        throw new Error('No description received from Together.ai vision');
+      }
+      
+    } catch (togetherError) {
+      console.warn('Together.ai vision failed, trying OpenAI vision...', (togetherError as Error).message);
+      
+      // FALLBACK: OpenAI vision model
       try {
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -353,7 +389,7 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
                 content: [
                   {
                     type: 'text',
-                    text: 'Describe this image in 1-2 sentences focusing on the main subject, colors, mood, and setting.'
+                    text: 'Describe this image in 2-3 sentences focusing on the main subject, colors, mood, and setting.'
                   },
                   {
                     type: 'image_url',
@@ -364,179 +400,83 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
                 ]
               }
             ],
-            max_tokens: 100
+            max_tokens: 150
           })
         });
 
         if (openaiResponse.ok) {
           const openaiData = await openaiResponse.json();
           imageDescription = openaiData.choices[0].message.content;
+          console.log('✅ OpenAI vision analysis successful (fallback)');
         }
       } catch (openaiError) {
-        console.log('OpenAI vision also failed, using generic image-based ideas');
+        console.log('OpenAI vision also failed, using template fallback');
+        imageDescription = 'An uploaded image with visual elements and creative potential';
       }
     }
 
-    // Generate ideas based on the image analysis (or generic if analysis failed)
+    // Generate ideas using Together.ai for consistency
     if (imageDescription.trim()) {
-      // Use OpenAI directly for reliable idea generation based on image
-      console.log('Using OpenAI for image-based idea generation...');
-
-      // Fallback to OpenAI if Llama 3 fails
-      try {
-        const openaiIdeaResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o',
-            messages: [
-              {
-                role: 'system',
-                content: `You are a creative idea generator. Parse the user's request for specific categories and generate exactly ${count} ideas total (repeat the pattern): 3 unusual business concepts, 2 creative plays/sitcoms, 2 food recipes, 2 fine art projects, then repeat this pattern until you reach ${count} total ideas. Present them in random order. Format as JSON with "ideas" array containing objects with "title", "description", and "category" fields. Make titles concise (max 6 words) and descriptions detailed but under 100 words.`
-              },
-              {
-                role: 'user',
-                content: `using the prompt "${imageDescription}" as inspiration, provide me 3 ideas for an unusual business concept, 2 ideas for a creative and unusual play or sitcom, 2 ideas for a food recipe, and 2 ideas for a fine art project, the ideas will be sorted randomly`
-              }
-            ],
-            max_tokens: 3000,
-            temperature: 0.9,
-            response_format: { type: "json_object" }
-          })
-        });
-
-        if (openaiIdeaResponse.ok) {
-          const openaiIdeaData = await openaiIdeaResponse.json();
-          const content = openaiIdeaData.choices[0].message.content;
-          
-          try {
-            const parsed = JSON.parse(content);
-            if (parsed.ideas && Array.isArray(parsed.ideas)) {
-              return parsed.ideas.map((idea: any, index: number) => ({
-                id: `openai-img-fallback-${Date.now()}-${index}`,
-                title: idea.title || `Creative Idea ${index + 1}`,
-                description: idea.description || 'A creative project inspired by your image.',
-                sourceContent: `Image: ${imageDescription}`
-              }));
-            }
-          } catch (parseError) {
-            console.error('Failed to parse OpenAI idea response:', parseError);
-          }
-        }
-      } catch (error) {
-        console.error('OpenAI idea generation failed:', error);
-      }
-
-      // Fallback to template-based unique ideas if OpenAI fails
-      const personalizedTemplates = [
-        {
-          title: "Artistic Recreation",
-          description: `Recreate this scene using watercolor, oil paint, or digital art. Focus on capturing the mood and lighting you see.`
-        },
-        {
-          title: "Story Writing",
-          description: `Write a short story or screenplay inspired by this moment. What led to this scene? What happens next?`
-        },
-        {
-          title: "Color Palette Design",
-          description: `Extract the dominant colors and create a design project - room decor, fashion collection, or brand identity.`
-        },
-        {
-          title: "Photography Series",
-          description: `Shoot a series of photos exploring the same theme, location type, or emotional tone as this image.`
-        },
-        {
-          title: "Mixed Media Art",
-          description: `Combine photography, painting, and text to create a layered artwork that expands on this visual concept.`
-        },
-        {
-          title: "Minimalist Interpretation",
-          description: `Reduce this scene to its essential elements using simple shapes, lines, and limited colors.`
-        },
-        {
-          title: "Different Time Period",
-          description: `Reimagine this scene in a different era - how would it look 50 years ago or 50 years from now?`
-        },
-        {
-          title: "Interactive Experience",
-          description: `Design an immersive installation or digital experience that lets people step into this world.`
-        }
-      ].slice(0, count);
-
-      return personalizedTemplates.map((template, index) => ({
-        id: `analyzed-img-${Date.now()}-${index}`,
-        title: template.title,
-        description: template.description,
-        sourceContent: `Image: ${imageDescription}`
-      }));
-    } else {
-      // Fallback generic image-inspired ideas - expand to 8
-      const genericTemplates = [
-        {
-          title: "Visual Storytelling Project",
-          description: "Create a series of images or artwork that tells a story inspired by your uploaded photo. Focus on the emotions, colors, and mood you captured."
-        },
-        {
-          title: "Photo Recreation Challenge", 
-          description: "Recreate your image using a completely different medium - paint, digital art, sculpture, or mixed media. Explore how the same concept translates across art forms."
-        },
-        {
-          title: "Inspired Color Palette",
-          description: "Extract the dominant colors from your image and use them as inspiration for a new creative project - room design, fashion outfit, or artistic composition."
-        },
-        {
-          title: "Abstract Interpretation",
-          description: "Transform your photo into an abstract artwork focusing on shapes, patterns, and emotional resonance rather than literal representation."
-        },
-        {
-          title: "Time-lapse Concept",
-          description: "Create a time-based project showing how the scene in your photo might change over hours, days, seasons, or years."
-        },
-        {
-          title: "Texture and Material Study",
-          description: "Focus on the textures and materials visible in your image to inspire a tactile art project using fabric, clay, metal, or natural materials."
-        },
-        {
-          title: "Lighting Experiment",
-          description: "Explore how different lighting conditions would change the mood and impact of your image through photography, digital art, or installation."
-        },
-        {
-          title: "Community Art Project",
-          description: "Use your image as inspiration for a collaborative artwork where others can contribute their own interpretations or additions."
-        }
-      ].slice(0, count);
-
-      return genericTemplates.map((template, index) => ({
-        id: `generic-img-${Date.now()}-${index}`,
-        title: template.title,
-        description: template.description,
-        sourceContent: "Image upload"
-      }));
+      console.log('🎯 Generating ideas from image description using Together.ai...');
+      const prompt = `Image analysis: ${imageDescription}. Generate creative ideas inspired by this visual content.`;
+      
+      // Import and use the text generation function
+      const { generateIdeasFromText } = await import('./huggingface');
+      return await generateIdeasFromText(prompt, count);
     }
+
+    // Template fallback when no description available
+    const imageTemplates = [
+      {
+        title: "Visual Art Series",
+        description: "Create a series of artworks inspired by the themes and colors in this image."
+      },
+      {
+        title: "Photo Story",
+        description: "Use this image as inspiration for a creative photography project or story."
+      },
+      {
+        title: "Color Palette Business",
+        description: "Start a design business using the color scheme from this image."
+      },
+      {
+        title: "Mood Board Creation",
+        description: "Build a comprehensive mood board around the aesthetic of this image."
+      },
+      {
+        title: "Interactive Installation",
+        description: "Design an interactive art piece that captures the essence of this visual."
+      },
+      {
+        title: "Fashion Collection",
+        description: "Design a clothing line inspired by the style and colors in this image."
+      },
+      {
+        title: "Interior Design",
+        description: "Create a room design concept based on the visual elements of this image."
+      },
+      {
+        title: "Digital Art Project",
+        description: "Use this image as reference for a digital illustration or animation project."
+      }
+    ].slice(0, count);
+
+    return imageTemplates.map((template, index) => ({
+      id: `image-template-${Date.now()}-${index}`,
+      title: template.title,
+      description: template.description,
+      sourceContent: "Image upload"
+    }));
 
   } catch (error) {
     console.error('Image processing error:', error);
     
-    // Fallback response if API fails
-    return [
-      {
-        id: `img-fallback-${Date.now()}-1`,
-        title: "Visual Art Project",
-        description: "Create an artistic interpretation or series inspired by the visual elements in your image. Explore different mediums and techniques."
-      },
-      {
-        id: `img-fallback-${Date.now()}-2`,
-        title: "Story Behind the Scene", 
-        description: "Develop a compelling narrative or backstory based on what you see in the image. Turn it into a short story, video, or interactive experience."
-      },
-      {
-        id: `img-fallback-${Date.now()}-3`,
-        title: "Educational Experience",
-        description: "Design a learning experience that uses your image as inspiration. Create tutorials, workshops, or educational content around the themes you observe."
-      }
-    ];
+    // Ultimate fallback
+    return [{
+      id: `image-error-${Date.now()}`,
+      title: "Creative Visual Project",
+      description: "Use your uploaded image as inspiration for a creative project or artistic exploration.",
+      sourceContent: "Image upload"
+    }];
   }
 }

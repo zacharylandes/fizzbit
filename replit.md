@@ -40,10 +40,11 @@ Preferred communication style: Simple, everyday language.
 - **Database Implementation**: Full schema with ideas, saved ideas, user authentication, and metadata storage
 
 ## AI Integration
-- **Together.ai Llama-3.2-3B**: Primary model for fast and cost-effective text-based creative idea generation (PAID but very affordable)
+- **Together.ai Llama-3.2-3B-Instruct-Turbo**: Primary model for cost-effective text-based creative idea generation (PAID but very affordable)
+- **Together.ai Llama-Vision-Free**: Primary vision model for image and drawing analysis (PAID but very affordable)
 - **Web Speech API**: Client-side browser speech-to-text - completely free and works offline (replaces server-side transcription)  
 - **OpenAI GPT-4o-mini**: Fallback model for text generation when Together.ai fails
-- **OpenAI GPT-4o**: Vision model for image analysis and description
+- **OpenAI GPT-4o**: Fallback vision model for image analysis when Together.ai vision fails
 - **Structured Responses**: Text parsing with template fallbacks for reliable outputs
 - **Enhanced Prompts**: All AI requests use "give me unique ideas that avoid the obvious for..." prefix for better creativity
 - **Zero-Cost Voice Input**: Browser-native speech recognition eliminates need for external speech-to-text APIs
