@@ -1,16 +1,13 @@
 import { HfInference } from '@huggingface/inference';
 import OpenAI from 'openai';
 
-if (!process.env.HUGGINGFACE_TOKEN) {
-  throw new Error('HUGGINGFACE_TOKEN is required');
+if (!process.env.TOGETHER_API_KEY) {
+  throw new Error('TOGETHER_API_KEY is required');
 }
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('OPENAI_API_KEY is required');
-}
-
-const hf = new HfInference(process.env.HUGGINGFACE_TOKEN);
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Keep OpenAI and HF as fallbacks
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
+const hf = process.env.HUGGINGFACE_TOKEN ? new HfInference(process.env.HUGGINGFACE_TOKEN) : null;
 
 export interface IdeaResponse {
   id: string;
@@ -77,7 +74,7 @@ export async function generateRelatedIdeas(contextualPrompt: string, count: numb
     
     const prompt = `Generate ${count} related creative ideas for: ${contextualPrompt}\n\nHere are ${count} related creative ideas:\n\n`;
     
-    const result = await hf.textGeneration({
+    const result = await hf!.textGeneration({
       model: 'mistralai/Mistral-7B-Instruct-v0.1',
       inputs: prompt,
       parameters: {
@@ -106,16 +103,115 @@ export async function generateRelatedIdeas(contextualPrompt: string, count: numb
   }
 }
 
-export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
-  // NOTE: Temporarily skipping Hugging Face due to "No Inference Provider available" errors
-  // This appears to be a Hugging Face API issue where no models have available inference providers
-  console.log('⚠️ Skipping Hugging Face due to provider availability issues, using OpenAI for reliable service...');
+// Together.ai API function for cost-effective idea generation
+async function generateWithTogetherAI(prompt: string, count: number): Promise<IdeaResponse[]> {
+  try {
+    console.log('🚀 Using Together.ai Llama-3.2-3B-Instruct-Turbo for cost-effective generation...');
+    
+    const response = await fetch('https://api.together.xyz/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.TOGETHER_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/Llama-3.2-3B-Instruct-Turbo',
+        messages: [
+          {
+            role: 'system',
+            content: `You are a creative idea generator. Always return exactly ${Math.min(count, 25)} ideas in a numbered list format. They should be interesting and unique. Some should be related to art/music/food, others should be related to business ideas and others related to health and wellness, meditation or plants. Format each as: "1. [Title]: [Description]"`
+          },
+          {
+            role: 'user',
+            content: `Generate ${Math.min(count, 25)} creative ideas inspired by: ${prompt}`
+          }
+        ],
+        max_tokens: 1000,
+        temperature: 0.8
+      })
+    });
 
-  // SECOND: Only fall back to OpenAI if Hugging Face fails
-  console.log('⚠️ All Hugging Face models failed, falling back to OpenAI...');
-  for (let attempt = 1; attempt <= 2; attempt++) {
+    if (!response.ok) {
+      throw new Error(`Together.ai API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+    
+    if (!content) {
+      throw new Error('No content received from Together.ai');
+    }
+
+    console.log('🚀 Together.ai response received, parsing ideas...');
+    const ideas = parseTogetherAIResponse(content, count, prompt);
+    
+    if (ideas.length > 0) {
+      console.log(`✅ Successfully generated ${ideas.length} ideas using Together.ai Llama`);
+      return ideas;
+    }
+    
+    throw new Error('No valid ideas parsed from Together.ai response');
+  } catch (error) {
+    console.error('Together.ai generation failed:', (error as Error).message);
+    throw error;
+  }
+}
+
+// Parse Together.ai numbered list response
+function parseTogetherAIResponse(text: string, count: number, prompt: string): IdeaResponse[] {
+  const ideas: IdeaResponse[] = [];
+  const lines = text.split('\n').filter(line => line.trim());
+  
+  for (const line of lines) {
+    const trimmed = line.trim();
+    
+    // Look for numbered list format: "1. Title: Description" or "1. Title - Description"
+    const match = trimmed.match(/^\d+\.\s*([^::\-]+)[:\-]\s*(.+)$/);
+    if (match) {
+      const [, title, description] = match;
+      ideas.push({
+        id: `together-${Date.now()}-${ideas.length}`,
+        title: title.trim().substring(0, 50),
+        description: description.trim().substring(0, 200),
+        sourceContent: prompt
+      });
+    }
+    // Alternative format: just numbered items without colons
+    else if (trimmed.match(/^\d+\.\s*(.+)$/)) {
+      const content = trimmed.replace(/^\d+\.\s*/, '').trim();
+      // Try to split on first sentence for title/description
+      const sentences = content.split(/[.!?]+/);
+      const title = sentences[0]?.substring(0, 50) || `Idea ${ideas.length + 1}`;
+      const description = sentences.slice(1).join('. ').trim() || content;
+      
+      ideas.push({
+        id: `together-${Date.now()}-${ideas.length}`,
+        title: title.trim(),
+        description: description.substring(0, 200) || title,
+        sourceContent: prompt
+      });
+    }
+    
+    if (ideas.length >= count) break;
+  }
+  
+  return ideas;
+}
+
+export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
+  // PRIMARY: Use Together.ai for cost-effective idea generation
+  try {
+    const ideas = await generateWithTogetherAI(prompt, count);
+    if (ideas.length > 0) {
+      return ideas;
+    }
+  } catch (error) {
+    console.warn('Together.ai failed, trying fallback options:', (error as Error).message);
+  }
+  // FALLBACK 1: OpenAI if available
+  if (openai) {
     try {
-      console.log(`🤖 Using OpenAI GPT-4o-mini as backup... (attempt ${attempt}/2)`);
+      console.log('🤖 Using OpenAI GPT-4o-mini as fallback...');
       
       const systemPrompt = `You are a creative idea generator. Using the user's specific prompt as your foundation, generate exactly ${count} diverse creative ideas that are directly related to their interest. Generate ideas across these categories: unusual business concepts, creative plays/sitcoms, food recipes, and fine art projects. All ideas must be clearly connected to and inspired by the user's specific prompt. Format as JSON with "ideas" array containing objects with "title", "description", and "category" fields. Make titles concise (max 6 words) and descriptions detailed but under 100 words.`;
       
@@ -145,29 +241,26 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
           }
 
           const formattedIdeas = ideas.slice(0, count).map((idea, index) => ({
-            id: `openai-${Date.now()}-${index}`,
+            id: `openai-fallback-${Date.now()}-${index}`,
             title: idea.title || `Idea ${index + 1}`,
             description: idea.description || idea.content || 'Creative idea generated for you.'
           }));
 
           if (formattedIdeas.length > 0) {
-            console.log(`✅ Generated ${formattedIdeas.length} ideas using OpenAI GPT-4o-mini (backup)`);
+            console.log(`✅ Generated ${formattedIdeas.length} ideas using OpenAI (fallback)`);
             return formattedIdeas;
           }
         } catch (parseError) {
           console.error('Failed to parse OpenAI JSON response:', parseError);
           const ideas = parseTextResponse(responseText, count, prompt);
           if (ideas.length > 0) {
-            console.log(`✅ Generated ${ideas.length} ideas using OpenAI text parsing fallback`);
+            console.log(`✅ Generated ${ideas.length} ideas using OpenAI text parsing`);
             return ideas;
           }
         }
       }
     } catch (error) {
-      console.error(`OpenAI generation attempt ${attempt} failed:`, error);
-      if (attempt < 2) {
-        await new Promise(resolve => setTimeout(resolve, attempt * 1000));
-      }
+      console.error('OpenAI fallback failed:', error);
     }
   }
 
@@ -233,6 +326,9 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
     
     try {
       const imageBuffer = Buffer.from(imageBase64, 'base64');
+      if (!hf) {
+        throw new Error('Hugging Face not available');
+      }
       const hfResult = await hf.imageToText({
         data: imageBuffer,
         model: 'Salesforce/blip-image-captioning-large',
