@@ -203,11 +203,18 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     
-    // Improved settings for better listening
-    recognition.continuous = true; // Allow continuous listening for longer phrases
-    recognition.interimResults = true; // Show interim results for better feedback
+    // Optimized settings for better accuracy
+    recognition.continuous = false; // Single phrase recognition for better accuracy
+    recognition.interimResults = true; // Show interim results for feedback
     recognition.lang = 'en-US';
-    recognition.maxAlternatives = 1; // Only need the best result
+    recognition.maxAlternatives = 3; // Get multiple alternatives for better accuracy
+    // Enhanced settings for better performance
+    if ('grammars' in recognition) {
+      recognition.grammars = null; // No specific grammar restrictions
+    }
+    if ('serviceURI' in recognition) {
+      recognition.serviceURI = ''; // Use default service
+    }
     
     // Store recognition instance to allow manual stopping
     const recognitionRef = { current: recognition };
@@ -237,18 +244,38 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
     recognition.onresult = (event: any): void => {
       let finalTranscript = '';
       let interimTranscript = '';
+      let bestConfidence = 0;
+      let bestTranscript = '';
       
-      // Process all results
+      // Process all results with confidence scoring
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript;
+        const result = event.results[i];
+        
+        // Get the best alternative based on confidence
+        let currentBest = result[0];
+        for (let j = 0; j < result.length; j++) {
+          if (result[j].confidence > currentBest.confidence) {
+            currentBest = result[j];
+          }
+        }
+        
+        if (result.isFinal) {
+          finalTranscript += currentBest.transcript;
+          if (currentBest.confidence > bestConfidence) {
+            bestConfidence = currentBest.confidence;
+            bestTranscript = currentBest.transcript;
+          }
         } else {
-          interimTranscript += transcript;
+          interimTranscript += currentBest.transcript;
         }
       }
       
-      console.log('🎤 Web Speech Recognition:', { finalTranscript, interimTranscript });
+      console.log('🎤 Web Speech Recognition:', { 
+        finalTranscript, 
+        interimTranscript, 
+        confidence: bestConfidence,
+        alternatives: event.results[event.resultIndex]?.length || 0
+      });
       
       // Show interim results in real-time
       if (interimTranscript) {
@@ -258,9 +285,10 @@ export function InputSection({ onIdeasGenerated, promptValue = "", onPromptChang
         }
       }
       
-      // Process final results
+      // Process final results with confidence threshold
       if (finalTranscript) {
-        setTextPrompt(finalTranscript);
+        const transcriptToUse = bestConfidence > 0.7 ? bestTranscript : finalTranscript;
+        setTextPrompt(transcriptToUse);
         
         if (onPromptChange) {
           onPromptChange(finalTranscript);
