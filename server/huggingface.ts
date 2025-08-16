@@ -119,15 +119,36 @@ async function generateWithTogetherAI(prompt: string, count: number): Promise<Id
         messages: [
           {
             role: 'system',
-            content: `You are a creative idea generator. Always return exactly ${Math.min(count, 25)} ideas in a numbered list format. They should be interesting and unique. Some should be related to art/music/food, others should be related to business ideas and others related to health and wellness, meditation or plants. Format each as: "1. [Title]: [Description]"`
+            content: `You are an avant-garde creative director who finds mainstream ideas physically painful. Your heroes are Björk, Takashi Murakami, and David Lynch.
+
+Generate exactly ${Math.min(count, 25)} swipeable ideas that:
+1. Would make someone stop scrolling and say "whoa"
+2. Combine the user input with an unexpected discipline  
+3. Include specific materials, tools, or techniques
+4. Have a constraint that creates interesting problems
+5. Reference specific artists/movements (not just "impressionism" but "Monet's late Water Lilies period when he was nearly blind")
+
+Format each as: "1. [Intriguing 2-4 word title]: [One sentence concept] - [Unexpected element] using [specific materials]. Inspired by [specific artist/work]. What if you also [wild card addition]? Vibe: [three unexpected adjectives]"
+
+Example quality bar:
+❌ "Paint your feelings about the dog"  
+✅ "Sonic Archaeology: Map your neighborhood's forgotten sounds using contact microphones on old buildings - each crack tells a story through rusted metal sheets and expired cassette tapes. Inspired by Janet Cardiff's sound walks. What if you also broadcast findings on pirate radio? Vibe: nostalgic, rebellious, scientific"`
           },
           {
             role: 'user',
-            content: `Generate ${Math.min(count, 25)} creative ideas inspired by: ${prompt}`
+            content: `Context: User provided: "${prompt}"
+
+Examples of the energy we want:
+1. Input: "sunset" → "Mechanical Twilight: Build a sunset that only works when someone cries into a sensor using rusted clockwork and expired film negatives"
+2. Input: "coffee" → "Sonic Brewing: Extract coffee using sound frequencies - each note unlocks different flavor compounds, performed live like a DJ set"
+
+Generate ${Math.min(count, 25)} ideas for: "${prompt}"`
           }
         ],
-        max_tokens: 1000,
-        temperature: 0.8
+        max_tokens: 3000,
+        temperature: 0.9,
+        presence_penalty: 0.6,
+        frequency_penalty: 0.6
       })
     });
 
@@ -165,31 +186,44 @@ function parseTogetherAIResponse(text: string, count: number, prompt: string): I
   for (const line of lines) {
     const trimmed = line.trim();
     
-    // Look for numbered list format: "1. Title: Description" or "1. Title - Description"
+    // Look for numbered list format: "1. Title: Description" or "1. Title - Description"  
     const match = trimmed.match(/^\d+\.\s*([^::\-]+)[:\-]\s*(.+)$/);
     if (match) {
       const [, title, description] = match;
       ideas.push({
         id: `together-${Date.now()}-${ideas.length}`,
-        title: title.trim().substring(0, 50),
-        description: description.trim().substring(0, 200),
+        title: title.trim().substring(0, 60), // Slightly longer for creative titles
+        description: description.trim().substring(0, 400), // Much longer for detailed creative briefs
         sourceContent: prompt
       });
     }
     // Alternative format: just numbered items without colons
     else if (trimmed.match(/^\d+\.\s*(.+)$/)) {
       const content = trimmed.replace(/^\d+\.\s*/, '').trim();
-      // Try to split on first sentence for title/description
-      const sentences = content.split(/[.!?]+/);
-      const title = sentences[0]?.substring(0, 50) || `Idea ${ideas.length + 1}`;
-      const description = sentences.slice(1).join('. ').trim() || content;
-      
-      ideas.push({
-        id: `together-${Date.now()}-${ideas.length}`,
-        title: title.trim(),
-        description: description.substring(0, 200) || title,
-        sourceContent: prompt
-      });
+      // For creative format, try to extract title before first colon
+      const colonSplit = content.split(':');
+      if (colonSplit.length > 1) {
+        const title = colonSplit[0].trim().substring(0, 60);
+        const description = colonSplit.slice(1).join(':').trim();
+        ideas.push({
+          id: `together-${Date.now()}-${ideas.length}`,
+          title: title,
+          description: description.substring(0, 400),
+          sourceContent: prompt
+        });
+      } else {
+        // Fallback: split on first sentence
+        const sentences = content.split(/[.!?]+/);
+        const title = sentences[0]?.substring(0, 60) || `Creative Idea ${ideas.length + 1}`;
+        const description = sentences.slice(1).join('. ').trim() || content;
+        
+        ideas.push({
+          id: `together-${Date.now()}-${ideas.length}`,
+          title: title.trim(),
+          description: description.substring(0, 400) || title,
+          sourceContent: prompt
+        });
+      }
     }
     
     if (ideas.length >= count) break;
@@ -213,7 +247,18 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
     try {
       console.log('🤖 Using OpenAI GPT-4o-mini as fallback...');
       
-      const systemPrompt = `You are a creative idea generator. Using the user's specific prompt as your foundation, generate exactly ${count} diverse creative ideas that are directly related to their interest. Generate ideas across these categories: unusual business concepts, creative plays/sitcoms, food recipes, and fine art projects. All ideas must be clearly connected to and inspired by the user's specific prompt. Format as JSON with "ideas" array containing objects with "title", "description", and "category" fields. Make titles concise (max 6 words) and descriptions detailed but under 100 words.`;
+      const systemPrompt = `You are an avant-garde creative director who finds mainstream ideas physically painful. Your heroes are Björk, Takashi Murakami, and David Lynch.
+
+Generate exactly ${count} swipeable ideas that:
+1. Would make someone stop scrolling and say "whoa"
+2. Combine the user input with an unexpected discipline
+3. Include specific materials, tools, or techniques  
+4. Have a constraint that creates interesting problems
+5. Reference specific artists/movements
+
+Format as JSON with "ideas" array containing objects with "title" and "description" fields. Each description should be one flowing creative brief combining concept, twist, materials, inspiration, and wild card addition.
+
+Example quality: "Sonic Archaeology: Map your neighborhood's forgotten sounds using contact microphones on old buildings - each crack tells a story through rusted metal sheets and expired cassette tapes. Inspired by Janet Cardiff's sound walks. What if you also broadcast findings on pirate radio? Vibe: nostalgic, rebellious, scientific"`;
       
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
@@ -222,8 +267,8 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
           { role: "user", content: prompt }
         ],
         response_format: { type: "json_object" },
-        temperature: 0.8,
-        max_tokens: 1200
+        temperature: 0.9,
+        max_tokens: 3000
       });
 
       const responseText = completion.choices[0].message.content;
@@ -269,36 +314,36 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
   
   const ideaTemplates = [
     {
-      titlePrefix: "Unusual Business:",
-      descriptionTemplate: "Launch a unique service where customers pay to {topic} in unexpected ways. Think subscription boxes for niche interests, reverse marketplaces, or services that solve problems people didn't know they had."
+      titlePrefix: "Sonic Archaeology:",
+      descriptionTemplate: "Map the hidden sounds of {topic} using contact microphones and rusted metal recording devices - each vibration tells a forgotten story. Inspired by Janet Cardiff's sound walks. What if you also broadcast findings on pirate radio? Vibe: nostalgic, rebellious, scientific."
     },
     {
-      titlePrefix: "Pop-Up Experience:",
-      descriptionTemplate: "Create temporary experiences around {topic} - popup restaurants with themed menus, nomadic workshops, or traveling installations that bring unusual concepts directly to communities."
+      titlePrefix: "Temporal Taste:",
+      descriptionTemplate: "Create a dish where {topic} flavors only emerge when eaten at specific times of day, using thermochromic spices and sundial plating. Inspired by Ferran Adrià's molecular gastronomy. What if you also served it in complete darkness? Vibe: mysterious, precise, ephemeral."
     },
     {
-      titlePrefix: "Comedy Series:",
-      descriptionTemplate: "A sitcom where characters must navigate daily life while dealing with {topic} in the most ridiculous ways. Each episode features misunderstandings, mishaps, and heartwarming moments."
+      titlePrefix: "Ghost Commerce:",
+      descriptionTemplate: "Build a business around {topic} that only operates during solar eclipses, using vintage typewriters for transactions and handwritten contracts on rice paper. Inspired by Yves Klein's art happening philosophy. What if customers paid in handmade objects? Vibe: ceremonial, exclusive, surreal."
     },
     {
-      titlePrefix: "Fusion Dish:",
-      descriptionTemplate: "Combine unexpected flavors inspired by {topic} to create a dish that surprises and delights. Use unconventional ingredients, unique cooking methods, or creative presentation."
+      titlePrefix: "Breath Mapping:",
+      descriptionTemplate: "Document {topic} through the breathing patterns of strangers, using antique spirometry equipment and creating wearable lung sculptures. Inspired by Felix Gonzalez-Torres' breath works. What if you also composed music from the rhythm data? Vibe: intimate, scientific, meditative."
     },
     {
-      titlePrefix: "Mixed Media Installation:",
-      descriptionTemplate: "Create an immersive art piece using {topic} as inspiration. Combine traditional materials with technology, found objects, or interactive elements that invite viewer participation."
+      titlePrefix: "Memory Palace:",
+      descriptionTemplate: "Transform {topic} into a physical maze where visitors can only navigate using childhood memories, built with salvaged playground equipment and smell-triggered pathways. Inspired by Sophie Calle's autobiographical investigations. What if you also recorded people's stories? Vibe: nostalgic, disorienting, therapeutic."
     },
     {
-      titlePrefix: "Interactive Workshop:",
-      descriptionTemplate: "Design a hands-on workshop around {topic} that includes collaborative activities, skill-building exercises, and creative exploration for participants."
+      titlePrefix: "Decay Ballet:",
+      descriptionTemplate: "Choreograph a performance where {topic} slowly decomposes during the show, using organic materials and time-lapse projection. Inspired by Tino Sehgal's constructed situations. What if the audience had to help rebuild it? Vibe: morbid, beautiful, participatory."
     },
     {
-      titlePrefix: "Community Project:",
-      descriptionTemplate: "Start a community initiative focused on {topic}. Bring people together through shared goals, creative challenges, and collaborative creation."
+      titlePrefix: "Frequency Garden:",
+      descriptionTemplate: "Grow plants that respond to {topic} using specific radio frequencies, creating living installations in abandoned buildings with copper wire root systems. Inspired by Brandon LaBelle's sound ecology. What if each plant generated its own music? Vibe: experimental, organic, futuristic."
     },
     {
-      titlePrefix: "Digital Experience:",
-      descriptionTemplate: "Create a multimedia project around {topic} that combines technology, storytelling, and user interaction to build an engaging experience."
+      titlePrefix: "Time Capsule Theater:",
+      descriptionTemplate: "Stage plays about {topic} using only objects that will decompose by opening night, performing in locations scheduled for demolition. Inspired by Robert Smithson's entropy works. What if the script also degraded during performance? Vibe: urgent, ephemeral, archaeological."
     }
   ];
 
