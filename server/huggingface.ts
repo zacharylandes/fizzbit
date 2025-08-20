@@ -28,7 +28,7 @@ HOOK: Blurs line between theater and reality`;
     styleGuide = "Be experimental, surreal, and boundary-pushing. Break rules and explore the absurd.";
     hookGuide = "What makes this delightfully strange or rule-breaking";
   } else if (actionable > 0.6) {
-    styleGuide = "Be practical, immediate, and doable. Focus on quick wins and simple daily practices.";
+    styleGuide = "Be practical, immediate, and doable. Focus on actionable wins and simple daily practices.";
     hookGuide = "Why this small action creates momentum or immediate satisfaction";
   } else if (deep > 0.6) {
     styleGuide = "Be substantial, meaningful, and project-oriented. Think long-term creative endeavors.";
@@ -53,7 +53,7 @@ HOOK: Blurs line between theater and reality`;
   } else if (wild > 0.4) {
     timeScope = "Focus on imaginative leaps regardless of time commitment. ";
   } else {
-    timeScope = "Mix time commitments from quick wins to longer projects. ";
+    timeScope = "Mix time commitments from actionable wins to longer projects. ";
   }
 
   return `Generate ${Math.min(count, 25)} compelling creative ideas using this creative blend:

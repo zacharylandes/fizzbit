@@ -227,7 +227,7 @@ export const CreativityTriangle = ({ onWeightsChange, className = "" }: Creativi
         <div className="absolute bottom-0 left-4 transform -translate-x-1/2 translate-y-3">
           <div className="text-center">
             <div className="w-2 h-2 bg-green-400 rounded-full mx-auto mb-1"></div>
-            <span className="text-xs font-medium text-gray-700">Quick</span>
+            <span className="text-xs font-medium text-gray-700">Actionable</span>
           </div>
         </div>
         
@@ -266,7 +266,7 @@ export const CreativityTriangle = ({ onWeightsChange, className = "" }: Creativi
         </div>
         <div className="text-center">
           <div className="text-lg font-semibold text-green-500">{Math.round(weights.actionable * 100)}%</div>
-          <div className="text-xs text-gray-600">Quick</div>
+          <div className="text-xs text-gray-600">Actionable</div>
         </div>
         <div className="text-center">
           <div className="text-lg font-semibold text-blue-500">{Math.round(weights.deep * 100)}%</div>

@@ -45,7 +45,7 @@ export const generateBlendedPrompt = (
   } else if (wildWeight > 0.4) {
     timeScope = "Focus on imaginative leaps regardless of time commitment. ";
   } else {
-    timeScope = "Mix time commitments from quick wins to longer projects. ";
+    timeScope = "Mix time commitments from actionable wins to longer projects. ";
   }
 
   return `Generate ${count} compelling creative ideas about: "${userInput}"
@@ -77,12 +77,12 @@ export const getBlendDescription = (weights: CreativityWeights): string => {
   const { wild, actionable, deep } = weights;
   
   if (wild > 0.6) return "Experimental & Surreal";
-  if (actionable > 0.6) return "Quick & Practical";
+  if (actionable > 0.6) return "Actionable & Practical";
   if (deep > 0.6) return "Substantial & Meaningful";
   
   const parts = [];
   if (wild > 0.2) parts.push("Wild");
-  if (actionable > 0.2) parts.push("Quick");
+  if (actionable > 0.2) parts.push("Actionable");
   if (deep > 0.2) parts.push("Deep");
   
   return parts.join(" + ");
