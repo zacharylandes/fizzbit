@@ -6,14 +6,16 @@ import { queryClient } from "@/lib/queryClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Sparkles, Image, Type, ArrowUp } from "lucide-react";
+import { CreativityTriangle } from "./creativity-triangle";
 
 interface CardStackProps {
   initialIdeas?: Idea[];
   onSwipeUpPrompt?: (ideaContent: string) => void;
   currentPrompt?: string; // Add current prompt to preserve context for chaining
+  onCreativityChange?: (weights: any) => void; // Add creativity weights callback
 }
 
-export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = "" }: CardStackProps) {
+export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = "", onCreativityChange }: CardStackProps) {
   const [cards, setCards] = useState<Idea[]>(initialIdeas);
   const [animatingCards, setAnimatingCards] = useState<{ [key: string]: { direction: string; isAnimating: boolean } }>({});
   const [refreshKey, setRefreshKey] = useState(0);
@@ -483,35 +485,30 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
               </>
             ) : (
               <>
-                {/* Default Empty State */}
-                <div className="flex items-center justify-center space-x-4 mb-4">
-                  <div className="p-3 bg-card-sage border border-card-sage/30 rounded-lg hover:scale-110 transition-all duration-300">
-                    <Sparkles className="h-6 w-6 text-card-sage" />
-                  </div>
-                  <div className="p-3 bg-card-blue-gray border border-card-blue-gray/30 rounded-lg hover:scale-110 transition-all duration-300">
-                    <Image className="h-6 w-6 text-card-blue-gray" />
-                  </div>
-                  <div className="p-3 bg-card-light-blue border border-card-light-blue/30 rounded-lg hover:scale-110 transition-all duration-300">
-                    <Type className="h-6 w-6 text-card-light-blue" />
-                  </div>
-                </div>
-                
-                {/* Message */}
-                <div>
-                  <h3 className="text-xl font-semibold text-card-foreground mb-2">
-                    No ideas yet!
+                {/* Creativity Triangle State */}
+                <div className="space-y-6">
+                  <h3 className="text-xl font-semibold text-card-foreground text-center">
+                    Choose Your Creative Style
                   </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    Use the input above to get inspired<br />
-                    Share a photo or describe your interests
+                  <p className="text-muted-foreground text-sm text-center leading-relaxed mb-6">
+                    Drag the triangle to blend creative approaches,<br />
+                    then add your prompt above to get personalized ideas
                   </p>
-                </div>
-                
-                {/* Visual hint */}
-                <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
-                  <ArrowUp className="h-4 w-4 animate-bounce text-card-light-blue" />
-                  <span>Start creating</span>
-                  <ArrowUp className="h-4 w-4 animate-bounce text-card-light-blue" style={{ animationDelay: '0.2s' }} />
+                  
+                  {/* Triangle Component */}
+                  <div className="flex justify-center">
+                    <CreativityTriangle 
+                      onWeightsChange={onCreativityChange || (() => {})}
+                      className="max-w-sm"
+                    />
+                  </div>
+                  
+                  {/* Visual hint */}
+                  <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
+                    <ArrowUp className="h-4 w-4 animate-bounce text-card-light-blue" />
+                    <span>Set your style, then add a prompt</span>
+                    <ArrowUp className="h-4 w-4 animate-bounce text-card-light-blue" style={{ animationDelay: '0.2s' }} />
+                  </div>
                 </div>
               </>
             )}

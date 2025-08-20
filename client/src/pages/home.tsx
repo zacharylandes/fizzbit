@@ -138,6 +138,7 @@ export default function HomePage() {
             initialIdeas={currentIdeas} 
             onSwipeUpPrompt={handleSwipeUpPrompt}
             currentPrompt={currentPrompt}
+            onCreativityChange={setCreativityWeights}
           />
         </div>
       )}
