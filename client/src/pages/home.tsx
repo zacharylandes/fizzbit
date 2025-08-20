@@ -2,15 +2,23 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { CardStack } from "@/components/card-stack";
 import { InputSection } from "@/components/input-section";
+import { CreativityTriangle } from "@/components/creativity-triangle";
 import { type Idea } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { type CreativityWeights, getBlendDescription } from "@/lib/blended-prompts";
 
 export default function HomePage() {
   const [currentIdeas, setCurrentIdeas] = useState<Idea[]>([]);
   const [currentPrompt, setCurrentPrompt] = useState<string>("");
   const [shouldAutoGenerate, setShouldAutoGenerate] = useState<boolean>(false);
+  const [creativityWeights, setCreativityWeights] = useState<CreativityWeights>({
+    wild: 0.33,
+    actionable: 0.33,
+    deep: 0.34
+  });
+  const [showTriangle, setShowTriangle] = useState(false);
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
 
@@ -84,7 +92,31 @@ export default function HomePage() {
               Get Inspired
             </h2>
             <p className="text-muted-foreground text-base font-inter">Upload a photo or describe your interests to get personalized creative inspiration.</p>
+            
+            {/* Creativity Blend Status */}
+            <div className="mt-2 flex items-center justify-center gap-2">
+              <span className="text-sm text-muted-foreground">Style:</span>
+              <span className="text-sm font-medium text-foreground">{getBlendDescription(creativityWeights)}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowTriangle(!showTriangle)}
+                className="text-xs px-2 py-1 h-auto"
+              >
+                {showTriangle ? 'Hide' : 'Adjust'}
+              </Button>
+            </div>
           </div>
+          
+          {/* Triangle Slider */}
+          {showTriangle && (
+            <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl border">
+              <CreativityTriangle 
+                onWeightsChange={setCreativityWeights}
+                className="max-w-sm"
+              />
+            </div>
+          )}
           
           {/* Input Section */}
           <div className="mb-2">
@@ -93,6 +125,7 @@ export default function HomePage() {
               promptValue={currentPrompt}
               onPromptChange={handlePromptChange}
               shouldAutoGenerate={shouldAutoGenerate}
+              creativityWeights={creativityWeights}
             />
           </div>
         </div>

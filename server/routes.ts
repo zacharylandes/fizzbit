@@ -76,7 +76,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Generate ideas from text prompt using Hugging Face Llama 3
   app.post("/api/ideas/generate-from-text", asyncHandler(async (req: any, res) => {
-    const { prompt } = req.body;
+    const { prompt, creativityWeights } = req.body;
     const userId = req.user?.claims?.sub; // Get user ID if authenticated
     
     if (!prompt) {
@@ -84,13 +84,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     console.log('📝 Received prompt from client:', prompt);
+    if (creativityWeights) {
+      console.log('🎨 Creativity weights:', creativityWeights);
+    }
 
     try {
       // Pass the original prompt directly to preserve context and maintain relevance
       console.log('🚀 Processing original prompt directly:', prompt);
       
-      // Use OpenAI for reliable idea generation with the original prompt
-      const ideas = await generateIdeasFromText(prompt);
+      // Use OpenAI for reliable idea generation with the original prompt and creativity weights
+      const ideas = await generateIdeasFromText(prompt, creativityWeights);
 
       // Store generated ideas in database with user ID if authenticated
       const createdIdeas = [];
@@ -129,7 +132,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Generate ideas from image using Hugging Face
   app.post("/api/ideas/generate-from-image", asyncHandler(async (req: any, res) => {
-    const { imageBase64 } = req.body;
+    const { imageBase64, creativityWeights } = req.body;
     const userId = req.user?.claims?.sub; // Get user ID if authenticated
     
     if (!imageBase64) {
@@ -138,7 +141,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       // Use Hugging Face for image analysis and idea generation
-      const ideas = await generateIdeasFromImage(imageBase64);
+      const ideas = await generateIdeasFromImage(imageBase64, creativityWeights);
 
       // Store generated ideas
       const createdIdeas = [];

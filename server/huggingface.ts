@@ -1,6 +1,80 @@
 import { HfInference } from '@huggingface/inference';
 import OpenAI from 'openai';
 
+// Function to generate system prompt based on creativity weights
+function generateSystemPrompt(count: number, creativityWeights?: any): string {
+  if (!creativityWeights) {
+    // Default prompt when no weights provided
+    return `Generate ${Math.min(count, 25)} compelling creative ideas. If it's a story/character concept, give plot and dramatic scenarios. If it's visual, give art projects. If it's abstract, give creative exercises. Always make the ideas directly about the user input - be imaginative but clear and actionable.
+
+Format each as:
+1. TITLE: [2-4 intriguing words]
+IDEA: [One clear sentence that directly explores the user input]
+HOOK: [What makes this interesting]
+
+Example for "play about old man from future":
+1. TITLE: Timeline Confusion
+IDEA: The old man's "future memories" start coming true in real time during the performance, confusing both characters and audience about what's scripted
+HOOK: Blurs line between theater and reality`;
+  }
+
+  const { wild = 0.33, actionable = 0.33, deep = 0.34 } = creativityWeights;
+  
+  // Build style guidance based on blend
+  let styleGuide = "";
+  let hookGuide = "";
+  
+  if (wild > 0.6) {
+    styleGuide = "Be experimental, surreal, and boundary-pushing. Break rules and explore the absurd.";
+    hookGuide = "What makes this delightfully strange or rule-breaking";
+  } else if (actionable > 0.6) {
+    styleGuide = "Be practical, immediate, and doable. Focus on quick wins and simple daily practices.";
+    hookGuide = "Why this small action creates momentum or immediate satisfaction";
+  } else if (deep > 0.6) {
+    styleGuide = "Be substantial, meaningful, and project-oriented. Think long-term creative endeavors.";
+    hookGuide = "What makes this worth the sustained effort and what you'll gain";
+  } else {
+    // Blended approach
+    const styles = [];
+    if (wild > 0.2) styles.push(`${Math.round(wild * 100)}% experimental/surreal`);
+    if (actionable > 0.2) styles.push(`${Math.round(actionable * 100)}% practical/immediate`);
+    if (deep > 0.2) styles.push(`${Math.round(deep * 100)}% substantial/long-term`);
+    
+    styleGuide = `Blend these creative approaches: ${styles.join(', ')}. `;
+    hookGuide = "What makes this interesting given the creative blend";
+  }
+  
+  // Time scope based on weights
+  let timeScope = "";
+  if (actionable > 0.4) {
+    timeScope = "Each idea should be startable today or completable in 5-30 minutes. ";
+  } else if (deep > 0.4) {
+    timeScope = "Each idea should be a multi-week or multi-month journey. ";
+  } else if (wild > 0.4) {
+    timeScope = "Focus on imaginative leaps regardless of time commitment. ";
+  } else {
+    timeScope = "Mix time commitments from quick wins to longer projects. ";
+  }
+
+  return `Generate ${Math.min(count, 25)} compelling creative ideas using this creative blend:
+
+STYLE BLEND: ${styleGuide}
+TIME SCOPE: ${timeScope}
+CREATIVE MIX: ${Math.round(wild * 100)}% Wild Inspiration + ${Math.round(actionable * 100)}% Daily Actionable + ${Math.round(deep * 100)}% Deep Projects
+
+Always make the ideas directly about the user input - be imaginative but clear and actionable for the given blend.
+
+Format each as:
+1. TITLE: [2-4 intriguing words]
+IDEA: [One clear sentence that explores the user input through this creative lens]
+HOOK: [${hookGuide}]
+
+Example for "learning piano" with 60% actionable, 30% deep, 10% wild:
+1. TITLE: Daily Chord Victory
+IDEA: Learn one new chord each morning and immediately play a simple song that uses it before breakfast
+HOOK: Builds piano skills through tiny daily wins that create instant musical satisfaction`;
+}
+
 if (!process.env.TOGETHER_API_KEY) {
   throw new Error('TOGETHER_API_KEY is required');
 }
@@ -104,7 +178,7 @@ export async function generateRelatedIdeas(contextualPrompt: string, count: numb
 }
 
 // Together.ai API function for cost-effective idea generation
-async function generateWithTogetherAI(prompt: string, count: number): Promise<IdeaResponse[]> {
+async function generateWithTogetherAI(prompt: string, count: number, creativityWeights?: any): Promise<IdeaResponse[]> {
   try {
     console.log('🚀 Using Together.ai Llama-3.2-3B-Instruct-Turbo for cost-effective generation...');
     
@@ -119,17 +193,7 @@ async function generateWithTogetherAI(prompt: string, count: number): Promise<Id
         messages: [
           {
             role: 'system',
-            content: `Generate ${Math.min(count, 25)} compelling creative ideas. If it's a story/character concept, give plot and dramatic scenarios. If it's visual, give art projects. If it's abstract, give creative exercises. Always make the ideas directly about the user input - be imaginative but clear and actionable.
-
-Format each as:
-1. TITLE: [2-4 intriguing words]
-IDEA: [One clear sentence that directly explores the user input]
-HOOK: [What makes this interesting]
-
-Example for "play about old man from future":
-1. TITLE: Timeline Confusion
-IDEA: The old man's "future memories" start coming true in real time during the performance, confusing both characters and audience about what's scripted
-HOOK: Blurs line between theater and reality`
+            content: generateSystemPrompt(count, creativityWeights)
           },
           {
             role: 'user',
@@ -248,10 +312,10 @@ function parseTogetherAIResponse(text: string, count: number, prompt: string): I
   return ideas;
 }
 
-export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
+export async function generateIdeasFromText(prompt: string, creativityWeights?: any, count: number = 25): Promise<IdeaResponse[]> {
   // PRIMARY: Use Together.ai for cost-effective idea generation
   try {
-    const ideas = await generateWithTogetherAI(prompt, count);
+    const ideas = await generateWithTogetherAI(prompt, count, creativityWeights);
     if (ideas.length > 0) {
       return ideas;
     }
@@ -263,15 +327,7 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
     try {
       console.log('🤖 Using OpenAI GPT-4o-mini as fallback...');
       
-      const systemPrompt = `Generate exactly ${count} compelling creative ideas. If it's a story/character concept, give plot and dramatic scenarios. If it's visual, give art projects. If it's abstract, give creative exercises. Always make the ideas directly about the prompt - be imaginative but clear and actionable.
-
-Format as JSON with "ideas" array containing objects with "title" and "description" fields. Use this structure for each idea:
-
-TITLE: [2-4 intriguing words]
-IDEA: [One clear sentence that directly explores the prompt]
-HOOK: [What makes this interesting]
-
-Example for "play about old man from future": "TITLE: Timeline Confusion / IDEA: The old man's 'future memories' start coming true in real time during the performance, confusing both characters and audience about what's scripted / HOOK: Blurs line between theater and reality"`;
+      const systemPrompt = generateSystemPrompt(count, creativityWeights).replace(/Format each as:\n1\. TITLE:.*$/s, 'Format as JSON with "ideas" array containing objects with "title" and "description" fields.');
       
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
@@ -377,7 +433,7 @@ Example for "play about old man from future": "TITLE: Timeline Confusion / IDEA:
   return ideas;
 }
 
-export async function generateIdeasFromImage(imageBase64: string, count: number = 25): Promise<IdeaResponse[]> {
+export async function generateIdeasFromImage(imageBase64: string, creativityWeights?: any, count: number = 25): Promise<IdeaResponse[]> {
   try {
     let imageDescription = '';
     
@@ -480,7 +536,7 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
       
       // Import and use the text generation function
       const { generateIdeasFromText } = await import('./huggingface');
-      return await generateIdeasFromText(prompt, count);
+      return await generateIdeasFromText(prompt, creativityWeights, count);
     }
 
     // Template fallback when no description available
