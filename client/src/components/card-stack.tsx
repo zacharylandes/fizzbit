@@ -6,16 +6,14 @@ import { queryClient } from "@/lib/queryClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Sparkles, Image, Type, ArrowUp } from "lucide-react";
-import { CreativityTriangle } from "./creativity-triangle";
 
 interface CardStackProps {
   initialIdeas?: Idea[];
   onSwipeUpPrompt?: (ideaContent: string) => void;
   currentPrompt?: string; // Add current prompt to preserve context for chaining
-  onCreativityChange?: (weights: any) => void; // Add creativity weights callback
 }
 
-export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = "", onCreativityChange }: CardStackProps) {
+export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = "" }: CardStackProps) {
   const [cards, setCards] = useState<Idea[]>(initialIdeas);
   const [animatingCards, setAnimatingCards] = useState<{ [key: string]: { direction: string; isAnimating: boolean } }>({});
   const [refreshKey, setRefreshKey] = useState(0);
@@ -485,28 +483,20 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
               </>
             ) : (
               <>
-                {/* Creativity Triangle State */}
+                {/* Empty State */}
                 <div className="space-y-6">
                   <h3 className="text-xl font-semibold text-card-foreground text-center">
-                    Choose Your Creative Style
+                    Ready for Creative Ideas?
                   </h3>
                   <p className="text-muted-foreground text-sm text-center leading-relaxed mb-6">
-                    Drag the triangle to blend creative approaches,<br />
-                    then add your prompt above to get personalized ideas
+                    Add a prompt above to discover ideas from Reddit communities<br />
+                    and get personalized creative inspiration
                   </p>
-                  
-                  {/* Triangle Component */}
-                  <div className="flex justify-center">
-                    <CreativityTriangle 
-                      onWeightsChange={onCreativityChange || (() => {})}
-                      className="max-w-sm"
-                    />
-                  </div>
                   
                   {/* Visual hint */}
                   <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
                     <ArrowUp className="h-4 w-4 animate-bounce text-card-light-blue" />
-                    <span>Set your style, then add a prompt</span>
+                    <span>Add a prompt to get started</span>
                     <ArrowUp className="h-4 w-4 animate-bounce text-card-light-blue" style={{ animationDelay: '0.2s' }} />
                   </div>
                 </div>

@@ -6,22 +6,19 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { type Idea } from "@shared/schema";
-import { type CreativityWeights } from "@/lib/blended-prompts";
 
 interface InputSectionProps {
   onIdeasGenerated: (ideas: Idea[]) => void;
   promptValue?: string;
   onPromptChange?: (prompt: string) => void;
   shouldAutoGenerate?: boolean;
-  creativityWeights?: CreativityWeights;
 }
 
 export function InputSection({ 
   onIdeasGenerated, 
   promptValue = "", 
   onPromptChange, 
-  shouldAutoGenerate = false,
-  creativityWeights = { wild: 0.33, actionable: 0.33, deep: 0.34 }
+  shouldAutoGenerate = false
 }: InputSectionProps) {
   const [showTextInput, setShowTextInput] = useState(false);
   const [textPrompt, setTextPrompt] = useState(promptValue);
@@ -40,8 +37,7 @@ export function InputSection({
   const generateFromTextMutation = useMutation({
     mutationFn: async (prompt: string) => {
       const response = await apiRequest("POST", "/api/ideas/generate-from-text", {
-        prompt,
-        creativityWeights,
+        prompt
       });
       return response.json();
     },
@@ -77,8 +73,7 @@ export function InputSection({
   const generateFromImageMutation = useMutation({
     mutationFn: async (imageBase64: string) => {
       const response = await apiRequest("POST", "/api/ideas/generate-from-image", {
-        imageBase64,
-        creativityWeights,
+        imageBase64
       });
       return response.json();
     },

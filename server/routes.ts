@@ -4,18 +4,13 @@ import { storage } from "./storage";
 import { insertIdeaSchema } from "@shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { generateIdeasFromText, generateIdeasFromImage, generateRelatedIdeas } from "./huggingface";
-import { HfInference } from '@huggingface/inference';
 import multer from "multer";
 import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
 
-// Initialize Hugging Face client for free AI models
-const hf = new HfInference(process.env.HUGGINGFACE_TOKEN);
-
-if (!process.env.HUGGINGFACE_TOKEN) {
-  console.warn("Warning: HUGGINGFACE_TOKEN not found - AI features will use fallback responses");
-}
+// Reddit API integration for community-sourced creative content
+// No API keys required for Reddit's public JSON endpoints
 
 // Function to convert audio to WAV format using FFmpeg
 const convertAudioToWav = (inputPath: string, outputPath: string): Promise<void> => {
@@ -74,9 +69,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       Promise.resolve(fn(req, res, next)).catch(next);
     };
   
-  // Generate ideas from text prompt using Hugging Face Llama 3
+  // Generate ideas from text prompt using Reddit community content
   app.post("/api/ideas/generate-from-text", asyncHandler(async (req: any, res) => {
-    const { prompt, creativityWeights } = req.body;
+    const { prompt } = req.body;
     const userId = req.user?.claims?.sub; // Get user ID if authenticated
     
     if (!prompt) {
@@ -84,16 +79,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     console.log('📝 Received prompt from client:', prompt);
-    if (creativityWeights) {
-      console.log('🎨 Creativity weights:', creativityWeights);
-    }
 
     try {
       // Pass the original prompt directly to preserve context and maintain relevance
       console.log('🚀 Processing original prompt directly:', prompt);
       
-      // Use OpenAI for reliable idea generation with the original prompt and creativity weights
-      const ideas = await generateIdeasFromText(prompt, creativityWeights);
+      // Use Reddit for community-sourced creative ideas
+      const ideas = await generateIdeasFromText(prompt);
 
       // Store generated ideas in database with user ID if authenticated
       const createdIdeas = [];
@@ -130,9 +122,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }));
 
-  // Generate ideas from image using Hugging Face
+  // Generate ideas from image using Reddit community content
   app.post("/api/ideas/generate-from-image", asyncHandler(async (req: any, res) => {
-    const { imageBase64, creativityWeights } = req.body;
+    const { imageBase64 } = req.body;
     const userId = req.user?.claims?.sub; // Get user ID if authenticated
     
     if (!imageBase64) {
@@ -140,8 +132,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      // Use Hugging Face for image analysis and idea generation
-      const ideas = await generateIdeasFromImage(imageBase64, creativityWeights);
+      // Use Reddit for visual inspiration and creative ideas
+      const ideas = await generateIdeasFromImage(imageBase64);
 
       // Store generated ideas
       const createdIdeas = [];
