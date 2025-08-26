@@ -174,18 +174,20 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
   // Smart prefetch more ideas from the same prompt/context
   const prefetchMoreIdeasMutation = useMutation({
     mutationFn: async () => {
-      if (!currentExploreContext?.originalPrompt) {
+      const activePrompt = currentExploreContext?.originalPrompt || currentPrompt;
+      
+      if (!activePrompt) {
         console.log('❌ No context for prefetch');
         return { ideas: [] };
       }
 
-      console.log('🔄 Prefetching from prompt:', currentExploreContext.originalPrompt);
+      console.log('🔄 Prefetching from prompt:', activePrompt);
 
       // Always use the EXACT original prompt to maintain context and relevance
-      console.log('🎯 Generating more ideas using original prompt context:', currentExploreContext.originalPrompt);
+      console.log('🎯 Generating more ideas using original prompt context:', activePrompt);
       
       const response = await apiRequest("POST", "/api/ideas/generate-from-text", {
-        prompt: currentExploreContext.originalPrompt
+        prompt: activePrompt
       });
       return response.json();
     },
@@ -260,12 +262,13 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
       console.log('🔄 EMERGENCY PREFETCH for current prompt:', currentExploreContext.originalPrompt);
       prefetchMoreIdeasMutation.mutate();
     }
-    // ULTIMATE fallback - if we somehow have no cards and no context, trigger emergency generation
+    // ULTIMATE fallback - if we somehow have no cards and no context, use current prompt or emergency fallback
     else if (cards.length === 0 && !currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
       console.log('🚨 ULTIMATE FALLBACK - Generating emergency ideas');
-      // Create temporary context to generate fresh ideas
+      // Use currentPrompt if available, otherwise create temporary context
+      const fallbackPrompt = currentPrompt || "creative inspiration and unusual ideas";
       setCurrentExploreContext({
-        originalPrompt: "creative inspiration and unusual ideas",
+        originalPrompt: fallbackPrompt,
         exploredIdea: null as any
       });
       prefetchMoreIdeasMutation.mutate();
