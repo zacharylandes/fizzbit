@@ -57,23 +57,33 @@ const CREATIVE_SUBREDDITS = [
 // Helper function to search Reddit and extract creative content
 async function searchRedditForContent(query: string, subreddit: string = 'all', limit: number = 25): Promise<RedditPost[]> {
   try {
-    // Use Reddit's public JSON API endpoint
-    const searchUrl = `https://www.reddit.com/r/${subreddit}/search.json?q=${encodeURIComponent(query)}&limit=${limit}&sort=top&t=month`;
+    // Add delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Use Reddit's public JSON API endpoint with better headers
+    const searchUrl = `https://www.reddit.com/r/${subreddit}/search.json?q=${encodeURIComponent(query)}&limit=${limit}&sort=top&t=month&restrict_sr=1`;
     
     const response = await fetch(searchUrl, {
       headers: {
-        'User-Agent': 'SWIVL-CreativeApp/1.0 (by /u/creativeideas)'
+        'User-Agent': 'Mozilla/5.0 (compatible; SWIVL-CreativeApp/1.0; +https://swivl.app)',
+        'Accept': 'application/json',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1'
       }
     });
     
     if (!response.ok) {
-      throw new Error(`Reddit API error: ${response.status}`);
+      console.warn(`Reddit search failed for "${query}" in r/${subreddit}: ${response.status}`);
+      return [];
     }
     
     const data: RedditResponse = await response.json();
     return data.data.children.map(child => child.data);
   } catch (error) {
-    console.error(`Error searching Reddit for "${query}" in r/${subreddit}:`, error);
+    console.warn(`Error searching Reddit for "${query}" in r/${subreddit}:`, error);
     return [];
   }
 }
@@ -81,22 +91,32 @@ async function searchRedditForContent(query: string, subreddit: string = 'all', 
 // Helper function to get hot posts from a specific subreddit
 async function getHotPostsFromSubreddit(subreddit: string, limit: number = 25): Promise<RedditPost[]> {
   try {
+    // Add delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 150));
+    
     const url = `https://www.reddit.com/r/${subreddit}/hot.json?limit=${limit}`;
     
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'SWIVL-CreativeApp/1.0 (by /u/creativeideas)'
+        'User-Agent': 'Mozilla/5.0 (compatible; SWIVL-CreativeApp/1.0; +https://swivl.app)',
+        'Accept': 'application/json',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1'
       }
     });
     
     if (!response.ok) {
-      throw new Error(`Reddit API error: ${response.status}`);
+      console.warn(`Reddit hot posts failed for r/${subreddit}: ${response.status}`);
+      return [];
     }
     
     const data: RedditResponse = await response.json();
     return data.data.children.map(child => child.data);
   } catch (error) {
-    console.error(`Error getting hot posts from r/${subreddit}:`, error);
+    console.warn(`Error getting hot posts from r/${subreddit}:`, error);
     return [];
   }
 }
@@ -133,50 +153,61 @@ export async function generateRelatedIdeas(contextualPrompt: string, count: numb
   }
 }
 
-// Reddit-based idea generation function
+// Reddit-based idea generation function with improved error handling
 async function generateWithReddit(prompt: string, count: number): Promise<IdeaResponse[]> {
   try {
     console.log('🔍 Searching Reddit communities for inspiration...');
     
     // Extract keywords from user prompt
     const keywords = extractKeywords(prompt);
-    const searchQuery = keywords.slice(0, 3).join(' ');
+    const searchQuery = keywords.slice(0, 2).join(' '); // Use fewer keywords for broader results
     
-    // Search across different types of creative subreddits
-    const searchPromises = CREATIVE_SUBREDDITS.slice(0, 8).map(async (subreddit) => {
-      const posts = await searchRedditForContent(searchQuery, subreddit, 5);
-      return posts;
-    });
+    console.log(`🔍 Using search query: "${searchQuery}"`);
     
-    // Also get some hot posts from idea-focused subreddits
-    const hotPostsPromises = ['CrazyIdeas', 'Showerthoughts', 'LifeProTips'].map(async (subreddit) => {
-      const posts = await getHotPostsFromSubreddit(subreddit, 10);
-      return posts;
-    });
-    
-    const [searchResults, hotPostsResults] = await Promise.all([
-      Promise.all(searchPromises),
-      Promise.all(hotPostsPromises)
-    ]);
-    
-    // Combine all results
+    // Try a more focused approach - search fewer subreddits sequentially to avoid rate limits
+    const prioritySubreddits = ['CrazyIdeas', 'Showerthoughts', 'LifeProTips', 'AskReddit'];
     let allPosts: RedditPost[] = [];
-    searchResults.forEach(posts => allPosts = allPosts.concat(posts));
-    hotPostsResults.forEach(posts => allPosts = allPosts.concat(posts));
     
-    console.log(`🔍 Found ${allPosts.length} Reddit posts, converting to ideas...`);
+    // Search one subreddit at a time to avoid overwhelming Reddit
+    for (const subreddit of prioritySubreddits) {
+      console.log(`🔍 Searching r/${subreddit}...`);
+      const posts = await searchRedditForContent(searchQuery, subreddit, 8);
+      allPosts = allPosts.concat(posts);
+      
+      // If we have enough posts, stop searching
+      if (allPosts.length >= count) {
+        break;
+      }
+    }
+    
+    // If search didn't yield enough results, try getting hot posts
+    if (allPosts.length < count / 2) {
+      console.log('🔍 Supplementing with hot posts...');
+      for (const subreddit of prioritySubreddits.slice(0, 2)) {
+        const hotPosts = await getHotPostsFromSubreddit(subreddit, 10);
+        allPosts = allPosts.concat(hotPosts);
+        
+        if (allPosts.length >= count) {
+          break;
+        }
+      }
+    }
+    
+    console.log(`🔍 Found ${allPosts.length} Reddit posts total`);
     
     // Convert Reddit posts to formatted ideas
-    const ideas = convertRedditPostsToIdeas(allPosts, prompt, count);
-    
-    if (ideas.length > 0) {
-      console.log(`✅ Successfully generated ${ideas.length} ideas from Reddit content`);
-      return ideas;
+    if (allPosts.length > 0) {
+      const ideas = convertRedditPostsToIdeas(allPosts, prompt, count);
+      
+      if (ideas.length > 0) {
+        console.log(`✅ Successfully generated ${ideas.length} ideas from Reddit content`);
+        return ideas;
+      }
     }
     
     throw new Error('No suitable Reddit content found for idea generation');
   } catch (error) {
-    console.error('Reddit idea generation failed:', (error as Error).message);
+    console.warn('Reddit idea generation failed:', (error as Error).message);
     throw error;
   }
 }
