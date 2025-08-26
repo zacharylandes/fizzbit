@@ -136,12 +136,28 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
       const parsed = JSON.parse(jsonMatch[0]);
       const ideas = Array.isArray(parsed) ? parsed : (parsed.ideas || [parsed]);
       
-      return ideas.slice(0, count).map((idea: any, index: number) => ({
-        id: `ai-${Date.now()}-${index}`,
-        title: idea.title || `Creative Idea ${index + 1}`,
-        description: idea.description || idea.idea || String(idea),
-        sourceContent: originalPrompt
-      }));
+      return ideas.slice(0, count).map((idea: any, index: number) => {
+        // Handle different response formats
+        let title = idea.title || `Creative Idea ${index + 1}`;
+        let description = idea.description || idea.idea || idea.content;
+        
+        // If description is still an object, try to extract meaningful text
+        if (typeof description === 'object' && description !== null) {
+          description = description.description || description.content || description.text || JSON.stringify(description);
+        }
+        
+        // If description is still not a string, use a fallback
+        if (typeof description !== 'string') {
+          description = `Creative concept related to ${originalPrompt}`;
+        }
+        
+        return {
+          id: `ai-${Date.now()}-${index}`,
+          title: String(title),
+          description: String(description),
+          sourceContent: originalPrompt
+        };
+      });
     }
   } catch (e) {
     console.log('JSON parsing failed, using text parsing...');
