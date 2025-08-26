@@ -132,16 +132,16 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-card-sage-bg via-card-light-blue-bg to-card-lavender-bg text-foreground flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className="min-h-screen bg-white text-foreground flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Header */}
-      <div className="border-b border-border bg-white/70 backdrop-blur-sm shadow-sm">
+      <div className="border-b border-border bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* SWIVL Brand */}
             <Link href="/">
               <div className="flex items-center space-x-3 cursor-pointer hover-lift transition-all duration-300">
-                <div className="p-2 bg-primary/10 border border-primary/20 rounded-lg card-shadow">
-                  <img src={logoImage} alt="SWIVL Logo" className="h-6 w-6 object-contain" />
+                <div className="p-3 bg-card-light-blue-bg border border-card-light-blue/40 rounded-lg card-shadow">
+                  <img src={logoImage} alt="SWIVL Logo" className="h-8 w-8 object-contain" style={{ filter: 'hue-rotate(200deg) saturate(1.5) brightness(0.7)' }} />
                 </div>
                 <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
                   SWIVL

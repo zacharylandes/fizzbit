@@ -5,14 +5,14 @@ import logoImage from "@/assets/logo.png";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-card-sage-bg via-card-light-blue-bg to-card-lavender-bg text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
+    <div className="min-h-screen bg-white text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
       {/* Hero Section */}
       <div className="relative">
         {/* Navigation */}
         <nav className="flex items-center justify-between p-6 max-w-7xl mx-auto">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-primary/10 border border-primary/20 rounded-lg shadow-sm">
-              <img src={logoImage} alt="SWIVL Logo" className="h-6 w-6 object-contain" />
+            <div className="p-3 bg-card-light-blue-bg border border-card-light-blue/40 rounded-lg card-shadow">
+              <img src={logoImage} alt="SWIVL Logo" className="h-8 w-8 object-contain" style={{ filter: 'hue-rotate(200deg) saturate(1.5) brightness(0.7)' }} />
             </div>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
               SWIVL
