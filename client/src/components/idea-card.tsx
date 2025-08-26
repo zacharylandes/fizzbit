@@ -65,6 +65,8 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
                 <strong className={`block mt-3 mb-2 ${index === 0 ? 'mt-0' : ''} ${accentColor}`}>
                   {line.replace(/\*\*/g, '')}
                 </strong>
+              ) : line.startsWith('• ') ? (
+                <div className="mb-1 ml-2">{line}</div>
               ) : line.trim() ? (
                 <div className="mb-1">{line}</div>
               ) : (
