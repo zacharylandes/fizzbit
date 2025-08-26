@@ -223,46 +223,67 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
   // Enhanced fallback to text parsing
   console.log('Text parsing fallback - cleaning response...');
   
-  // Clean the response of JSON artifacts and broken formatting
-  let cleanedResponse = response
-    .replace(/[{}[\]]/g, ' ') // Remove JSON brackets
-    .replace(/"title":|"description":|"id":/g, '') // Remove JSON keys
-    .replace(/^\s*[",]\s*/gm, '') // Remove leading quotes and commas
-    .replace(/\s*[",]\s*$/gm, '') // Remove trailing quotes and commas
-    .replace(/\*\*\s*$/gm, '') // Remove hanging bold markers
-    .replace(/^\s*\*\*\s*/gm, '**') // Clean up bold formatting
-    .split('\n')
+  // Split response into meaningful segments
+  const segments = response
+    .replace(/[{}[\]]/g, '') // Remove JSON brackets
+    .replace(/"title":|"description":/g, '') // Remove JSON keys  
+    .replace(/^\s*[",]+\s*/gm, '') // Remove leading quotes/commas
+    .replace(/\s*[",]+\s*$/gm, '') // Remove trailing quotes/commas
+    .split(/\n+/) // Split on line breaks
+    .map(line => line.trim())
     .filter(line => {
-      const trimmed = line.trim();
-      // Skip empty lines, JSON fragments, and broken formatting
-      return trimmed.length > 5 && 
-             !trimmed.match(/^[",{\[\]}]*$/) && 
-             !trimmed.includes('Creative concept:') &&
-             !trimmed.includes('Action steps:') &&
-             !trimmed.startsWith('•') &&
-             !trimmed.match(/^\*\*\s*$/) &&
-             trimmed.length < 200; // Skip overly long lines
+      // Keep lines that look like creative content
+      return line.length > 15 && 
+             !line.match(/^[",{\[\]}]*$/) && 
+             !line.includes('JSON') &&
+             !line.includes('array') &&
+             line.split(' ').length > 2; // Must have at least 3 words
     });
 
   const ideas: IdeaResponse[] = [];
   
-  // Generate ideas from cleaned lines
-  for (let i = 0; i < cleanedResponse.length && ideas.length < Math.min(count, 10); i++) {
-    const line = cleanedResponse[i].trim();
+  // Extract multiple ideas from segments
+  for (let i = 0; i < segments.length && ideas.length < count; i++) {
+    const segment = segments[i];
     
-    if (line.length > 10) {
-      // Extract a reasonable title from the line
-      let title = line.split('.')[0] || line.split(':')[0] || line.substring(0, 30);
-      title = title.replace(/^\*\*|\*\*$/g, '').trim(); // Remove bold markers
-      if (title.length < 3) title = `Creative Idea ${ideas.length + 1}`;
-      
-      // Create a simple description
-      const description = `**Creative concept:**\n• ${line.replace(/^\*\*|\*\*$/g, '').trim()}\n\n**Action steps:**\n• Start experimenting with this concept\n• Develop it further based on your interests`;
-      
+    // Look for title patterns
+    const titlePatterns = [
+      /^(.+?):/, // Title: Description pattern
+      /^(\d+\.\s*)?(.+?)\s*[-–]\s*/, // Numbered or dashed pattern
+      /^(.+?)\s*\|\s*/, // Title | Description pattern
+      /^(.{10,40}?)\./, // First sentence as title
+    ];
+    
+    let title = '';
+    let description = segment;
+    
+    // Try to extract title using patterns
+    for (const pattern of titlePatterns) {
+      const match = segment.match(pattern);
+      if (match) {
+        title = (match[2] || match[1]).trim();
+        description = segment.replace(pattern, '').trim();
+        break;
+      }
+    }
+    
+    // Fallback title generation
+    if (!title || title.length < 3) {
+      title = segment.split(' ').slice(0, 4).join(' ') || `Creative Idea ${ideas.length + 1}`;
+    }
+    
+    // Clean up title and description
+    title = title.replace(/[^\w\s-]/g, '').trim().substring(0, 50);
+    description = description || segment;
+    
+    // Format as structured description
+    const formattedDescription = `**Creative concept:**\n• ${description.substring(0, 150)}\n\n**Action steps:**\n• Start developing this concept\n• Explore variations and possibilities`;
+    
+    if (title.length > 2 && description.length > 10) {
       ideas.push({
         id: `ai-${Date.now()}-${ideas.length}`,
-        title: title.substring(0, 50), // Limit title length
-        description: description,
+        title: title,
+        description: formattedDescription,
         sourceContent: originalPrompt
       });
     }
