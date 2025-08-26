@@ -4,6 +4,7 @@ import { Home, Bookmark, Settings, History, LogOut, LogIn } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
+import logoImage from "@/assets/logo.png";
 
 interface LayoutProps {
   children: ReactNode;
@@ -131,26 +132,16 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className="min-h-screen bg-gradient-to-br from-card-sage-bg via-card-light-blue-bg to-card-lavender-bg text-foreground flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Header */}
-      <div className="border-b border-border bg-card/50 backdrop-blur-sm">
+      <div className="border-b border-border bg-white/70 backdrop-blur-sm shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* SWIVL Brand */}
             <Link href="/">
               <div className="flex items-center space-x-3 cursor-pointer hover-lift transition-all duration-300">
-                <div className="p-2 bg-card-light-blue-bg border border-card-light-blue/40 rounded-lg card-shadow">
-                  <svg className="h-6 w-6" viewBox="0 0 100 100" fill="none">
-                    {/* Concentric circle arcs starting from bottom */}
-                    <path d="M 3 50 A 47 47 0 0 1 97 50" stroke="#1e293b" strokeWidth="1.5" fill="none"/>
-                    <path d="M 8 50 A 42 42 0 0 1 92 50" stroke="#334155" strokeWidth="1.5" fill="none"/>
-                    <path d="M 13 50 A 37 37 0 0 1 87 50" stroke="#475569" strokeWidth="1.5" fill="none"/>
-                    <path d="M 18 50 A 32 32 0 0 1 82 50" stroke="#64748b" strokeWidth="1.5" fill="none"/>
-                    <path d="M 23 50 A 27 27 0 0 1 77 50" stroke="#64748b" strokeWidth="1.5" fill="none"/>
-                    <path d="M 28 50 A 22 22 0 0 1 72 50" stroke="#64748b" strokeWidth="1.2" fill="none"/>
-                    <path d="M 33 50 A 17 17 0 0 1 67 50" stroke="#64748b" strokeWidth="1" fill="none"/>
-                    <circle cx="50" cy="50" r="2" fill="#1e293b"/>
-                  </svg>
+                <div className="p-2 bg-primary/10 border border-primary/20 rounded-lg card-shadow">
+                  <img src={logoImage} alt="SWIVL Logo" className="h-6 w-6 object-contain" />
                 </div>
                 <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
                   SWIVL

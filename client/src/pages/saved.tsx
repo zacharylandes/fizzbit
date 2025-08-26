@@ -763,7 +763,7 @@ export default function SavedPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-card-sage-bg via-card-light-blue-bg to-card-lavender-bg flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           <p className="text-muted-foreground">Loading...</p>
@@ -887,7 +887,7 @@ export default function SavedPage() {
     : savedIdeas;
 
   return (
-    <div className="min-h-screen bg-background" data-keyboard-open={isKeyboardOpen}>
+    <div className="min-h-screen bg-gradient-to-br from-card-sage-bg via-card-light-blue-bg to-card-lavender-bg" data-keyboard-open={isKeyboardOpen}>
       {/* Mobile Overlay */}
       {isMobile && sidebarExpanded && (
         <div 

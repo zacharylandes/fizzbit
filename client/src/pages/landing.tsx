@@ -1,27 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, Image, ArrowRight, Heart, Eye } from "lucide-react";
+import logoImage from "@/assets/logo.png";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
+    <div className="min-h-screen bg-gradient-to-br from-card-sage-bg via-card-light-blue-bg to-card-lavender-bg text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
       {/* Hero Section */}
       <div className="relative">
         {/* Navigation */}
         <nav className="flex items-center justify-between p-6 max-w-7xl mx-auto">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-card-light-blue-bg rounded-lg shadow-sm">
-              <svg className="h-6 w-6" viewBox="0 0 100 100" fill="none">
-                {/* Concentric circle arcs starting from bottom */}
-                <path d="M 3 50 A 47 47 0 0 1 97 50" stroke="#1e293b" strokeWidth="1.5" fill="none"/>
-                <path d="M 8 50 A 42 42 0 0 1 92 50" stroke="#334155" strokeWidth="1.5" fill="none"/>
-                <path d="M 13 50 A 37 37 0 0 1 87 50" stroke="#475569" strokeWidth="1.5" fill="none"/>
-                <path d="M 18 50 A 32 32 0 0 1 82 50" stroke="#64748b" strokeWidth="1.5" fill="none"/>
-                <path d="M 23 50 A 27 27 0 0 1 77 50" stroke="#64748b" strokeWidth="1.5" fill="none"/>
-                <path d="M 28 50 A 22 22 0 0 1 72 50" stroke="#64748b" strokeWidth="1.2" fill="none"/>
-                <path d="M 33 50 A 17 17 0 0 1 67 50" stroke="#64748b" strokeWidth="1" fill="none"/>
-                <circle cx="50" cy="50" r="2" fill="#1e293b"/>
-              </svg>
+            <div className="p-2 bg-primary/10 border border-primary/20 rounded-lg shadow-sm">
+              <img src={logoImage} alt="SWIVL Logo" className="h-6 w-6 object-contain" />
             </div>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
               SWIVL
