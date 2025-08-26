@@ -339,18 +339,13 @@ function generateTemplateFallback(prompt: string, count: number): IdeaResponse[]
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
-  const systemPrompt = `You are a creative AI that generates personalized, actionable creative ideas. Generate exactly ${count} unique creative ideas based on the user's prompt. Keep responses concise and well-structured.
-
-Each idea should be:
-1. Directly related to their specific prompt/interest
-2. Contextually appropriate (plots for stories, art projects for visuals, exercises for abstract concepts)  
-3. Actionable and specific, not generic
+  const systemPrompt = `Generate ${count} unique creative project ideas. Be concise and actionable.
 
 Respond with a JSON array of objects, each with:
-- "title": A catchy 3-5 word title
-- "description": Format as vertical bullet list: "**Based on your uploaded image:**\n• [concept point]\n• [concept point]\n• [concept point]\n\n**Next steps:**\n• [action step]\n• [action step]\n• [action step]"
+- "title": A catchy 3-4 word title
+- "description": Format as: "**Creative concept:**\n• [brief concept]\n• [unique angle]\n\n**Action steps:**\n• [first step]\n• [next step]"
 
-Keep descriptions concise - maximum 6 bullet points total. Use proper line breaks (\n) for clean vertical formatting.`;
+Keep each description under 4 bullet points total. Be creative and specific, not descriptive.`;
 
   // PRIMARY: Try Together.ai Llama
   try {
@@ -455,7 +450,7 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
   }
   
   // Generate ideas based on image description
-  const enhancedPrompt = `Based on this visual content: ${imageDescription}. Generate concise creative project ideas inspired by the visual elements, themes, colors, and mood. Keep responses short and structured with bullet points.`;
+  const enhancedPrompt = `Generate creative project ideas inspired by: ${imageDescription.split('.')[0]}. Focus on actionable creative concepts, not descriptions.`;
   
   const ideas = await generateIdeasFromText(enhancedPrompt, count);
   
@@ -472,7 +467,7 @@ export async function generateRelatedIdeas(contextualPrompt: string, count: numb
   
   const systemPrompt = `Generate ${count} concise creative ideas that build upon or relate to the given context. Each idea should feel like a natural extension or creative variation of the original concept.
 
-Format descriptions as vertical bullet lists with bold headers: "**Based on your uploaded image:**\n• [concept]\n• [concept]\n\n**Next steps:**\n• [action]\n• [action]"
+Format as: "**Creative concept:**\n• [brief concept]\n• [unique angle]\n\n**Action steps:**\n• [first step]\n• [next step]"
 
 Respond with JSON array of objects with "title" and "description" fields.`;
 
