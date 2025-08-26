@@ -126,11 +126,15 @@ async function analyzeImageWithOpenAI(imageBase64: string) {
 // Parse AI response to extract ideas
 function parseIdeasFromResponse(response: string, originalPrompt: string, count: number): IdeaResponse[] {
   try {
-    // Try to parse as JSON first
-    const jsonMatch = response.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+    // Try to parse as JSON first - handle various JSON formats
+    let jsonMatch = response.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) {
+      jsonMatch = response.match(/\{[\s\S]*\}/);
+    }
+    
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);
-      const ideas = Array.isArray(parsed) ? parsed : (parsed.ideas || []);
+      const ideas = Array.isArray(parsed) ? parsed : (parsed.ideas || [parsed]);
       
       return ideas.slice(0, count).map((idea: any, index: number) => ({
         id: `ai-${Date.now()}-${index}`,
@@ -143,13 +147,19 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
     console.log('JSON parsing failed, using text parsing...');
   }
   
-  // Fallback to text parsing
+  // Enhanced fallback to text parsing
   const lines = response.split('\n').filter(line => line.trim());
   const ideas: IdeaResponse[] = [];
   
   for (let i = 0; i < lines.length && ideas.length < count; i++) {
     const line = lines[i].trim();
-    if (line.length > 10) {
+    
+    // Skip JSON syntax fragments
+    if (line.includes('"title"') || line.includes('"description"') || line === '{' || line === '}' || line === '[' || line === ']') {
+      continue;
+    }
+    
+    if (line.length > 10 && !line.startsWith('"') && !line.endsWith(',')) {
       // Try to extract title and description
       const titleMatch = line.match(/^(\d+\.\s*)?([^:]+):\s*(.+)$/);
       if (titleMatch) {
@@ -164,7 +174,7 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
         ideas.push({
           id: `ai-${Date.now()}-${ideas.length}`,
           title: `Creative Concept ${ideas.length + 1}`,
-          description: line,
+          description: line.replace(/^["']|["']$/g, '').trim(),
           sourceContent: originalPrompt
         });
       }
