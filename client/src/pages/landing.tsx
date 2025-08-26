@@ -12,17 +12,17 @@ export default function LandingPage() {
         <nav className="flex items-center justify-between p-6 max-w-7xl mx-auto">
           <div className="flex items-center space-x-3">
             <svg className="h-12 w-12" viewBox="0 0 400 400" fill="none">
-              <path d="M 40 200 A 160 160 0 0 1 360 200" stroke="hsl(210, 30%, 40%)" strokeWidth="6" fill="none"/>
-              <path d="M 55 200 A 145 145 0 0 1 345 200" stroke="hsl(210, 30%, 40%)" strokeWidth="5" fill="none"/>
-              <path d="M 70 200 A 130 130 0 0 1 330 200" stroke="hsl(210, 30%, 40%)" strokeWidth="4.5" fill="none"/>
-              <path d="M 85 200 A 115 115 0 0 1 315 200" stroke="hsl(210, 30%, 40%)" strokeWidth="4" fill="none"/>
-              <path d="M 100 200 A 100 100 0 0 1 300 200" stroke="hsl(210, 30%, 40%)" strokeWidth="3.5" fill="none"/>
-              <path d="M 115 200 A 85 85 0 0 1 285 200" stroke="hsl(210, 30%, 40%)" strokeWidth="3" fill="none"/>
-              <path d="M 130 200 A 70 70 0 0 1 270 200" stroke="hsl(210, 30%, 40%)" strokeWidth="2.5" fill="none"/>
-              <path d="M 145 200 A 55 55 0 0 1 255 200" stroke="hsl(210, 30%, 40%)" strokeWidth="2" fill="none"/>
-              <path d="M 160 200 A 40 40 0 0 1 240 200" stroke="hsl(210, 30%, 40%)" strokeWidth="1.5" fill="none"/>
-              <path d="M 175 200 A 25 25 0 0 1 225 200" stroke="hsl(210, 30%, 40%)" strokeWidth="1" fill="none"/>
-              <circle cx="200" cy="200" r="8" fill="hsl(210, 30%, 40%)"/>
+              <circle cx="200" cy="200" r="190" stroke="hsl(210, 30%, 40%)" strokeWidth="3" fill="none"/>
+              <circle cx="200" cy="200" r="170" stroke="hsl(210, 30%, 40%)" strokeWidth="2.5" fill="none"/>
+              <circle cx="200" cy="200" r="150" stroke="hsl(210, 30%, 40%)" strokeWidth="2.5" fill="none"/>
+              <circle cx="200" cy="200" r="130" stroke="hsl(210, 30%, 40%)" strokeWidth="2" fill="none"/>
+              <circle cx="200" cy="200" r="110" stroke="hsl(210, 30%, 40%)" strokeWidth="2" fill="none"/>
+              <circle cx="200" cy="200" r="90" stroke="hsl(210, 30%, 40%)" strokeWidth="2" fill="none"/>
+              <circle cx="200" cy="200" r="70" stroke="hsl(210, 30%, 40%)" strokeWidth="1.5" fill="none"/>
+              <circle cx="200" cy="200" r="50" stroke="hsl(210, 30%, 40%)" strokeWidth="1.5" fill="none"/>
+              <circle cx="200" cy="200" r="30" stroke="hsl(210, 30%, 40%)" strokeWidth="1.5" fill="none"/>
+              <circle cx="200" cy="200" r="15" stroke="hsl(210, 30%, 40%)" strokeWidth="1" fill="none"/>
+              <circle cx="200" cy="200" r="5" fill="hsl(210, 30%, 40%)"/>
             </svg>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
               SWIVL

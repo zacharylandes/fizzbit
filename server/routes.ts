@@ -4,13 +4,13 @@ import { storage } from "./storage";
 import { insertIdeaSchema } from "@shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { generateIdeasFromText, generateIdeasFromImage, generateRelatedIdeas } from "./huggingface";
+import { HfInference } from "@huggingface/inference";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
 
-// Reddit API integration for community-sourced creative content
-// No API keys required for Reddit's public JSON endpoints
+// AI-powered creative idea generation using Together.ai, Hugging Face, and OpenAI
 
 // Function to convert audio to WAV format using FFmpeg
 const convertAudioToWav = (inputPath: string, outputPath: string): Promise<void> => {
@@ -69,7 +69,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       Promise.resolve(fn(req, res, next)).catch(next);
     };
   
-  // Generate ideas from text prompt using Reddit community content
+  // Generate ideas from text prompt using AI models
   app.post("/api/ideas/generate-from-text", asyncHandler(async (req: any, res) => {
     const { prompt } = req.body;
     const userId = req.user?.claims?.sub; // Get user ID if authenticated
@@ -84,7 +84,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Pass the original prompt directly to preserve context and maintain relevance
       console.log('🚀 Processing original prompt directly:', prompt);
       
-      // Use Reddit for community-sourced creative ideas
+      // Use AI models for personalized creative ideas
       const ideas = await generateIdeasFromText(prompt);
 
       // Store generated ideas in database with user ID if authenticated
@@ -122,7 +122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }));
 
-  // Generate ideas from image using Reddit community content
+  // Generate ideas from image using AI vision analysis
   app.post("/api/ideas/generate-from-image", asyncHandler(async (req: any, res) => {
     const { imageBase64 } = req.body;
     const userId = req.user?.claims?.sub; // Get user ID if authenticated
@@ -132,7 +132,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      // Use Reddit for visual inspiration and creative ideas
+      // Use AI vision models for visual analysis and creative ideas
       const ideas = await generateIdeasFromImage(imageBase64);
 
       // Store generated ideas
@@ -285,6 +285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const audioBuffer = fs.readFileSync(wavPath);
         
         // Try multiple Hugging Face speech-to-text models
+        const hf = new HfInference(process.env.HUGGINGFACE_TOKEN);
         let transcriptionResult;
         const speechModels = [
           'facebook/wav2vec2-base-960h',
@@ -513,7 +514,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       contextualPrompt += ` Respond with JSON containing an array of ideas, each with 'title' and 'description' fields.`;
 
       // Use gpt-4o-mini for faster response times in explore/swipe up actions
-      // Use Hugging Face for reliable related idea generation
+      // Use AI models for reliable related idea generation
       const relatedIdeas = await generateRelatedIdeas(contextualPrompt, 3);
       
       if (relatedIdeas.length > 0) {
