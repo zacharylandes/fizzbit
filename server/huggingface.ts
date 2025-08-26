@@ -221,36 +221,50 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
   }
   
   // Enhanced fallback to text parsing
-  const lines = response.split('\n').filter(line => line.trim());
+  console.log('Text parsing fallback - cleaning response...');
+  
+  // Clean the response of JSON artifacts and broken formatting
+  let cleanedResponse = response
+    .replace(/[{}[\]]/g, ' ') // Remove JSON brackets
+    .replace(/"title":|"description":|"id":/g, '') // Remove JSON keys
+    .replace(/^\s*[",]\s*/gm, '') // Remove leading quotes and commas
+    .replace(/\s*[",]\s*$/gm, '') // Remove trailing quotes and commas
+    .replace(/\*\*\s*$/gm, '') // Remove hanging bold markers
+    .replace(/^\s*\*\*\s*/gm, '**') // Clean up bold formatting
+    .split('\n')
+    .filter(line => {
+      const trimmed = line.trim();
+      // Skip empty lines, JSON fragments, and broken formatting
+      return trimmed.length > 5 && 
+             !trimmed.match(/^[",{\[\]}]*$/) && 
+             !trimmed.includes('Creative concept:') &&
+             !trimmed.includes('Action steps:') &&
+             !trimmed.startsWith('•') &&
+             !trimmed.match(/^\*\*\s*$/) &&
+             trimmed.length < 200; // Skip overly long lines
+    });
+
   const ideas: IdeaResponse[] = [];
   
-  for (let i = 0; i < lines.length && ideas.length < count; i++) {
-    const line = lines[i].trim();
+  // Generate ideas from cleaned lines
+  for (let i = 0; i < cleanedResponse.length && ideas.length < Math.min(count, 10); i++) {
+    const line = cleanedResponse[i].trim();
     
-    // Skip JSON syntax fragments
-    if (line.includes('"title"') || line.includes('"description"') || line === '{' || line === '}' || line === '[' || line === ']') {
-      continue;
-    }
-    
-    if (line.length > 10 && !line.startsWith('"') && !line.endsWith(',')) {
-      // Try to extract title and description
-      const titleMatch = line.match(/^(\d+\.\s*)?([^:]+):\s*(.+)$/);
-      if (titleMatch) {
-        ideas.push({
-          id: `ai-${Date.now()}-${ideas.length}`,
-          title: titleMatch[2].trim(),
-          description: titleMatch[3].trim(),
-          sourceContent: originalPrompt
-        });
-      } else {
-        // Use whole line as description with generated title
-        ideas.push({
-          id: `ai-${Date.now()}-${ideas.length}`,
-          title: `Creative Concept ${ideas.length + 1}`,
-          description: line.replace(/^["']|["']$/g, '').trim(),
-          sourceContent: originalPrompt
-        });
-      }
+    if (line.length > 10) {
+      // Extract a reasonable title from the line
+      let title = line.split('.')[0] || line.split(':')[0] || line.substring(0, 30);
+      title = title.replace(/^\*\*|\*\*$/g, '').trim(); // Remove bold markers
+      if (title.length < 3) title = `Creative Idea ${ideas.length + 1}`;
+      
+      // Create a simple description
+      const description = `**Creative concept:**\n• ${line.replace(/^\*\*|\*\*$/g, '').trim()}\n\n**Action steps:**\n• Start experimenting with this concept\n• Develop it further based on your interests`;
+      
+      ideas.push({
+        id: `ai-${Date.now()}-${ideas.length}`,
+        title: title.substring(0, 50), // Limit title length
+        description: description,
+        sourceContent: originalPrompt
+      });
     }
   }
   
