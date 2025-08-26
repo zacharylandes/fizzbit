@@ -11,7 +11,7 @@ export default function LandingPage() {
         {/* Navigation */}
         <nav className="flex items-center justify-between p-6 max-w-7xl mx-auto">
           <div className="flex items-center space-x-3">
-            <img src={logoImage} alt="SWIVL Logo" className="h-12 w-12 object-contain" style={{ filter: 'hue-rotate(280deg) saturate(0.8) brightness(0.8)' }} />
+            <img src={logoImage} alt="SWIVL Logo" className="h-12 w-12 object-contain" style={{ filter: 'hue-rotate(210deg) saturate(0.6) brightness(0.5)' }} />
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
               SWIVL
             </h1>
