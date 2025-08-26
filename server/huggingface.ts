@@ -6,6 +6,7 @@ export interface IdeaResponse {
   title: string;
   description: string;
   sourceContent?: string;
+  svg?: string; // Optional SVG drawing
 }
 
 // Initialize Together.ai (primary) and Hugging Face (fallback) and OpenAI (ultimate fallback)
@@ -14,6 +15,51 @@ const hf = new HfInference(process.env.HUGGINGFACE_TOKEN);
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+// Generate simple SVG drawing related to prompt using Llama
+async function generateSVGDrawing(prompt: string): Promise<string | null> {
+  try {
+    const svgMessages = [
+      {
+        role: "system",
+        content: "You are an SVG drawing generator. Create a simple, clean SVG illustration related to the given prompt. Use basic shapes and 2-3 colors maximum. Keep it minimalist and clear. Respond with only the SVG code, no explanations."
+      },
+      {
+        role: "user", 
+        content: `Create a simple SVG drawing related to: ${prompt}`
+      }
+    ];
+    
+    const response = await fetch("https://api.together.xyz/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${TOGETHER_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "meta-llama/Llama-3.2-3B-Instruct-Turbo",
+        messages: svgMessages,
+        max_tokens: 1000,
+        temperature: 0.7
+      }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`SVG generation failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const svgContent = data.choices[0].message.content;
+    
+    // Extract SVG from response
+    const svgMatch = svgContent.match(/<svg[\s\S]*?<\/svg>/i);
+    return svgMatch ? svgMatch[0] : null;
+    
+  } catch (error) {
+    console.warn('SVG generation failed:', (error as Error).message);
+    return null;
+  }
+}
 
 // Together.ai API client with timeout
 async function callTogetherAI(messages: any[], model: string = "meta-llama/Llama-3.2-3B-Instruct-Turbo") {
@@ -211,6 +257,33 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
   return ideas.slice(0, count);
 }
 
+// Add SVG drawings to approximately 1/3 of ideas
+async function addSVGToIdeas(ideas: IdeaResponse[], originalPrompt: string): Promise<IdeaResponse[]> {
+  const ideasWithSvg = [...ideas];
+  const svgCount = Math.ceil(ideas.length / 3); // 1/3 of ideas get SVG
+  
+  // Randomly select which ideas get SVG drawings
+  const selectedIndices = new Set<number>();
+  while (selectedIndices.size < svgCount && selectedIndices.size < ideas.length) {
+    selectedIndices.add(Math.floor(Math.random() * ideas.length));
+  }
+  
+  // Generate SVG drawings for selected ideas
+  const svgPromises = Array.from(selectedIndices).map(async (index) => {
+    const idea = ideas[index];
+    const svgPrompt = `${originalPrompt} - ${idea.title}`;
+    const svg = await generateSVGDrawing(svgPrompt);
+    
+    if (svg) {
+      ideasWithSvg[index] = { ...idea, svg };
+      console.log(`🎨 Added SVG to idea: ${idea.title}`);
+    }
+  });
+  
+  await Promise.all(svgPromises);
+  return ideasWithSvg;
+}
+
 // Generate template fallback ideas when all AI fails
 function generateTemplateFallback(prompt: string, count: number): IdeaResponse[] {
   const templates = [
@@ -292,8 +365,10 @@ Make each idea feel personally crafted for their specific interest.`;
     const ideas = parseIdeasFromResponse(response, prompt, count);
     
     if (ideas.length > 0) {
-      console.log(`✅ Together.ai generated ${ideas.length} ideas`);
-      return ideas;
+      // Add SVG drawings to 1/3 of the ideas
+      const ideasWithSvg = await addSVGToIdeas(ideas, prompt);
+      console.log(`✅ Together.ai generated ${ideasWithSvg.length} ideas`);
+      return ideasWithSvg;
     } else {
       console.log('❌ Together.ai returned no valid ideas');
     }
@@ -310,8 +385,10 @@ Make each idea feel personally crafted for their specific interest.`;
     const ideas = parseIdeasFromResponse(response, prompt, count);
     
     if (ideas.length > 0) {
-      console.log(`✅ Hugging Face generated ${ideas.length} ideas`);  
-      return ideas;
+      // Add SVG drawings to 1/3 of the ideas
+      const ideasWithSvg = await addSVGToIdeas(ideas, prompt);
+      console.log(`✅ Hugging Face generated ${ideasWithSvg.length} ideas`);  
+      return ideasWithSvg;
     } else {
       console.log('❌ Hugging Face returned no valid ideas');
     }
@@ -338,8 +415,10 @@ Make each idea feel personally crafted for their specific interest.`;
     const ideas = parseIdeasFromResponse(rawContent, prompt, count);
     
     if (ideas.length > 0) {
-      console.log(`✅ OpenAI generated ${ideas.length} ideas`);
-      return ideas;
+      // Add SVG drawings to 1/3 of the ideas
+      const ideasWithSvg = await addSVGToIdeas(ideas, prompt);
+      console.log(`✅ OpenAI generated ${ideasWithSvg.length} ideas`);
+      return ideasWithSvg;
     } else {
       console.log('❌ OpenAI returned no valid ideas');
     }

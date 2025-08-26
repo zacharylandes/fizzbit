@@ -45,6 +45,7 @@ export const ideas = pgTable("ideas", {
   parentIdeaId: varchar("parent_idea_id"), // for inspiration chains
   userId: varchar("user_id").references(() => users.id), // Link to user who created this
   isSaved: integer("is_saved").default(0), // 0 = not saved, 1 = saved
+  svg: text("svg"), // Optional SVG drawing
   metadata: jsonb("metadata"), // additional data like image analysis results
   createdAt: timestamp("created_at").defaultNow(),
 });

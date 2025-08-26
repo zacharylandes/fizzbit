@@ -47,7 +47,18 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
         </div>
         
         <h3 className={`text-xl font-bold mb-3 leading-tight ${accentColor}`}>{idea.title}</h3>
-        <p className="text-foreground/80 leading-relaxed text-sm overflow-y-auto max-h-56 pr-2" style={{ fontFamily: 'Inter, sans-serif' }}>
+        
+        {/* SVG Drawing if available */}
+        {idea.svg && (
+          <div className="mb-4 flex justify-center">
+            <div 
+              className="max-w-48 max-h-32 overflow-hidden rounded-lg bg-white/50 p-2"
+              dangerouslySetInnerHTML={{ __html: idea.svg }}
+            />
+          </div>
+        )}
+        
+        <p className="text-foreground/80 leading-relaxed text-sm overflow-y-auto pr-2" style={{ fontFamily: 'Inter, sans-serif', maxHeight: idea.svg ? '150px' : '220px' }}>
           {idea.description}
         </p>
         
