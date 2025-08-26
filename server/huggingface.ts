@@ -39,7 +39,7 @@ async function generateSVGDrawing(prompt: string): Promise<string | null> {
       body: JSON.stringify({
         model: "meta-llama/Llama-3.2-3B-Instruct-Turbo",
         messages: svgMessages,
-        max_tokens: 1000,
+        max_tokens: 400,
         temperature: 0.7
       }),
     });
@@ -76,7 +76,7 @@ async function callTogetherAI(messages: any[], model: string = "meta-llama/Llama
       body: JSON.stringify({
         model,
         messages,
-        max_tokens: 2000,
+        max_tokens: 1200,
         temperature: 0.8,
         response_format: { type: "json_object" }
       }),
@@ -339,18 +339,18 @@ function generateTemplateFallback(prompt: string, count: number): IdeaResponse[]
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
-  const systemPrompt = `You are a creative AI that generates personalized, actionable creative ideas. Generate exactly ${count} unique creative ideas based on the user's prompt. Each idea should be:
+  const systemPrompt = `You are a creative AI that generates personalized, actionable creative ideas. Generate exactly ${count} unique creative ideas based on the user's prompt. Keep responses concise and well-structured.
 
+Each idea should be:
 1. Directly related to their specific prompt/interest
 2. Contextually appropriate (plots for stories, art projects for visuals, exercises for abstract concepts)  
 3. Actionable and specific, not generic
-4. Use TITLE/IDEA/HOOK structure for clear, compelling suggestions
 
 Respond with a JSON array of objects, each with:
 - "title": A catchy 3-5 word title
-- "description": Detailed idea with specific next steps
+- "description": Format as: "**Based on your uploaded image:** [2-3 bullet points about the concept]\n\n**Next steps:** [2-3 bullet points with specific actions]"
 
-Make each idea feel personally crafted for their specific interest.`;
+Keep descriptions concise - maximum 4-6 bullet points total. Use bullet points (•) not dashes.`;
 
   // PRIMARY: Try Together.ai Llama
   try {
@@ -407,7 +407,7 @@ Make each idea feel personally crafted for their specific interest.`;
       ],
       response_format: { type: "json_object" },
       temperature: 0.8,
-      max_tokens: 2000
+      max_tokens: 1200
     });
     
     const rawContent = response.choices[0].message.content || "";
@@ -455,15 +455,14 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
   }
   
   // Generate ideas based on image description
-  const enhancedPrompt = `Based on this visual content: ${imageDescription}. Generate creative project ideas inspired by the visual elements, themes, colors, and mood.`;
+  const enhancedPrompt = `Based on this visual content: ${imageDescription}. Generate concise creative project ideas inspired by the visual elements, themes, colors, and mood. Keep responses short and structured with bullet points.`;
   
   const ideas = await generateIdeasFromText(enhancedPrompt, count);
   
-  // Mark ideas as image-sourced
+  // Mark ideas as image-sourced - descriptions already formatted by AI
   return ideas.map(idea => ({
     ...idea,
-    sourceContent: 'Image upload',
-    description: `Based on your uploaded image: ${idea.description}`
+    sourceContent: 'Image upload'
   }));
 }
 
@@ -471,7 +470,9 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
 export async function generateRelatedIdeas(contextualPrompt: string, count: number = 3): Promise<IdeaResponse[]> {
   console.log(`🔗 Generating ${count} related ideas from context: "${contextualPrompt}"`);
   
-  const systemPrompt = `Generate ${count} creative ideas that build upon or relate to the given context. Each idea should feel like a natural extension or creative variation of the original concept.
+  const systemPrompt = `Generate ${count} concise creative ideas that build upon or relate to the given context. Each idea should feel like a natural extension or creative variation of the original concept.
+
+Format descriptions with bullet points and bold headers as: "**Based on your uploaded image:** [2-3 bullet points] **Next steps:** [2-3 bullet points]"
 
 Respond with JSON array of objects with "title" and "description" fields.`;
 
