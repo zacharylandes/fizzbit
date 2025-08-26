@@ -140,7 +140,7 @@ export default function Layout({ children }: LayoutProps) {
             {/* SWIVL Brand */}
             <Link href="/">
               <div className="flex items-center space-x-3 cursor-pointer hover-lift transition-all duration-300">
-                <img src={logoImage} alt="SWIVL Logo" className="h-12 w-12 object-contain" style={{ filter: 'hue-rotate(200deg) saturate(1.5) brightness(0.7)' }} />
+                <img src={logoImage} alt="SWIVL Logo" className="h-12 w-12 object-contain" style={{ filter: 'hue-rotate(280deg) saturate(0.8) brightness(0.8)' }} />
                 <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
                   SWIVL
                 </h1>
