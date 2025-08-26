@@ -15,29 +15,40 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Together.ai API client
+// Together.ai API client with timeout
 async function callTogetherAI(messages: any[], model: string = "meta-llama/Llama-3.2-3B-Instruct-Turbo") {
-  const response = await fetch("https://api.together.xyz/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${TOGETHER_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model,
-      messages,
-      max_tokens: 2000,
-      temperature: 0.8,
-      response_format: { type: "json_object" }
-    }),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
   
-  if (!response.ok) {
-    throw new Error(`Together.ai API error: ${response.status}`);
+  try {
+    const response = await fetch("https://api.together.xyz/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${TOGETHER_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        max_tokens: 2000,
+        temperature: 0.8,
+        response_format: { type: "json_object" }
+      }),
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`Together.ai API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.choices[0].message.content;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
   }
-  
-  const data = await response.json();
-  return data.choices[0].message.content;
 }
 
 // Hugging Face LLM fallback
@@ -270,38 +281,47 @@ Make each idea feel personally crafted for their specific interest.`;
 
   // PRIMARY: Try Together.ai Llama
   try {
+    console.log('🔄 Trying Together.ai...');
     const messages = [
       { role: "system", content: systemPrompt },
       { role: "user", content: prompt }
     ];
     
     const response = await callTogetherAI(messages);
+    console.log('📦 Together.ai raw response length:', response?.length || 0);
     const ideas = parseIdeasFromResponse(response, prompt, count);
     
     if (ideas.length > 0) {
       console.log(`✅ Together.ai generated ${ideas.length} ideas`);
       return ideas;
+    } else {
+      console.log('❌ Together.ai returned no valid ideas');
     }
   } catch (error) {
-    console.warn('Together.ai failed:', (error as Error).message);
+    console.warn('❌ Together.ai failed:', (error as Error).message);
   }
 
   // FALLBACK 1: Try Hugging Face Mistral
   try {
+    console.log('🔄 Trying Hugging Face fallback...');
     const hfPrompt = `${systemPrompt}\n\nUser prompt: ${prompt}\n\nGenerate creative ideas in JSON format:`;
     const response = await callHuggingFaceLLM(hfPrompt);
+    console.log('📦 Hugging Face raw response length:', response?.length || 0);
     const ideas = parseIdeasFromResponse(response, prompt, count);
     
     if (ideas.length > 0) {
       console.log(`✅ Hugging Face generated ${ideas.length} ideas`);  
       return ideas;
+    } else {
+      console.log('❌ Hugging Face returned no valid ideas');
     }
   } catch (error) {
-    console.warn('Hugging Face failed:', (error as Error).message);
+    console.warn('❌ Hugging Face failed:', (error as Error).message);
   }
 
   // FALLBACK 2: Try OpenAI
   try {
+    console.log('🔄 Trying OpenAI fallback...');
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini", // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
       messages: [
@@ -313,14 +333,18 @@ Make each idea feel personally crafted for their specific interest.`;
       max_tokens: 2000
     });
     
-    const ideas = parseIdeasFromResponse(response.choices[0].message.content || "", prompt, count);
+    const rawContent = response.choices[0].message.content || "";
+    console.log('📦 OpenAI raw response length:', rawContent.length);
+    const ideas = parseIdeasFromResponse(rawContent, prompt, count);
     
     if (ideas.length > 0) {
       console.log(`✅ OpenAI generated ${ideas.length} ideas`);
       return ideas;
+    } else {
+      console.log('❌ OpenAI returned no valid ideas');
     }
   } catch (error) {
-    console.warn('OpenAI failed:', (error as Error).message);
+    console.warn('❌ OpenAI failed:', (error as Error).message);
   }
 
   // FINAL FALLBACK: Template-based ideas
