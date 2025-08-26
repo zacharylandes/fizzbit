@@ -58,9 +58,21 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
           </div>
         )}
         
-        <p className="text-foreground/80 leading-relaxed text-sm overflow-y-auto pr-2" style={{ fontFamily: 'Inter, sans-serif', maxHeight: idea.svg ? '150px' : '220px' }}>
-          {idea.description}
-        </p>
+        <div className="text-foreground/80 leading-relaxed text-sm overflow-y-auto pr-2" style={{ fontFamily: 'Inter, sans-serif', maxHeight: idea.svg ? '150px' : '220px' }}>
+          {idea.description.split('\n').map((line, index) => (
+            <div key={index}>
+              {line.startsWith('**') && line.endsWith('**') ? (
+                <strong className={`block mt-3 mb-2 ${index === 0 ? 'mt-0' : ''} ${accentColor}`}>
+                  {line.replace(/\*\*/g, '')}
+                </strong>
+              ) : line.trim() ? (
+                <div className="mb-1">{line}</div>
+              ) : (
+                <div className="h-2" />
+              )}
+            </div>
+          ))}
+        </div>
         
         {/* Swipe Indicators */}
         <div className="absolute bottom-4 left-6 right-6 flex justify-between items-center">

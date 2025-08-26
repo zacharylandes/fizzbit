@@ -348,9 +348,9 @@ Each idea should be:
 
 Respond with a JSON array of objects, each with:
 - "title": A catchy 3-5 word title
-- "description": Format as: "**Based on your uploaded image:** [2-3 bullet points about the concept]\n\n**Next steps:** [2-3 bullet points with specific actions]"
+- "description": Format as ordered list: "**Based on your uploaded image:**\n1. [concept point]\n2. [concept point]\n3. [concept point]\n\n**Next steps:**\n1. [action step]\n2. [action step]\n3. [action step]"
 
-Keep descriptions concise - maximum 4-6 bullet points total. Use bullet points (•) not dashes.`;
+Keep descriptions concise - maximum 6 numbered points total. Use proper line breaks (\n) for clean formatting.`;
 
   // PRIMARY: Try Together.ai Llama
   try {
@@ -472,7 +472,7 @@ export async function generateRelatedIdeas(contextualPrompt: string, count: numb
   
   const systemPrompt = `Generate ${count} concise creative ideas that build upon or relate to the given context. Each idea should feel like a natural extension or creative variation of the original concept.
 
-Format descriptions with bullet points and bold headers as: "**Based on your uploaded image:** [2-3 bullet points] **Next steps:** [2-3 bullet points]"
+Format descriptions as ordered lists with bold headers: "**Based on your uploaded image:**\n1. [concept]\n2. [concept]\n\n**Next steps:**\n1. [action]\n2. [action]"
 
 Respond with JSON array of objects with "title" and "description" fields.`;
 
