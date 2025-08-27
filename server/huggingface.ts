@@ -193,25 +193,38 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
       const parsed = JSON.parse(jsonMatch[0]);
       const ideas = Array.isArray(parsed) ? parsed : (parsed.ideas || [parsed]);
       
-      return ideas.slice(0, count).map((idea: any, index: number) => {
-        // Handle different response formats
-        let title = idea.title || `Creative Idea ${index + 1}`;
-        let description = idea.description || idea.idea || idea.content;
+      const validIdeas = ideas.filter((idea: any) => {
+        const title = idea.title || idea.idea || idea.content;
+        if (!title || typeof title !== 'string') return false;
         
-        // If description is still an object, try to extract meaningful text
-        if (typeof description === 'object' && description !== null) {
-          description = description.description || description.content || description.text || JSON.stringify(description);
+        const titleStr = String(title).trim();
+        const words = titleStr.split(' ');
+        
+        // REJECT invalid titles
+        if (titleStr.length < 10 || 
+            titleStr.length > 100 ||
+            words.length < 4 || 
+            words.length > 15 ||
+            titleStr.toLowerCase().includes('creative concept') ||
+            titleStr.toLowerCase().includes('creative idea') ||
+            titleStr.toLowerCase().includes('action step')) {
+          return false;
         }
         
-        // If description is still not a string, use a fallback
-        if (typeof description !== 'string') {
-          description = `Creative concept related to ${originalPrompt}`;
-        }
+        // ACCEPT only if it looks like a real creative project
+        const actionWords = ['build', 'create', 'design', 'make', 'explore', 'investigate', 'experiment', 'develop', 'construct', 'test', 'observe', 'study', 'grow', 'mix', 'measure', 'compare', 'track', 'record', 'demonstrate', 'write', 'tell', 'claim', 'pretend', 'rehearse'];
+        const hasAction = actionWords.some(verb => titleStr.toLowerCase().includes(verb));
+        
+        return hasAction;
+      }).slice(0, count);
+      
+      return validIdeas.map((idea: any, index: number) => {
+        const title = String(idea.title || idea.idea || idea.content).trim();
         
         return {
           id: `ai-${Date.now()}-${index}`,
-          title: String(title),
-          description: String(description),
+          title: title,
+          description: title, // Use title as description for simple format
           sourceContent: originalPrompt
         };
       });
