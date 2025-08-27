@@ -270,13 +270,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      console.log('🎤 Processing audio file for transcription:', req.file.filename, 'Size:', req.file.size);
+      console.log('🎤 Processing audio file for transcription:', req.file.filename, 'Size:', req.file.size, 'MimeType:', req.file.mimetype);
+      
+      // Add proper file extension based on mimetype so Whisper can recognize the format
+      let fileExtension = '.webm'; // default
+      if (req.file.mimetype.includes('webm')) {
+        fileExtension = '.webm';
+      } else if (req.file.mimetype.includes('mp4')) {
+        fileExtension = '.mp4';
+      } else if (req.file.mimetype.includes('wav')) {
+        fileExtension = '.wav';
+      } else if (req.file.mimetype.includes('ogg')) {
+        fileExtension = '.ogg';
+      }
+      
+      // Rename file with proper extension
+      const properFileName = req.file.path + fileExtension;
+      fs.renameSync(req.file.path, properFileName);
+      
+      console.log('🎤 Renamed file to:', properFileName);
       
       // Use OpenAI Whisper for transcription
-      const result = await transcribeAudio(req.file.path);
+      const result = await transcribeAudio(properFileName);
       
       // Clean up uploaded file
-      fs.unlink(req.file.path, (err) => {
+      fs.unlink(properFileName, (err) => {
         if (err) console.error('Error deleting uploaded file:', err);
       });
       
@@ -289,8 +307,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Clean up uploaded file on error
       if (req.file) {
-        fs.unlink(req.file.path, (err) => {
-          if (err) console.error('Error deleting uploaded file:', err);
+        const possibleFiles = [req.file.path, req.file.path + '.webm', req.file.path + '.mp4', req.file.path + '.wav', req.file.path + '.ogg'];
+        possibleFiles.forEach(filePath => {
+          if (fs.existsSync(filePath)) {
+            fs.unlink(filePath, (err) => {
+              if (err) console.error('Error deleting uploaded file:', err);
+            });
+          }
         });
       }
       
