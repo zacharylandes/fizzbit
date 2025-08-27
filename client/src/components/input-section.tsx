@@ -208,18 +208,27 @@ export function InputSection({
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     
-    // Optimized settings for better accuracy
-    recognition.continuous = false; // Single phrase recognition for better accuracy
+    // Enhanced settings for much better accuracy and flexibility
+    recognition.continuous = true; // Allow longer phrases and continuous speech
     recognition.interimResults = true; // Show interim results for feedback
-    recognition.lang = 'en-US';
-    recognition.maxAlternatives = 3; // Get multiple alternatives for better accuracy
-    // Enhanced settings for better performance
+    
+    // Try to detect user's preferred language, fallback to en-US
+    const userLang = navigator.language || navigator.languages?.[0] || 'en-US';
+    const supportedLangs = ['en-US', 'en-GB', 'en-CA', 'en-AU', 'en-IN']; // Common English variants
+    recognition.lang = supportedLangs.includes(userLang) ? userLang : 'en-US';
+    
+    recognition.maxAlternatives = 5; // More alternatives for better accuracy
+    
+    // Remove restrictions for better recognition
     if ('grammars' in recognition) {
-      recognition.grammars = null; // No specific grammar restrictions
+      recognition.grammars = null; // No grammar restrictions
     }
     if ('serviceURI' in recognition) {
       recognition.serviceURI = ''; // Use default service
     }
+    
+    // Add timeout to automatically stop after 30 seconds
+    let autoStopTimeout: NodeJS.Timeout;
     
     // Store recognition instance to allow manual stopping
     const recognitionRef = { current: recognition };
@@ -239,9 +248,16 @@ export function InputSection({
         setRecordingDuration(recordingCounterRef.current);
       }, 1000);
       
+      // Auto-stop after 30 seconds to prevent infinite listening
+      autoStopTimeout = setTimeout(() => {
+        if (recognitionRef.current) {
+          recognitionRef.current.stop();
+        }
+      }, 30000);
+      
       toast({
         title: "Listening...",
-        description: "Speak your idea now",
+        description: "Speak naturally - I'll capture everything you say",
         duration: 1000,
       });
     };
@@ -252,26 +268,29 @@ export function InputSection({
       let bestConfidence = 0;
       let bestTranscript = '';
       
-      // Process all results with confidence scoring
+      // Process all results with improved confidence handling
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
         
-        // Get the best alternative based on confidence
-        let currentBest = result[0];
+        // Get the best alternative - be more forgiving with confidence
+        let currentBest = result[0]; // Default to first result
         for (let j = 0; j < result.length; j++) {
-          if (result[j].confidence > currentBest.confidence) {
+          // Accept any result with reasonable confidence, or if it's longer/more complete
+          if (result[j].confidence > 0.3 && 
+              (result[j].confidence > currentBest.confidence || 
+               result[j].transcript.length > currentBest.transcript.length)) {
             currentBest = result[j];
           }
         }
         
         if (result.isFinal) {
-          finalTranscript += currentBest.transcript;
-          if (currentBest.confidence > bestConfidence) {
+          finalTranscript += currentBest.transcript + ' ';
+          if (currentBest.confidence > bestConfidence || bestTranscript === '') {
             bestConfidence = currentBest.confidence;
-            bestTranscript = currentBest.transcript;
+            bestTranscript = finalTranscript.trim();
           }
         } else {
-          interimTranscript += currentBest.transcript;
+          interimTranscript += currentBest.transcript + ' ';
         }
       }
       
@@ -290,8 +309,8 @@ export function InputSection({
         }
       }
       
-      // Process final results with confidence threshold
-      if (finalTranscript) {
+      // Process final results - be more accepting of lower confidence
+      if (finalTranscript.trim()) {
         const transcriptToUse = bestConfidence > 0.7 ? bestTranscript : finalTranscript;
         setTextPrompt(transcriptToUse);
         
@@ -300,17 +319,19 @@ export function InputSection({
         }
         
         // Stop recognition after getting final result
+        if (autoStopTimeout) {
+          clearTimeout(autoStopTimeout);
+        }
         recognition.stop();
         
         // Generate ideas with the final transcript
-        console.log('🎤 Generating ideas from voice transcript:', finalTranscript);
-        generateFromTextMutation.mutate(finalTranscript);
+        console.log('🎤 Generating ideas from voice transcript:', finalTranscript.trim());
+        generateFromTextMutation.mutate(finalTranscript.trim());
         
         toast({
           title: "Speech Recognized!",
-          description: `"${finalTranscript}"`,
+          description: `"${finalTranscript.trim()}"`,
           duration: 3000,
-          variant: "success",
         });
       }
     };
@@ -319,9 +340,13 @@ export function InputSection({
       console.error('Web Speech Recognition error:', event.error);
       setIsRecording(false);
       
+      // Clear all timers and timeouts
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
         recordingIntervalRef.current = null;
+      }
+      if (autoStopTimeout) {
+        clearTimeout(autoStopTimeout);
       }
       
       let errorMessage = "Speech recognition failed. Try typing your idea instead.";
@@ -353,9 +378,13 @@ export function InputSection({
       setRecordingDuration(0);
       setCurrentRecognition(null);
       
+      // Clear all timers and timeouts
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
         recordingIntervalRef.current = null;
+      }
+      if (autoStopTimeout) {
+        clearTimeout(autoStopTimeout);
       }
     };
     
