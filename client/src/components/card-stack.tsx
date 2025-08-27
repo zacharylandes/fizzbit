@@ -91,8 +91,8 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
       setSwipeUpPrompt("");
       setIsGeneratingIdeas(false);
       
-      // Trigger immediate prefetch check for new cards
-      setTimeout(() => checkAndPrefetch(), 200);
+      // Trigger immediate prefetch check for new cards with correct count
+      setTimeout(() => checkAndPrefetch(initialIdeas.length), 200);
       // Also check periodically to ensure continuous flow
       setTimeout(() => checkAndPrefetch(), 1000);
       setTimeout(() => checkAndPrefetch(), 2000);
@@ -249,21 +249,22 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
   });
 
   // Smart prefetching logic - check when cards get low and ensure continuous flow with deduplication
-  const checkAndPrefetch = () => {
-    console.log('🔄 Checking prefetch - Cards remaining:', cards.length, 'Has context:', !!currentExploreContext, 'Is pending:', prefetchMoreIdeasMutation.isPending);
+  const checkAndPrefetch = (cardCount?: number) => {
+    const currentCardCount = cardCount ?? cards.length;
+    console.log('🔄 Checking prefetch - Cards remaining:', currentCardCount, 'Has context:', !!currentExploreContext, 'Is pending:', prefetchMoreIdeasMutation.isPending);
     
     // EARLY prefetch when cards get to 15 or fewer to ensure smooth flow
-    if (cards.length <= 15 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
+    if (currentCardCount <= 15 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
       console.log('🔄 EARLY PREFETCH TRIGGERED for current prompt:', currentExploreContext.originalPrompt);
       prefetchMoreIdeasMutation.mutate();
     }
     // BACKUP prefetch if cards get critically low (3 or fewer) - emergency measure
-    else if (cards.length <= 3 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
+    else if (currentCardCount <= 3 && currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
       console.log('🔄 EMERGENCY PREFETCH for current prompt:', currentExploreContext.originalPrompt);
       prefetchMoreIdeasMutation.mutate();
     }
     // ULTIMATE fallback - if we somehow have no cards and no context, use current prompt or emergency fallback
-    else if (cards.length === 0 && !currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
+    else if (currentCardCount === 0 && !currentExploreContext && !prefetchMoreIdeasMutation.isPending) {
       console.log('🚨 ULTIMATE FALLBACK - Generating emergency ideas');
       // Use currentPrompt if available, otherwise create temporary context
       const fallbackPrompt = currentPrompt || "creative inspiration and unusual ideas";
