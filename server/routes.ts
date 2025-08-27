@@ -272,47 +272,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('🎤 Processing audio file for transcription:', req.file.filename, 'Size:', req.file.size, 'MimeType:', req.file.mimetype);
       
-      // Convert audio to WAV format for reliable Whisper processing
-      const wavPath = req.file.path + '.wav';
+      // Determine proper file extension based on mimetype
+      let fileExtension = '.webm';
+      if (req.file.mimetype.includes('wav')) {
+        fileExtension = '.wav';
+      } else if (req.file.mimetype.includes('mp4')) {
+        fileExtension = '.mp4';
+      } else if (req.file.mimetype.includes('ogg')) {
+        fileExtension = '.ogg';
+      } else if (req.file.mimetype.includes('webm')) {
+        fileExtension = '.webm';
+      }
+      
+      // First try: Direct transcription with proper extension
+      const directPath = req.file.path + fileExtension;
+      fs.renameSync(req.file.path, directPath);
+      console.log('🎤 Renamed file to:', directPath);
       
       try {
-        await convertAudioToWav(req.file.path, wavPath);
-        console.log('🎤 Successfully converted audio to WAV format:', wavPath);
+        const result = await transcribeAudio(directPath);
         
-        // Use OpenAI Whisper for transcription
-        const result = await transcribeAudio(wavPath);
-        
-        // Clean up both files
-        if (fs.existsSync(req.file.path)) {
-          fs.unlinkSync(req.file.path);
-        }
-        if (fs.existsSync(wavPath)) {
-          fs.unlinkSync(wavPath);
-        }
+        // Clean up file
+        fs.unlinkSync(directPath);
         
         res.json({
           text: result.text,
           duration: result.duration
         });
         
-      } catch (conversionError) {
-        // If conversion fails, try direct transcription with proper extension
-        console.log('Audio conversion failed, trying direct transcription...');
+      } catch (directError) {
+        console.log('Direct transcription failed, trying WAV conversion...');
         
-        const directPath = req.file.path + '.webm';
-        fs.renameSync(req.file.path, directPath);
+        // Second try: Convert to WAV format
+        const wavPath = req.file.path + '.wav';
         
         try {
-          const result = await transcribeAudio(directPath);
+          await convertAudioToWav(directPath, wavPath);
+          console.log('🎤 Successfully converted audio to WAV format:', wavPath);
           
+          const result = await transcribeAudio(wavPath);
+          
+          // Clean up both files
           fs.unlinkSync(directPath);
+          fs.unlinkSync(wavPath);
           
           res.json({
             text: result.text,
             duration: result.duration
           });
-        } catch (directError) {
-          throw directError;
+          
+        } catch (wavError) {
+          // Final fallback: Try with .mp3 extension
+          console.log('WAV conversion failed, trying MP3 format...');
+          const mp3Path = req.file.path + '.mp3';
+          fs.renameSync(directPath, mp3Path);
+          
+          try {
+            const result = await transcribeAudio(mp3Path);
+            fs.unlinkSync(mp3Path);
+            
+            res.json({
+              text: result.text,
+              duration: result.duration
+            });
+          } catch (mp3Error) {
+            fs.unlinkSync(mp3Path);
+            throw mp3Error;
+          }
         }
       }
     } catch (error) {
