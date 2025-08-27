@@ -220,70 +220,38 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
     console.log('JSON parsing failed, using text parsing...');
   }
   
-  // Enhanced fallback to text parsing
-  console.log('Text parsing fallback - cleaning response...');
+  // Simple text parsing for title-only format
+  console.log('Text parsing fallback - extracting simple titles...');
   
-  // Split response into meaningful segments
-  const segments = response
-    .replace(/[{}[\]]/g, '') // Remove JSON brackets
-    .replace(/"title":|"description":/g, '') // Remove JSON keys  
-    .replace(/^\s*[",]+\s*/gm, '') // Remove leading quotes/commas
-    .replace(/\s*[",]+\s*$/gm, '') // Remove trailing quotes/commas
-    .split(/\n+/) // Split on line breaks
+  // Clean response and split into lines
+  const lines = response
+    .replace(/[{}[\]"]/g, '') // Remove JSON syntax
+    .replace(/title:|,\s*$/gm, '') // Remove JSON keys and trailing commas
+    .split(/\n+/)
     .map(line => line.trim())
     .filter(line => {
-      // Keep lines that look like creative content
-      return line.length > 15 && 
-             !line.match(/^[",{\[\]}]*$/) && 
+      // Keep lines that look like creative ideas (not JSON fragments)
+      return line.length > 10 && 
+             line.length <= 100 && // Max 12 words ≈ 100 chars
              !line.includes('JSON') &&
              !line.includes('array') &&
-             line.split(' ').length > 2; // Must have at least 3 words
+             !line.includes('Creative concept') &&
+             !line.includes('Action steps') &&
+             line.split(' ').length >= 3 &&
+             line.split(' ').length <= 15; // 3-15 words
     });
 
   const ideas: IdeaResponse[] = [];
   
-  // Extract multiple ideas from segments
-  for (let i = 0; i < segments.length && ideas.length < count; i++) {
-    const segment = segments[i];
+  // Create ideas from clean lines (title-only format)
+  for (let i = 0; i < lines.length && ideas.length < count; i++) {
+    const cleanTitle = lines[i].trim();
     
-    // Look for title patterns
-    const titlePatterns = [
-      /^(.+?):/, // Title: Description pattern
-      /^(\d+\.\s*)?(.+?)\s*[-–]\s*/, // Numbered or dashed pattern
-      /^(.+?)\s*\|\s*/, // Title | Description pattern
-      /^(.{10,40}?)\./, // First sentence as title
-    ];
-    
-    let title = '';
-    let description = segment;
-    
-    // Try to extract title using patterns
-    for (const pattern of titlePatterns) {
-      const match = segment.match(pattern);
-      if (match) {
-        title = (match[2] || match[1]).trim();
-        description = segment.replace(pattern, '').trim();
-        break;
-      }
-    }
-    
-    // Fallback title generation
-    if (!title || title.length < 3) {
-      title = segment.split(' ').slice(0, 4).join(' ') || `Creative Idea ${ideas.length + 1}`;
-    }
-    
-    // Clean up title and description
-    title = title.replace(/[^\w\s-]/g, '').trim().substring(0, 50);
-    description = description || segment;
-    
-    // Use the segment directly as the title (new simple format)
-    const formattedDescription = segment.trim();
-    
-    if (formattedDescription.length > 10) {
+    if (cleanTitle.length > 10) {
       ideas.push({
         id: `ai-${Date.now()}-${ideas.length}`,
-        title: formattedDescription.substring(0, 80), // Use content as title
-        description: formattedDescription, // Simple description without extra formatting
+        title: cleanTitle,
+        description: cleanTitle, // Use same content for both since we only have titles
         sourceContent: originalPrompt
       });
     }
