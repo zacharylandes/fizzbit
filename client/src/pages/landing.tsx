@@ -11,19 +11,7 @@ export default function LandingPage() {
         {/* Navigation */}
         <nav className="flex items-center justify-between p-6 max-w-7xl mx-auto">
           <div className="flex items-center space-x-3">
-            <svg className="h-12 w-12" viewBox="0 0 400 400" fill="none">
-              <circle cx="200" cy="200" r="190" stroke="hsl(210, 30%, 40%)" strokeWidth="3" fill="none"/>
-              <circle cx="200" cy="200" r="170" stroke="hsl(210, 30%, 40%)" strokeWidth="2.5" fill="none"/>
-              <circle cx="200" cy="200" r="150" stroke="hsl(210, 30%, 40%)" strokeWidth="2.5" fill="none"/>
-              <circle cx="200" cy="200" r="130" stroke="hsl(210, 30%, 40%)" strokeWidth="2" fill="none"/>
-              <circle cx="200" cy="200" r="110" stroke="hsl(210, 30%, 40%)" strokeWidth="2" fill="none"/>
-              <circle cx="200" cy="200" r="90" stroke="hsl(210, 30%, 40%)" strokeWidth="2" fill="none"/>
-              <circle cx="200" cy="200" r="70" stroke="hsl(210, 30%, 40%)" strokeWidth="1.5" fill="none"/>
-              <circle cx="200" cy="200" r="50" stroke="hsl(210, 30%, 40%)" strokeWidth="1.5" fill="none"/>
-              <circle cx="200" cy="200" r="30" stroke="hsl(210, 30%, 40%)" strokeWidth="1.5" fill="none"/>
-              <circle cx="200" cy="200" r="15" stroke="hsl(210, 30%, 40%)" strokeWidth="1" fill="none"/>
-              <circle cx="200" cy="200" r="5" fill="hsl(210, 30%, 40%)"/>
-            </svg>
+            <img src={logoImage} alt="FizzBit Logo" className="h-12 w-12 object-contain" />
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
               FizzBit
             </h1>
@@ -147,17 +135,7 @@ export default function LandingPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-card-light-blue-bg rounded-lg shadow-sm">
-                <svg className="h-5 w-5" viewBox="0 0 100 100" fill="none">
-                  {/* Concentric circle arcs starting from bottom */}
-                  <path d="M 3 50 A 47 47 0 0 1 97 50" stroke="#1e293b" strokeWidth="1.5" fill="none"/>
-                  <path d="M 8 50 A 42 42 0 0 1 92 50" stroke="#334155" strokeWidth="1.5" fill="none"/>
-                  <path d="M 13 50 A 37 37 0 0 1 87 50" stroke="#475569" strokeWidth="1.5" fill="none"/>
-                  <path d="M 18 50 A 32 32 0 0 1 82 50" stroke="#64748b" strokeWidth="1.5" fill="none"/>
-                  <path d="M 23 50 A 27 27 0 0 1 77 50" stroke="#64748b" strokeWidth="1.5" fill="none"/>
-                  <path d="M 28 50 A 22 22 0 0 1 72 50" stroke="#64748b" strokeWidth="1.2" fill="none"/>
-                  <path d="M 33 50 A 17 17 0 0 1 67 50" stroke="#64748b" strokeWidth="1" fill="none"/>
-                  <circle cx="50" cy="50" r="2" fill="#1e293b"/>
-                </svg>
+                <img src={logoImage} alt="FizzBit Logo" className="h-5 w-5 object-contain" />
               </div>
               <span className="text-lg font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>FizzBit</span>
             </div>
