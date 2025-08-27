@@ -378,14 +378,16 @@ function generateTemplateFallback(prompt: string, count: number): IdeaResponse[]
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
-  const systemPrompt = `Create ${count} simple project ideas for: ${prompt}
+  const systemPrompt = `Generate ${count} specific, actionable ideas directly related to: "${prompt}"
+
+CRITICAL: Ideas must be contextually relevant to the user's exact input. If they ask about inspiration, give inspiration techniques. If they ask about cooking, give cooking ideas. If they ask about art, give art projects.
 
 IMPORTANT: Each idea must be EXACTLY one sentence, maximum 12 words, starting with an action verb.
 
-Examples of GOOD responses:
-- "Build volcano models using baking soda and vinegar"
-- "Create weather station projects with rain gauges"
-- "Design solar oven experiments using cardboard boxes"
+Examples based on different prompts:
+- For "creative inspiration": "Practice morning pages to unlock creative thoughts daily"
+- For "cooking": "Make homemade pasta using just flour and eggs"  
+- For "art projects": "Paint abstract landscapes using only three colors"
 
 DO NOT include:
 - "Creative concept" 
@@ -393,8 +395,9 @@ DO NOT include:
 - Bullet points
 - Descriptions
 - Multiple sentences
+- Generic craft projects unrelated to the prompt
 
-Format as JSON: [{"title": "Build volcano models using baking soda and vinegar"}, {"title": "Create weather station projects with rain gauges"}]`;
+Format as JSON: [{"title": "Practice morning pages to unlock creative thoughts daily"}, {"title": "Make homemade pasta using just flour and eggs"}]`;
 
   // PRIMARY: Try Together.ai Llama
   try {
