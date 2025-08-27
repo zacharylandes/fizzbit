@@ -220,12 +220,12 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
     console.log('JSON parsing failed, using text parsing...');
   }
   
-  // Aggressively extract ONLY actual project ideas
-  console.log('Text parsing fallback - extracting project ideas...');
+  // Debug what we're getting from AI
+  console.log('Text parsing fallback - raw response sample:', response.substring(0, 500));
   
-  // Split response and find actual project sentences
+  // Extract project ideas with more flexible approach
   const lines = response
-    .replace(/[{}[\]"]/g, ' ') // Remove JSON syntax
+    .replace(/[{}[\]"]/g, '') // Remove JSON syntax
     .replace(/title:|description:/gi, '') // Remove JSON keys
     .split(/[,\n]+/) // Split on separators
     .map(line => line.trim())
@@ -233,39 +233,42 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
       const words = line.split(' ');
       const lowerLine = line.toLowerCase();
       
-      // REJECT any line containing these phrases
+      // REJECT lines with unwanted content
       if (lowerLine.includes('creative concept') ||
           lowerLine.includes('action step') ||
-          lowerLine.includes('related to') ||
-          lowerLine.includes('curriculum') ||
           lowerLine.includes('json') ||
           lowerLine.includes('array') ||
-          words.length < 4 || words.length > 12) {
+          words.length < 4 || words.length > 15) { // Relaxed word count
         return false;
       }
       
-      // ACCEPT only lines that start with action verbs
-      const actionVerbs = ['build', 'create', 'design', 'make', 'explore', 'investigate', 'experiment', 'develop', 'construct', 'test', 'observe', 'study', 'grow', 'mix', 'measure'];
-      const firstWord = words[0].toLowerCase();
+      // ACCEPT lines that look like project ideas
+      const actionIndicators = ['build', 'create', 'design', 'make', 'explore', 'investigate', 'experiment', 'develop', 'construct', 'test', 'observe', 'study', 'grow', 'mix', 'measure', 'compare', 'track', 'record', 'demonstrate'];
       
-      return actionVerbs.some(verb => firstWord.includes(verb)) && line.length >= 20 && line.length <= 80;
+      // Check if line contains action words (not just starting)
+      const hasAction = actionIndicators.some(verb => lowerLine.includes(verb));
+      
+      return hasAction && line.length >= 15 && line.length <= 100;
     });
 
-  // Further clean each line
+  console.log('Found potential ideas:', lines.length, lines.slice(0, 3));
+
+  // Clean each line
   const cleanedResponse = lines.map(line => {
     return line
       .replace(/^\W+/, '') // Remove leading punctuation
       .replace(/\W+$/, '') // Remove trailing punctuation
+      .replace(/^\d+\.?\s*/, '') // Remove numbering
       .trim();
-  }).filter(line => line.length > 15);
+  }).filter(line => line.length > 10);
 
   const ideas: IdeaResponse[] = [];
   
-  // Create ideas from actual creative content
+  // Create ideas from cleaned content
   for (let i = 0; i < cleanedResponse.length && ideas.length < count; i++) {
     const ideaText = cleanedResponse[i].trim();
     
-    if (ideaText.length > 15) {
+    if (ideaText.length > 10) {
       ideas.push({
         id: `ai-${Date.now()}-${ideas.length}`,
         title: ideaText,
@@ -274,6 +277,8 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
       });
     }
   }
+  
+  console.log(`Extracted ${ideas.length} actual ideas from response`);
   
   return ideas.slice(0, count);
 }
