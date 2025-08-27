@@ -141,17 +141,17 @@ export default function Layout({ children }: LayoutProps) {
             <Link href="/">
               <div className="flex items-center space-x-4 cursor-pointer hover-lift transition-all duration-300 p-3 rounded-lg hover:bg-accent/10">
                 <svg className="h-12 w-12" viewBox="0 0 400 400" fill="none">
-                  <ellipse cx="200" cy="200" rx="190" ry="160" stroke="hsl(210, 30%, 40%)" strokeWidth="3" fill="none"/>
-                  <ellipse cx="200" cy="200" rx="170" ry="145" stroke="hsl(210, 30%, 40%)" strokeWidth="2.5" fill="none"/>
-                  <ellipse cx="200" cy="200" rx="150" ry="130" stroke="hsl(210, 30%, 40%)" strokeWidth="2.5" fill="none"/>
-                  <ellipse cx="200" cy="200" rx="130" ry="115" stroke="hsl(210, 30%, 40%)" strokeWidth="2" fill="none"/>
-                  <ellipse cx="200" cy="200" rx="110" ry="100" stroke="hsl(210, 30%, 40%)" strokeWidth="2" fill="none"/>
-                  <ellipse cx="200" cy="200" rx="90" ry="85" stroke="hsl(210, 30%, 40%)" strokeWidth="2" fill="none"/>
-                  <ellipse cx="200" cy="200" rx="70" ry="68" stroke="hsl(210, 30%, 40%)" strokeWidth="1.5" fill="none"/>
-                  <ellipse cx="200" cy="200" rx="50" ry="48" stroke="hsl(210, 30%, 40%)" strokeWidth="1.5" fill="none"/>
-                  <ellipse cx="200" cy="200" rx="30" ry="29" stroke="hsl(210, 30%, 40%)" strokeWidth="1.5" fill="none"/>
-                  <ellipse cx="200" cy="200" rx="15" ry="14" stroke="hsl(210, 30%, 40%)" strokeWidth="1" fill="none"/>
-                  <ellipse cx="200" cy="200" rx="5" ry="4" fill="hsl(210, 30%, 40%)"/>
+                  <ellipse cx="200" cy="200" rx="190" ry="95" stroke="hsl(210, 30%, 40%)" strokeWidth="3" fill="none"/>
+                  <ellipse cx="200" cy="200" rx="170" ry="85" stroke="hsl(210, 30%, 40%)" strokeWidth="2.5" fill="none"/>
+                  <ellipse cx="200" cy="200" rx="150" ry="75" stroke="hsl(210, 30%, 40%)" strokeWidth="2.5" fill="none"/>
+                  <ellipse cx="200" cy="200" rx="130" ry="65" stroke="hsl(210, 30%, 40%)" strokeWidth="2" fill="none"/>
+                  <ellipse cx="200" cy="200" rx="110" ry="55" stroke="hsl(210, 30%, 40%)" strokeWidth="2" fill="none"/>
+                  <ellipse cx="200" cy="200" rx="90" ry="45" stroke="hsl(210, 30%, 40%)" strokeWidth="2" fill="none"/>
+                  <ellipse cx="200" cy="200" rx="70" ry="35" stroke="hsl(210, 30%, 40%)" strokeWidth="1.5" fill="none"/>
+                  <ellipse cx="200" cy="200" rx="50" ry="25" stroke="hsl(210, 30%, 40%)" strokeWidth="1.5" fill="none"/>
+                  <ellipse cx="200" cy="200" rx="30" ry="15" stroke="hsl(210, 30%, 40%)" strokeWidth="1.5" fill="none"/>
+                  <ellipse cx="200" cy="200" rx="15" ry="8" stroke="hsl(210, 30%, 40%)" strokeWidth="1" fill="none"/>
+                  <ellipse cx="200" cy="200" rx="5" ry="3" fill="hsl(210, 30%, 40%)"/>
                 </svg>
                 <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
                   FizzBit
