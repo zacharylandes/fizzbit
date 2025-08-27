@@ -200,22 +200,20 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
         const titleStr = String(title).trim();
         const words = titleStr.split(' ');
         
-        // REJECT invalid titles
-        if (titleStr.length < 10 || 
-            titleStr.length > 100 ||
-            words.length < 4 || 
-            words.length > 15 ||
+        // REJECT only obviously invalid titles
+        if (titleStr.length < 2 || 
+            titleStr.length > 150 ||
+            words.length < 1 || 
+            words.length > 20 ||
             titleStr.toLowerCase().includes('creative concept') ||
             titleStr.toLowerCase().includes('creative idea') ||
             titleStr.toLowerCase().includes('action step')) {
           return false;
         }
         
-        // ACCEPT only if it looks like a real creative project
-        const actionWords = ['build', 'create', 'design', 'make', 'explore', 'investigate', 'experiment', 'develop', 'construct', 'test', 'observe', 'study', 'grow', 'mix', 'measure', 'compare', 'track', 'record', 'demonstrate', 'write', 'tell', 'claim', 'pretend', 'rehearse'];
-        const hasAction = actionWords.some(verb => titleStr.toLowerCase().includes(verb));
-        
-        return hasAction;
+        // ACCEPT any reasonable title - be much more flexible
+        // Allow app names, techniques, methods, project ideas, etc.
+        return true;
       }).slice(0, count);
       
       return validIdeas.map((idea: any, index: number) => {
