@@ -137,7 +137,7 @@ export default function Layout({ children }: LayoutProps) {
       <div className="border-b border-border bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* SWIVL Brand */}
+            {/* FizzBit Brand */}
             <Link href="/">
               <div className="flex items-center space-x-3 cursor-pointer hover-lift transition-all duration-300">
                 <svg className="h-12 w-12" viewBox="0 0 400 400" fill="none">
@@ -154,7 +154,7 @@ export default function Layout({ children }: LayoutProps) {
                   <circle cx="200" cy="200" r="5" fill="hsl(210, 30%, 40%)"/>
                 </svg>
                 <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
-                  SWIVL
+                  FizzBit
                 </h1>
               </div>
             </Link>

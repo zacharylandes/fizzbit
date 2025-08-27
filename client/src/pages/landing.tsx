@@ -25,7 +25,7 @@ export default function LandingPage() {
               <circle cx="200" cy="200" r="5" fill="hsl(210, 30%, 40%)"/>
             </svg>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
-              SWIVL
+              FizzBit
             </h1>
           </div>
           <a href="/api/login">
@@ -126,7 +126,7 @@ export default function LandingPage() {
             Start your creative journey today
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto" style={{ fontFamily: 'Inter, sans-serif' }}>
-            Join thousands of creators who use SWIVL to unlock their creative potential.
+            Join thousands of creators who use FizzBit to unlock their creative potential.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="/api/login">
@@ -159,10 +159,10 @@ export default function LandingPage() {
                   <circle cx="50" cy="50" r="2" fill="#1e293b"/>
                 </svg>
               </div>
-              <span className="text-lg font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>SWIVL</span>
+              <span className="text-lg font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>FizzBit</span>
             </div>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-              © 2025 SWIVL. All rights reserved.
+              © 2025 FizzBit. All rights reserved.
             </p>
           </div>
         </div>

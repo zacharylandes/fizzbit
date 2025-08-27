@@ -1,6 +1,6 @@
-# SWIVL - Creative Inspiration App
+# FizzBit - Creative Inspiration App
 
-SWIVL is an interactive creative inspiration app that generates personalized ideas from text prompts and images using AI. The application presents ideas in a swipeable card interface, allowing users to explore, save, and chain creative concepts together. Built with a modern full-stack architecture featuring React frontend, Express backend, and AI-powered content generation.
+FizzBit is an interactive creative inspiration app that generates personalized ideas from text prompts and images using AI. The application presents ideas in a swipeable card interface, allowing users to explore, save, and chain creative concepts together. Built with a modern full-stack architecture featuring React frontend, Express backend, and AI-powered content generation.
 
 ## Recent Updates
 - **Adaptive Creative Format (Aug 16, 2025)**: Refined idea generation to be contextually appropriate - generates plot/dramatic scenarios for stories, art projects for visual concepts, creative exercises for abstract ideas. Uses TITLE/IDEA/HOOK structure with clear relevance to user input and actionable suggestions
