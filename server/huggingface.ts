@@ -220,36 +220,44 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
     console.log('JSON parsing failed, using text parsing...');
   }
   
-  // Extract only actual creative ideas from response
-  console.log('Text parsing fallback - extracting creative ideas...');
+  // Aggressively extract ONLY actual project ideas
+  console.log('Text parsing fallback - extracting project ideas...');
   
-  // Clean response and extract meaningful content
-  const cleanedResponse = response
+  // Split response and find actual project sentences
+  const lines = response
     .replace(/[{}[\]"]/g, ' ') // Remove JSON syntax
-    .replace(/title:|description:|Creative concept|Action steps/gi, '') // Remove unwanted text
-    .replace(/related to .+?curriculum/gi, '') // Remove generic text about curriculum
-    .split(/[,\n]+/) // Split on commas and newlines
+    .replace(/title:|description:/gi, '') // Remove JSON keys
+    .split(/[,\n]+/) // Split on separators
     .map(line => line.trim())
     .filter(line => {
-      // Only keep lines that are actual creative project ideas
       const words = line.split(' ');
-      return line.length > 15 && 
-             line.length <= 80 && // Reasonable sentence length
-             words.length >= 4 && words.length <= 12 && // 4-12 words as requested
-             !line.toLowerCase().includes('creative') &&
-             !line.toLowerCase().includes('concept') &&
-             !line.toLowerCase().includes('action') &&
-             !line.toLowerCase().includes('step') &&
-             !line.toLowerCase().includes('json') &&
-             // Must contain action words indicating a project
-             (line.toLowerCase().includes('create') || 
-              line.toLowerCase().includes('build') || 
-              line.toLowerCase().includes('design') ||
-              line.toLowerCase().includes('make') ||
-              line.toLowerCase().includes('explore') ||
-              line.toLowerCase().includes('investigate') ||
-              line.toLowerCase().includes('experiment'));
+      const lowerLine = line.toLowerCase();
+      
+      // REJECT any line containing these phrases
+      if (lowerLine.includes('creative concept') ||
+          lowerLine.includes('action step') ||
+          lowerLine.includes('related to') ||
+          lowerLine.includes('curriculum') ||
+          lowerLine.includes('json') ||
+          lowerLine.includes('array') ||
+          words.length < 4 || words.length > 12) {
+        return false;
+      }
+      
+      // ACCEPT only lines that start with action verbs
+      const actionVerbs = ['build', 'create', 'design', 'make', 'explore', 'investigate', 'experiment', 'develop', 'construct', 'test', 'observe', 'study', 'grow', 'mix', 'measure'];
+      const firstWord = words[0].toLowerCase();
+      
+      return actionVerbs.some(verb => firstWord.includes(verb)) && line.length >= 20 && line.length <= 80;
     });
+
+  // Further clean each line
+  const cleanedResponse = lines.map(line => {
+    return line
+      .replace(/^\W+/, '') // Remove leading punctuation
+      .replace(/\W+$/, '') // Remove trailing punctuation
+      .trim();
+  }).filter(line => line.length > 15);
 
   const ideas: IdeaResponse[] = [];
   
@@ -352,9 +360,23 @@ function generateTemplateFallback(prompt: string, count: number): IdeaResponse[]
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
-  const systemPrompt = `Generate ${count} unique creative project ideas related to ${prompt}. Be concise and actionable.
-Respond with a JSON array of objects, each with:
-- "title": a short and concise sentence with no more than 12 words. it should be a unique and creative idea related to ${prompt}`;
+  const systemPrompt = `Create ${count} simple project ideas for: ${prompt}
+
+IMPORTANT: Each idea must be EXACTLY one sentence, maximum 12 words, starting with an action verb.
+
+Examples of GOOD responses:
+- "Build volcano models using baking soda and vinegar"
+- "Create weather station projects with rain gauges"
+- "Design solar oven experiments using cardboard boxes"
+
+DO NOT include:
+- "Creative concept" 
+- "Action steps"
+- Bullet points
+- Descriptions
+- Multiple sentences
+
+Format as JSON: [{"title": "Build volcano models using baking soda and vinegar"}, {"title": "Create weather station projects with rain gauges"}]`;
 
   // PRIMARY: Try Together.ai Llama
   try {
