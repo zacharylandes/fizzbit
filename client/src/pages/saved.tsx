@@ -198,15 +198,15 @@ export default function SavedPage() {
       const deltaY = clientY - swipeState.startY;
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      // Only start dragging if movement exceeds threshold (10px)
-      if (!swipeState.isDragging && distance > 10) {
+      // Only start dragging if movement exceeds threshold (35px for less sensitivity)
+      if (!swipeState.isDragging && distance > 35) {
         setSwipeState(prev => ({ ...prev, isDragging: true }));
       }
       
       // Only set drag direction if we're actually dragging
-      if (swipeState.isDragging || distance > 10) {
-        // Determine if this is vertical drag or horizontal swipe (higher threshold for less sensitivity)
-        if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 25) {
+      if (swipeState.isDragging || distance > 35) {
+        // Determine if this is vertical drag or horizontal swipe (much higher threshold to prevent accidental reordering)
+        if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 60) {
           setSwipeState(prev => ({ ...prev, isVerticalDrag: true }));
         }
       }
@@ -226,7 +226,7 @@ export default function SavedPage() {
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
       // If no significant movement occurred, treat as a click
-      if (distance < 10 && swipeState.ideaId) {
+      if (distance < 35 && swipeState.ideaId) {
         const idea = savedIdeas.find(idea => idea.id === swipeState.ideaId);
         if (idea) {
           console.log('Treating as click - no drag movement detected');
@@ -247,23 +247,23 @@ export default function SavedPage() {
             currentMobileIdea(swipeState.dragIndex, newIndex);
           }
         }
-      } else if (deltaX < -150) {
-        // Handle horizontal swipe to delete - animate slide away before removing (higher threshold)
+      } else if (deltaX < -100) {
+        // Handle horizontal swipe to delete - improved animation for smoother experience
         if (swipeState.ideaId) {
           // Set state to animate the card sliding away
           setSwipeState(prev => ({
             ...prev,
-            currentX: swipeState.startX - 400, // Slide completely off screen
-            isDragging: false, // This will enable transition
+            currentX: swipeState.startX - 350, // Slide off screen
+            isDragging: false, // Enable smooth CSS transition
             isVerticalDrag: false,
             isDeleting: true // Mark as deleting to prevent state reset
           }));
           
-          // Remove after animation completes
+          // Remove after shorter animation for better responsiveness
           setTimeout(() => {
             const currentUnsaveIdea = unsaveIdeaMutation;
             currentUnsaveIdea.mutate(swipeState.ideaId!);
-          }, 300); // Wait for slide animation to complete
+          }, 200); // Faster animation
           return;
         }
       }
