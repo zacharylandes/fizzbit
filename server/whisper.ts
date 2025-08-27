@@ -11,7 +11,26 @@ const openai = new OpenAI({
 
 export async function transcribeAudio(audioFilePath: string): Promise<{ text: string, duration?: number }> {
   try {
-    console.log('🎤 Transcribing audio file:', audioFilePath);
+    console.log('🎤 WHISPER DEBUGGING - Starting transcription for file:', audioFilePath);
+    
+    // Check if file exists before creating stream
+    if (!fs.existsSync(audioFilePath)) {
+      throw new Error(`Audio file not found at path: ${audioFilePath}`);
+    }
+    
+    const fileStats = fs.statSync(audioFilePath);
+    console.log('🎤 WHISPER DEBUGGING - File stats:', {
+      path: audioFilePath,
+      size: fileStats.size,
+      isFile: fileStats.isFile(),
+      extension: audioFilePath.split('.').pop()
+    });
+    
+    // Check file extension
+    const extension = audioFilePath.split('.').pop()?.toLowerCase();
+    const supportedFormats = ['flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm'];
+    
+    console.log('🎤 WHISPER DEBUGGING - File extension:', extension, 'Supported?', supportedFormats.includes(extension || ''));
     
     const audioReadStream = fs.createReadStream(audioFilePath);
 

@@ -270,7 +270,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      console.log('🎤 Processing audio file for transcription:', req.file.filename, 'Size:', req.file.size, 'MimeType:', req.file.mimetype);
+      console.log('🎤 DEBUGGING - Raw file info:', {
+        filename: req.file.filename,
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        path: req.file.path,
+        encoding: req.file.encoding,
+        fieldname: req.file.fieldname
+      });
+      
+      // Check if original file exists and has content
+      if (!fs.existsSync(req.file.path)) {
+        throw new Error(`Original file doesn't exist at path: ${req.file.path}`);
+      }
+      
+      const originalStats = fs.statSync(req.file.path);
+      console.log('🎤 DEBUGGING - Original file stats:', {
+        size: originalStats.size,
+        isFile: originalStats.isFile()
+      });
       
       // Determine proper file extension based on mimetype
       let fileExtension = '.webm';
@@ -284,13 +303,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         fileExtension = '.webm';
       }
       
+      console.log('🎤 DEBUGGING - Determined file extension:', fileExtension, 'based on mimetype:', req.file.mimetype);
+      
       // First try: Direct transcription with proper extension
       const directPath = req.file.path + fileExtension;
+      console.log('🎤 DEBUGGING - Renaming file from:', req.file.path, 'to:', directPath);
+      
       fs.renameSync(req.file.path, directPath);
-      console.log('🎤 Renamed file to:', directPath);
+      
+      // Verify the renamed file exists and has content
+      if (!fs.existsSync(directPath)) {
+        throw new Error(`Renamed file doesn't exist at path: ${directPath}`);
+      }
+      
+      const renamedStats = fs.statSync(directPath);
+      console.log('🎤 DEBUGGING - Renamed file stats:', {
+        path: directPath,
+        size: renamedStats.size,
+        isFile: renamedStats.isFile()
+      });
+      
+      // Read first few bytes to check file header
+      const buffer = fs.readFileSync(directPath).slice(0, 20);
+      console.log('🎤 DEBUGGING - File header bytes:', Array.from(buffer).map(b => b.toString(16).padStart(2, '0')).join(' '));
       
       try {
+        console.log('🎤 DEBUGGING - Attempting direct transcription with file:', directPath);
         const result = await transcribeAudio(directPath);
+        
+        console.log('🎤 DEBUGGING - Direct transcription SUCCESS:', {
+          text: result.text,
+          duration: result.duration
+        });
         
         // Clean up file
         fs.unlinkSync(directPath);
@@ -301,7 +345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
       } catch (directError) {
-        console.log('Direct transcription failed, trying WAV conversion...');
+        console.log('🎤 DEBUGGING - Direct transcription FAILED:', directError.message);
         
         // Second try: Convert to WAV format
         const wavPath = req.file.path + '.wav';
