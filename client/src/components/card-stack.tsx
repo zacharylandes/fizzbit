@@ -174,6 +174,9 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
   // Smart prefetch more ideas from the same prompt/context
   const prefetchMoreIdeasMutation = useMutation({
     mutationFn: async () => {
+      console.log('🔍 PREFETCH DEBUG - currentExploreContext:', currentExploreContext?.originalPrompt);
+      console.log('🔍 PREFETCH DEBUG - currentPrompt:', currentPrompt);
+      
       const activePrompt = currentExploreContext?.originalPrompt || currentPrompt;
       
       if (!activePrompt) {
@@ -349,14 +352,10 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
         const newCards = prev.filter(c => c.id !== ideaId);
         console.log('🎯 CARDS AFTER SWIPE - Remaining:', newCards.length);
         
-        // Trigger smart prefetching check immediately after state update
+        // Trigger smart prefetching check immediately after state update with correct count
         setTimeout(() => {
-          checkAndPrefetch();
-          // Also check again after cards state has fully updated
-          setTimeout(() => checkAndPrefetch(), 100);
-          // Final check to be absolutely sure we have enough cards
-          setTimeout(() => checkAndPrefetch(), 500);
-        }, 50);
+          checkAndPrefetch(newCards.length);
+        }, 100);
         
         return newCards;
       });
