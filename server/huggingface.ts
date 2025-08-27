@@ -182,6 +182,8 @@ async function analyzeImageWithOpenAI(imageBase64: string) {
 
 // Parse AI response to extract ideas
 function parseIdeasFromResponse(response: string, originalPrompt: string, count: number): IdeaResponse[] {
+  console.log('🔍 PARSING DEBUG - Raw AI response:', response.substring(0, 500) + (response.length > 500 ? '...' : ''));
+  
   try {
     // Try to parse as JSON first - handle various JSON formats
     let jsonMatch = response.match(/\[[\s\S]*\]/);
@@ -189,16 +191,28 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
       jsonMatch = response.match(/\{[\s\S]*\}/);
     }
     
+    console.log('🔍 PARSING DEBUG - JSON match found:', !!jsonMatch);
+    console.log('🔍 PARSING DEBUG - JSON content:', jsonMatch?.[0]?.substring(0, 200));
+    
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);
+      console.log('🔍 PARSING DEBUG - Parsed JSON:', parsed);
       const ideas = Array.isArray(parsed) ? parsed : (parsed.ideas || [parsed]);
+      console.log('🔍 PARSING DEBUG - Ideas array length:', ideas.length);
       
-      const validIdeas = ideas.filter((idea: any) => {
+      const validIdeas = ideas.filter((idea: any, index: number) => {
         const title = idea.title || idea.idea || idea.content;
-        if (!title || typeof title !== 'string') return false;
+        console.log(`🔍 PARSING DEBUG - Idea ${index}:`, { title, type: typeof title });
+        
+        if (!title || typeof title !== 'string') {
+          console.log(`🔍 PARSING DEBUG - Rejected ${index}: No valid title`);
+          return false;
+        }
         
         const titleStr = String(title).trim();
         const words = titleStr.split(' ');
+        
+        console.log(`🔍 PARSING DEBUG - Title ${index}: "${titleStr}" (${titleStr.length} chars, ${words.length} words)`);
         
         // REJECT only obviously invalid titles
         if (titleStr.length < 2 || 
@@ -208,13 +222,17 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
             titleStr.toLowerCase().includes('creative concept') ||
             titleStr.toLowerCase().includes('creative idea') ||
             titleStr.toLowerCase().includes('action step')) {
+          console.log(`🔍 PARSING DEBUG - Rejected ${index}: Failed validation`);
           return false;
         }
         
+        console.log(`🔍 PARSING DEBUG - Accepted ${index}: "${titleStr}"`);
         // ACCEPT any reasonable title - be much more flexible
         // Allow app names, techniques, methods, project ideas, etc.
         return true;
       }).slice(0, count);
+      
+      console.log('🔍 PARSING DEBUG - Valid ideas count:', validIdeas.length);
       
       return validIdeas.map((idea: any, index: number) => {
         const title = String(idea.title || idea.idea || idea.content).trim();
