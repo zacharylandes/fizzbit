@@ -91,11 +91,10 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
       setSwipeUpPrompt("");
       setIsGeneratingIdeas(false);
       
-      // Trigger immediate prefetch check for new cards with correct count
-      setTimeout(() => checkAndPrefetch(initialIdeas.length), 200);
-      // Also check periodically to ensure continuous flow
-      setTimeout(() => checkAndPrefetch(), 1000);
-      setTimeout(() => checkAndPrefetch(), 2000);
+      // Only prefetch if we have fewer than 15 cards initially
+      if (initialIdeas.length <= 15) {
+        setTimeout(() => checkAndPrefetch(initialIdeas.length), 500);
+      }
     }
   }, [initialIdeas]);
 
