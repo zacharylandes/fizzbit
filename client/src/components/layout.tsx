@@ -140,7 +140,7 @@ export default function Layout({ children }: LayoutProps) {
             {/* FizzBit Brand */}
             <Link href="/">
               <div className="flex items-center space-x-4 cursor-pointer hover-lift transition-all duration-300 p-3 rounded-lg hover:bg-accent/10">
-                <img src="/src/assets/logo.png" alt="FizzBit Logo" className="h-12 w-12 object-contain" />
+                <img src="/src/assets/logo.png" alt="FizzBit Logo" className="h-16 w-16 object-contain" />
                 <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
                   FizzBit
                 </h1>
