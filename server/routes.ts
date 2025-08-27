@@ -272,47 +272,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('🎤 Processing audio file for transcription:', req.file.filename, 'Size:', req.file.size, 'MimeType:', req.file.mimetype);
       
-      // Add proper file extension based on mimetype so Whisper can recognize the format
-      let fileExtension = '.webm'; // default
-      if (req.file.mimetype.includes('webm')) {
-        fileExtension = '.webm';
-      } else if (req.file.mimetype.includes('mp4')) {
-        fileExtension = '.mp4';
-      } else if (req.file.mimetype.includes('wav')) {
-        fileExtension = '.wav';
-      } else if (req.file.mimetype.includes('ogg')) {
-        fileExtension = '.ogg';
+      // Convert audio to WAV format for reliable Whisper processing
+      const wavPath = req.file.path + '.wav';
+      
+      try {
+        await convertAudioToWav(req.file.path, wavPath);
+        console.log('🎤 Successfully converted audio to WAV format:', wavPath);
+        
+        // Use OpenAI Whisper for transcription
+        const result = await transcribeAudio(wavPath);
+        
+        // Clean up both files
+        if (fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+        if (fs.existsSync(wavPath)) {
+          fs.unlinkSync(wavPath);
+        }
+        
+        res.json({
+          text: result.text,
+          duration: result.duration
+        });
+        
+      } catch (conversionError) {
+        // If conversion fails, try direct transcription with proper extension
+        console.log('Audio conversion failed, trying direct transcription...');
+        
+        const directPath = req.file.path + '.webm';
+        fs.renameSync(req.file.path, directPath);
+        
+        try {
+          const result = await transcribeAudio(directPath);
+          
+          fs.unlinkSync(directPath);
+          
+          res.json({
+            text: result.text,
+            duration: result.duration
+          });
+        } catch (directError) {
+          throw directError;
+        }
       }
-      
-      // Rename file with proper extension
-      const properFileName = req.file.path + fileExtension;
-      fs.renameSync(req.file.path, properFileName);
-      
-      console.log('🎤 Renamed file to:', properFileName);
-      
-      // Use OpenAI Whisper for transcription
-      const result = await transcribeAudio(properFileName);
-      
-      // Clean up uploaded file
-      fs.unlink(properFileName, (err) => {
-        if (err) console.error('Error deleting uploaded file:', err);
-      });
-      
-      res.json({
-        text: result.text,
-        duration: result.duration
-      });
     } catch (error) {
       console.error('Speech transcription failed:', error);
       
-      // Clean up uploaded file on error
+      // Clean up uploaded files on error
       if (req.file) {
-        const possibleFiles = [req.file.path, req.file.path + '.webm', req.file.path + '.mp4', req.file.path + '.wav', req.file.path + '.ogg'];
+        const possibleFiles = [
+          req.file.path, 
+          req.file.path + '.wav', 
+          req.file.path + '.webm', 
+          req.file.path + '.mp4', 
+          req.file.path + '.ogg'
+        ];
         possibleFiles.forEach(filePath => {
           if (fs.existsSync(filePath)) {
-            fs.unlink(filePath, (err) => {
-              if (err) console.error('Error deleting uploaded file:', err);
-            });
+            fs.unlinkSync(filePath);
           }
         });
       }
