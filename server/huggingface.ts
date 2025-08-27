@@ -425,7 +425,9 @@ Format as JSON: [{"title": "Practice morning pages to unlock creative thoughts d
     
     const response = await callTogetherAI(messages);
     console.log('📦 Together.ai raw response length:', response?.length || 0);
+    console.log('🔍 TOGETHER DEBUG - First 300 chars:', response?.substring(0, 300));
     const ideas = parseIdeasFromResponse(response, prompt, count);
+    console.log('🔍 TOGETHER DEBUG - Ideas returned from parser:', ideas.length);
     
     if (ideas.length > 0) {
       // Add SVG drawings to 1/3 of the ideas
@@ -475,7 +477,9 @@ Format as JSON: [{"title": "Practice morning pages to unlock creative thoughts d
     
     const rawContent = response.choices[0].message.content || "";
     console.log('📦 OpenAI raw response length:', rawContent.length);
+    console.log('🔍 OPENAI DEBUG - First 300 chars:', rawContent.substring(0, 300));
     const ideas = parseIdeasFromResponse(rawContent, prompt, count);
+    console.log('🔍 OPENAI DEBUG - Ideas returned from parser:', ideas.length);
     
     if (ideas.length > 0) {
       // Add SVG drawings to 1/3 of the ideas
