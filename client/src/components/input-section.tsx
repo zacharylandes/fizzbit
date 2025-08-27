@@ -191,12 +191,12 @@ export function InputSection({
 
 
 
-  // Web Speech API for client-side speech recognition
-  const startWebSpeechRecognition = () => {
-    // Check if Web Speech API is supported
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+  // OpenAI Whisper for high-accuracy speech recognition
+  const startWhisperRecognition = () => {
+    // Check if getUserMedia is supported
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       toast({
-        title: "Speech Recognition Not Supported",
+        title: "Microphone Not Supported",
         description: "Please use the text input instead.",
         variant: "destructive",
         duration: 3000,
@@ -204,216 +204,184 @@ export function InputSection({
       return;
     }
 
-    // @ts-ignore - Web Speech API types
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    
-    // Enhanced settings for much better accuracy and flexibility
-    recognition.continuous = true; // Allow longer phrases and continuous speech
-    recognition.interimResults = true; // Show interim results for feedback
-    
-    // Try to detect user's preferred language, fallback to en-US
-    const userLang = navigator.language || navigator.languages?.[0] || 'en-US';
-    const supportedLangs = ['en-US', 'en-GB', 'en-CA', 'en-AU', 'en-IN']; // Common English variants
-    recognition.lang = supportedLangs.includes(userLang) ? userLang : 'en-US';
-    
-    recognition.maxAlternatives = 5; // More alternatives for better accuracy
-    
-    // Remove restrictions for better recognition
-    if ('grammars' in recognition) {
-      recognition.grammars = null; // No grammar restrictions
-    }
-    if ('serviceURI' in recognition) {
-      recognition.serviceURI = ''; // Use default service
-    }
-    
-    // Add timeout to automatically stop after 30 seconds
-    let autoStopTimeout: NodeJS.Timeout;
-    
-    // Store recognition instance to allow manual stopping
-    const recognitionRef = { current: recognition };
-    
-    recognition.onstart = (): void => {
-      setIsRecording(true);
-      setRecordingDuration(0);
-      recordingCounterRef.current = 0;
-      
-      // Start timer
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-      }
-      
-      recordingIntervalRef.current = setInterval(() => {
-        recordingCounterRef.current++;
-        setRecordingDuration(recordingCounterRef.current);
-      }, 1000);
-      
-      // Auto-stop after 30 seconds to prevent infinite listening
-      autoStopTimeout = setTimeout(() => {
-        if (recognitionRef.current) {
-          recognitionRef.current.stop();
+    let mediaRecorder: MediaRecorder | null = null;
+    let audioChunks: Blob[] = [];
+    // Start recording with MediaRecorder
+    navigator.mediaDevices.getUserMedia({ 
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        sampleRate: 16000
+      } 
+    })
+      .then(stream => {
+        // Create MediaRecorder with optimal settings
+        const options = { mimeType: 'audio/webm;codecs=opus' };
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+          options.mimeType = 'audio/webm';
         }
-      }, 30000);
-      
-      toast({
-        title: "Listening...",
-        description: "Speak naturally - I'll capture everything you say",
-        duration: 1000,
-      });
-    };
-    
-    recognition.onresult = (event: any): void => {
-      let finalTranscript = '';
-      let interimTranscript = '';
-      let bestConfidence = 0;
-      let bestTranscript = '';
-      
-      // Process all results with improved confidence handling
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        
-        // Get the best alternative - be more forgiving with confidence
-        let currentBest = result[0]; // Default to first result
-        for (let j = 0; j < result.length; j++) {
-          // Accept any result with reasonable confidence, or if it's longer/more complete
-          if (result[j].confidence > 0.3 && 
-              (result[j].confidence > currentBest.confidence || 
-               result[j].transcript.length > currentBest.transcript.length)) {
-            currentBest = result[j];
-          }
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+          options.mimeType = 'audio/mp4';
         }
         
-        if (result.isFinal) {
-          finalTranscript += currentBest.transcript + ' ';
-          if (currentBest.confidence > bestConfidence || bestTranscript === '') {
-            bestConfidence = currentBest.confidence;
-            bestTranscript = finalTranscript.trim();
-          }
-        } else {
-          interimTranscript += currentBest.transcript + ' ';
-        }
-      }
-      
-      console.log('🎤 Web Speech Recognition:', { 
-        finalTranscript, 
-        interimTranscript, 
-        confidence: bestConfidence,
-        alternatives: event.results[event.resultIndex]?.length || 0
-      });
-      
-      // Show interim results in real-time
-      if (interimTranscript) {
-        setTextPrompt(interimTranscript);
-        if (onPromptChange) {
-          onPromptChange(interimTranscript);
-        }
-      }
-      
-      // Process final results - be more accepting of lower confidence
-      if (finalTranscript.trim()) {
-        const transcriptToUse = bestConfidence > 0.7 ? bestTranscript : finalTranscript;
-        setTextPrompt(transcriptToUse);
+        mediaRecorder = new MediaRecorder(stream, options);
+        audioChunks = [];
         
-        if (onPromptChange) {
-          onPromptChange(finalTranscript);
+        // Set up recording state
+        setIsRecording(true);
+        setRecordingDuration(0);
+        recordingCounterRef.current = 0;
+        
+        // Start timer
+        if (recordingIntervalRef.current) {
+          clearInterval(recordingIntervalRef.current);
         }
         
-        // Stop recognition after getting final result
-        if (autoStopTimeout) {
-          clearTimeout(autoStopTimeout);
-        }
-        recognition.stop();
-        
-        // Generate ideas with the final transcript
-        console.log('🎤 Generating ideas from voice transcript:', finalTranscript.trim());
-        generateFromTextMutation.mutate(finalTranscript.trim());
+        recordingIntervalRef.current = setInterval(() => {
+          recordingCounterRef.current++;
+          setRecordingDuration(recordingCounterRef.current);
+        }, 1000);
         
         toast({
-          title: "Speech Recognized!",
-          description: `"${finalTranscript.trim()}"`,
-          duration: 3000,
+          title: "Recording...",
+          description: "Speak clearly - using professional speech recognition",
+          duration: 1500,
         });
-      }
-    };
-    
-    recognition.onerror = (event: any): void => {
-      console.error('Web Speech Recognition error:', event.error);
-      setIsRecording(false);
-      
-      // Clear all timers and timeouts
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-        recordingIntervalRef.current = null;
-      }
-      if (autoStopTimeout) {
-        clearTimeout(autoStopTimeout);
-      }
-      
-      let errorMessage = "Speech recognition failed. Try typing your idea instead.";
-      let shouldShowError = true;
-      
-      if (event.error === 'no-speech') {
-        errorMessage = "No speech detected. Try speaking louder or closer to your microphone.";
-      } else if (event.error === 'not-allowed') {
-        errorMessage = "Microphone access denied. Please allow microphone access in your browser settings.";
-      } else if (event.error === 'network') {
-        errorMessage = "Network error. Please check your internet connection and try again.";
-      } else if (event.error === 'aborted') {
-        // Don't show error for intentional stops
-        shouldShowError = false;
-      }
-      
-      if (shouldShowError) {
+        
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunks.push(event.data);
+          }
+        };
+        
+        mediaRecorder.onstop = async () => {
+          // Stop all streams
+          stream.getTracks().forEach(track => track.stop());
+          
+          if (recordingIntervalRef.current) {
+            clearInterval(recordingIntervalRef.current);
+            recordingIntervalRef.current = null;
+          }
+          
+          if (audioChunks.length === 0) {
+            setIsRecording(false);
+            toast({
+              title: "No Audio Recorded",
+              description: "Please try recording again.",
+              variant: "destructive",
+              duration: 3000,
+            });
+            return;
+          }
+          
+          // Create audio blob and send to Whisper
+          const audioBlob = new Blob(audioChunks, { type: mediaRecorder?.mimeType || 'audio/webm' });
+          console.log('🎤 Audio recorded, size:', audioBlob.size, 'bytes');
+          
+          // Show processing message
+          toast({
+            title: "Processing Speech...",
+            description: "Converting your voice to text with AI",
+            duration: 2000,
+          });
+          
+          try {
+            // Send to backend for Whisper processing
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recording.webm');
+            
+            const response = await fetch('/api/speech/transcribe', {
+              method: 'POST',
+              body: formData,
+            });
+            
+            if (!response.ok) {
+              throw new Error(`Transcription failed: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            const transcript = result.text?.trim();
+            
+            if (!transcript || transcript.length < 2) {
+              throw new Error('No speech detected in recording');
+            }
+            
+            console.log('🎤 Whisper transcript:', transcript);
+            
+            // Update UI with transcript
+            setTextPrompt(transcript);
+            if (onPromptChange) {
+              onPromptChange(transcript);
+            }
+            
+            // Generate ideas
+            generateFromTextMutation.mutate(transcript);
+            
+            toast({
+              title: "Speech Recognized!",
+              description: `"${transcript}"`,
+              duration: 3000,
+            });
+            
+          } catch (error) {
+            console.error('Whisper transcription failed:', error);
+            toast({
+              title: "Speech Recognition Failed",
+              description: "Please try speaking again or use text input.",
+              variant: "destructive",
+              duration: 4000,
+            });
+          } finally {
+            setIsRecording(false);
+            setCurrentRecognition(null);
+          }
+        };
+        
+        // Auto-stop after 30 seconds
+        const autoStopTimeout = setTimeout(() => {
+          if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+          }
+        }, 30000);
+        
+        // Store recorder for manual stopping
+        setCurrentRecognition({
+          stop: () => {
+            clearTimeout(autoStopTimeout);
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+              mediaRecorder.stop();
+            }
+          }
+        });
+        
+        // Start recording
+        mediaRecorder.start(1000); // Collect data every second
+        console.log('🎤 Whisper recording started');
+        
+      })
+      .catch(error => {
+        console.error('Failed to access microphone:', error);
+        setIsRecording(false);
+        
+        let errorMessage = "Could not access your microphone.";
+        if (error.name === 'NotAllowedError') {
+          errorMessage = "Microphone access denied. Please allow microphone access in your browser settings.";
+        } else if (error.name === 'NotFoundError') {
+          errorMessage = "No microphone found. Please check your audio devices.";
+        }
+        
         toast({
-          title: "Voice Input Issue",
+          title: "Microphone Error",
           description: errorMessage,
           variant: "destructive",
           duration: 4000,
         });
-      }
-    };
-    
-    recognition.onend = (): void => {
-      setIsRecording(false);
-      setRecordingDuration(0);
-      setCurrentRecognition(null);
-      
-      // Clear all timers and timeouts
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-        recordingIntervalRef.current = null;
-      }
-      if (autoStopTimeout) {
-        clearTimeout(autoStopTimeout);
-      }
-    };
-    
-    try {
-      // Store recognition instance for manual control
-      setCurrentRecognition(recognition);
-      
-      // Auto-stop after 15 seconds if no final result
-      setTimeout(() => {
-        if (recognition && isRecording) {
-          recognition.stop();
-        }
-      }, 15000);
-      
-      recognition.start();
-    } catch (error) {
-      console.error('Error starting recognition:', error);
-      setCurrentRecognition(null);
-      toast({
-        title: "Speech Recognition Error",
-        description: "Please type your idea instead.",
-        variant: "destructive",
-        duration: 3000,
       });
-    }
   };
 
-  // Audio recording functions (kept as fallback)
-  const startRecording = startWebSpeechRecognition;
+  // Audio recording functions using Whisper
+  const startRecording = startWhisperRecognition;
 
   // Store recognition instance globally to allow manual control
   const [currentRecognition, setCurrentRecognition] = useState<any>(null);

@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertIdeaSchema } from "@shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { generateIdeasFromText, generateIdeasFromImage, generateRelatedIdeas } from "./huggingface";
+import { transcribeAudio } from "./whisper";
 import { HfInference } from "@huggingface/inference";
 import multer from "multer";
 import fs from "fs";
@@ -59,7 +60,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     },
     limits: {
-      fileSize: 10 * 1024 * 1024 // 10MB limit
+      fileSize: 25 * 1024 * 1024 // 25MB limit for audio files
     }
   });
   
@@ -259,6 +260,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.json({ ideas: createdIdeas });
+    }
+  }));
+
+  // Speech transcription using OpenAI Whisper (standalone endpoint)
+  app.post("/api/speech/transcribe", upload.single('audio'), asyncHandler(async (req: any, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No audio file provided' });
+    }
+    
+    try {
+      console.log('🎤 Processing audio file for transcription:', req.file.filename, 'Size:', req.file.size);
+      
+      // Use OpenAI Whisper for transcription
+      const result = await transcribeAudio(req.file.path);
+      
+      // Clean up uploaded file
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error('Error deleting uploaded file:', err);
+      });
+      
+      res.json({
+        text: result.text,
+        duration: result.duration
+      });
+    } catch (error) {
+      console.error('Speech transcription failed:', error);
+      
+      // Clean up uploaded file on error
+      if (req.file) {
+        fs.unlink(req.file.path, (err) => {
+          if (err) console.error('Error deleting uploaded file:', err);
+        });
+      }
+      
+      res.status(500).json({ 
+        error: 'Speech transcription failed',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   }));
 
