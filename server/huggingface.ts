@@ -470,9 +470,8 @@ Format as JSON: [{"title": "Practice morning pages to unlock creative thoughts d
         { role: "system", content: systemPrompt },
         { role: "user", content: prompt }
       ],
-      response_format: { type: "json_object" },
       temperature: 0.8,
-      max_tokens: 1200
+      max_tokens: 2500
     });
     
     const rawContent = response.choices[0].message.content || "";
