@@ -220,38 +220,48 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
     console.log('JSON parsing failed, using text parsing...');
   }
   
-  // Simple text parsing for title-only format
-  console.log('Text parsing fallback - extracting simple titles...');
+  // Extract only actual creative ideas from response
+  console.log('Text parsing fallback - extracting creative ideas...');
   
-  // Clean response and split into lines
-  const lines = response
-    .replace(/[{}[\]"]/g, '') // Remove JSON syntax
-    .replace(/title:|,\s*$/gm, '') // Remove JSON keys and trailing commas
-    .split(/\n+/)
+  // Clean response and extract meaningful content
+  const cleanedResponse = response
+    .replace(/[{}[\]"]/g, ' ') // Remove JSON syntax
+    .replace(/title:|description:|Creative concept|Action steps/gi, '') // Remove unwanted text
+    .replace(/related to .+?curriculum/gi, '') // Remove generic text about curriculum
+    .split(/[,\n]+/) // Split on commas and newlines
     .map(line => line.trim())
     .filter(line => {
-      // Keep lines that look like creative ideas (not JSON fragments)
-      return line.length > 10 && 
-             line.length <= 100 && // Max 12 words ≈ 100 chars
-             !line.includes('JSON') &&
-             !line.includes('array') &&
-             !line.includes('Creative concept') &&
-             !line.includes('Action steps') &&
-             line.split(' ').length >= 3 &&
-             line.split(' ').length <= 15; // 3-15 words
+      // Only keep lines that are actual creative project ideas
+      const words = line.split(' ');
+      return line.length > 15 && 
+             line.length <= 80 && // Reasonable sentence length
+             words.length >= 4 && words.length <= 12 && // 4-12 words as requested
+             !line.toLowerCase().includes('creative') &&
+             !line.toLowerCase().includes('concept') &&
+             !line.toLowerCase().includes('action') &&
+             !line.toLowerCase().includes('step') &&
+             !line.toLowerCase().includes('json') &&
+             // Must contain action words indicating a project
+             (line.toLowerCase().includes('create') || 
+              line.toLowerCase().includes('build') || 
+              line.toLowerCase().includes('design') ||
+              line.toLowerCase().includes('make') ||
+              line.toLowerCase().includes('explore') ||
+              line.toLowerCase().includes('investigate') ||
+              line.toLowerCase().includes('experiment'));
     });
 
   const ideas: IdeaResponse[] = [];
   
-  // Create ideas from clean lines (title-only format)
-  for (let i = 0; i < lines.length && ideas.length < count; i++) {
-    const cleanTitle = lines[i].trim();
+  // Create ideas from actual creative content
+  for (let i = 0; i < cleanedResponse.length && ideas.length < count; i++) {
+    const ideaText = cleanedResponse[i].trim();
     
-    if (cleanTitle.length > 10) {
+    if (ideaText.length > 15) {
       ideas.push({
         id: `ai-${Date.now()}-${ideas.length}`,
-        title: cleanTitle,
-        description: cleanTitle, // Use same content for both since we only have titles
+        title: ideaText,
+        description: ideaText,
         sourceContent: originalPrompt
       });
     }

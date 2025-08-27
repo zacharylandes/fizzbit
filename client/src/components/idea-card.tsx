@@ -46,11 +46,9 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
           </div>
         </div>
         
-        <h3 className={`text-xl font-bold mb-3 leading-tight ${accentColor}`}>{idea.title}</h3>
-        
         {/* SVG Drawing if available */}
         {idea.svg && (
-          <div className="mb-4 flex justify-center">
+          <div className="mb-6 flex justify-center">
             <div 
               className="max-w-48 max-h-32 overflow-hidden rounded-lg bg-white/50 p-2"
               dangerouslySetInnerHTML={{ __html: idea.svg }}
@@ -58,22 +56,11 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
           </div>
         )}
         
-        <div className="text-foreground/80 leading-relaxed text-sm overflow-y-auto pr-2" style={{ fontFamily: 'Inter, sans-serif', maxHeight: idea.svg ? '150px' : '220px' }}>
-          {idea.description.split('\n').map((line, index) => (
-            <div key={index}>
-              {line.startsWith('**') && line.endsWith('**') ? (
-                <strong className={`block mt-3 mb-2 ${index === 0 ? 'mt-0' : ''} ${accentColor}`}>
-                  {line.replace(/\*\*/g, '')}
-                </strong>
-              ) : line.startsWith('• ') ? (
-                <div className="mb-1 ml-2">{line}</div>
-              ) : line.trim() ? (
-                <div className="mb-1">{line}</div>
-              ) : (
-                <div className="h-2" />
-              )}
-            </div>
-          ))}
+        {/* Simple centered title */}
+        <div className="flex items-start justify-center h-full">
+          <h3 className={`text-lg font-bold text-center leading-relaxed ${accentColor}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+            {idea.title}
+          </h3>
         </div>
         
         {/* Swipe Indicators */}
