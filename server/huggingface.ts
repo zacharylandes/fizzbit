@@ -374,13 +374,9 @@ function generateTemplateFallback(prompt: string, count: number): IdeaResponse[]
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
-  const systemPrompt = `Generate ${count} unique creative project ideas. Be concise and actionable.
-
+  const systemPrompt = `Generate ${count} unique creative project ideas related to ${prompt}. Be concise and actionable.
 Respond with a JSON array of objects, each with:
-- "title": A catchy 3-4 word title
-- "description": Format as: "**Creative concept:**\n• [brief concept]\n• [unique angle]\n\n**Action steps:**\n• [first step]\n• [next step]"
-
-Keep each description under 4 bullet points total. Be creative and specific, not descriptive.`;
+- "title": a short and concise sentence with no more than 12 words. it should be a unique and creative idea related to ${prompt}`;
 
   // PRIMARY: Try Together.ai Llama
   try {
