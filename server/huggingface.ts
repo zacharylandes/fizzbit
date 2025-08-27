@@ -276,14 +276,14 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
     title = title.replace(/[^\w\s-]/g, '').trim().substring(0, 50);
     description = description || segment;
     
-    // Format as structured description
-    const formattedDescription = `**Creative concept:**\n• ${description.substring(0, 150)}\n\n**Action steps:**\n• Start developing this concept\n• Explore variations and possibilities`;
+    // Use the segment directly as the title (new simple format)
+    const formattedDescription = segment.trim();
     
-    if (title.length > 2 && description.length > 10) {
+    if (formattedDescription.length > 10) {
       ideas.push({
         id: `ai-${Date.now()}-${ideas.length}`,
-        title: title,
-        description: formattedDescription,
+        title: formattedDescription.substring(0, 80), // Use content as title
+        description: formattedDescription, // Simple description without extra formatting
         sourceContent: originalPrompt
       });
     }
@@ -496,11 +496,9 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
 export async function generateRelatedIdeas(contextualPrompt: string, count: number = 3): Promise<IdeaResponse[]> {
   console.log(`🔗 Generating ${count} related ideas from context: "${contextualPrompt}"`);
   
-  const systemPrompt = `Generate ${count} concise creative ideas that build upon or relate to the given context. Each idea should feel like a natural extension or creative variation of the original concept.
-
-Format as: "**Creative concept:**\n• [brief concept]\n• [unique angle]\n\n**Action steps:**\n• [first step]\n• [next step]"
-
-Respond with JSON array of objects with "title" and "description" fields.`;
+  const systemPrompt = `Generate ${count} unique creative project ideas related to ${contextualPrompt}. Be concise and actionable.
+Respond with a JSON array of objects, each with:
+- "title": a short and concise sentence with no more than 12 words. it should be a unique and creative idea related to ${contextualPrompt}`;
 
   // PRIMARY: Try Together.ai
   try {
