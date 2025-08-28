@@ -1729,7 +1729,6 @@ export default function SavedPage() {
             </div>
           </div>
         </div>
-        </div>
       )}
     </div>
   );
