@@ -1130,14 +1130,16 @@ export default function SavedPage() {
             </div>
           </div>
         )}
-        {isLoading ? (
+        {isLoading && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className="w-8 h-8 mx-auto mb-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
               <p className="text-muted-foreground">Loading your saved ideas...</p>
             </div>
           </div>
-        ) : filteredIdeas.length === 0 ? (
+        )}
+        
+        {!isLoading && filteredIdeas.length === 0 && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center p-8">
               <div className="bg-card border border-card-sage/30 rounded-2xl p-8 max-w-sm mx-auto shadow-sm">
@@ -1159,7 +1161,9 @@ export default function SavedPage() {
               </div>
             </div>
           </div>
-        ) : isMobile ? (
+        )}
+        
+        {!isLoading && filteredIdeas.length > 0 && isMobile && (
           // Mobile: Vertical scrollable list
           <div className="h-full overflow-y-auto px-4 pt-4 pb-24">
             <div className="space-y-3">
@@ -1385,7 +1389,9 @@ export default function SavedPage() {
                 })}
             </div>
           </div>
-        ) : (
+        )}
+        
+        {!isLoading && filteredIdeas.length > 0 && !isMobile && (
           // Desktop: Infinite canvas
           <div
             ref={canvasRef}
@@ -1565,7 +1571,88 @@ export default function SavedPage() {
             })}
           </div>
         )}
+        
+        {!isLoading && filteredIdeas.length > 0 && !isMobile && (
+          // Desktop: Grid layout
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+            {filteredIdeas.map((idea, index) => {
+              const colorIndex = cardColors[idea.id] ?? index % 8;
+              const cardStyles = [
+                "bg-card-sage border-card-sage/40",
+                "bg-card-blue-gray border-card-blue-gray/40", 
+                "bg-card-cream border-card-cream/40",
+                "bg-card-light-blue border-card-light-blue/40",
+                "bg-card-purple-gray border-card-purple-gray/40",
+                "bg-card-peach border-card-peach/40",
+                "bg-card-lavender border-card-lavender/40",
+                "bg-card-mint border-card-mint/40"
+              ];
+              
+              return (
+                <Card 
+                  key={idea.id}
+                  className={`${cardStyles[colorIndex]} w-full border-2 card-shadow hover-lift transition-all duration-300 flex flex-col cursor-pointer`}
+                  onClick={() => handleCardClick(idea)}
+                >
+                  <div className="flex-shrink-0 p-2 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50">
+                    <div className="flex items-center justify-between">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 hover:bg-gray-200 dark:hover:bg-gray-700"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Palette className="h-3 w-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-32">
+                          {cardStyles.map((style, idx) => (
+                            <DropdownMenuItem
+                              key={idx}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                changeCardColor(idea.id, idx);
+                              }}
+                              className="flex items-center gap-2"
+                            >
+                              <div className={`w-3 h-3 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')}`} />
+                              <span className="text-xs">{groupTitles[idx] || `Group ${idx + 1}`}</span>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          unsaveIdeaMutation.mutate(idea.id);
+                        }}
+                        className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 p-4 flex flex-col">
+                    <h3 className="font-bold text-lg leading-tight mb-2 text-gray-800 dark:text-gray-100">
+                      {idea.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed flex-1">
+                      {idea.description}
+                    </p>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        )}
       </div>
+      )}
 
       {/* Desktop Card Expansion Modal */}
       {expandedCard && !isMobile && (
@@ -1629,7 +1716,7 @@ export default function SavedPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleStartEditing(expandedCard)}
+                      onClick={() => expandedCard && handleStartEditing(expandedCard)}
                       className="ml-2"
                     >
                       <Pencil className="h-4 w-4 mr-2" />
