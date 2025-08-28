@@ -901,7 +901,7 @@ export default function SavedPage() {
         <div className={`sidebar-container fixed left-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
           isMobile ? 'w-[70%] rounded-tr-xl' : 'w-[416px] rounded-tr-xl'
         }`} style={{ 
-          top: '192px', // Start below the saved ideas title section
+          top: '96px', // Start at same level as saved ideas section
           bottom: '0'
         }}>
         <div className="p-4 h-full overflow-y-auto overflow-x-hidden" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -1065,9 +1065,9 @@ export default function SavedPage() {
       <div className={`flex-1 relative overflow-hidden ${
         sidebarExpanded && isMobile ? 'ml-[70%]' : !isMobile && sidebarExpanded ? 'ml-[416px]' : ''
       }`}>
-        {/* Drawing and Zoom Controls - Inside content area boundaries (Desktop Only) */}
+        {/* Drawing and Zoom Controls - Truly inside saved ideas container */}
         {!isMobile && (
-          <div className="absolute top-8 left-8 z-40 bg-white border-2 border-gray-200 rounded-lg p-3 shadow-md">
+          <div className="absolute top-4 right-4 z-30 bg-white border border-gray-300 rounded-lg p-2 shadow-sm">
             <div className="flex items-center gap-2">
               {/* Drawing Mode Toggle */}
               <Button
