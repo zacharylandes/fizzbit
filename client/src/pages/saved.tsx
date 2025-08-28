@@ -1651,6 +1651,7 @@ export default function SavedPage() {
           </div>
         )}
       </div>
+      </div>
 
       {/* Desktop Card Expansion Modal */}
       {expandedCard && !isMobile && (
