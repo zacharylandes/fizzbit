@@ -1030,11 +1030,11 @@ export default function SavedPage() {
       )}
 
       {/* Content Area */}
-      <div className={`flex-1 relative overflow-hidden ${
+      <div className={`flex-1 relative overflow-hidden bg-background border border-border rounded-lg m-4 ${
         sidebarExpanded && isMobile ? 'ml-[70%]' : !isMobile && sidebarExpanded ? 'ml-[416px]' : ''
       }`}>
         {/* Toolbar Section - Inside the Content Area */}
-        <div className="relative bg-background border-b border-border px-4 py-3" style={{ height: isMobile ? '64px' : '80px' }}>
+        <div className="relative px-4 py-3" style={{ height: isMobile ? '64px' : '80px' }}>
           <div className="flex items-center gap-3 h-full">
             {/* Sidebar Toggle Button - Always visible when sidebar closed */}
             {!sidebarExpanded && (
