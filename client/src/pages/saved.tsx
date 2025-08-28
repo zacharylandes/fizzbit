@@ -1065,6 +1065,9 @@ export default function SavedPage() {
       <div className={`flex-1 relative overflow-hidden ${
         sidebarExpanded && isMobile ? 'ml-[70%]' : !isMobile && sidebarExpanded ? 'ml-[416px]' : ''
       }`}>
+        {/* Drawing and Zoom Controls */}
+        {filteredIdeas.length > 0 && !isMobile && (
+          <div className="absolute top-4 right-4 z-10 bg-background/95 backdrop-blur-sm border border-border rounded-lg px-3 py-2 shadow-sm">
             <div className="flex items-center gap-2">
               {/* Drawing Mode Toggle */}
               <Button
@@ -1652,7 +1655,6 @@ export default function SavedPage() {
           </div>
         )}
       </div>
-      )}
 
       {/* Desktop Card Expansion Modal */}
       {expandedCard && !isMobile && (
