@@ -897,10 +897,12 @@ export default function SavedPage() {
       )}
 
       {/* Collapsible Sidebar */}
-      <div className={`sidebar-container fixed top-0 left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
+      <div className={`sidebar-container fixed left-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
         sidebarExpanded ? isMobile ? 'w-[70%] rounded-tr-xl' : 'w-[416px] rounded-tr-xl' : isMobile ? 'w-0' : 'w-16'
       }`} style={{ 
-        visibility: sidebarExpanded || !isMobile ? 'visible' : 'hidden'
+        visibility: sidebarExpanded || !isMobile ? 'visible' : 'hidden',
+        top: '96px', // Start below the main header
+        bottom: '0'
       }}>
         <div className="p-4 h-full overflow-y-auto overflow-x-hidden" style={{ WebkitOverflowScrolling: 'touch' }}>
           {/* Sidebar Header */}
@@ -1027,9 +1029,9 @@ export default function SavedPage() {
       </div>
 
       {/* Page Title Section - Full width below main header */}
-      <div className={`relative bg-background border-b border-border ${isMobile ? 'h-16' : 'h-16'} ${
+      <div className={`relative bg-background border-b border-border ${isMobile ? 'h-16' : 'h-20'} ${
         sidebarExpanded && isMobile ? 'ml-[70%]' : !isMobile && sidebarExpanded ? 'ml-[416px]' : !isMobile ? 'ml-16' : ''
-      }`}>
+      }`} style={{ marginTop: '0px' }}>
         <div className="max-w-7xl mx-auto px-4 py-3 h-full">
           <div className="flex items-center gap-3 h-full">
             {/* Mobile Hamburger Menu */}
@@ -1064,7 +1066,7 @@ export default function SavedPage() {
       }`}>
         {/* Drawing and Zoom Controls - Inside content container (Desktop Only) */}
         {!isMobile && (
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 bg-background/95 backdrop-blur-sm border border-border rounded-lg p-2 shadow-lg">
+          <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-50 bg-background/95 backdrop-blur-sm border border-border rounded-lg p-3 shadow-lg">
             <div className="flex items-center gap-2">
               {/* Drawing Mode Toggle */}
               <Button
