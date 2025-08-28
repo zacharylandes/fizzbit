@@ -1065,9 +1065,6 @@ export default function SavedPage() {
       <div className={`flex-1 relative overflow-hidden ${
         sidebarExpanded && isMobile ? 'ml-[70%]' : !isMobile && sidebarExpanded ? 'ml-[416px]' : ''
       }`}>
-        {/* Drawing and Zoom Controls - Truly inside saved ideas container */}
-        {!isMobile && (
-          <div className="absolute top-4 right-4 z-30 bg-white border border-gray-300 rounded-lg p-2 shadow-sm">
             <div className="flex items-center gap-2">
               {/* Drawing Mode Toggle */}
               <Button
