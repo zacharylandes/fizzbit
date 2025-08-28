@@ -897,7 +897,7 @@ export default function SavedPage() {
       )}
 
       {/* Collapsible Sidebar */}
-      <div className={`sidebar-container fixed top-16 left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
+      <div className={`sidebar-container fixed top-0 left-0 bottom-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
         sidebarExpanded ? isMobile ? 'w-[70%] rounded-tr-xl' : 'w-[416px] rounded-tr-xl' : isMobile ? 'w-0' : 'w-16'
       }`} style={{ 
         visibility: sidebarExpanded || !isMobile ? 'visible' : 'hidden'
@@ -1055,72 +1055,6 @@ export default function SavedPage() {
             </div>
           </div>
           
-          {/* Drawing and Zoom Controls - Centered Below Header (Desktop Only) */}
-          {!isMobile && (
-            <div className="flex items-center justify-center gap-2">
-            {/* Drawing Mode Toggle */}
-            <Button
-              size="sm"
-              variant={isDrawingMode ? "default" : "outline"}
-              onClick={() => setIsDrawingMode(!isDrawingMode)}
-              className="h-8 px-3"
-            >
-              <Pencil className="h-4 w-4 mr-1" />
-              <span className="text-xs">Draw</span>
-            </Button>
-            
-            {isDrawingMode && (
-              <>
-                {/* Color Picker */}
-                <div className="flex items-center gap-1">
-                  {['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#000000'].map(color => (
-                    <button
-                      key={color}
-                      className={`w-6 h-6 rounded-full border-2 ${
-                        drawingState.color === color ? 'border-gray-800' : 'border-gray-300'
-                      }`}
-                      style={{ backgroundColor: color }}
-                      onClick={() => setDrawingState(prev => ({ ...prev, color }))}
-                    />
-                  ))}
-                </div>
-                
-                {/* Clear Drawings */}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={clearDrawings}
-                  className="h-8 px-2"
-                >
-                  <Eraser className="h-3 w-3" />
-                </Button>
-              </>
-            )}
-            
-            <div className="w-px h-6 bg-border mx-1" />
-            
-            {/* Zoom Controls */}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleZoomOut}
-              className="h-8 w-8 p-0"
-            >
-              <ZoomOut className="h-4 w-4" />
-            </Button>
-            <span className="text-sm text-muted-foreground min-w-[3rem] text-center">
-              {Math.round(zoom * 100)}%
-            </span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleZoomIn}
-              className="h-8 w-8 p-0"
-            >
-              <ZoomIn className="h-4 w-4" />
-            </Button>
-            </div>
-          )}
         </div>
       </div>
 
@@ -1128,6 +1062,74 @@ export default function SavedPage() {
       <div className={`flex-1 relative overflow-hidden ${
         sidebarExpanded && isMobile ? 'ml-[70%]' : !isMobile && sidebarExpanded ? 'ml-[416px]' : !isMobile ? 'ml-16' : ''
       }`}>
+        {/* Drawing and Zoom Controls - Inside content container (Desktop Only) */}
+        {!isMobile && (
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 bg-background/95 backdrop-blur-sm border border-border rounded-lg p-2 shadow-lg">
+            <div className="flex items-center gap-2">
+              {/* Drawing Mode Toggle */}
+              <Button
+                size="sm"
+                variant={isDrawingMode ? "default" : "outline"}
+                onClick={() => setIsDrawingMode(!isDrawingMode)}
+                className="h-8 px-3"
+              >
+                <Pencil className="h-4 w-4 mr-1" />
+                <span className="text-xs">Draw</span>
+              </Button>
+              
+              {isDrawingMode && (
+                <>
+                  {/* Color Picker */}
+                  <div className="flex items-center gap-1">
+                    {['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#000000'].map(color => (
+                      <button
+                        key={color}
+                        className={`w-6 h-6 rounded-full border-2 ${
+                          drawingState.color === color ? 'border-gray-800' : 'border-gray-300'
+                        }`}
+                        style={{ backgroundColor: color }}
+                        onClick={() => setDrawingState(prev => ({ ...prev, color }))}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* Clear Drawings */}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={clearDrawings}
+                    className="h-8 px-2"
+                  >
+                    <Eraser className="h-3 w-3" />
+                  </Button>
+                </>
+              )}
+              
+              <div className="w-px h-6 bg-border mx-1" />
+              
+              {/* Zoom Controls */}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleZoomOut}
+                className="h-8 w-8 p-0"
+              >
+                <ZoomOut className="h-4 w-4" />
+              </Button>
+              <span className="text-sm text-muted-foreground min-w-[3rem] text-center">
+                {Math.round(zoom * 100)}%
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleZoomIn}
+                className="h-8 w-8 p-0"
+              >
+                <ZoomIn className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
