@@ -901,7 +901,7 @@ export default function SavedPage() {
         <div className={`sidebar-container fixed left-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
           isMobile ? 'w-[70%] rounded-tr-xl' : 'w-[416px] rounded-tr-xl'
         }`} style={{ 
-          top: '96px', // Start at same level as saved ideas section
+          top: '0', // Align with the start of the saved page content
           bottom: '0'
         }}>
         <div className="p-4 h-full overflow-y-auto overflow-x-hidden" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -1029,11 +1029,12 @@ export default function SavedPage() {
         </div>
       )}
 
-      {/* Page Title Section - Full width below main header */}
-      <div className={`relative bg-background border-b border-border ${isMobile ? 'h-16' : 'h-20'} ${
+      {/* Content Area */}
+      <div className={`flex-1 relative overflow-hidden ${
         sidebarExpanded && isMobile ? 'ml-[70%]' : !isMobile && sidebarExpanded ? 'ml-[416px]' : ''
-      }`} style={{ marginTop: '0px' }}>
-        <div className="max-w-7xl mx-auto px-4 py-3 h-full">
+      }`}>
+        {/* Toolbar Section - Inside the Content Area */}
+        <div className="relative bg-background border-b border-border px-4 py-3" style={{ height: isMobile ? '64px' : '80px' }}>
           <div className="flex items-center gap-3 h-full">
             {/* Sidebar Toggle Button - Always visible when sidebar closed */}
             {!sidebarExpanded && (
@@ -1057,17 +1058,10 @@ export default function SavedPage() {
               </h1>
             </div>
           </div>
-          
         </div>
-      </div>
-
-      {/* Content Area */}
-      <div className={`flex-1 relative overflow-hidden ${
-        sidebarExpanded && isMobile ? 'ml-[70%]' : !isMobile && sidebarExpanded ? 'ml-[416px]' : ''
-      }`}>
         {/* Drawing and Zoom Controls */}
         {filteredIdeas.length > 0 && !isMobile && (
-          <div className="absolute top-4 right-4 z-10 bg-background/95 backdrop-blur-sm border border-border rounded-lg px-3 py-2 shadow-sm">
+          <div className="absolute right-4 z-10 bg-background/95 backdrop-blur-sm border border-border rounded-lg px-3 py-2 shadow-sm" style={{ top: isMobile ? '68px' : '84px' }}>
             <div className="flex items-center gap-2">
               {/* Drawing Mode Toggle */}
               <Button
