@@ -896,14 +896,14 @@ export default function SavedPage() {
         />
       )}
 
-      {/* Collapsible Sidebar */}
-      <div className={`sidebar-container fixed left-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
-        sidebarExpanded ? isMobile ? 'w-[70%] rounded-tr-xl' : 'w-[416px] rounded-tr-xl' : isMobile ? 'w-0' : 'w-16'
-      }`} style={{ 
-        visibility: sidebarExpanded || !isMobile ? 'visible' : 'hidden',
-        top: '192px', // Start below the saved ideas title section
-        bottom: '0'
-      }}>
+      {/* Collapsible Sidebar - Only visible when expanded */}
+      {sidebarExpanded && (
+        <div className={`sidebar-container fixed left-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
+          isMobile ? 'w-[70%] rounded-tr-xl' : 'w-[416px] rounded-tr-xl'
+        }`} style={{ 
+          top: '192px', // Start below the saved ideas title section
+          bottom: '0'
+        }}>
         <div className="p-4 h-full overflow-y-auto overflow-x-hidden" style={{ WebkitOverflowScrolling: 'touch' }}>
           {/* Sidebar Header */}
           <div className="flex items-center justify-center mb-6">
@@ -1026,16 +1026,17 @@ export default function SavedPage() {
             </div>
           )}
         </div>
-      </div>
+        </div>
+      )}
 
       {/* Page Title Section - Full width below main header */}
       <div className={`relative bg-background border-b border-border ${isMobile ? 'h-16' : 'h-20'} ${
-        sidebarExpanded && isMobile ? 'ml-[70%]' : !isMobile && sidebarExpanded ? 'ml-[416px]' : !isMobile ? 'ml-16' : ''
+        sidebarExpanded && isMobile ? 'ml-[70%]' : !isMobile && sidebarExpanded ? 'ml-[416px]' : ''
       }`} style={{ marginTop: '0px' }}>
         <div className="max-w-7xl mx-auto px-4 py-3 h-full">
           <div className="flex items-center gap-3 h-full">
-            {/* Mobile Hamburger Menu */}
-            {isMobile && !sidebarExpanded && (
+            {/* Sidebar Toggle Button - Always visible when sidebar closed */}
+            {!sidebarExpanded && (
               <Button
                 size="sm"
                 variant="ghost"
@@ -1062,11 +1063,11 @@ export default function SavedPage() {
 
       {/* Content Area */}
       <div className={`flex-1 relative overflow-hidden ${
-        sidebarExpanded && isMobile ? 'ml-[70%]' : !isMobile && sidebarExpanded ? 'ml-[416px]' : !isMobile ? 'ml-16' : ''
+        sidebarExpanded && isMobile ? 'ml-[70%]' : !isMobile && sidebarExpanded ? 'ml-[416px]' : ''
       }`}>
-        {/* Drawing and Zoom Controls - Inside content container (Desktop Only) */}
+        {/* Drawing and Zoom Controls - Inside content area boundaries (Desktop Only) */}
         {!isMobile && (
-          <div className="absolute top-4 right-4 z-50 bg-background border border-border rounded-lg p-2 shadow-lg">
+          <div className="absolute top-8 left-8 z-40 bg-white border-2 border-gray-200 rounded-lg p-3 shadow-md">
             <div className="flex items-center gap-2">
               {/* Drawing Mode Toggle */}
               <Button
