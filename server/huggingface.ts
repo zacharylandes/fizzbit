@@ -77,8 +77,7 @@ async function callTogetherAI(messages: any[], model: string = "meta-llama/Llama
         model,
         messages,
         max_tokens: 1200,
-        temperature: 0.8,
-        response_format: { type: "json_object" }
+        temperature: 0.8
       }),
       signal: controller.signal
     });
