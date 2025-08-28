@@ -901,7 +901,7 @@ export default function SavedPage() {
         <div className={`sidebar-container fixed left-0 z-40 bg-background border-r border-border transition-all duration-300 ease-in-out ${
           isMobile ? 'w-[70%] rounded-tr-xl' : 'w-[416px] rounded-tr-xl'
         }`} style={{ 
-          top: '0', // Align with the start of the saved page content
+          top: '120px', // Align with the saved ideas container below the header
           bottom: '0'
         }}>
         <div className="p-4 h-full overflow-y-auto overflow-x-hidden" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -1729,9 +1729,8 @@ export default function SavedPage() {
             </div>
           </div>
         </div>
-      )}
         </div>
-      </div>
+      )}
     </div>
   );
 }
