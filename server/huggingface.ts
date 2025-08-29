@@ -405,6 +405,8 @@ IMPORTANT: Keep responses concise, typically 1-6 words for names, or 1 clear sen
 
 Examples based on different prompts:
 - For "software consultancy names with Landes": "LandesTech", "Landes Logic", "CodeLandes"
+- For "ideas for a play": "Comedy about roommates who accidentally time travel", "Drama exploring family secrets during dinner"
+- For "play names": "The Time Between", "Midnight Confessions", "Breaking Bread"
 - For "creative inspiration": "Practice morning pages daily", "Take photos of textures"
 - For "cooking ideas": "Make homemade pasta", "Try fusion tacos"
 
