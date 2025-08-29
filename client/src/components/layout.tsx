@@ -132,9 +132,9 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white text-foreground flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className="min-h-screen bg-background text-foreground flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Header */}
-      <div className="border-b border-border bg-white shadow-sm">
+      <div className="border-b border-border bg-background shadow-sm">
         <div className="max-w-7xl mx-auto px-6 pt-4 pb-2">
           <div className="flex items-center justify-between">
             {/* FizzBit Brand */}

@@ -134,7 +134,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-card-light-blue-bg rounded-lg shadow-sm">
+              <div className="p-2 bg-background rounded-lg shadow-sm">
                 <img src={logoImage} alt="FizzBit Logo" className="h-5 w-5 object-contain" />
               </div>
               <span className="text-lg font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>FizzBit</span>
