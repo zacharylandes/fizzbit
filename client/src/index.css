@@ -152,7 +152,7 @@ input, textarea {
   }
 
   html {
-    background-color: hsl(var(--background));
+    background-color: var(--background);
     overscroll-behavior: none;
   }
 
