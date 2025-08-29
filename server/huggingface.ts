@@ -61,73 +61,72 @@ async function generateSVGDrawing(prompt: string): Promise<string | null> {
   }
 }
 
-// Generate pure abstract SVG ideas with no text
-async function generatePureAbstractSVGs(originalPrompt: string, count: number): Promise<IdeaResponse[]> {
+// Generate simple programmatic abstract SVGs (more reliable than AI-generated)
+function generatePureAbstractSVGs(originalPrompt: string, count: number): IdeaResponse[] {
   const abstractSVGs: IdeaResponse[] = [];
   
-  const svgPromises = Array.from({ length: count }, async (_, index) => {
-    try {
-      const abstractPrompt = `Create a simple, abstract line drawing inspired by: ${originalPrompt}. Use minimal geometric shapes, flowing lines, and curves. No text, letters, or words. Pure visual abstraction.`;
-      
-      const svgMessages = [
-        {
-          role: "system",
-          content: "You are an abstract SVG art generator. Create simple, minimal line drawings using only basic geometric shapes, curves, and lines. No text, letters, or realistic objects. Use 2-3 colors maximum. Respond with only the SVG code."
-        },
-        {
-          role: "user", 
-          content: abstractPrompt
-        }
-      ];
-      
-      const response = await fetch("https://api.together.xyz/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${TOGETHER_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "meta-llama/Llama-3.2-3B-Instruct-Turbo",
-          messages: svgMessages,
-          max_tokens: 400,
-          temperature: 0.8
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Abstract SVG generation failed: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      const svgContent = data.choices[0].message.content;
-      
-      // Extract SVG from response
-      const svgMatch = svgContent.match(/<svg[\s\S]*?<\/svg>/i);
-      const svg = svgMatch ? svgMatch[0] : null;
-      
-      if (svg) {
-        return {
-          id: `abstract-svg-${Date.now()}-${index}`,
-          title: `Abstract Inspiration ${index + 1}`, // Give it a simple title so it's not blank
-          description: `Visual inspiration inspired by: ${originalPrompt}`,
-          sourceContent: originalPrompt,
-          svg: svg
-        };
-      }
-    } catch (error) {
-      console.warn('Abstract SVG generation failed:', (error as Error).message);
-    }
-    return null;
-  });
+  const colors = ['#4f46e5', '#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981'];
   
-  const results = await Promise.all(svgPromises);
-  
-  // Filter out null results
-  results.forEach(result => {
-    if (result) {
-      abstractSVGs.push(result);
+  for (let i = 0; i < count; i++) {
+    // Generate deterministic but varied abstract patterns based on prompt
+    const promptHash = originalPrompt.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const seed = promptHash + i;
+    
+    // Use seed to generate consistent but varied shapes
+    const color1 = colors[seed % colors.length];
+    const color2 = colors[(seed + 2) % colors.length];
+    
+    let svg = '';
+    
+    switch (i % 5) {
+      case 0: // Flowing curves
+        svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20,75 Q100,20 180,75 Q100,130 20,75" fill="none" stroke="${color1}" stroke-width="3"/>
+          <circle cx="50" cy="50" r="15" fill="${color2}" opacity="0.6"/>
+          <circle cx="150" cy="100" r="10" fill="${color1}" opacity="0.4"/>
+        </svg>`;
+        break;
+      case 1: // Geometric shapes
+        svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="40" width="60" height="60" fill="none" stroke="${color1}" stroke-width="2" transform="rotate(15 70 70)"/>
+          <polygon points="120,30 160,90 80,90" fill="${color2}" opacity="0.5"/>
+          <line x1="20" y1="20" x2="180" y2="130" stroke="${color1}" stroke-width="2" opacity="0.7"/>
+        </svg>`;
+        break;
+      case 2: // Organic lines
+        svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10,75 C50,25 100,125 140,75 C180,25 200,75 190,100" fill="none" stroke="${color1}" stroke-width="2"/>
+          <path d="M30,100 C70,60 130,110 170,70" fill="none" stroke="${color2}" stroke-width="3" opacity="0.6"/>
+          <circle cx="100" cy="75" r="5" fill="${color1}"/>
+        </svg>`;
+        break;
+      case 3: // Abstract composition
+        svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="100" cy="75" rx="80" ry="40" fill="none" stroke="${color1}" stroke-width="2" opacity="0.5"/>
+          <rect x="70" y="55" width="60" height="40" fill="${color2}" opacity="0.3" rx="10"/>
+          <line x1="40" y1="40" x2="160" y2="110" stroke="${color1}" stroke-width="1" opacity="0.8"/>
+        </svg>`;
+        break;
+      case 4: // Minimalist design
+        svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="70" cy="60" r="25" fill="none" stroke="${color1}" stroke-width="2"/>
+          <circle cx="130" cy="90" r="20" fill="${color2}" opacity="0.4"/>
+          <path d="M40,120 L160,30" stroke="${color1}" stroke-width="1" opacity="0.6"/>
+          <rect x="85" y="70" width="30" height="10" fill="${color2}" opacity="0.7"/>
+        </svg>`;
+        break;
     }
-  });
+    
+    abstractSVGs.push({
+      id: `abstract-svg-${Date.now()}-${i}`,
+      title: `Abstract Inspiration ${i + 1}`,
+      description: `Visual inspiration inspired by: ${originalPrompt}`,
+      sourceContent: originalPrompt,
+      svg: svg
+    });
+    
+    console.log(`🎨 Generated programmatic abstract SVG ${i + 1}`);
+  }
   
   return abstractSVGs;
 }
@@ -388,7 +387,7 @@ async function addSVGToIdeas(ideas: IdeaResponse[], originalPrompt: string): Pro
   
   // STEP 1: Create 5 pure abstract SVG ideas (no text) 
   console.log('🎨 Generating 5 pure abstract SVGs...');
-  const pureAbstractSVGs = await generatePureAbstractSVGs(originalPrompt, 5);
+  const pureAbstractSVGs = generatePureAbstractSVGs(originalPrompt, 5);
   console.log(`🎨 Successfully generated ${pureAbstractSVGs.length} abstract SVGs`);
   
   // STEP 2: Add pure SVG ideas to the end (don't replace, just add)
