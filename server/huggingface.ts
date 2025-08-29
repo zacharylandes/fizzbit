@@ -393,54 +393,28 @@ function generateTemplateFallback(prompt: string, count: number): IdeaResponse[]
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
-  // Detect if user is asking for names specifically
-  const isNamingRequest = /\b(name|names|called|title|brand|company|business|consultancy|firm|agency|startup|app|product|service|organization|group|team|project)\b.*\b(name|names|called|title|brand)\b/i.test(prompt) || 
-                         /\b(name for|names for|call it|title for|brand for)\b/i.test(prompt);
-  
-  let systemPrompt;
-  
-  if (isNamingRequest) {
-    systemPrompt = `Generate ${count} creative, memorable names directly related to: "${prompt}"
+  const systemPrompt = `Generate ${count} creative ideas directly related to: "${prompt}"
 
-CRITICAL: These should be actual NAMES, not descriptions or action statements.
+CRITICAL: Ideas must be contextually relevant to the user's exact input. Give them what they're actually asking for:
+- If they ask for names, give actual names
+- If they ask for inspiration, give inspiration techniques  
+- If they ask for recipes, give cooking ideas
+- If they ask for projects, give project ideas
 
-IMPORTANT: Each name should be short, catchy, and brandable - typically 1-3 words.
-
-Examples based on different naming prompts:
-- For "software consultancy with Landes": "LandesTech", "Landes Logic", "CodeLandes", "Landes Labs"
-- For "coffee shop": "Brew & Co", "The Daily Grind", "Roasted Dreams"
-- For "fitness app": "FitFlow", "ActiveSync", "PulseTracker"
-
-DO NOT include:
-- Action verbs or commands
-- Full sentences
-- Descriptions
-- "Creative concept" 
-- Bullet points
-
-Format as JSON: [{"title": "LandesTech"}, {"title": "Landes Logic"}]`;
-  } else {
-    systemPrompt = `Generate ${count} specific, actionable ideas directly related to: "${prompt}"
-
-CRITICAL: Ideas must be contextually relevant to the user's exact input. If they ask about inspiration, give inspiration techniques. If they ask about cooking, give cooking ideas. If they ask about art, give art projects.
-
-IMPORTANT: Each idea must be EXACTLY one sentence, maximum 12 words, starting with an action verb.
+IMPORTANT: Keep responses concise, typically 1-6 words for names, or 1 clear sentence for ideas.
 
 Examples based on different prompts:
-- For "creative inspiration": "Practice morning pages to unlock creative thoughts daily"
-- For "cooking": "Make homemade pasta using just flour and eggs"  
-- For "art projects": "Paint abstract landscapes using only three colors"
+- For "software consultancy names with Landes": "LandesTech", "Landes Logic", "CodeLandes"
+- For "creative inspiration": "Practice morning pages daily", "Take photos of textures"
+- For "cooking ideas": "Make homemade pasta", "Try fusion tacos"
 
 DO NOT include:
-- "Creative concept" 
-- "Action steps"
-- Bullet points
-- Descriptions
+- Generic "creative concept" labels
+- Bullet points or formatting
 - Multiple sentences
-- Generic craft projects unrelated to the prompt
+- Unrelated suggestions
 
-Format as JSON: [{"title": "Practice morning pages to unlock creative thoughts daily"}, {"title": "Make homemade pasta using just flour and eggs"}]`;
-  }
+Format as JSON: [{"title": "LandesTech"}, {"title": "Practice morning pages daily"}]`;
 
   // PRIMARY: Try Together.ai Llama
   try {
