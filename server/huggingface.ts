@@ -119,8 +119,8 @@ function generatePureAbstractSVGs(originalPrompt: string, count: number): IdeaRe
     
     abstractSVGs.push({
       id: `abstract-svg-${Date.now()}-${i}`,
-      title: `Abstract Inspiration ${i + 1}`,
-      description: `Visual inspiration inspired by: ${originalPrompt}`,
+      title: "", // No title for pure visual inspiration
+      description: "", // No description for pure visual inspiration  
       sourceContent: originalPrompt,
       svg: svg
     });
@@ -390,14 +390,29 @@ async function addSVGToIdeas(ideas: IdeaResponse[], originalPrompt: string): Pro
   const pureAbstractSVGs = generatePureAbstractSVGs(originalPrompt, 5);
   console.log(`🎨 Successfully generated ${pureAbstractSVGs.length} abstract SVGs`);
   
-  // STEP 2: Add pure SVG ideas to the end (don't replace, just add)
+  // STEP 2: Distribute pure SVG ideas throughout the cards (sprinkle them in)
   if (pureAbstractSVGs.length > 0) {
-    for (let i = 0; i < pureAbstractSVGs.length; i++) {
-      if (pureAbstractSVGs[i]) {
-        finalIdeas.push(pureAbstractSVGs[i]);
-        console.log(`🎨 Added pure abstract SVG idea: ${pureAbstractSVGs[i].title}`);
-      }
+    // Calculate positions to insert SVGs evenly throughout
+    const totalSlots = 25;
+    const svgPositions = [];
+    
+    // Spread SVGs evenly: positions 4, 9, 14, 19, 24 (every 5 cards)
+    for (let i = 0; i < Math.min(pureAbstractSVGs.length, 5); i++) {
+      svgPositions.push(4 + (i * 5)); // 4, 9, 14, 19, 24
     }
+    
+    // Insert SVGs at calculated positions
+    svgPositions.forEach((position, index) => {
+      if (position < totalSlots && pureAbstractSVGs[index]) {
+        // Make sure we don't exceed the array bounds
+        if (position < finalIdeas.length) {
+          finalIdeas.splice(position, 0, pureAbstractSVGs[index]);
+        } else {
+          finalIdeas.push(pureAbstractSVGs[index]);
+        }
+        console.log(`🎨 Inserted abstract SVG at position ${position + 1}`);
+      }
+    });
   } else {
     console.log('🚨 No abstract SVGs generated, keeping all text ideas');
   }
@@ -405,6 +420,11 @@ async function addSVGToIdeas(ideas: IdeaResponse[], originalPrompt: string): Pro
   // Ensure we have exactly 25 ideas total
   while (finalIdeas.length > 25) {
     finalIdeas.pop(); // Remove excess
+  }
+  
+  // If we have less than 25, pad with text ideas if available
+  while (finalIdeas.length < 25 && ideas.length > 0) {
+    finalIdeas.push(ideas[finalIdeas.length % ideas.length]);
   }
   
   // STEP 3: Add SVG illustrations to some remaining text ideas (about 1/4 of remaining)
