@@ -61,6 +61,77 @@ async function generateSVGDrawing(prompt: string): Promise<string | null> {
   }
 }
 
+// Generate pure abstract SVG ideas with no text
+async function generatePureAbstractSVGs(originalPrompt: string, count: number): Promise<IdeaResponse[]> {
+  const abstractSVGs: IdeaResponse[] = [];
+  
+  const svgPromises = Array.from({ length: count }, async (_, index) => {
+    try {
+      const abstractPrompt = `Create a simple, abstract line drawing inspired by: ${originalPrompt}. Use minimal geometric shapes, flowing lines, and curves. No text, letters, or words. Pure visual abstraction.`;
+      
+      const svgMessages = [
+        {
+          role: "system",
+          content: "You are an abstract SVG art generator. Create simple, minimal line drawings using only basic geometric shapes, curves, and lines. No text, letters, or realistic objects. Use 2-3 colors maximum. Respond with only the SVG code."
+        },
+        {
+          role: "user", 
+          content: abstractPrompt
+        }
+      ];
+      
+      const response = await fetch("https://api.together.xyz/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${TOGETHER_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "meta-llama/Llama-3.2-3B-Instruct-Turbo",
+          messages: svgMessages,
+          max_tokens: 400,
+          temperature: 0.8
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Abstract SVG generation failed: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const svgContent = data.choices[0].message.content;
+      
+      // Extract SVG from response
+      const svgMatch = svgContent.match(/<svg[\s\S]*?<\/svg>/i);
+      const svg = svgMatch ? svgMatch[0] : null;
+      
+      if (svg) {
+        return {
+          id: `abstract-svg-${Date.now()}-${index}`,
+          title: "", // No text title for pure SVG
+          description: "", // No description for pure SVG
+          sourceContent: originalPrompt,
+          svg: svg
+        };
+      }
+    } catch (error) {
+      console.warn('Abstract SVG generation failed:', (error as Error).message);
+    }
+    return null;
+  });
+  
+  const results = await Promise.all(svgPromises);
+  
+  // Filter out null results
+  results.forEach(result => {
+    if (result) {
+      abstractSVGs.push(result);
+    }
+  });
+  
+  return abstractSVGs;
+}
+
 // Together.ai API client with timeout
 async function callTogetherAI(messages: any[], model: string = "meta-llama/Llama-3.2-3B-Instruct-Turbo") {
   const controller = new AbortController();
@@ -311,31 +382,45 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
   return ideas.slice(0, count);
 }
 
-// Add SVG drawings to approximately 1/3 of ideas
+// Create 5 pure abstract SVG ideas + add SVGs to some text ideas  
 async function addSVGToIdeas(ideas: IdeaResponse[], originalPrompt: string): Promise<IdeaResponse[]> {
-  const ideasWithSvg = [...ideas];
-  const svgCount = Math.ceil(ideas.length / 3); // 1/3 of ideas get SVG
+  const finalIdeas = [...ideas];
   
-  // Randomly select which ideas get SVG drawings
-  const selectedIndices = new Set<number>();
-  while (selectedIndices.size < svgCount && selectedIndices.size < ideas.length) {
-    selectedIndices.add(Math.floor(Math.random() * ideas.length));
+  // STEP 1: Create 5 pure abstract SVG ideas (no text) 
+  const pureAbstractSVGs = await generatePureAbstractSVGs(originalPrompt, 5);
+  
+  // STEP 2: Replace the last 5 text ideas with pure SVG ideas
+  for (let i = 0; i < pureAbstractSVGs.length; i++) {
+    if (pureAbstractSVGs[i]) {
+      const replaceIndex = finalIdeas.length - 1 - i;
+      finalIdeas[replaceIndex] = pureAbstractSVGs[i];
+      console.log(`🎨 Created pure abstract SVG idea: ${pureAbstractSVGs[i].title}`);
+    }
   }
   
-  // Generate SVG drawings for selected ideas
+  // STEP 3: Add SVG illustrations to some remaining text ideas (about 1/4 of remaining)
+  const remainingTextIdeas = finalIdeas.length - pureAbstractSVGs.length;
+  const textSvgCount = Math.ceil(remainingTextIdeas / 4); // 1/4 of remaining text ideas get SVG
+  
+  const selectedIndices = new Set<number>();
+  while (selectedIndices.size < textSvgCount && selectedIndices.size < remainingTextIdeas) {
+    selectedIndices.add(Math.floor(Math.random() * remainingTextIdeas));
+  }
+  
+  // Generate SVG drawings for selected text ideas
   const svgPromises = Array.from(selectedIndices).map(async (index) => {
-    const idea = ideas[index];
+    const idea = finalIdeas[index];
     const svgPrompt = `${originalPrompt} - ${idea.title}`;
     const svg = await generateSVGDrawing(svgPrompt);
     
     if (svg) {
-      ideasWithSvg[index] = { ...idea, svg };
-      console.log(`🎨 Added SVG to idea: ${idea.title}`);
+      finalIdeas[index] = { ...idea, svg };
+      console.log(`🎨 Added SVG to text idea: ${idea.title}`);
     }
   });
   
   await Promise.all(svgPromises);
-  return ideasWithSvg;
+  return finalIdeas;
 }
 
 // Generate template fallback ideas when all AI fails
