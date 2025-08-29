@@ -393,7 +393,34 @@ function generateTemplateFallback(prompt: string, count: number): IdeaResponse[]
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
-  const systemPrompt = `Generate ${count} specific, actionable ideas directly related to: "${prompt}"
+  // Detect if user is asking for names specifically
+  const isNamingRequest = /\b(name|names|called|title|brand|company|business|consultancy|firm|agency|startup|app|product|service|organization|group|team|project)\b.*\b(name|names|called|title|brand)\b/i.test(prompt) || 
+                         /\b(name for|names for|call it|title for|brand for)\b/i.test(prompt);
+  
+  let systemPrompt;
+  
+  if (isNamingRequest) {
+    systemPrompt = `Generate ${count} creative, memorable names directly related to: "${prompt}"
+
+CRITICAL: These should be actual NAMES, not descriptions or action statements.
+
+IMPORTANT: Each name should be short, catchy, and brandable - typically 1-3 words.
+
+Examples based on different naming prompts:
+- For "software consultancy with Landes": "LandesTech", "Landes Logic", "CodeLandes", "Landes Labs"
+- For "coffee shop": "Brew & Co", "The Daily Grind", "Roasted Dreams"
+- For "fitness app": "FitFlow", "ActiveSync", "PulseTracker"
+
+DO NOT include:
+- Action verbs or commands
+- Full sentences
+- Descriptions
+- "Creative concept" 
+- Bullet points
+
+Format as JSON: [{"title": "LandesTech"}, {"title": "Landes Logic"}]`;
+  } else {
+    systemPrompt = `Generate ${count} specific, actionable ideas directly related to: "${prompt}"
 
 CRITICAL: Ideas must be contextually relevant to the user's exact input. If they ask about inspiration, give inspiration techniques. If they ask about cooking, give cooking ideas. If they ask about art, give art projects.
 
@@ -413,6 +440,7 @@ DO NOT include:
 - Generic craft projects unrelated to the prompt
 
 Format as JSON: [{"title": "Practice morning pages to unlock creative thoughts daily"}, {"title": "Make homemade pasta using just flour and eggs"}]`;
+  }
 
   // PRIMARY: Try Together.ai Llama
   try {
