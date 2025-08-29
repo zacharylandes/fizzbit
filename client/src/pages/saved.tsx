@@ -887,7 +887,7 @@ export default function SavedPage() {
     : savedIdeas;
 
   return (
-    <div className="min-h-screen bg-white" data-keyboard-open={isKeyboardOpen}>
+    <div className="min-h-screen bg-background" data-keyboard-open={isKeyboardOpen}>
       {/* Mobile Overlay */}
       {isMobile && sidebarExpanded && (
         <div 

@@ -5,7 +5,7 @@ import logoImage from "@/assets/logo.png";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
+    <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
       {/* Hero Section */}
       <div className="relative">
         {/* Navigation */}
