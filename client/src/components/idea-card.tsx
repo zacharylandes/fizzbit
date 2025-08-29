@@ -56,12 +56,21 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
           </div>
         )}
         
-        {/* Simple centered title */}
-        <div className="flex items-start justify-center h-full">
-          <h3 className={`text-lg font-bold text-center leading-relaxed ${accentColor}`} style={{ fontFamily: 'Inter, sans-serif' }}>
-            {idea.title}
-          </h3>
-        </div>
+        {/* Title (only show if not empty) */}
+        {idea.title && idea.title.trim().length > 0 ? (
+          <div className="flex items-start justify-center h-full">
+            <h3 className={`text-lg font-bold text-center leading-relaxed ${accentColor}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+              {idea.title}
+            </h3>
+          </div>
+        ) : (
+          // Pure visual card - just center the content
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center text-xs text-gray-500 opacity-60">
+              Visual Inspiration
+            </div>
+          </div>
+        )}
         
         {/* Swipe Indicators */}
         <div className="absolute bottom-4 left-6 right-6 flex justify-between items-center">

@@ -427,24 +427,29 @@ async function addSVGToIdeas(ideas: IdeaResponse[], originalPrompt: string): Pro
     finalIdeas.push(ideas[finalIdeas.length % ideas.length]);
   }
   
-  // STEP 3: Add SVG illustrations to some remaining text ideas (about 1/4 of remaining)
-  const remainingTextIdeas = finalIdeas.length - pureAbstractSVGs.length;
-  const textSvgCount = Math.ceil(remainingTextIdeas / 4); // 1/4 of remaining text ideas get SVG
+  // STEP 3: Add SVG illustrations to some text ideas (ideas with non-empty titles)
+  const textIdeasIndices = finalIdeas
+    .map((idea, index) => ({ idea, index }))
+    .filter(({ idea }) => idea.title && idea.title.trim().length > 0) // Only ideas with titles
+    .map(({ index }) => index);
   
-  const selectedIndices = new Set<number>();
-  while (selectedIndices.size < textSvgCount && selectedIndices.size < remainingTextIdeas) {
-    selectedIndices.add(Math.floor(Math.random() * remainingTextIdeas));
-  }
+  const textSvgCount = Math.ceil(textIdeasIndices.length / 4); // 1/4 of text ideas get SVG
+  
+  // Randomly select text ideas to add SVGs to
+  const shuffledIndices = [...textIdeasIndices].sort(() => Math.random() - 0.5);
+  const selectedIndices = shuffledIndices.slice(0, textSvgCount);
   
   // Generate SVG drawings for selected text ideas
-  const svgPromises = Array.from(selectedIndices).map(async (index) => {
+  const svgPromises = selectedIndices.map(async (index) => {
     const idea = finalIdeas[index];
-    const svgPrompt = `${originalPrompt} - ${idea.title}`;
-    const svg = await generateSVGDrawing(svgPrompt);
-    
-    if (svg) {
-      finalIdeas[index] = { ...idea, svg };
-      console.log(`🎨 Added SVG to text idea: ${idea.title}`);
+    if (idea.title && idea.title.trim().length > 0) {
+      const svgPrompt = `${originalPrompt} - ${idea.title}`;
+      const svg = await generateSVGDrawing(svgPrompt);
+      
+      if (svg) {
+        finalIdeas[index] = { ...idea, svg };
+        console.log(`🎨 Added SVG to text idea: ${idea.title}`);
+      }
     }
   });
   
