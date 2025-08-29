@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, Image, ArrowRight, Heart, Eye } from "lucide-react";
-import logoImage from "@assets/Untitled_design-removebg-preview_1756486187641.png";
+import logoImage from "@/assets/spiral-logo.png";
 
 export default function LandingPage() {
   return (
