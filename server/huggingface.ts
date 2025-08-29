@@ -108,8 +108,8 @@ async function generatePureAbstractSVGs(originalPrompt: string, count: number): 
       if (svg) {
         return {
           id: `abstract-svg-${Date.now()}-${index}`,
-          title: "", // No text title for pure SVG
-          description: "", // No description for pure SVG
+          title: `Abstract Inspiration ${index + 1}`, // Give it a simple title so it's not blank
+          description: `Visual inspiration inspired by: ${originalPrompt}`,
           sourceContent: originalPrompt,
           svg: svg
         };
@@ -387,15 +387,25 @@ async function addSVGToIdeas(ideas: IdeaResponse[], originalPrompt: string): Pro
   const finalIdeas = [...ideas];
   
   // STEP 1: Create 5 pure abstract SVG ideas (no text) 
+  console.log('🎨 Generating 5 pure abstract SVGs...');
   const pureAbstractSVGs = await generatePureAbstractSVGs(originalPrompt, 5);
+  console.log(`🎨 Successfully generated ${pureAbstractSVGs.length} abstract SVGs`);
   
-  // STEP 2: Replace the last 5 text ideas with pure SVG ideas
-  for (let i = 0; i < pureAbstractSVGs.length; i++) {
-    if (pureAbstractSVGs[i]) {
-      const replaceIndex = finalIdeas.length - 1 - i;
-      finalIdeas[replaceIndex] = pureAbstractSVGs[i];
-      console.log(`🎨 Created pure abstract SVG idea: ${pureAbstractSVGs[i].title}`);
+  // STEP 2: Add pure SVG ideas to the end (don't replace, just add)
+  if (pureAbstractSVGs.length > 0) {
+    for (let i = 0; i < pureAbstractSVGs.length; i++) {
+      if (pureAbstractSVGs[i]) {
+        finalIdeas.push(pureAbstractSVGs[i]);
+        console.log(`🎨 Added pure abstract SVG idea: ${pureAbstractSVGs[i].title}`);
+      }
     }
+  } else {
+    console.log('🚨 No abstract SVGs generated, keeping all text ideas');
+  }
+  
+  // Ensure we have exactly 25 ideas total
+  while (finalIdeas.length > 25) {
+    finalIdeas.pop(); // Remove excess
   }
   
   // STEP 3: Add SVG illustrations to some remaining text ideas (about 1/4 of remaining)
