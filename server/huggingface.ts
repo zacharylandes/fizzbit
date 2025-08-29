@@ -336,7 +336,7 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
           lowerLine.includes('action step') ||
           lowerLine.includes('json') ||
           lowerLine.includes('array') ||
-          words.length < 4 || words.length > 15) { // Relaxed word count
+          words.length < 6 || words.length > 20) { // Longer phrases for plot concepts
         return false;
       }
       
@@ -512,40 +512,29 @@ function generateTemplateFallback(prompt: string, count: number): IdeaResponse[]
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
-  const systemPrompt = `Generate ${count} creative ideas directly related to: "${prompt}"
+  const systemPrompt = `Generate ${count} creative CONCEPTS/PLOT IDEAS for: "${prompt}"
 
-CRITICAL: Give them exactly what they're asking for. Pay attention to whether they want CONCEPTS or NAMES:
+IMPORTANT: The user asked for "ideas for a play" - this means PLOT CONCEPTS, not titles or names.
 
-- "ideas for X" = Give actual concepts, plots, scenarios, or descriptions of what X could be about
-- "names for X" = Give short titles, labels, or names only
+Generate actual play scenarios, plots, and story concepts. Each should be a complete creative concept in 6-15 words.
 
-EXAMPLES:
-✅ CORRECT for "ideas for a play":
-- "Comedy about roommates who accidentally time travel"
-- "Drama where family secrets emerge during dinner"
-- "Musical about competing food truck owners"
+EXAMPLES for "ideas for a play about a man who thinks he's from the future":
+✅ CORRECT (actual plot concepts):
+- "Comedy where man tries convincing others he's from 2087 but fails hilariously"
+- "Drama about someone whose future memories turn out to be elaborate dreams"
+- "Man believes he's time traveler but discovers he just watches too much sci-fi"
+- "Office comedy where employee thinks modern technology proves he's from tomorrow"
+- "Family struggles with father who insists he's from year 3000"
 
-❌ WRONG for "ideas for a play" (these are names/titles):
-- "The Time Traveler"
-- "Family Secrets" 
-- "Future Shock"
+❌ WRONG (just titles/names):
+- "Time Traveler"
+- "Future Shock" 
+- "The Man from Tomorrow"
+- "Temporal Confusion"
 
-✅ CORRECT for "names for a play":
-- "The Time Between"
-- "Midnight Confessions" 
-- "Breaking Bread"
+Each response should be a STORY CONCEPT that explains what the play is about, not just a title.
 
-Other examples:
-- For "software consultancy names with Landes": "LandesTech", "Landes Logic"
-- For "creative inspiration": "Practice morning pages daily", "Take photos of textures"
-
-DO NOT include:
-- Generic "creative concept" labels
-- Bullet points or formatting
-- Multiple sentences
-- Unrelated suggestions
-
-Format as JSON: [{"title": "LandesTech"}, {"title": "Practice morning pages daily"}]`;
+Format as JSON: [{"title": "Comedy where man tries convincing others he's from 2087 but fails hilariously"}, {"title": "Drama about someone whose future memories turn out to be elaborate dreams"}]`;
 
   // PRIMARY: Try Together.ai Llama
   try {
