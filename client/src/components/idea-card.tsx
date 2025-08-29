@@ -50,13 +50,9 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
         {idea.svg && (
           <div className="mb-6 flex justify-center">
             <div 
-              className="w-48 h-32 flex items-center justify-center rounded-lg bg-white/20 p-4 border border-white/30"
+              className="w-full max-w-48 h-32 flex items-center justify-center rounded-lg bg-gradient-to-br from-white/10 to-white/5 p-3 border border-white/20 shadow-sm"
               dangerouslySetInnerHTML={{ __html: idea.svg }}
             />
-            {/* Debug info - remove later */}
-            <div className="absolute top-2 left-2 text-xs text-red-500 bg-black/50 px-1 rounded">
-              SVG: {idea.svg ? 'YES' : 'NO'} ({idea.svg?.length || 0})
-            </div>
           </div>
         )}
         
