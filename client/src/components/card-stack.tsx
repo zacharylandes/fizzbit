@@ -74,8 +74,9 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
       
       // RESET exploration context to ensure we start fresh with new prompt
       // This prevents mixing ideas from different prompts
+      // Prioritize currentPrompt (fresh user input) over sourceContent (which may contain old chained prompts)
       setCurrentExploreContext({
-        originalPrompt: initialIdeas[0]?.sourceContent || currentPrompt || "",
+        originalPrompt: currentPrompt || initialIdeas[0]?.sourceContent || "",
         exploredIdea: initialIdeas[0]
       });
       
