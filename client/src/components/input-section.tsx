@@ -46,7 +46,8 @@ export function InputSection({
         // Clear existing state and provide fresh ideas
         onIdeasGenerated(data.ideas);
         setTextPrompt("");
-        onPromptChange?.("");
+        // Don't clear currentPrompt - keep it for maintaining context during prefetch
+        // onPromptChange?.(""); 
         setShowTextInput(false); // Hide input after generation
         toast({
           title: "Ideas Generated!",
