@@ -50,9 +50,13 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
         {idea.svg && (
           <div className="mb-6 flex justify-center">
             <div 
-              className="max-w-48 max-h-32 overflow-hidden rounded-lg bg-white/50 p-2"
+              className="w-48 h-32 flex items-center justify-center rounded-lg bg-white/20 p-4 border border-white/30"
               dangerouslySetInnerHTML={{ __html: idea.svg }}
             />
+            {/* Debug info - remove later */}
+            <div className="absolute top-2 left-2 text-xs text-red-500 bg-black/50 px-1 rounded">
+              SVG: {idea.svg ? 'YES' : 'NO'} ({idea.svg?.length || 0})
+            </div>
           </div>
         )}
         
@@ -63,8 +67,15 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
               {idea.title}
             </h3>
           </div>
+        ) : idea.svg ? (
+          // Pure visual card with SVG - minimal text
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center text-xs text-white/40">
+              •
+            </div>
+          </div>
         ) : (
-          // Pure visual card - just center the content
+          // Card with no title and no SVG
           <div className="flex items-center justify-center h-full">
             <div className="text-center text-xs text-gray-500 opacity-60">
               Visual Inspiration
