@@ -395,20 +395,30 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
   
   const systemPrompt = `Generate ${count} creative ideas directly related to: "${prompt}"
 
-CRITICAL: Ideas must be contextually relevant to the user's exact input. Give them what they're actually asking for:
-- If they ask for names, give actual names
-- If they ask for inspiration, give inspiration techniques  
-- If they ask for recipes, give cooking ideas
-- If they ask for projects, give project ideas
+CRITICAL: Give them exactly what they're asking for. Pay attention to whether they want CONCEPTS or NAMES:
 
-IMPORTANT: Keep responses concise, typically 1-6 words for names, or 1 clear sentence for ideas.
+- "ideas for X" = Give actual concepts, plots, scenarios, or descriptions of what X could be about
+- "names for X" = Give short titles, labels, or names only
 
-Examples based on different prompts:
-- For "software consultancy names with Landes": "LandesTech", "Landes Logic", "CodeLandes"
-- For "ideas for a play": "Comedy about roommates who accidentally time travel", "Drama exploring family secrets during dinner"
-- For "play names": "The Time Between", "Midnight Confessions", "Breaking Bread"
+EXAMPLES:
+✅ CORRECT for "ideas for a play":
+- "Comedy about roommates who accidentally time travel"
+- "Drama where family secrets emerge during dinner"
+- "Musical about competing food truck owners"
+
+❌ WRONG for "ideas for a play" (these are names/titles):
+- "The Time Traveler"
+- "Family Secrets" 
+- "Future Shock"
+
+✅ CORRECT for "names for a play":
+- "The Time Between"
+- "Midnight Confessions" 
+- "Breaking Bread"
+
+Other examples:
+- For "software consultancy names with Landes": "LandesTech", "Landes Logic"
 - For "creative inspiration": "Practice morning pages daily", "Take photos of textures"
-- For "cooking ideas": "Make homemade pasta", "Try fusion tacos"
 
 DO NOT include:
 - Generic "creative concept" labels
