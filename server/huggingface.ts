@@ -640,7 +640,16 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
                             prompt.toLowerCase().includes('idea') ||
                             prompt.toLowerCase().includes('concept') ||
                             prompt.toLowerCase().includes('strategy') ||
-                            prompt.toLowerCase().includes('method');
+                            prompt.toLowerCase().includes('method') ||
+                            prompt.toLowerCase().includes('routine') ||
+                            prompt.toLowerCase().includes('exercise') ||
+                            prompt.toLowerCase().includes('workout') ||
+                            prompt.toLowerCase().includes('tips') ||
+                            prompt.toLowerCase().includes('guide') ||
+                            prompt.toLowerCase().includes('how to') ||
+                            prompt.toLowerCase().includes('technique') ||
+                            prompt.toLowerCase().includes('plan') ||
+                            prompt.toLowerCase().includes('steps');
   
   let systemPrompt = '';
   
