@@ -318,22 +318,27 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
   // Debug what we're getting from AI
   console.log('Text parsing fallback - raw response sample:', response.substring(0, 500));
   
-  // Extract project ideas with more flexible approach
+  // Extract project ideas with more flexible approach - split ONLY on numbered list items
   const lines = response
     .replace(/[{}[\]"]/g, '') // Remove JSON syntax
     .replace(/title:|description:/gi, '') // Remove JSON keys
-    .split(/[,\n]+/) // Split on separators
+    .split(/\n/) // Split only on newlines first
+    .map(line => line.trim())
+    .filter(line => line.length > 5)
+    .join('\n')
+    .split(/\n(?=\d+\.|\-\s|\*\s)/) // Split only on numbered/bulleted items
     .map(line => line.trim())
     .filter(line => {
       const words = line.split(' ');
       const lowerLine = line.toLowerCase();
       
       // REJECT lines with unwanted content
-      if (lowerLine.includes('creative concept') ||
+      if (lowerLine.includes('here are') ||
+          lowerLine.includes('creative concept') ||
           lowerLine.includes('action step') ||
           lowerLine.includes('json') ||
           lowerLine.includes('array') ||
-          words.length < 6 || words.length > 20) { // Longer phrases for plot concepts
+          words.length < 6 || words.length > 25) { // Allow longer complete sentences
         return false;
       }
       
@@ -343,19 +348,27 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
       // Check if line contains story/character words
       const hasStoryElement = storyIndicators.some(word => lowerLine.includes(word));
       
-      return hasStoryElement && line.length >= 15 && line.length <= 150;
+      return hasStoryElement && line.length >= 15 && line.length <= 200;
     });
 
   console.log('Found potential ideas:', lines.length, lines.slice(0, 3));
 
-  // Clean each line
+  // Clean each line more carefully to preserve complete ideas
   const cleanedResponse = lines.map(line => {
     return line
-      .replace(/^\W+/, '') // Remove leading punctuation
-      .replace(/\W+$/, '') // Remove trailing punctuation
       .replace(/^\d+\.?\s*/, '') // Remove numbering
+      .replace(/^[\-\*]\s*/, '') // Remove bullet points
+      .replace(/^["']/, '') // Remove opening quotes
+      .replace(/["']$/, '') // Remove closing quotes
       .trim();
-  }).filter(line => line.length > 10);
+  }).filter(line => {
+    // Only accept lines that look like complete ideas
+    return line.length > 15 && 
+           line.length < 200 && 
+           !line.toLowerCase().includes('here are') &&
+           !line.toLowerCase().includes('creative concept') &&
+           line.split(' ').length >= 6; // Ensure it's a complete sentence
+  });
 
   const ideas: IdeaResponse[] = [];
   
