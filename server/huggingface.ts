@@ -65,7 +65,7 @@ async function generateSVGDrawing(prompt: string): Promise<string | null> {
 function generatePureAbstractSVGs(originalPrompt: string, count: number): IdeaResponse[] {
   const abstractSVGs: IdeaResponse[] = [];
   
-  const colors = ['#4f46e5', '#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981'];
+  const colors = ['#1e40af', '#0891b2', '#7c3aed', '#d97706', '#dc2626', '#059669']; // Darker, higher contrast colors
   
   for (let i = 0; i < count; i++) {
     // Generate deterministic but varied abstract patterns based on prompt
@@ -81,29 +81,29 @@ function generatePureAbstractSVGs(originalPrompt: string, count: number): IdeaRe
     switch (i % 5) {
       case 0: // Flowing curves
         svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <path d="M20,75 Q100,20 180,75 Q100,130 20,75" fill="none" stroke="${color1}" stroke-width="3"/>
-          <circle cx="50" cy="50" r="15" fill="${color2}" opacity="0.6"/>
-          <circle cx="150" cy="100" r="10" fill="${color1}" opacity="0.4"/>
+          <path d="M20,75 Q100,20 180,75 Q100,130 20,75" fill="none" stroke="${color1}" stroke-width="4"/>
+          <circle cx="50" cy="50" r="15" fill="${color2}" opacity="0.8"/>
+          <circle cx="150" cy="100" r="10" fill="${color1}" opacity="0.7"/>
         </svg>`;
         break;
       case 1: // Geometric shapes
         svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <rect x="40" y="40" width="60" height="60" fill="none" stroke="${color1}" stroke-width="2" transform="rotate(15 70 70)"/>
-          <polygon points="120,30 160,90 80,90" fill="${color2}" opacity="0.5"/>
-          <line x1="20" y1="20" x2="180" y2="130" stroke="${color1}" stroke-width="2" opacity="0.7"/>
+          <rect x="40" y="40" width="60" height="60" fill="none" stroke="${color1}" stroke-width="3" transform="rotate(15 70 70)"/>
+          <polygon points="120,30 160,90 80,90" fill="${color2}" opacity="0.7"/>
+          <line x1="20" y1="20" x2="180" y2="130" stroke="${color1}" stroke-width="3" opacity="0.8"/>
         </svg>`;
         break;
       case 2: // Organic lines
         svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <path d="M10,75 C50,25 100,125 140,75 C180,25 200,75 190,100" fill="none" stroke="${color1}" stroke-width="2"/>
-          <path d="M30,100 C70,60 130,110 170,70" fill="none" stroke="${color2}" stroke-width="3" opacity="0.6"/>
-          <circle cx="100" cy="75" r="5" fill="${color1}"/>
+          <path d="M10,75 C50,25 100,125 140,75 C180,25 200,75 190,100" fill="none" stroke="${color1}" stroke-width="3"/>
+          <path d="M30,100 C70,60 130,110 170,70" fill="none" stroke="${color2}" stroke-width="4" opacity="0.8"/>
+          <circle cx="100" cy="75" r="6" fill="${color1}"/>
         </svg>`;
         break;
       case 3: // Abstract composition
         svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <ellipse cx="100" cy="75" rx="80" ry="40" fill="none" stroke="${color1}" stroke-width="2" opacity="0.5"/>
-          <rect x="70" y="55" width="60" height="40" fill="${color2}" opacity="0.3" rx="10"/>
+          <ellipse cx="100" cy="75" rx="80" ry="40" fill="none" stroke="${color1}" stroke-width="3" opacity="0.7"/>
+          <rect x="70" y="55" width="60" height="40" fill="${color2}" opacity="0.6" rx="10"/>
           <line x1="40" y1="40" x2="160" y2="110" stroke="${color1}" stroke-width="1" opacity="0.8"/>
         </svg>`;
         break;
@@ -340,13 +340,13 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
         return false;
       }
       
-      // ACCEPT lines that look like project ideas
-      const actionIndicators = ['build', 'create', 'design', 'make', 'explore', 'investigate', 'experiment', 'develop', 'construct', 'test', 'observe', 'study', 'grow', 'mix', 'measure', 'compare', 'track', 'record', 'demonstrate'];
+      // ACCEPT creative concepts - look for story indicators instead of action words
+      const storyIndicators = ['comedy', 'drama', 'man', 'woman', 'family', 'story', 'play', 'character', 'person', 'about', 'where', 'who', 'discovers', 'believes', 'thinks', 'tries', 'struggles', 'leads', 'turns', 'becomes', 'finds'];
       
-      // Check if line contains action words (not just starting)
-      const hasAction = actionIndicators.some(verb => lowerLine.includes(verb));
+      // Check if line contains story/character words
+      const hasStoryElement = storyIndicators.some(word => lowerLine.includes(word));
       
-      return hasAction && line.length >= 15 && line.length <= 100;
+      return hasStoryElement && line.length >= 15 && line.length <= 150;
     });
 
   console.log('Found potential ideas:', lines.length, lines.slice(0, 3));

@@ -53,18 +53,8 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
               className="w-full max-w-48 h-32 flex items-center justify-center rounded-lg bg-gradient-to-br from-white/10 to-white/5 p-3 border border-white/20 shadow-sm"
               dangerouslySetInnerHTML={{ __html: idea.svg }}
             />
-            {/* Temporary debug */}
-            <div className="absolute top-0 left-0 text-xs bg-red-500 text-white px-1">
-              SVG: {idea.svg ? 'YES' : 'NO'} ({idea.svg?.length || 0})
-            </div>
           </div>
         )}
-        
-        {/* Debug for SVG content */}
-        {idea.svg && (() => {
-          console.log('Card SVG content:', idea.svg.substring(0, 100));
-          return null;
-        })()}
         
         {/* Title (only show if not empty) */}
         {idea.title && idea.title.trim().length > 0 ? (
