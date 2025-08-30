@@ -61,20 +61,102 @@ async function generateSVGDrawing(prompt: string): Promise<string | null> {
   }
 }
 
-// Generate simple programmatic abstract SVGs (more reliable than AI-generated)
-function generatePureAbstractSVGs(originalPrompt: string, count: number): IdeaResponse[] {
+// OpenAI API client for SVG generation
+async function callOpenAI(messages: any[]): Promise<string | null> {
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini", // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
+        messages,
+        max_tokens: 1500,
+        temperature: 0.7
+      }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.choices[0].message.content;
+    
+  } catch (error) {
+    console.warn('OpenAI API call failed:', (error as Error).message);
+    return null;
+  }
+}
+
+// Generate AI-influenced abstract SVGs based on the prompt
+async function generatePureAbstractSVGs(originalPrompt: string, count: number): Promise<IdeaResponse[]> {
   const abstractSVGs: IdeaResponse[] = [];
   
-  const colors = ['black', 'black', 'black', 'black', 'black', 'black']; // Use black as placeholder - will be replaced by frontend
+  console.log(`🎨 Generating ${count} AI-influenced abstract SVGs for prompt: "${originalPrompt}"`);
+  
+  const svgPrompt = `Create ${count} different abstract SVG line art designs inspired by: "${originalPrompt}"
+
+REQUIREMENTS:
+- Each SVG must use viewBox="0 0 200 150" 
+- Only use <path> elements with curves and lines
+- NO fills - only stroke="black" (will be recolored later)
+- stroke-width between 1-3
+- Abstract, flowing, organic shapes (no geometric shapes like circles, rectangles)
+- Each design should be unique and relate to the theme of "${originalPrompt}"
+
+Format each as valid SVG:
+<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
+  <path d="..." fill="none" stroke="black" stroke-width="2"/>
+</svg>
+
+Generate ${count} different SVG designs, each on a new line.`;
+
+  try {
+    // Try OpenAI first for SVG generation
+    console.log('🔄 Trying OpenAI for SVG generation...');
+    const openaiResponse = await callOpenAI([
+      { role: "system", content: "You are an expert SVG artist who creates minimal abstract line art." },
+      { role: "user", content: svgPrompt }
+    ]);
+
+    if (openaiResponse) {
+      console.log('📦 OpenAI SVG response length:', openaiResponse.length);
+      
+      // Extract SVG tags from response
+      const svgMatches = openaiResponse.match(/<svg[^>]*>[\s\S]*?<\/svg>/g);
+      
+      if (svgMatches && svgMatches.length > 0) {
+        console.log(`🎨 Found ${svgMatches.length} SVG designs from OpenAI`);
+        
+        for (let i = 0; i < Math.min(count, svgMatches.length); i++) {
+          abstractSVGs.push({
+            id: `ai-svg-${Date.now()}-${i}`,
+            title: "", // No title for pure visual inspiration
+            description: "", // No description for pure visual inspiration  
+            sourceContent: originalPrompt,
+            svg: svgMatches[i].trim()
+          });
+          
+          console.log(`🎨 Generated AI-influenced abstract SVG ${i + 1}`);
+        }
+        
+        return abstractSVGs;
+      }
+    }
+  } catch (error) {
+    console.log('❌ OpenAI SVG generation failed:', error.message);
+  }
+
+  // Fallback to simple programmatic generation if AI fails
+  console.log('🔄 Falling back to programmatic SVG generation...');
   
   for (let i = 0; i < count; i++) {
     // Generate deterministic but varied abstract patterns based on prompt
     const promptHash = originalPrompt.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const seed = promptHash + i;
-    
-    // Use seed to generate consistent but varied shapes
-    const color1 = colors[seed % colors.length];
-    const color2 = colors[(seed + 2) % colors.length];
     
     let svg = '';
     
@@ -115,14 +197,14 @@ function generatePureAbstractSVGs(originalPrompt: string, count: number): IdeaRe
     }
     
     abstractSVGs.push({
-      id: `abstract-svg-${Date.now()}-${i}`,
+      id: `fallback-svg-${Date.now()}-${i}`,
       title: "", // No title for pure visual inspiration
       description: "", // No description for pure visual inspiration  
       sourceContent: originalPrompt,
       svg: svg
     });
     
-    console.log(`🎨 Generated programmatic abstract SVG ${i + 1}`);
+    console.log(`🎨 Generated fallback abstract SVG ${i + 1}`);
   }
   
   return abstractSVGs;
@@ -417,7 +499,7 @@ async function addSVGToIdeas(ideas: IdeaResponse[], originalPrompt: string): Pro
   
   // STEP 1: Create 5 pure abstract SVG ideas (no text) 
   console.log('🎨 Generating 5 pure abstract SVGs...');
-  const pureAbstractSVGs = generatePureAbstractSVGs(originalPrompt, 5);
+  const pureAbstractSVGs = await generatePureAbstractSVGs(originalPrompt, 5);
   console.log(`🎨 Successfully generated ${pureAbstractSVGs.length} abstract SVGs`);
   
   // STEP 2: Distribute pure SVG ideas throughout the cards (sprinkle them in)
