@@ -58,8 +58,8 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
         
         {/* Title (only show if not empty) */}
         {idea.title && idea.title.trim().length > 0 ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <h3 className={`text-lg font-bold text-center leading-relaxed mb-4 ${accentColor}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+          <div className="flex flex-col items-center justify-start h-full pt-8">
+            <h3 className={`text-lg font-bold text-center leading-relaxed mb-6 ${accentColor}`} style={{ fontFamily: 'Inter, sans-serif' }}>
               {idea.title}
             </h3>
             
@@ -67,7 +67,7 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
             {idea.svg && (
               <div className="flex justify-center">
                 <div 
-                  className="w-32 h-24"
+                  className="w-48 h-36"
                   dangerouslySetInnerHTML={{ 
                     __html: idea.svg
                       .replace(/stroke="black"/g, `stroke="${strokeColor}"`)
@@ -80,9 +80,9 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
           </div>
         ) : idea.svg ? (
           // Pure visual card with SVG only
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-start justify-center h-full pt-12">
             <div 
-              className="w-40 h-32"
+              className="w-56 h-40"
               dangerouslySetInnerHTML={{ 
                 __html: idea.svg
                   .replace(/stroke="black"/g, `stroke="${strokeColor}"`)
