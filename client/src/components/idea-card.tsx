@@ -62,9 +62,16 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
             <div 
               className="w-full max-w-48 h-32 flex items-center justify-center rounded-lg bg-gradient-to-br from-white/10 to-white/5 p-3 border border-white/20 shadow-sm"
               dangerouslySetInnerHTML={{ 
-                __html: idea.svg.replace(/stroke="black"/g, `stroke="${strokeColor}"`)
+                __html: idea.svg
+                  .replace(/stroke="black"/g, `stroke="${strokeColor}"`)
+                  .replace(/stroke='black'/g, `stroke='${strokeColor}'`)
+                  .replace(/stroke:black/g, `stroke:${strokeColor}`)
               }}
             />
+            {/* Debug info */}
+            <div className="absolute top-1 left-1 text-xs bg-blue-500 text-white px-1 rounded">
+              Color {colorIndex}: {strokeColor}
+            </div>
           </div>
         )}
         
