@@ -22,11 +22,11 @@ async function generateSVGDrawing(prompt: string): Promise<string | null> {
     const svgMessages = [
       {
         role: "system",
-        content: "You are an SVG drawing generator. Create a simple, clean SVG illustration related to the given prompt. Use basic shapes and 2-3 colors maximum. Keep it minimalist and clear. Respond with only the SVG code, no explanations."
+        content: "You are an SVG drawing generator. Make a minimal abstract SVG, viewBox 0 0 100 100, stroke-width 2, black stroke, no fill. Respond with only the SVG code, no explanations."
       },
       {
         role: "user", 
-        content: `Create a simple SVG drawing related to: ${prompt}`
+        content: `Make a minimal abstract SVG, viewBox 0 0 100 100, stroke-width 2, black stroke, no fill, inspired by the idea '${prompt}'.`
       }
     ];
     
