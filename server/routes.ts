@@ -97,6 +97,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           source: "text",
           sourceContent: prompt,
           isSaved: 0,
+          svg: ideaData.svg, // Include SVG data!
           metadata: { generatedAt: new Date().toISOString() }
         }, userId);
         createdIdeas.push(idea);
