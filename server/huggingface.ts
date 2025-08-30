@@ -627,6 +627,20 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
   // Determine what type of ideas to generate based on the prompt
   const isPlayRequest = prompt.toLowerCase().includes('play') || prompt.toLowerCase().includes('story') || prompt.toLowerCase().includes('drama') || prompt.toLowerCase().includes('comedy');
   const isNameRequest = prompt.toLowerCase().includes('name') || prompt.toLowerCase().includes('title') || prompt.toLowerCase().includes('call');
+  const isPracticalRequest = prompt.toLowerCase().includes('curriculum') || 
+                            prompt.toLowerCase().includes('lesson') || 
+                            prompt.toLowerCase().includes('education') || 
+                            prompt.toLowerCase().includes('teaching') || 
+                            prompt.toLowerCase().includes('course') || 
+                            prompt.toLowerCase().includes('workshop') || 
+                            prompt.toLowerCase().includes('training') || 
+                            prompt.toLowerCase().includes('project') || 
+                            prompt.toLowerCase().includes('business') || 
+                            prompt.toLowerCase().includes('app') || 
+                            prompt.toLowerCase().includes('idea') ||
+                            prompt.toLowerCase().includes('concept') ||
+                            prompt.toLowerCase().includes('strategy') ||
+                            prompt.toLowerCase().includes('method');
   
   let systemPrompt = '';
   
@@ -647,6 +661,31 @@ EXAMPLES for "names for a software consultancy that are witty and funny, with La
 Each response should be a direct answer to what the user requested - names, titles, or company names.
 
 Format as JSON: [{"title": "Landes End Software Solutions"}, {"title": "Debug Landes: Where Bugs Go to Die"}]`;
+  } else if (isPracticalRequest && !isPlayRequest) {
+    // Generate practical, educational, or business concepts
+    systemPrompt = `Generate ${count} practical, actionable concepts for: "${prompt}"
+
+Generate actual educational concepts, curriculum ideas, project concepts, business strategies, or practical approaches. Each should be a direct, implementable idea in 5-15 words.
+
+EXAMPLES for "5th grade science curriculum":
+✅ CORRECT (actual curriculum concepts):
+- "Hands-on volcano experiments using baking soda and food coloring"
+- "Weather tracking station with daily measurements and predictions"
+- "Plant growth lab comparing different light and water conditions"
+- "Simple machines workshop building levers, pulleys, and inclined planes"
+- "Solar system model-making with accurate scale and distances"
+
+EXAMPLES for "business ideas for teenagers":
+✅ CORRECT (actual business concepts):
+- "Custom phone case design service using 3D printing technology"
+- "Pet sitting and dog walking service for neighborhood families"
+- "Social media management for local small businesses"
+- "Tutoring service for younger students in math and science"
+- "Handmade jewelry sales through online marketplace platforms"
+
+Each response should be a PRACTICAL CONCEPT that directly addresses the user's request, not a story or narrative.
+
+Format as JSON: [{"title": "Hands-on volcano experiments using baking soda and food coloring"}, {"title": "Weather tracking station with daily measurements and predictions"}]`;
   } else {
     // Generate play concepts (original behavior)
     systemPrompt = `Generate ${count} creative CONCEPTS/PLOT IDEAS for: "${prompt}"
