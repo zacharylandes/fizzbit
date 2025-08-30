@@ -56,11 +56,33 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
           </div>
         </div>
         
-        {/* SVG Drawing if available */}
-        {idea.svg && (
-          <div className="mb-6 flex justify-center">
+        {/* Title (only show if not empty) */}
+        {idea.title && idea.title.trim().length > 0 ? (
+          <div className="flex flex-col items-center justify-center h-full">
+            <h3 className={`text-lg font-bold text-center leading-relaxed mb-4 ${accentColor}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+              {idea.title}
+            </h3>
+            
+            {/* SVG Drawing below text */}
+            {idea.svg && (
+              <div className="flex justify-center">
+                <div 
+                  className="w-32 h-24"
+                  dangerouslySetInnerHTML={{ 
+                    __html: idea.svg
+                      .replace(/stroke="black"/g, `stroke="${strokeColor}"`)
+                      .replace(/stroke='black'/g, `stroke='${strokeColor}'`)
+                      .replace(/stroke:black/g, `stroke:${strokeColor}`)
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        ) : idea.svg ? (
+          // Pure visual card with SVG only
+          <div className="flex items-center justify-center h-full">
             <div 
-              className="w-full max-w-48 h-32 flex items-center justify-center rounded-lg bg-gradient-to-br from-white/10 to-white/5 p-3 border border-white/20 shadow-sm"
+              className="w-40 h-32"
               dangerouslySetInnerHTML={{ 
                 __html: idea.svg
                   .replace(/stroke="black"/g, `stroke="${strokeColor}"`)
@@ -68,26 +90,6 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
                   .replace(/stroke:black/g, `stroke:${strokeColor}`)
               }}
             />
-            {/* Debug info */}
-            <div className="absolute top-1 left-1 text-xs bg-blue-500 text-white px-1 rounded">
-              Color {colorIndex}: {strokeColor}
-            </div>
-          </div>
-        )}
-        
-        {/* Title (only show if not empty) */}
-        {idea.title && idea.title.trim().length > 0 ? (
-          <div className="flex items-start justify-center h-full">
-            <h3 className={`text-lg font-bold text-center leading-relaxed ${accentColor}`} style={{ fontFamily: 'Inter, sans-serif' }}>
-              {idea.title}
-            </h3>
-          </div>
-        ) : idea.svg ? (
-          // Pure visual card with SVG - minimal text
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center text-xs text-white/40">
-              •
-            </div>
           </div>
         ) : (
           // Card with no title and no SVG

@@ -79,40 +79,37 @@ function generatePureAbstractSVGs(originalPrompt: string, count: number): IdeaRe
     let svg = '';
     
     switch (i % 5) {
-      case 0: // Flowing curves
+      case 0: // Flowing organic curves
         svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <path d="M20,75 Q100,20 180,75 Q100,130 20,75" fill="none" stroke="black" stroke-width="4"/>
-          <circle cx="50" cy="50" r="15" fill="none" stroke="black" stroke-width="2"/>
-          <circle cx="150" cy="100" r="10" fill="none" stroke="black" stroke-width="2"/>
+          <path d="M20,120 C60,40 90,110 130,30 C160,90 180,20 200,80" fill="none" stroke="black" stroke-width="2"/>
+          <path d="M10,60 C50,90 120,10 150,70 C170,30 190,100 210,50" fill="none" stroke="black" stroke-width="1.5"/>
         </svg>`;
         break;
-      case 1: // Geometric shapes
+      case 1: // Abstract waves
         svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <rect x="40" y="40" width="60" height="60" fill="none" stroke="black" stroke-width="3" transform="rotate(15 70 70)"/>
-          <polygon points="120,30 160,90 80,90" fill="none" stroke="black" stroke-width="2"/>
-          <line x1="20" y1="20" x2="180" y2="130" stroke="black" stroke-width="3"/>
+          <path d="M0,75 Q50,20 100,75 T200,75" fill="none" stroke="black" stroke-width="2"/>
+          <path d="M0,100 Q30,60 80,100 Q120,140 160,100 Q180,80 200,120" fill="none" stroke="black" stroke-width="1.5"/>
+          <path d="M20,50 Q60,80 100,50 Q140,20 180,50" fill="none" stroke="black" stroke-width="1"/>
         </svg>`;
         break;
-      case 2: // Organic lines
+      case 2: // Intertwining lines
         svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <path d="M10,75 C50,25 100,125 140,75 C180,25 200,75 190,100" fill="none" stroke="black" stroke-width="3"/>
-          <path d="M30,100 C70,60 130,110 170,70" fill="none" stroke="black" stroke-width="4"/>
-          <circle cx="100" cy="75" r="6" fill="none" stroke="black" stroke-width="2"/>
+          <path d="M10,75 C50,25 100,125 140,75 C180,25 200,75 190,100" fill="none" stroke="black" stroke-width="2"/>
+          <path d="M30,30 C70,120 130,40 170,130" fill="none" stroke="black" stroke-width="1.5"/>
+          <path d="M180,40 C140,80 100,20 60,90 C40,60 20,120 0,90" fill="none" stroke="black" stroke-width="1"/>
         </svg>`;
         break;
-      case 3: // Abstract composition
+      case 3: // Spiral abstractions
         svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <ellipse cx="100" cy="75" rx="80" ry="40" fill="none" stroke="black" stroke-width="3"/>
-          <rect x="70" y="55" width="60" height="40" fill="none" stroke="black" stroke-width="2" rx="10"/>
-          <line x1="40" y1="40" x2="160" y2="110" stroke="black" stroke-width="1"/>
+          <path d="M100,75 C120,55 140,75 120,95 C80,115 60,75 80,55 C100,35 140,55 120,95 C60,135 20,75 60,35" fill="none" stroke="black" stroke-width="2"/>
+          <path d="M170,40 C150,60 170,80 190,60 C210,40 190,20 170,40" fill="none" stroke="black" stroke-width="1.5"/>
         </svg>`;
         break;
-      case 4: // Minimalist design
+      case 4: // Abstract brush strokes  
         svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <circle cx="70" cy="60" r="25" fill="none" stroke="${color1}" stroke-width="2"/>
-          <circle cx="130" cy="90" r="20" fill="${color2}" opacity="0.4"/>
-          <path d="M40,120 L160,30" stroke="${color1}" stroke-width="1" opacity="0.6"/>
-          <rect x="85" y="70" width="30" height="10" fill="${color2}" opacity="0.7"/>
+          <path d="M20,40 C60,20 80,100 120,80 C140,60 180,120 200,100" fill="none" stroke="black" stroke-width="3"/>
+          <path d="M0,110 C40,130 100,70 160,90 C180,100 200,80 220,110" fill="none" stroke="black" stroke-width="1.5"/>
+          <path d="M30,70 C80,50 120,130 170,110" fill="none" stroke="black" stroke-width="2"/>
         </svg>`;
         break;
     }
