@@ -663,27 +663,7 @@ Each response should be a direct answer to what the user requested - names, titl
 Format as JSON: [{"title": "Landes End Software Solutions"}, {"title": "Debug Landes: Where Bugs Go to Die"}]`;
   } else if (isPracticalRequest && !isPlayRequest) {
     // Generate practical, educational, or business concepts
-    systemPrompt = `Generate ${count} practical, actionable concepts for: "${prompt}"
-
-Generate actual educational concepts, curriculum ideas, project concepts, business strategies, or practical approaches. Each should be a direct, implementable idea in 5-15 words.
-
-EXAMPLES for "5th grade science curriculum":
-✅ CORRECT (actual curriculum concepts):
-- "Hands-on volcano experiments using baking soda and food coloring"
-- "Weather tracking station with daily measurements and predictions"
-- "Plant growth lab comparing different light and water conditions"
-- "Simple machines workshop building levers, pulleys, and inclined planes"
-- "Solar system model-making with accurate scale and distances"
-
-EXAMPLES for "business ideas for teenagers":
-✅ CORRECT (actual business concepts):
-- "Custom phone case design service using 3D printing technology"
-- "Pet sitting and dog walking service for neighborhood families"
-- "Social media management for local small businesses"
-- "Tutoring service for younger students in math and science"
-- "Handmade jewelry sales through online marketplace platforms"
-
-Each response should be a PRACTICAL CONCEPT that directly addresses the user's request, not a story or narrative.
+    systemPrompt = `Generate ${count} practical, actionable concepts for: "${prompt}". Each response should be a PRACTICAL CONCEPT that directly addresses the user's request.
 
 Format as JSON: [{"title": "Hands-on volcano experiments using baking soda and food coloring"}, {"title": "Weather tracking station with daily measurements and predictions"}]`;
   } else {
