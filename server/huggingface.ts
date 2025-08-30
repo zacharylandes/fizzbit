@@ -342,13 +342,21 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
         return false;
       }
       
-      // ACCEPT creative concepts - look for story indicators instead of action words
-      const storyIndicators = ['comedy', 'drama', 'man', 'woman', 'family', 'story', 'play', 'character', 'person', 'about', 'where', 'who', 'discovers', 'believes', 'thinks', 'tries', 'struggles', 'leads', 'turns', 'becomes', 'finds'];
+      // Different validation for names vs story concepts
+      const isNameRequest = originalPrompt.toLowerCase().includes('name') || originalPrompt.toLowerCase().includes('title') || originalPrompt.toLowerCase().includes('call');
       
-      // Check if line contains story/character words
-      const hasStoryElement = storyIndicators.some(word => lowerLine.includes(word));
-      
-      return hasStoryElement && line.length >= 15 && line.length <= 200;
+      if (isNameRequest) {
+        // For names/titles, accept shorter, more direct responses
+        return line.length >= 5 && line.length <= 100 && !lowerLine.includes('concept:');
+      } else {
+        // For play concepts, look for story indicators
+        const storyIndicators = ['comedy', 'drama', 'man', 'woman', 'family', 'story', 'play', 'character', 'person', 'about', 'where', 'who', 'discovers', 'believes', 'thinks', 'tries', 'struggles', 'leads', 'turns', 'becomes', 'finds'];
+        
+        // Check if line contains story/character words
+        const hasStoryElement = storyIndicators.some(word => lowerLine.includes(word));
+        
+        return hasStoryElement && line.length >= 15 && line.length <= 200;
+      }
     });
 
   console.log('Found potential ideas:', lines.length, lines.slice(0, 3));
@@ -362,12 +370,24 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
       .replace(/["']$/, '') // Remove closing quotes
       .trim();
   }).filter(line => {
-    // Only accept lines that look like complete ideas
-    return line.length > 15 && 
-           line.length < 200 && 
-           !line.toLowerCase().includes('here are') &&
-           !line.toLowerCase().includes('creative concept') &&
-           line.split(' ').length >= 6; // Ensure it's a complete sentence
+    // Different validation for names vs story concepts
+    const isNameRequest = originalPrompt.toLowerCase().includes('name') || originalPrompt.toLowerCase().includes('title') || originalPrompt.toLowerCase().includes('call');
+    
+    if (isNameRequest) {
+      // For names/titles, be more lenient
+      return line.length > 5 && 
+             line.length < 100 && 
+             !line.toLowerCase().includes('here are') &&
+             !line.toLowerCase().includes('creative concept') &&
+             line.split(' ').length >= 2; // Names can be short
+    } else {
+      // For play concepts, require complete sentences
+      return line.length > 15 && 
+             line.length < 200 && 
+             !line.toLowerCase().includes('here are') &&
+             !line.toLowerCase().includes('creative concept') &&
+             line.split(' ').length >= 6; // Ensure it's a complete sentence
+    }
   });
 
   const ideas: IdeaResponse[] = [];
@@ -522,9 +542,32 @@ function generateTemplateFallback(prompt: string, count: number): IdeaResponse[]
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
-  const systemPrompt = `Generate ${count} creative CONCEPTS/PLOT IDEAS for: "${prompt}"
+  // Determine what type of ideas to generate based on the prompt
+  const isPlayRequest = prompt.toLowerCase().includes('play') || prompt.toLowerCase().includes('story') || prompt.toLowerCase().includes('drama') || prompt.toLowerCase().includes('comedy');
+  const isNameRequest = prompt.toLowerCase().includes('name') || prompt.toLowerCase().includes('title') || prompt.toLowerCase().includes('call');
+  
+  let systemPrompt = '';
+  
+  if (isNameRequest && !isPlayRequest) {
+    // Generate actual names/titles
+    systemPrompt = `Generate ${count} creative ${prompt.includes('consultancy') ? 'company names' : 'names/titles'} for: "${prompt}"
 
-IMPORTANT: The user asked for "ideas for a play" - this means PLOT CONCEPTS, not titles or names.
+Generate actual names, titles, or company names that directly answer the user's request. Each should be concise and relevant.
+
+EXAMPLES for "names for a software consultancy that are witty and funny, with Landes in the title":
+✅ CORRECT (actual names):
+- "Landes End Software Solutions"
+- "Debug Landes: Where Bugs Go to Die"
+- "Landes of Code Consulting" 
+- "The Landes of Confusion (Software Clarity)"
+- "Landes Ahoy! Tech Consulting"
+
+Each response should be a direct answer to what the user requested - names, titles, or company names.
+
+Format as JSON: [{"title": "Landes End Software Solutions"}, {"title": "Debug Landes: Where Bugs Go to Die"}]`;
+  } else {
+    // Generate play concepts (original behavior)
+    systemPrompt = `Generate ${count} creative CONCEPTS/PLOT IDEAS for: "${prompt}"
 
 Generate actual play scenarios, plots, and story concepts. Each should be a complete creative concept in 6-15 words.
 
@@ -536,15 +579,10 @@ EXAMPLES for "ideas for a play about a man who thinks he's from the future":
 - "Office comedy where employee thinks modern technology proves he's from tomorrow"
 - "Family struggles with father who insists he's from year 3000"
 
-❌ WRONG (just titles/names):
-- "Time Traveler"
-- "Future Shock" 
-- "The Man from Tomorrow"
-- "Temporal Confusion"
-
 Each response should be a STORY CONCEPT that explains what the play is about, not just a title.
 
 Format as JSON: [{"title": "Comedy where man tries convincing others he's from 2087 but fails hilariously"}, {"title": "Drama about someone whose future memories turn out to be elaborate dreams"}]`;
+  }
 
   // PRIMARY: Try Together.ai Llama
   try {
