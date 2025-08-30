@@ -624,75 +624,10 @@ function generateTemplateFallback(prompt: string, count: number): IdeaResponse[]
 export async function generateIdeasFromText(prompt: string, count: number = 25): Promise<IdeaResponse[]> {
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
-  // Determine what type of ideas to generate based on the prompt
-  const isPlayRequest = prompt.toLowerCase().includes('play') || prompt.toLowerCase().includes('story') || prompt.toLowerCase().includes('drama') || prompt.toLowerCase().includes('comedy');
-  const isNameRequest = prompt.toLowerCase().includes('name') || prompt.toLowerCase().includes('title') || prompt.toLowerCase().includes('call');
-  const isPracticalRequest = prompt.toLowerCase().includes('curriculum') || 
-                            prompt.toLowerCase().includes('lesson') || 
-                            prompt.toLowerCase().includes('education') || 
-                            prompt.toLowerCase().includes('teaching') || 
-                            prompt.toLowerCase().includes('course') || 
-                            prompt.toLowerCase().includes('workshop') || 
-                            prompt.toLowerCase().includes('training') || 
-                            prompt.toLowerCase().includes('project') || 
-                            prompt.toLowerCase().includes('business') || 
-                            prompt.toLowerCase().includes('app') || 
-                            prompt.toLowerCase().includes('idea') ||
-                            prompt.toLowerCase().includes('concept') ||
-                            prompt.toLowerCase().includes('strategy') ||
-                            prompt.toLowerCase().includes('method') ||
-                            prompt.toLowerCase().includes('routine') ||
-                            prompt.toLowerCase().includes('exercise') ||
-                            prompt.toLowerCase().includes('workout') ||
-                            prompt.toLowerCase().includes('tips') ||
-                            prompt.toLowerCase().includes('guide') ||
-                            prompt.toLowerCase().includes('how to') ||
-                            prompt.toLowerCase().includes('technique') ||
-                            prompt.toLowerCase().includes('plan') ||
-                            prompt.toLowerCase().includes('steps');
-  
-  let systemPrompt = '';
-  
-  if (isNameRequest && !isPlayRequest) {
-    // Generate actual names/titles
-    systemPrompt = `Generate ${count} creative ${prompt.includes('consultancy') ? 'company names' : 'names/titles'} for: "${prompt}"
-
-Generate actual names, titles, or company names that directly answer the user's request. Each should be concise and relevant.
-
-EXAMPLES for "names for a software consultancy that are witty and funny, with Landes in the title":
-✅ CORRECT (actual names):
-- "Landes End Software Solutions"
-- "Debug Landes: Where Bugs Go to Die"
-- "Landes of Code Consulting" 
-- "The Landes of Confusion (Software Clarity)"
-- "Landes Ahoy! Tech Consulting"
-
-Each response should be a direct answer to what the user requested - names, titles, or company names.
-
-Format as JSON: [{"title": "Landes End Software Solutions"}, {"title": "Debug Landes: Where Bugs Go to Die"}]`;
-  } else if (isPracticalRequest && !isPlayRequest) {
-    // Generate practical, educational, or business concepts
-    systemPrompt = `Generate ${count} practical, actionable concepts for: "${prompt}". Each response should be a PRACTICAL CONCEPT that directly addresses the user's request.
+  // Use simple, direct prompt for all requests
+  const systemPrompt = `Generate ${count} practical, actionable concepts for: "${prompt}". Each response should be a PRACTICAL CONCEPT that directly addresses the user's request.
 
 Format as JSON: [{"title": "Hands-on volcano experiments using baking soda and food coloring"}, {"title": "Weather tracking station with daily measurements and predictions"}]`;
-  } else {
-    // Generate play concepts (original behavior)
-    systemPrompt = `Generate ${count} creative CONCEPTS/PLOT IDEAS for: "${prompt}"
-
-Generate actual play scenarios, plots, and story concepts. Each should be a complete creative concept in 6-15 words.
-
-EXAMPLES for "ideas for a play about a man who thinks he's from the future":
-✅ CORRECT (actual plot concepts):
-- "Comedy where man tries convincing others he's from 2087 but fails hilariously"
-- "Drama about someone whose future memories turn out to be elaborate dreams"
-- "Man believes he's time traveler but discovers he just watches too much sci-fi"
-- "Office comedy where employee thinks modern technology proves he's from tomorrow"
-- "Family struggles with father who insists he's from year 3000"
-
-Each response should be a STORY CONCEPT that explains what the play is about, not just a title.
-
-Format as JSON: [{"title": "Comedy where man tries convincing others he's from 2087 but fails hilariously"}, {"title": "Drama about someone whose future memories turn out to be elaborate dreams"}]`;
-  }
 
   // PRIMARY: Try Together.ai Llama
   try {
