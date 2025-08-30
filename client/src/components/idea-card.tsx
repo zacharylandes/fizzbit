@@ -27,7 +27,17 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
     "text-card-purple-gray"
   ];
   
+  // Corresponding hex colors for SVG stroke (converted from HSL values in CSS)
+  const strokeColors = [
+    "#6B7C3E", // hsl(85, 35%, 45%) - sage
+    "#3F4A66", // hsl(210, 30%, 40%) - blue-gray  
+    "#8B6914", // hsl(35, 60%, 30%) - brown for cream
+    "#4080A6", // hsl(200, 45%, 50%) - light blue
+    "#554059"  // hsl(270, 25%, 35%) - purple-gray
+  ];
+  
   const accentColor = accentColors[colorIndex % accentColors.length];
+  const strokeColor = strokeColors[colorIndex % strokeColors.length];
 
   return (
     <div className={`relative rounded-xl border overflow-hidden w-full h-full cursor-pointer transition-all duration-300 ${cardStyle}`} style={{ fontFamily: 'Crimson Text, serif' }}>
@@ -51,7 +61,9 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
           <div className="mb-6 flex justify-center">
             <div 
               className="w-full max-w-48 h-32 flex items-center justify-center rounded-lg bg-gradient-to-br from-white/10 to-white/5 p-3 border border-white/20 shadow-sm"
-              dangerouslySetInnerHTML={{ __html: idea.svg }}
+              dangerouslySetInnerHTML={{ 
+                __html: idea.svg.replace(/stroke="black"/g, `stroke="${strokeColor}"`)
+              }}
             />
           </div>
         )}
