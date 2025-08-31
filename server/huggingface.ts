@@ -395,12 +395,11 @@ async function addSVGToIdeas(ideas: IdeaResponse[], originalPrompt: string): Pro
     finalIdeas.pop(); // Remove excess
   }
   
-  // If we have less than 25, pad with template-based ideas instead of repeating
+  // If we have less than 25, throw error instead of generic templates
   if (finalIdeas.length < 25) {
     const needed = 25 - finalIdeas.length;
-    console.log(`🔄 Need ${needed} more ideas, generating template-based ideas...`);
-    const templateIdeas = generateTemplateFallback(originalPrompt, needed);
-    finalIdeas.push(...templateIdeas);
+    console.log(`❌ Only generated ${finalIdeas.length} relevant ideas, need ${needed} more. Throwing error instead of using generic templates.`);
+    throw new Error('Unable to generate enough relevant ideas for this prompt. Please try rephrasing your request or check back later.');
   }
   
   // SVG illustrations for text ideas are now generated client-side
