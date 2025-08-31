@@ -1,0 +1,152 @@
+function hashString(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+function generateAbstractSVG(prompt, width = 300, height = 150, color = null) {
+  // Add timestamp and random number to make it unique each time
+  const uniquePrompt = prompt + Date.now() + Math.random();
+  const seed = hashString(uniquePrompt);
+  
+  // Choose a random shape type
+  const shapeTypes = ['waves', 'spirals', 'polygons', 'circles', 'lines', 'curves'];
+  const shapeType = shapeTypes[seed % shapeTypes.length];
+  
+  // Use provided color or generate a random hue
+  const hue = color ? color : (seed % 360);
+  const strokeWidth = ((seed >> 3) % 3) + 1;
+  
+  let content = "";
+  
+  switch(shapeType) {
+    case 'waves':
+      const numWaves = (seed % 5) + 2;
+      const waveHeight = (seed % 40) + 20;
+      for (let i = 0; i < numWaves; i++) {
+        const offset = (i * 20) + (seed % 30);
+        content += `
+          <path d="M0 ${height/2 + offset}
+            Q ${width/4} ${height/2 + offset - waveHeight},
+              ${width/2} ${height/2 + offset}
+            T ${width} ${height/2 + offset}"
+            fill="none" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}">
+            <animateTransform attributeName="transform" type="translate"
+              from="0 0" to="20 0" dur="${3 + (i % 3)}s" repeatCount="indefinite"/>
+          </path>`;
+      }
+      break;
+      
+    case 'spirals':
+      const numSpirals = (seed % 3) + 1;
+      for (let i = 0; i < numSpirals; i++) {
+        const cx = width/2 + ((seed >> (i*2)) % 60) - 30;
+        const cy = height/2 + ((seed >> (i*3)) % 40) - 20;
+        content += `
+          <path d="M${cx} ${cy} 
+            A10 10 0 0 1 ${cx+20} ${cy}
+            A20 20 0 0 1 ${cx-30} ${cy}
+            A35 35 0 0 1 ${cx+40} ${cy}
+            A50 50 0 0 1 ${cx-50} ${cy}"
+            fill="none" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}">
+            <animateTransform attributeName="transform" type="rotate"
+              from="0 ${cx} ${cy}" to="360 ${cx} ${cy}" dur="${4 + i}s" repeatCount="indefinite"/>
+          </path>`;
+      }
+      break;
+      
+    case 'polygons':
+      const numPolygons = (seed % 4) + 2;
+      for (let i = 0; i < numPolygons; i++) {
+        const sides = 3 + ((seed >> i) % 5);
+        const radius = 20 + ((seed >> (i*2)) % 40);
+        const cx = width/2 + ((seed >> (i*3)) % 100) - 50;
+        const cy = height/2 + ((seed >> (i*4)) % 60) - 30;
+        const polygonHue = (hue + i * 60) % 360;
+        let points = "";
+        for (let j = 0; j < sides; j++) {
+          const angle = (j * 2 * Math.PI) / sides;
+          const x = cx + radius * Math.cos(angle);
+          const y = cy + radius * Math.sin(angle);
+          points += `${x},${y} `;
+        }
+        
+        content += `
+          <polygon points="${points}" fill="hsla(${hue},70%,50%,0.3)" 
+            stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}">
+            <animateTransform attributeName="transform" type="rotate"
+              from="0 ${cx} ${cy}" to="360 ${cx} ${cy}" dur="${5 + i}s" repeatCount="indefinite"/>
+          </polygon>`;
+      }
+      break;
+      
+    case 'circles':
+      const numCircles = (seed % 6) + 3;
+      for (let i = 0; i < numCircles; i++) {
+        const r = 10 + ((seed >> i) % 30);
+        const cx = width/2 + ((seed >> (i*2)) % 120) - 60;
+        const cy = height/2 + ((seed >> (i*3)) % 80) - 40;
+        content += `
+          <circle cx="${cx}" cy="${cy}" r="${r}" 
+            fill="hsla(${hue},70%,50%,0.4)" 
+            stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}">
+            <animate attributeName="r" from="${r}" to="${r+10}" dur="${2 + i}s" 
+              repeatCount="indefinite" direction="alternate"/>
+          </circle>`;
+      }
+      break;
+      
+    case 'lines':
+      const numLines = (seed % 8) + 4;
+      for (let i = 0; i < numLines; i++) {
+        const x1 = (seed >> i) % width;
+        const y1 = (seed >> (i*2)) % height;
+        const x2 = (seed >> (i*3)) % width;
+        const y2 = (seed >> (i*4)) % height;
+        content += `
+          <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" 
+            stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}">
+            <animate attributeName="opacity" from="0.3" to="1" dur="${3 + (i % 2)}s" 
+              repeatCount="indefinite" direction="alternate"/>
+          </line>`;
+      }
+      break;
+      
+    case 'curves':
+      const numCurves = (seed % 4) + 2;
+      for (let i = 0; i < numCurves; i++) {
+        const x1 = ((seed >> i) % width/2) + width/4;
+        const y1 = ((seed >> (i*2)) % height/2) + height/4;
+        const x2 = ((seed >> (i*3)) % width/2) + width/4;
+        const y2 = ((seed >> (i*4)) % height/2) + height/4;
+        const cx = ((seed >> (i*5)) % width/3) + width/3;
+        const cy = ((seed >> (i*6)) % height/3) + height/3;
+        content += `
+          <path d="M${x1} ${y1} Q${cx} ${cy} ${x2} ${y2}" 
+            fill="none" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}">
+            <animateTransform attributeName="transform" type="scale"
+              from="1" to="1.2" dur="${4 + i}s" repeatCount="indefinite" direction="alternate"/>
+          </path>`;
+      }
+      break;
+  }
+  
+  return `
+    <svg xmlns="http://www.w3.org/2000/svg"
+         viewBox="0 0 ${width} ${height}"
+         width="${width}" height="${height}">
+      ${content}
+    </svg>
+  `;
+}
+
+function generateNewSVG(customColor = null) {
+  const svgMarkup = generateAbstractSVG("a quirky startup name", 300, 150, customColor);
+  document.getElementById('svg-container').innerHTML = svgMarkup;
+}
+
+// Generate initial SVG when page loads with green color
+generateNewSVG(120);

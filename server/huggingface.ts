@@ -17,49 +17,7 @@ const openai = new OpenAI({
 });
 
 // Generate simple SVG drawing related to prompt using Llama
-async function generateSVGDrawing(prompt: string): Promise<string | null> {
-  try {
-    const svgMessages = [
-      {
-        role: "system",
-        content: "You are an SVG drawing generator. Make a minimal abstract SVG, viewBox 0 0 100 100, stroke-width 2, black stroke, no fill. Respond with only the SVG code, no explanations."
-      },
-      {
-        role: "user", 
-        content: `Make a minimal abstract SVG, viewBox 0 0 100 100, stroke-width 2, black stroke, no fill, inspired by the idea '${prompt}'.`
-      }
-    ];
-    
-    const response = await fetch("https://api.together.xyz/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${TOGETHER_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "meta-llama/Llama-3.2-3B-Instruct-Turbo",
-        messages: svgMessages,
-        max_tokens: 400,
-        temperature: 0.7
-      }),
-    });
-    
-    if (!response.ok) {
-      throw new Error(`SVG generation failed: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    const svgContent = data.choices[0].message.content;
-    
-    // Extract SVG from response
-    const svgMatch = svgContent.match(/<svg[\s\S]*?<\/svg>/i);
-    return svgMatch ? svgMatch[0] : null;
-    
-  } catch (error) {
-    console.warn('SVG generation failed:', (error as Error).message);
-    return null;
-  }
-}
+// SVG generation now handled client-side using procedural JavaScript
 
 // OpenAI API client for SVG generation
 async function callOpenAI(messages: any[]): Promise<string | null> {
@@ -91,133 +49,23 @@ async function callOpenAI(messages: any[]): Promise<string | null> {
   }
 }
 
-// Generate AI-influenced abstract SVGs based on the prompt
-async function generatePureAbstractSVGs(originalPrompt: string, count: number): Promise<IdeaResponse[]> {
+// Generate placeholder SVG ideas that will be procedurally generated client-side
+function generatePureAbstractSVGs(originalPrompt: string, count: number): IdeaResponse[] {
   const abstractSVGs: IdeaResponse[] = [];
   
-  console.log(`🎨 Generating ${count} AI-influenced abstract SVGs for prompt: "${originalPrompt}"`);
-  
-  const svgPrompt = `Create ${count} different abstract SVG line art designs inspired by: "${originalPrompt}"
-
-CRITICAL REQUIREMENTS:
-- Each SVG must use viewBox="0 0 200 150" 
-- ONLY <path> elements with curves and lines - NO OTHER ELEMENTS
-- NO fills - only stroke="black" (will be recolored later)
-- stroke-width between 1-3
-- Abstract, flowing, organic shapes (no geometric shapes)
-
-ABSOLUTELY FORBIDDEN:
-- NO <text> tags
-- NO <tspan> tags  
-- NO words, letters, numbers, or characters
-- NO <rect>, <circle>, <ellipse> - only <path>
-- PURELY ABSTRACT LINES ONLY
-
-Format each as valid SVG:
-<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
-  <path d="..." fill="none" stroke="black" stroke-width="2"/>
-</svg>
-
-Return ONLY pure abstract line art - no text anywhere!`;
-
-  try {
-    // Try OpenAI first for SVG generation
-    console.log('🔄 Trying OpenAI for SVG generation...');
-    const openaiResponse = await callOpenAI([
-      { role: "system", content: "You are an expert SVG artist who creates minimal abstract line art." },
-      { role: "user", content: svgPrompt }
-    ]);
-
-    if (openaiResponse) {
-      console.log('📦 OpenAI SVG response length:', openaiResponse.length);
-      
-      // Extract SVG tags from response and clean them
-      const svgMatches = openaiResponse.match(/<svg[^>]*>[\s\S]*?<\/svg>/g);
-      
-      if (svgMatches && svgMatches.length > 0) {
-        console.log(`🎨 Found ${svgMatches.length} SVG designs from OpenAI`);
-        
-        for (let i = 0; i < Math.min(count, svgMatches.length); i++) {
-          // Clean SVG by removing any text elements
-          let cleanSvg = svgMatches[i].trim();
-          
-          // Remove all text elements and their content
-          cleanSvg = cleanSvg.replace(/<text[^>]*>[\s\S]*?<\/text>/gi, '');
-          cleanSvg = cleanSvg.replace(/<tspan[^>]*>[\s\S]*?<\/tspan>/gi, '');
-          
-          abstractSVGs.push({
-            id: `ai-svg-${Date.now()}-${i}`,
-            title: "", // No title for pure visual inspiration
-            description: "", // No description for pure visual inspiration  
-            sourceContent: originalPrompt,
-            svg: cleanSvg
-          });
-          
-          console.log(`🎨 Generated AI-influenced abstract SVG ${i + 1}`);
-        }
-        
-        return abstractSVGs;
-      }
-    }
-  } catch (error) {
-    console.log('❌ OpenAI SVG generation failed:', error instanceof Error ? error.message : String(error));
-  }
-
-  // Fallback to simple programmatic generation if AI fails
-  console.log('🔄 Falling back to programmatic SVG generation...');
+  console.log(`🎨 Generating ${count} procedural abstract SVGs for prompt: "${originalPrompt}"`);
   
   for (let i = 0; i < count; i++) {
-    // Generate deterministic but varied abstract patterns based on prompt
-    const promptHash = originalPrompt.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const seed = promptHash + i;
-    
-    let svg = '';
-    
-    switch (i % 5) {
-      case 0: // Flowing organic curves
-        svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <path d="M20,120 C60,40 90,110 130,30 C160,90 180,20 200,80" fill="none" stroke="black" stroke-width="2"/>
-          <path d="M10,60 C50,90 120,10 150,70 C170,30 190,100 210,50" fill="none" stroke="black" stroke-width="1.5"/>
-        </svg>`;
-        break;
-      case 1: // Abstract waves
-        svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <path d="M0,75 Q50,20 100,75 T200,75" fill="none" stroke="black" stroke-width="2"/>
-          <path d="M0,100 Q30,60 80,100 Q120,140 160,100 Q180,80 200,120" fill="none" stroke="black" stroke-width="1.5"/>
-          <path d="M20,50 Q60,80 100,50 Q140,20 180,50" fill="none" stroke="black" stroke-width="1"/>
-        </svg>`;
-        break;
-      case 2: // Intertwining lines
-        svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <path d="M10,75 C50,25 100,125 140,75 C180,25 200,75 190,100" fill="none" stroke="black" stroke-width="2"/>
-          <path d="M30,30 C70,120 130,40 170,130" fill="none" stroke="black" stroke-width="1.5"/>
-          <path d="M180,40 C140,80 100,20 60,90 C40,60 20,120 0,90" fill="none" stroke="black" stroke-width="1"/>
-        </svg>`;
-        break;
-      case 3: // Spiral abstractions
-        svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <path d="M100,75 C120,55 140,75 120,95 C80,115 60,75 80,55 C100,35 140,55 120,95 C60,135 20,75 60,35" fill="none" stroke="black" stroke-width="2"/>
-          <path d="M170,40 C150,60 170,80 190,60 C210,40 190,20 170,40" fill="none" stroke="black" stroke-width="1.5"/>
-        </svg>`;
-        break;
-      case 4: // Abstract brush strokes  
-        svg = `<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-          <path d="M20,40 C60,20 80,100 120,80 C140,60 180,120 200,100" fill="none" stroke="black" stroke-width="3"/>
-          <path d="M0,110 C40,130 100,70 160,90 C180,100 200,80 220,110" fill="none" stroke="black" stroke-width="1.5"/>
-          <path d="M30,70 C80,50 120,130 170,110" fill="none" stroke="black" stroke-width="2"/>
-        </svg>`;
-        break;
-    }
-    
     abstractSVGs.push({
-      id: `fallback-svg-${Date.now()}-${i}`,
+      id: `procedural-svg-${Date.now()}-${i}`,
       title: "", // No title for pure visual inspiration
       description: "", // No description for pure visual inspiration  
       sourceContent: originalPrompt,
-      svg: svg
+      // Flag to indicate client-side generation needed - use empty svg field
+      svg: "PROCEDURAL"
     });
     
-    console.log(`🎨 Generated fallback abstract SVG ${i + 1}`);
+    console.log(`🎨 Generated procedural abstract SVG placeholder ${i + 1}`);
   }
   
   return abstractSVGs;
@@ -552,33 +400,7 @@ async function addSVGToIdeas(ideas: IdeaResponse[], originalPrompt: string): Pro
     finalIdeas.push(ideas[finalIdeas.length % ideas.length]);
   }
   
-  // STEP 3: Add SVG illustrations to some text ideas (ideas with non-empty titles)
-  const textIdeasIndices = finalIdeas
-    .map((idea, index) => ({ idea, index }))
-    .filter(({ idea }) => idea.title && idea.title.trim().length > 0) // Only ideas with titles
-    .map(({ index }) => index);
-  
-  const textSvgCount = Math.ceil(textIdeasIndices.length / 4); // 1/4 of text ideas get SVG
-  
-  // Randomly select text ideas to add SVGs to
-  const shuffledIndices = [...textIdeasIndices].sort(() => Math.random() - 0.5);
-  const selectedIndices = shuffledIndices.slice(0, textSvgCount);
-  
-  // Generate SVG drawings for selected text ideas
-  const svgPromises = selectedIndices.map(async (index) => {
-    const idea = finalIdeas[index];
-    if (idea.title && idea.title.trim().length > 0) {
-      const svgPrompt = `${originalPrompt} - ${idea.title}`;
-      const svg = await generateSVGDrawing(svgPrompt);
-      
-      if (svg) {
-        finalIdeas[index] = { ...idea, svg };
-        console.log(`🎨 Added SVG to text idea: ${idea.title}`);
-      }
-    }
-  });
-  
-  await Promise.all(svgPromises);
+  // SVG illustrations for text ideas are now generated client-side
   return finalIdeas;
 }
 

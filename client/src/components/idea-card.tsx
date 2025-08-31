@@ -1,5 +1,6 @@
 import { type Idea } from "@shared/schema";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
+import { generateAbstractSVG } from "@/utils/svg-generator";
 
 interface IdeaCardProps {
   idea: Idea;
@@ -36,8 +37,18 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
     "#554059"  // hsl(270, 25%, 35%) - purple-gray
   ];
   
+  // Hue values for procedural SVG generation (extracted from HSL values above)
+  const hueValues = [
+    85,   // sage green
+    210,  // blue-gray
+    35,   // cream/brown
+    200,  // light blue
+    270   // purple-gray
+  ];
+  
   const accentColor = accentColors[colorIndex % accentColors.length];
   const strokeColor = strokeColors[colorIndex % strokeColors.length];
+  const hue = hueValues[colorIndex % hueValues.length];
 
   return (
     <div className={`relative rounded-xl border overflow-hidden w-full h-full cursor-pointer transition-all duration-300 ${cardStyle}`} style={{ fontFamily: 'Crimson Text, serif' }}>
@@ -69,17 +80,19 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
                 <div 
                   className="w-48 h-36"
                   dangerouslySetInnerHTML={{ 
-                    __html: idea.svg
-                      .replace(/stroke="black"/gi, `stroke="${strokeColor}"`)
-                      .replace(/stroke='black'/gi, `stroke='${strokeColor}'`)
-                      .replace(/stroke:black/gi, `stroke:${strokeColor}`)
-                      .replace(/stroke="#000000"/gi, `stroke="${strokeColor}"`)
-                      .replace(/stroke='#000000'/gi, `stroke='${strokeColor}'`)
-                      .replace(/stroke="#000"/gi, `stroke="${strokeColor}"`)
-                      .replace(/stroke='#000'/gi, `stroke='${strokeColor}'`)
-                      .replace(/stroke:\s*black/gi, `stroke:${strokeColor}`)
-                      .replace(/stroke:\s*#000000/gi, `stroke:${strokeColor}`)
-                      .replace(/stroke:\s*#000/gi, `stroke:${strokeColor}`)
+                    __html: idea.svg === "PROCEDURAL" 
+                      ? generateAbstractSVG(idea.sourceContent || idea.title, 192, 144, hue)
+                      : idea.svg
+                          .replace(/stroke="black"/gi, `stroke="${strokeColor}"`)
+                          .replace(/stroke='black'/gi, `stroke='${strokeColor}'`)
+                          .replace(/stroke:black/gi, `stroke:${strokeColor}`)
+                          .replace(/stroke="#000000"/gi, `stroke="${strokeColor}"`)
+                          .replace(/stroke='#000000'/gi, `stroke='${strokeColor}'`)
+                          .replace(/stroke="#000"/gi, `stroke="${strokeColor}"`)
+                          .replace(/stroke='#000'/gi, `stroke='${strokeColor}'`)
+                          .replace(/stroke:\s*black/gi, `stroke:${strokeColor}`)
+                          .replace(/stroke:\s*#000000/gi, `stroke:${strokeColor}`)
+                          .replace(/stroke:\s*#000/gi, `stroke:${strokeColor}`)
                   }}
                 />
               </div>
@@ -91,10 +104,12 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
             <div 
               className="w-56 h-40"
               dangerouslySetInnerHTML={{ 
-                __html: idea.svg
-                  .replace(/stroke="black"/g, `stroke="${strokeColor}"`)
-                  .replace(/stroke='black'/g, `stroke='${strokeColor}'`)
-                  .replace(/stroke:black/g, `stroke:${strokeColor}`)
+                __html: idea.svg === "PROCEDURAL" 
+                  ? generateAbstractSVG(idea.sourceContent || "abstract visual", 224, 160, hue)
+                  : idea.svg
+                      .replace(/stroke="black"/g, `stroke="${strokeColor}"`)
+                      .replace(/stroke='black'/g, `stroke='${strokeColor}'`)
+                      .replace(/stroke:black/g, `stroke:${strokeColor}`)
               }}
             />
           </div>
