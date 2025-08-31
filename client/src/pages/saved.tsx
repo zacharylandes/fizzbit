@@ -776,8 +776,9 @@ export default function SavedPage() {
     return null;
   }
 
-  // Get available color groups from saved ideas + any groups that have custom titles
+  // Get available color groups: always show default groups 0-4, plus any with saved ideas or custom titles
   const availableColorGroups = Array.from(new Set([
+    0, 1, 2, 3, 4, // Always show default groups
     ...Object.values(cardColors),
     ...Object.keys(groupTitles).map(k => parseInt(k))
   ])).sort((a, b) => a - b);
