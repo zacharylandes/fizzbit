@@ -8,9 +8,8 @@ function hashString(str: string): number {
 }
 
 export function generateAbstractSVG(prompt: string, width: number = 300, height: number = 150, color: number | null = null): string {
-  // Add timestamp and random number to make it unique each time
-  const uniquePrompt = prompt + Date.now() + Math.random();
-  const seed = hashString(uniquePrompt);
+  // Use only the prompt for deterministic generation (no timestamp/random for stability)
+  const seed = hashString(prompt);
   
   // Choose a random shape type
   const shapeTypes = ['waves', 'spirals', 'polygons', 'circles', 'lines', 'curves'];
