@@ -81,7 +81,7 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
                   className="w-48 h-36"
                   dangerouslySetInnerHTML={{ 
                     __html: idea.svg === "PROCEDURAL" 
-                      ? generateAbstractSVG(idea.sourceContent || idea.title, 192, 144, hue)
+                      ? generateAbstractSVG((idea.sourceContent || idea.title) + idea.id, 192, 144, hue)
                       : idea.svg
                           .replace(/stroke="black"/gi, `stroke="${strokeColor}"`)
                           .replace(/stroke='black'/gi, `stroke='${strokeColor}'`)
@@ -105,7 +105,7 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
               className="w-56 h-40"
               dangerouslySetInnerHTML={{ 
                 __html: idea.svg === "PROCEDURAL" 
-                  ? generateAbstractSVG(idea.sourceContent || "abstract visual", 224, 160, hue)
+                  ? generateAbstractSVG((idea.sourceContent || "abstract visual") + idea.id, 224, 160, hue)
                   : idea.svg
                       .replace(/stroke="black"/g, `stroke="${strokeColor}"`)
                       .replace(/stroke='black'/g, `stroke='${strokeColor}'`)
