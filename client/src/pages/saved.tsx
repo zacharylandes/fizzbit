@@ -247,7 +247,7 @@ export default function SavedPage() {
             currentMobileIdea(swipeState.dragIndex, newIndex);
           }
         }
-      } else if (deltaX < -100) {
+      } else if (deltaX < -180) {
         // Handle horizontal swipe to delete - improved animation for smoother experience
         if (swipeState.ideaId) {
           // Set state to animate the card sliding away
@@ -776,9 +776,11 @@ export default function SavedPage() {
     return null;
   }
 
-  // Get available color groups from saved ideas
-  const availableColorGroups = Array.from(new Set(Object.values(cardColors)))
-    .sort((a, b) => a - b);
+  // Get available color groups from saved ideas + any groups that have custom titles
+  const availableColorGroups = Array.from(new Set([
+    ...Object.values(cardColors),
+    ...Object.keys(groupTitles).map(k => parseInt(k))
+  ])).sort((a, b) => a - b);
   
   // Get default group title
   const getGroupTitle = (colorIndex: number) => {
