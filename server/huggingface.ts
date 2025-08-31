@@ -625,7 +625,7 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
   // Use simple, direct prompt for all requests
-  const systemPrompt = `Generate ${count} practical, actionable concepts for: "${prompt}". Each response should be a PRACTICAL CONCEPT that directly addresses the user's request.
+  const systemPrompt = `Generate ${count} detailed, practical concepts for: "${prompt}". Each response should be a complete concept description (8-15 words), not just a name or title.
 
 Format as JSON: [{"title": "Hands-on volcano experiments using baking soda and food coloring"}, {"title": "Weather tracking station with daily measurements and predictions"}]`;
 
