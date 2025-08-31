@@ -346,7 +346,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
       } catch (directError) {
-        console.log('🎤 DEBUGGING - Direct transcription FAILED:', directError.message);
+        console.log('🎤 DEBUGGING - Direct transcription FAILED:', directError instanceof Error ? directError.message : String(directError));
         
         // Second try: Convert to WAV format
         const wavPath = req.file.path + '.wav';
