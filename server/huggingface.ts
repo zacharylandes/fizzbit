@@ -479,23 +479,43 @@ Example (but you must create ${count} items):
 
 CRITICAL: Must return exactly ${count} different ideas in valid JSON array format. No single objects, no text outside JSON.`;
 
-  // PRIMARY: Try Together.ai Llama
+  // PRIMARY: Try Together.ai Llama - Make multiple calls for variety
   try {
-    console.log('🔄 Trying Together.ai...');
-    const messages = [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: prompt }
-    ];
+    console.log('🔄 Trying Together.ai with multiple calls for variety...');
+    const allIdeas: IdeaResponse[] = [];
     
-    const response = await callTogetherAI(messages);
-    console.log('📦 Together.ai raw response length:', response?.length || 0);
-    console.log('🔍 TOGETHER DEBUG - First 300 chars:', response?.substring(0, 300));
-    const ideas = parseIdeasFromResponse(response, prompt, count);
-    console.log('🔍 TOGETHER DEBUG - Ideas returned from parser:', ideas.length);
+    // Make multiple calls to get diverse ideas
+    const batchSize = Math.min(5, count); // Generate in batches of 5
+    const numBatches = Math.ceil(count / batchSize);
     
-    if (ideas.length > 0) {
+    for (let batch = 0; batch < numBatches; batch++) {
+      const batchPrompt = `Generate 1 unique creative concept based on: "${prompt}". 
+      Variation ${batch + 1}: Make this different from typical approaches.
+      Return only: {"title": "your creative concept here"}`;
+      
+      const messages = [
+        { role: "user", content: batchPrompt }
+      ];
+      
+      try {
+        const response = await callTogetherAI(messages);
+        const ideas = parseIdeasFromResponse(response, prompt, 1);
+        if (ideas.length > 0) {
+          allIdeas.push(...ideas);
+        }
+      } catch (batchError) {
+        console.log(`Batch ${batch + 1} failed, continuing...`);
+      }
+      
+      // Stop if we have enough ideas
+      if (allIdeas.length >= count) break;
+    }
+    
+    console.log(`🔍 TOGETHER DEBUG - Total ideas from batches: ${allIdeas.length}`);
+    
+    if (allIdeas.length > 0) {
       // Add SVG drawings to 1/3 of the ideas
-      const ideasWithSvg = await addSVGToIdeas(ideas, prompt);
+      const ideasWithSvg = await addSVGToIdeas(allIdeas, prompt);
       console.log(`✅ Together.ai generated ${ideasWithSvg.length} ideas`);
       return ideasWithSvg;
     } else {
