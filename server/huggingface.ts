@@ -395,9 +395,12 @@ async function addSVGToIdeas(ideas: IdeaResponse[], originalPrompt: string): Pro
     finalIdeas.pop(); // Remove excess
   }
   
-  // If we have less than 25, pad with text ideas if available
-  while (finalIdeas.length < 25 && ideas.length > 0) {
-    finalIdeas.push(ideas[finalIdeas.length % ideas.length]);
+  // If we have less than 25, pad with template-based ideas instead of repeating
+  if (finalIdeas.length < 25) {
+    const needed = 25 - finalIdeas.length;
+    console.log(`🔄 Need ${needed} more ideas, generating template-based ideas...`);
+    const templateIdeas = generateTemplateFallback(originalPrompt, needed);
+    finalIdeas.push(...templateIdeas);
   }
   
   // SVG illustrations for text ideas are now generated client-side
@@ -460,9 +463,21 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
   // Use simple, direct prompt for all requests
-  const systemPrompt = `Generate ${count} detailed, practical concepts based on the user's input. Each response should be a complete concept description (8-15 words), not just a name or title.
+  const systemPrompt = `You must generate exactly ${count} different creative ideas based on the user's input. Each idea should be unique and varied.
 
-Format as JSON: [{"title": "Hands-on volcano experiments using baking soda and food coloring"}, {"title": "Weather tracking station with daily measurements and predictions"}]`;
+CRITICAL: Return a JSON array with ${count} objects. Example format:
+[
+  {"title": "Hands-on volcano experiments using baking soda and food coloring"},
+  {"title": "Weather tracking station with daily measurements and predictions"},
+  {"title": "Interactive storytelling app with voice recognition features"},
+  {"title": "Community garden project with automated watering systems"}
+]
+
+Requirements:
+- Must be a valid JSON array with ${count} items
+- Each title should be 8-15 words describing a complete concept
+- Make each idea unique and different from the others
+- No duplicates or very similar ideas`;
 
   // PRIMARY: Try Together.ai Llama
   try {
