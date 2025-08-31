@@ -576,9 +576,9 @@ CRITICAL: Must return exactly ${count} different ideas in valid JSON array forma
     console.warn('❌ OpenAI failed:', (error as Error).message);
   }
 
-  // FINAL FALLBACK: Template-based ideas
-  console.log('All AI services failed, using template fallback');
-  return generateTemplateFallback(prompt, count);
+  // FINAL FALLBACK: Throw error instead of generic templates
+  console.log('All AI services failed, no fallback to generic content');
+  throw new Error('Unable to generate relevant ideas for this prompt. Please try rephrasing your request or check back later.');
 }
 
 // Image analysis and idea generation  
