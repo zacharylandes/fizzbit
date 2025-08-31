@@ -160,7 +160,7 @@ Return ONLY pure abstract line art - no text anywhere!`;
       }
     }
   } catch (error) {
-    console.log('❌ OpenAI SVG generation failed:', error.message);
+    console.log('❌ OpenAI SVG generation failed:', error instanceof Error ? error.message : String(error));
   }
 
   // Fallback to simple programmatic generation if AI fails
