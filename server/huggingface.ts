@@ -105,6 +105,8 @@ REQUIREMENTS:
 - NO fills - only stroke="black" (will be recolored later)
 - stroke-width between 1-3
 - Abstract, flowing, organic shapes (no geometric shapes like circles, rectangles)
+- ABSOLUTELY NO TEXT ELEMENTS - no <text>, no words, no letters, no numbers
+- PURELY VISUAL - only abstract flowing lines and curves
 - Each design should be unique and relate to the theme of "${originalPrompt}"
 
 Format each as valid SVG:
@@ -112,7 +114,7 @@ Format each as valid SVG:
   <path d="..." fill="none" stroke="black" stroke-width="2"/>
 </svg>
 
-Generate ${count} different SVG designs, each on a new line.`;
+Generate ${count} different SVG designs, each on a new line. NO TEXT OR LETTERS IN ANY SVG.`;
 
   try {
     // Try OpenAI first for SVG generation
