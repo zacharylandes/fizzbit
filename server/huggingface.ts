@@ -463,21 +463,21 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
   // Use simple, direct prompt for all requests
-  const systemPrompt = `You must generate exactly ${count} different creative ideas based on the user's input. Each idea should be unique and varied.
+  const systemPrompt = `Generate ${count} completely different creative concepts. RETURN ONLY A JSON ARRAY - no other text.
 
-CRITICAL: Return a JSON array with ${count} objects. Example format:
+Example (but you must create ${count} items):
 [
   {"title": "Hands-on volcano experiments using baking soda and food coloring"},
   {"title": "Weather tracking station with daily measurements and predictions"},
   {"title": "Interactive storytelling app with voice recognition features"},
-  {"title": "Community garden project with automated watering systems"}
+  {"title": "Community garden project with automated watering systems"},
+  {"title": "DIY photo booth with custom props and backdrop designs"},
+  {"title": "Weekly cooking challenge featuring international cuisine exploration"},
+  {"title": "Local history walking tour with augmented reality components"},
+  {"title": "Mindfulness meditation garden with sound therapy elements"}
 ]
 
-Requirements:
-- Must be a valid JSON array with ${count} items
-- Each title should be 8-15 words describing a complete concept
-- Make each idea unique and different from the others
-- No duplicates or very similar ideas`;
+CRITICAL: Must return exactly ${count} different ideas in valid JSON array format. No single objects, no text outside JSON.`;
 
   // PRIMARY: Try Together.ai Llama
   try {
