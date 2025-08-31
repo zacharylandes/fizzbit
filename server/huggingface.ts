@@ -99,22 +99,26 @@ async function generatePureAbstractSVGs(originalPrompt: string, count: number): 
   
   const svgPrompt = `Create ${count} different abstract SVG line art designs inspired by: "${originalPrompt}"
 
-REQUIREMENTS:
+CRITICAL REQUIREMENTS:
 - Each SVG must use viewBox="0 0 200 150" 
-- Only use <path> elements with curves and lines
+- ONLY <path> elements with curves and lines - NO OTHER ELEMENTS
 - NO fills - only stroke="black" (will be recolored later)
 - stroke-width between 1-3
-- Abstract, flowing, organic shapes (no geometric shapes like circles, rectangles)
-- ABSOLUTELY NO TEXT ELEMENTS - no <text>, no words, no letters, no numbers
-- PURELY VISUAL - only abstract flowing lines and curves
-- Each design should be unique and relate to the theme of "${originalPrompt}"
+- Abstract, flowing, organic shapes (no geometric shapes)
+
+ABSOLUTELY FORBIDDEN:
+- NO <text> tags
+- NO <tspan> tags  
+- NO words, letters, numbers, or characters
+- NO <rect>, <circle>, <ellipse> - only <path>
+- PURELY ABSTRACT LINES ONLY
 
 Format each as valid SVG:
-<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
+<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
   <path d="..." fill="none" stroke="black" stroke-width="2"/>
 </svg>
 
-Generate ${count} different SVG designs, each on a new line. NO TEXT OR LETTERS IN ANY SVG.`;
+Return ONLY pure abstract line art - no text anywhere!`;
 
   try {
     // Try OpenAI first for SVG generation
@@ -127,19 +131,26 @@ Generate ${count} different SVG designs, each on a new line. NO TEXT OR LETTERS 
     if (openaiResponse) {
       console.log('📦 OpenAI SVG response length:', openaiResponse.length);
       
-      // Extract SVG tags from response
+      // Extract SVG tags from response and clean them
       const svgMatches = openaiResponse.match(/<svg[^>]*>[\s\S]*?<\/svg>/g);
       
       if (svgMatches && svgMatches.length > 0) {
         console.log(`🎨 Found ${svgMatches.length} SVG designs from OpenAI`);
         
         for (let i = 0; i < Math.min(count, svgMatches.length); i++) {
+          // Clean SVG by removing any text elements
+          let cleanSvg = svgMatches[i].trim();
+          
+          // Remove all text elements and their content
+          cleanSvg = cleanSvg.replace(/<text[^>]*>[\s\S]*?<\/text>/gi, '');
+          cleanSvg = cleanSvg.replace(/<tspan[^>]*>[\s\S]*?<\/tspan>/gi, '');
+          
           abstractSVGs.push({
             id: `ai-svg-${Date.now()}-${i}`,
             title: "", // No title for pure visual inspiration
             description: "", // No description for pure visual inspiration  
             sourceContent: originalPrompt,
-            svg: svgMatches[i].trim()
+            svg: cleanSvg
           });
           
           console.log(`🎨 Generated AI-influenced abstract SVG ${i + 1}`);

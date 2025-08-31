@@ -70,9 +70,16 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
                   className="w-48 h-36"
                   dangerouslySetInnerHTML={{ 
                     __html: idea.svg
-                      .replace(/stroke="black"/g, `stroke="${strokeColor}"`)
-                      .replace(/stroke='black'/g, `stroke='${strokeColor}'`)
-                      .replace(/stroke:black/g, `stroke:${strokeColor}`)
+                      .replace(/stroke="black"/gi, `stroke="${strokeColor}"`)
+                      .replace(/stroke='black'/gi, `stroke='${strokeColor}'`)
+                      .replace(/stroke:black/gi, `stroke:${strokeColor}`)
+                      .replace(/stroke="#000000"/gi, `stroke="${strokeColor}"`)
+                      .replace(/stroke='#000000'/gi, `stroke='${strokeColor}'`)
+                      .replace(/stroke="#000"/gi, `stroke="${strokeColor}"`)
+                      .replace(/stroke='#000'/gi, `stroke='${strokeColor}'`)
+                      .replace(/stroke:\s*black/gi, `stroke:${strokeColor}`)
+                      .replace(/stroke:\s*#000000/gi, `stroke:${strokeColor}`)
+                      .replace(/stroke:\s*#000/gi, `stroke:${strokeColor}`)
                   }}
                 />
               </div>
