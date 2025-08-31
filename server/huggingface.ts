@@ -638,7 +638,7 @@ export async function generateIdeasFromText(prompt: string, count: number = 25):
   console.log(`🚀 Generating ${count} ideas from text prompt: "${prompt}"`);
   
   // Use simple, direct prompt for all requests
-  const systemPrompt = `Generate ${count} detailed, practical concepts for: "${prompt}". Each response should be a complete concept description (8-15 words), not just a name or title.
+  const systemPrompt = `Generate ${count} detailed, practical concepts based on the user's input. Each response should be a complete concept description (8-15 words), not just a name or title.
 
 Format as JSON: [{"title": "Hands-on volcano experiments using baking soda and food coloring"}, {"title": "Weather tracking station with daily measurements and predictions"}]`;
 
@@ -671,7 +671,7 @@ Format as JSON: [{"title": "Hands-on volcano experiments using baking soda and f
   // FALLBACK 1: Try Hugging Face Mistral
   try {
     console.log('🔄 Trying Hugging Face fallback...');
-    const hfPrompt = `${systemPrompt}\n\nUser prompt: ${prompt}\n\nGenerate creative ideas in JSON format:`;
+    const hfPrompt = `${systemPrompt}\n\nGenerate creative ideas in JSON format:`;
     const response = await callHuggingFaceLLM(hfPrompt);
     console.log('📦 Hugging Face raw response length:', response?.length || 0);
     const ideas = parseIdeasFromResponse(response, prompt, count);
