@@ -14,6 +14,21 @@ export default function HomePage() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
 
+  // Check for reused prompt from history tab
+  useEffect(() => {
+    const reusedPromptData = localStorage.getItem("reusedPrompt");
+    if (reusedPromptData) {
+      try {
+        const { content } = JSON.parse(reusedPromptData);
+        setCurrentPrompt(content);
+        setShouldAutoGenerate(true);
+        localStorage.removeItem("reusedPrompt"); // Clear after use
+      } catch (error) {
+        console.error("Failed to parse reused prompt:", error);
+      }
+    }
+  }, []);
+
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
