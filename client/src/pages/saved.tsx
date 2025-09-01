@@ -190,7 +190,6 @@ export default function SavedPage() {
     if (!isMobile || !swipeState.ideaId) return;
 
     const handleGlobalMove = (e: TouchEvent | MouseEvent) => {
-      e.preventDefault();
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
       
@@ -198,17 +197,24 @@ export default function SavedPage() {
       const deltaY = clientY - swipeState.startY;
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      // Only start dragging if movement exceeds threshold (35px for less sensitivity)
-      if (!swipeState.isDragging && distance > 35) {
+      // Much higher threshold for drag detection (80px instead of 35px)
+      if (!swipeState.isDragging && distance > 80 && swipeState.canDrag) {
+        e.preventDefault(); // Only prevent default when we're sure it's a drag
         setSwipeState(prev => ({ ...prev, isDragging: true }));
       }
       
-      // Only set drag direction if we're actually dragging
-      if (swipeState.isDragging || distance > 35) {
-        // Determine if this is vertical drag or horizontal swipe (much higher threshold to prevent accidental reordering)
-        if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 60) {
+      // Only set drag direction if we're actually dragging with higher threshold
+      if (swipeState.isDragging || (distance > 80 && swipeState.canDrag)) {
+        // Much higher threshold for vertical drag detection (120px instead of 60px)
+        if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 120) {
+          e.preventDefault(); // Prevent scrolling only when intentional vertical drag
           setSwipeState(prev => ({ ...prev, isVerticalDrag: true }));
         }
+      }
+      
+      // Only prevent default if we're actually dragging
+      if (swipeState.isDragging) {
+        e.preventDefault();
       }
       
       setSwipeState(prev => ({
@@ -219,14 +225,17 @@ export default function SavedPage() {
     };
 
     const handleGlobalEnd = (e: TouchEvent | MouseEvent) => {
-      e.preventDefault();
+      // Only prevent default if we were actually dragging
+      if (swipeState.isDragging) {
+        e.preventDefault();
+      }
       
       const deltaX = swipeState.currentX - swipeState.startX;
       const deltaY = swipeState.currentY - swipeState.startY;
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      // If no significant movement occurred, treat as a click
-      if (distance < 35 && swipeState.ideaId) {
+      // If no significant movement occurred, treat as a click (matches 80px drag threshold)
+      if (distance < 80 && swipeState.ideaId) {
         const idea = savedIdeas.find(idea => idea.id === swipeState.ideaId);
         if (idea) {
           console.log('Treating as click - no drag movement detected');
@@ -291,8 +300,8 @@ export default function SavedPage() {
       }
     };
 
-    document.addEventListener('touchmove', handleGlobalMove, { passive: false });
-    document.addEventListener('touchend', handleGlobalEnd, { passive: false });
+    document.addEventListener('touchmove', handleGlobalMove, { passive: true });
+    document.addEventListener('touchend', handleGlobalEnd, { passive: true });
     document.addEventListener('mousemove', handleGlobalMove);
     document.addEventListener('mouseup', handleGlobalEnd);
 
@@ -445,7 +454,7 @@ export default function SavedPage() {
 
   // Mouse/Touch handlers for dragging cards
   const handleMouseDown = useCallback((e: React.MouseEvent, ideaId: string) => {
-    e.preventDefault();
+    // Only prevent default for intentional drag operations
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
@@ -489,7 +498,7 @@ export default function SavedPage() {
 
   // Touch handlers
   const handleTouchStart = useCallback((e: React.TouchEvent, ideaId: string) => {
-    e.preventDefault();
+    // Only prevent default after confirming it's a drag gesture
     const touch = e.touches[0];
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -724,7 +733,7 @@ export default function SavedPage() {
 
   // Mobile interaction start handler with hold delay
   const handleMobileInteractionStart = (e: React.TouchEvent | React.MouseEvent, ideaId: string, index: number) => {
-    e.preventDefault();
+    // Don't prevent default initially - allow natural scrolling
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
     const startTime = Date.now();
@@ -734,7 +743,7 @@ export default function SavedPage() {
       clearTimeout(swipeState.holdTimer);
     }
     
-    // Set a timer to enable drag after 500ms hold (longer hold for less accidental activation)
+    // Set a timer to enable drag after 800ms hold (much longer hold to prevent accidental activation)
     const holdTimer = setTimeout(() => {
       setSwipeState(prev => ({
         ...prev,
