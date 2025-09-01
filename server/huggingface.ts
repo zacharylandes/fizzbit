@@ -608,10 +608,10 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
   
   const ideas = await generateIdeasFromText(enhancedPrompt, count);
   
-  // Mark ideas as image-sourced - don't add extra prefix since AI already formats with "Based on your uploaded image:"
+  // Mark ideas as image-sourced - preserve original sourceContent for procedural SVGs
   return ideas.map(idea => ({
     ...idea,
-    sourceContent: 'Image upload'
+    sourceContent: idea.svg === "PROCEDURAL" ? idea.sourceContent : 'Image upload'
   }));
 }
 
