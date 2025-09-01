@@ -1190,12 +1190,9 @@ export default function SavedPage() {
                   const swipeOffsetX = isBeingInteracted && !swipeState.isVerticalDrag ? swipeState.currentX - swipeState.startX : 0;
                   const swipeOffsetY = isBeingInteracted && swipeState.isVerticalDrag ? swipeState.currentY - swipeState.startY : 0;
                   
-                  // Optimized reordering offset calculation
-                  const reorderOffsetY = useMemo(() => {
-                    if (!swipeState.isDragging || !swipeState.isVerticalDrag || swipeState.dragIndex === null || isBeingInteracted) {
-                      return 0;
-                    }
-                    
+                  // Calculate reordering offset for other cards
+                  let reorderOffsetY = 0;
+                  if (swipeState.isDragging && swipeState.isVerticalDrag && swipeState.dragIndex !== null && !isBeingInteracted) {
                     const draggedIndex = swipeState.dragIndex;
                     const draggedY = swipeState.currentY - swipeState.startY;
                     const cardHeight = 80;
@@ -1203,12 +1200,11 @@ export default function SavedPage() {
                     const targetIndex = Math.max(0, Math.min(mobileOrder.length - 1, draggedIndex + newPosition));
                     
                     if (draggedIndex < targetIndex && index > draggedIndex && index <= targetIndex) {
-                      return -cardHeight; // Move up
+                      reorderOffsetY = -cardHeight; // Move up
                     } else if (draggedIndex > targetIndex && index >= targetIndex && index < draggedIndex) {
-                      return cardHeight; // Move down
+                      reorderOffsetY = cardHeight; // Move down
                     }
-                    return 0;
-                  }, [swipeState.isDragging, swipeState.isVerticalDrag, swipeState.dragIndex, swipeState.currentY, swipeState.startY, isBeingInteracted, index, mobileOrder.length]);
+                  }
                   
                   const cardStyles = [
                     "bg-card-sage border-card-sage/40",
