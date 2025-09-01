@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Heart, Image, Type, Trash2, Move, ZoomIn, ZoomOut, Pencil, Eraser, Palette, GripVertical, Menu, Edit2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -197,16 +197,16 @@ export default function SavedPage() {
       const deltaY = clientY - swipeState.startY;
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      // Responsive threshold for drag detection
-      if (!swipeState.isDragging && distance > 25 && swipeState.canDrag) {
+      // Ultra responsive threshold for drag detection
+      if (!swipeState.isDragging && distance > 15 && swipeState.canDrag) {
         e.preventDefault(); // Only prevent default when we're sure it's a drag
         setSwipeState(prev => ({ ...prev, isDragging: true }));
       }
       
-      // Only set drag direction if we're actually dragging with responsive threshold
-      if (swipeState.isDragging || (distance > 25 && swipeState.canDrag)) {
-        // Responsive threshold for vertical drag detection
-        if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 40) {
+      // Only set drag direction if we're actually dragging with ultra responsive threshold
+      if (swipeState.isDragging || (distance > 15 && swipeState.canDrag)) {
+        // Ultra responsive threshold for vertical drag detection
+        if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 25) {
           e.preventDefault(); // Prevent scrolling only when intentional vertical drag
           setSwipeState(prev => ({ ...prev, isVerticalDrag: true }));
         }
@@ -234,8 +234,8 @@ export default function SavedPage() {
       const deltaY = swipeState.currentY - swipeState.startY;
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      // If no significant movement occurred, treat as a click (matches 80px drag threshold)
-      if (distance < 80 && swipeState.ideaId) {
+      // If no significant movement occurred, treat as a click
+      if (distance < 30 && swipeState.ideaId) {
         const idea = savedIdeas.find(idea => idea.id === swipeState.ideaId);
         if (idea) {
           console.log('Treating as click - no drag movement detected');
@@ -743,13 +743,13 @@ export default function SavedPage() {
       clearTimeout(swipeState.holdTimer);
     }
     
-    // Set a timer to enable drag after shorter hold for better responsiveness
+    // Set a timer to enable drag after very short hold for instant responsiveness
     const holdTimer = setTimeout(() => {
       setSwipeState(prev => ({
         ...prev,
         canDrag: true
       }));
-    }, 200);
+    }, 150);
     
     // Don't set isDragging immediately - wait for actual movement
     setSwipeState({
@@ -1184,28 +1184,31 @@ export default function SavedPage() {
                 .filter(idea => selectedColorGroup === null || cardColors[idea.id] === selectedColorGroup)
                 .map((idea, index) => {
                   const colorIndex = cardColors[idea.id] ?? index % 8;
-                  console.log('🎨 Mobile card render:', { ideaId: idea.id, colorIndex, cardColorsState: cardColors[idea.id] });
                   const isBeingInteracted = swipeState.ideaId === idea.id;
                   const isDeleting = isBeingInteracted && swipeState.isDeleting;
                   const isDragging = isBeingInteracted && swipeState.isDragging;
                   const swipeOffsetX = isBeingInteracted && !swipeState.isVerticalDrag ? swipeState.currentX - swipeState.startX : 0;
                   const swipeOffsetY = isBeingInteracted && swipeState.isVerticalDrag ? swipeState.currentY - swipeState.startY : 0;
                   
-                  // Calculate smooth reordering offset for other cards
-                  let reorderOffsetY = 0;
-                  if (swipeState.isDragging && swipeState.isVerticalDrag && swipeState.dragIndex !== null && !isBeingInteracted) {
+                  // Optimized reordering offset calculation
+                  const reorderOffsetY = useMemo(() => {
+                    if (!swipeState.isDragging || !swipeState.isVerticalDrag || swipeState.dragIndex === null || isBeingInteracted) {
+                      return 0;
+                    }
+                    
                     const draggedIndex = swipeState.dragIndex;
                     const draggedY = swipeState.currentY - swipeState.startY;
-                    const cardHeight = 80; // Height of each card including spacing
+                    const cardHeight = 80;
                     const newPosition = Math.round(draggedY / cardHeight);
                     const targetIndex = Math.max(0, Math.min(mobileOrder.length - 1, draggedIndex + newPosition));
                     
                     if (draggedIndex < targetIndex && index > draggedIndex && index <= targetIndex) {
-                      reorderOffsetY = -cardHeight; // Move up
+                      return -cardHeight; // Move up
                     } else if (draggedIndex > targetIndex && index >= targetIndex && index < draggedIndex) {
-                      reorderOffsetY = cardHeight; // Move down
+                      return cardHeight; // Move down
                     }
-                  }
+                    return 0;
+                  }, [swipeState.isDragging, swipeState.isVerticalDrag, swipeState.dragIndex, swipeState.currentY, swipeState.startY, isBeingInteracted, index, mobileOrder.length]);
                   
                   const cardStyles = [
                     "bg-card-sage border-card-sage/40",
@@ -1229,7 +1232,7 @@ export default function SavedPage() {
                       className="relative"
                       style={{
                         transform: `translate(${swipeOffsetX}px, ${swipeOffsetY + reorderOffsetY}px)`,
-                        transition: isDragging && isBeingInteracted ? 'none' : 'transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.15s ease',
+                        transition: isDragging && isBeingInteracted ? 'none' : 'transform 0.2s ease-out, opacity 0.1s ease',
                         zIndex: isBeingInteracted ? 10 : 1,
                         opacity: isDeleting ? 0 : 1,
                       }}
