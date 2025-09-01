@@ -197,16 +197,16 @@ export default function SavedPage() {
       const deltaY = clientY - swipeState.startY;
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      // Much higher threshold for drag detection (80px instead of 35px)
-      if (!swipeState.isDragging && distance > 80 && swipeState.canDrag) {
+      // Responsive threshold for drag detection
+      if (!swipeState.isDragging && distance > 25 && swipeState.canDrag) {
         e.preventDefault(); // Only prevent default when we're sure it's a drag
         setSwipeState(prev => ({ ...prev, isDragging: true }));
       }
       
-      // Only set drag direction if we're actually dragging with higher threshold
-      if (swipeState.isDragging || (distance > 80 && swipeState.canDrag)) {
-        // Much higher threshold for vertical drag detection (120px instead of 60px)
-        if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 120) {
+      // Only set drag direction if we're actually dragging with responsive threshold
+      if (swipeState.isDragging || (distance > 25 && swipeState.canDrag)) {
+        // Responsive threshold for vertical drag detection
+        if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 40) {
           e.preventDefault(); // Prevent scrolling only when intentional vertical drag
           setSwipeState(prev => ({ ...prev, isVerticalDrag: true }));
         }
@@ -256,7 +256,7 @@ export default function SavedPage() {
             currentMobileIdea(swipeState.dragIndex, newIndex);
           }
         }
-      } else if (deltaX < -180) {
+      } else if (deltaX < -120) {
         // Handle horizontal swipe to delete - improved animation for smoother experience
         if (swipeState.ideaId) {
           // Set state to animate the card sliding away
@@ -743,13 +743,13 @@ export default function SavedPage() {
       clearTimeout(swipeState.holdTimer);
     }
     
-    // Set a timer to enable drag after 800ms hold (much longer hold to prevent accidental activation)
+    // Set a timer to enable drag after shorter hold for better responsiveness
     const holdTimer = setTimeout(() => {
       setSwipeState(prev => ({
         ...prev,
         canDrag: true
       }));
-    }, 500);
+    }, 200);
     
     // Don't set isDragging immediately - wait for actual movement
     setSwipeState({
