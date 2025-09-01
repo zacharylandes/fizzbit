@@ -214,7 +214,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           title: ideaData.title,
           description: ideaData.description,
           source: "drawing",
-          sourceContent: `Drawing created at ${new Date().toISOString()}`,
+          sourceContent: ideaData.sourceContent || `Drawing created at ${new Date().toISOString()}`,
+          svg: ideaData.svg, // Preserve SVG field for procedural graphics
           isSaved: 0,
           metadata: { 
             generatedAt: new Date().toISOString(),
