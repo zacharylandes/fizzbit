@@ -213,17 +213,25 @@ export function InputSection({
         echoCancellation: true,
         noiseSuppression: true,
         autoGainControl: true,
-        sampleRate: 16000
+        sampleRate: 48000, // Higher sample rate for better quality
+        channelCount: 1 // Mono for speech
       } 
     })
       .then(stream => {
-        // Create MediaRecorder with optimal settings
-        const options = { mimeType: 'audio/webm;codecs=opus' };
+        // Create MediaRecorder with optimal settings for better quality
+        let options = { 
+          mimeType: 'audio/webm;codecs=opus',
+          audioBitsPerSecond: 128000 // Higher bitrate for better quality
+        };
+        
         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-          options.mimeType = 'audio/webm';
+          options = { mimeType: 'audio/webm', audioBitsPerSecond: 128000 };
         }
         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-          options.mimeType = 'audio/mp4';
+          options = { mimeType: 'audio/mp4', audioBitsPerSecond: 128000 };
+        }
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+          options = { mimeType: 'audio/wav', audioBitsPerSecond: 128000 };
         }
         
         mediaRecorder = new MediaRecorder(stream, options);
