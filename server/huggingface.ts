@@ -599,7 +599,7 @@ export async function generateIdeasFromImage(imageBase64: string, count: number 
       console.log('✅ OpenAI vision analysis successful');
     } catch (visionError) {
       console.warn('All vision models failed:', (visionError as Error).message);
-      imageDescription = "visual art photography creative projects image inspiration design aesthetic colors composition";
+      throw new Error('Unable to analyze your drawing. Please try again or check your internet connection.');
     }
   }
   
