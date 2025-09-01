@@ -139,7 +139,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex items-center justify-between">
             {/* FizzBit Brand */}
             <Link href="/">
-              <div className="flex items-center space-x-4 cursor-pointer hover-lift transition-all duration-300 p-1 rounded-lg hover:bg-accent/10">
+              <div className="flex items-center space-x-2 cursor-pointer hover-lift transition-all duration-300 p-1 rounded-lg hover:bg-accent/10">
                 <img src="/src/assets/spiral-logo.png" alt="FizzBit Logo" className="h-20 w-20 object-contain" />
                 <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
                   FizzBit
