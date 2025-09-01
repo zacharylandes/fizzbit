@@ -76,12 +76,12 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
             
             {/* SVG Drawing below text */}
             {idea.svg && (
-              <div className="flex justify-center">
+              <div className="flex justify-center w-full">
                 <div 
-                  className="w-56 h-42"
+                  className="w-full h-32"
                   dangerouslySetInnerHTML={{ 
                     __html: idea.svg === "PROCEDURAL" 
-                      ? generateAbstractSVG((idea.sourceContent || idea.title) + idea.id, 224, 168, hue)
+                      ? generateAbstractSVG((idea.sourceContent || idea.title) + idea.id, 400, 128, hue)
                       : idea.svg
                           .replace(/stroke="black"/gi, `stroke="${strokeColor}"`)
                           .replace(/stroke='black'/gi, `stroke='${strokeColor}'`)
@@ -100,12 +100,12 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
           </div>
         ) : idea.svg ? (
           // Pure visual card with SVG only
-          <div className="flex items-start justify-center h-full pt-12">
+          <div className="flex items-center justify-center h-full">
             <div 
-              className="w-64 h-48"
+              className="w-full h-48"
               dangerouslySetInnerHTML={{ 
                 __html: idea.svg === "PROCEDURAL" 
-                  ? generateAbstractSVG((idea.sourceContent || "abstract visual") + idea.id, 256, 192, hue)
+                  ? generateAbstractSVG((idea.sourceContent || "abstract visual") + idea.id, 400, 192, hue)
                   : idea.svg
                       .replace(/stroke="black"/g, `stroke="${strokeColor}"`)
                       .replace(/stroke='black'/g, `stroke='${strokeColor}'`)
