@@ -233,6 +233,104 @@ input, textarea {
   .font-poppins-semibold { font-family: 'Poppins', sans-serif; font-weight: 600; }
   .font-poppins { font-family: 'Poppins', sans-serif; font-weight: 400; }
   
+  /* Inspired title animations */
+  .inspired-title {
+    position: relative;
+    display: inline-block;
+    animation: gentle-glow 3s ease-in-out infinite alternate;
+  }
+  
+  .inspired-stars {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .inspired-stars::before,
+  .inspired-stars::after {
+    content: '✨';
+    position: absolute;
+    font-size: 1.2em;
+    animation: twinkle 2s ease-in-out infinite;
+  }
+  
+  .inspired-stars::before {
+    top: -0.5rem;
+    left: -2rem;
+    animation-delay: 0s;
+  }
+  
+  .inspired-stars::after {
+    top: -0.3rem;
+    right: -2rem;
+    animation-delay: 1s;
+  }
+  
+  .floating-star {
+    position: absolute;
+    font-size: 0.8em;
+    animation: float-twinkle 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+  
+  .floating-star:nth-child(1) {
+    top: 10%;
+    left: 15%;
+    animation-delay: 0.5s;
+  }
+  
+  .floating-star:nth-child(2) {
+    top: 20%;
+    right: 20%;
+    animation-delay: 1.5s;
+  }
+  
+  .floating-star:nth-child(3) {
+    bottom: 30%;
+    left: 25%;
+    animation-delay: 2.5s;
+  }
+  
+  .floating-star:nth-child(4) {
+    bottom: 15%;
+    right: 30%;
+    animation-delay: 0.8s;
+  }
+  
+  @keyframes gentle-glow {
+    0% {
+      text-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+    }
+    100% {
+      text-shadow: 0 0 15px rgba(59, 130, 246, 0.6), 0 0 25px rgba(59, 130, 246, 0.4);
+    }
+  }
+  
+  @keyframes twinkle {
+    0%, 100% {
+      opacity: 0.4;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+  }
+  
+  @keyframes float-twinkle {
+    0%, 100% {
+      opacity: 0.3;
+      transform: translateY(0) scale(0.7);
+    }
+    25% {
+      opacity: 0.8;
+      transform: translateY(-10px) scale(1);
+    }
+    75% {
+      opacity: 0.6;
+      transform: translateY(5px) scale(0.9);
+    }
+  }
+  
   /* Accent Colors */
   .text-accent-blue { color: var(--accent-blue); }
   .bg-accent-blue { background-color: var(--accent-blue); }

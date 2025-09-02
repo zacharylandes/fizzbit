@@ -94,10 +94,16 @@ export default function HomePage() {
       {/* Content Section */}
       {isAuthenticated ? (
         <div className="max-w-7xl mx-auto w-full px-6 pt-4 pb-2">
-          <div className="mb-4 text-center">
-            <h2 className="text-2xl font-poppins-semibold mb-2 text-gray-800">
-              Get Inspired
-            </h2>
+          <div className="mb-4 text-center relative">
+            <div className="relative inline-block">
+              <div className="floating-star">⭐</div>
+              <div className="floating-star">✨</div>
+              <div className="floating-star">🌟</div>
+              <div className="floating-star">⭐</div>
+              <h2 className="text-2xl font-poppins-semibold mb-2 text-gray-800 inspired-title inspired-stars">
+                Get Inspired
+              </h2>
+            </div>
             <p className="text-muted-foreground text-base font-inter">Upload a photo or describe your interests to get personalized creative inspiration.</p>
             
           </div>
