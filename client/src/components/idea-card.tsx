@@ -157,7 +157,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
         ) : (
           // Card with no title and no SVG
           <div className="flex items-center justify-center h-full">
-            <div className="text-center text-xs text-gray-500 opacity-60">
+            <div className="text-center text-xs text-black opacity-60">
               Visual Inspiration
             </div>
           </div>
@@ -165,7 +165,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
         
         {/* Swipe Indicators */}
         <div className="absolute bottom-4 left-6 right-6 flex justify-between items-center">
-          <div className="flex items-center text-xs text-foreground bg-black/5 px-2 py-1 rounded-lg transition-all duration-300">
+          <div className="flex items-center text-xs text-black bg-black/5 px-2 py-1 rounded-lg transition-all duration-300">
             <ArrowLeft className="w-3 h-3 mr-1" />
             Dismiss
           </div>
@@ -173,7 +173,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
             <ArrowUp className="w-3 h-3 mr-1" />
             Explore
           </div>
-          <div className="flex items-center text-xs text-gray-600 bg-gray-100 border border-gray-200 px-2 py-1 rounded hover:bg-gray-200 transition-all duration-300">
+          <div className="flex items-center text-xs text-black bg-gray-100 border border-gray-200 px-2 py-1 rounded hover:bg-gray-200 transition-all duration-300">
             <ArrowRight className="w-3 h-3 mr-1" />
             Save
           </div>
