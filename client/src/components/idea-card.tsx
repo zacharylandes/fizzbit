@@ -1,6 +1,7 @@
 import { type Idea } from "@shared/schema";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 import { generateAbstractSVG } from "@/utils/svg-generator";
+import { generateProcessingIllustration } from "@/utils/p5-sketches";
 
 interface IdeaCardProps {
   idea: Idea;
@@ -21,6 +22,36 @@ const cardStyles = [
   "bg-card-blue card-shadow hover-lift border border-gray-200",
   "bg-card-taupe card-shadow hover-lift border border-gray-200"
 ];
+
+// Function to determine which illustration to use
+function getIllustrationForIdea(idea: Idea, hue: number): string {
+  const content = (idea.sourceContent || idea.title || '').toLowerCase();
+  const prompt = (idea.sourceContent || idea.title) + idea.id;
+  
+  // Check for reading-related keywords
+  if (content.includes('read') || content.includes('book') || content.includes('glasses') || 
+      content.includes('study') || content.includes('library') || content.includes('literature') ||
+      content.includes('novel') || content.includes('chapter')) {
+    return generateProcessingIllustration('reading', prompt);
+  }
+  
+  // Check for skateboarding/kid activity keywords
+  if (content.includes('skateboard') || content.includes('skate') || content.includes('kid') ||
+      content.includes('child') || content.includes('playground') || content.includes('youth') ||
+      content.includes('fun') || content.includes('exciting') || content.includes('ride')) {
+    return generateProcessingIllustration('skateboard', prompt);
+  }
+  
+  // Check for hiking/outdoor activity keywords
+  if (content.includes('hik') || content.includes('mountain') || content.includes('trail') ||
+      content.includes('outdoor') || content.includes('climb') || content.includes('nature') ||
+      content.includes('adventure') || content.includes('explore') || content.includes('backpack')) {
+    return generateProcessingIllustration('hiking', prompt);
+  }
+  
+  // Default to the regular abstract SVG
+  return generateAbstractSVG(prompt, 400, 128, hue);
+}
 
 export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDirection, showSwipeEffects }: IdeaCardProps) {
   const cardNumber = position === "top" ? 1 : position === "middle" ? 2 : 3;
@@ -120,7 +151,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
               <div 
                 className="w-full h-32"
                 dangerouslySetInnerHTML={{ 
-                  __html: generateAbstractSVG((idea.sourceContent || idea.title) + idea.id, 400, 128, hue)
+                  __html: getIllustrationForIdea(idea, hue)
                 }}
               />
             </div>
