@@ -103,6 +103,8 @@ input, textarea {
   --header-footer-bg: hsl(207, 50%, 94%); /* Light Blue #E7EFF8 */
   --button-custom: hsl(0, 0%, 40%);       /* Dark gray text */
   --button-custom-bg: hsl(24, 43%, 94%);  /* Cream #F7EEE8 */
+  --header-footer-button: hsl(0, 0%, 40%); /* Dark gray text */
+  --header-footer-button-bg: hsl(134, 20%, 92%); /* Light Green #EBF4EF */
   
   /* Professional Primary Colors */
   --primary-blue: hsl(210, 20%, 55%);
@@ -227,10 +229,12 @@ input, textarea {
   .text-header-footer { color: var(--header-footer) !important; }
   .bg-button-custom { background-color: var(--button-custom-bg) !important; }
   .text-button-custom { color: var(--button-custom) !important; }
+  .bg-header-footer-button { background-color: var(--header-footer-button-bg) !important; }
+  .text-header-footer-button { color: var(--header-footer-button) !important; }
   
   /* Font utility classes */
-  .font-poppins-bold { font-family: 'Poppins', sans-serif; font-weight: 500; }
-  .font-poppins-semibold { font-family: 'Poppins', sans-serif; font-weight: 400; }
+  .font-poppins-bold { font-family: 'Poppins', sans-serif; font-weight: 600; }
+  .font-poppins-semibold { font-family: 'Poppins', sans-serif; font-weight: 500; }
   .font-poppins { font-family: 'Poppins', sans-serif; font-weight: 400; }
   
   /* Inspired title animations - subtle */

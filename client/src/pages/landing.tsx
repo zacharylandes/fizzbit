@@ -18,7 +18,7 @@ export default function LandingPage() {
             </h1>
           </div>
           <a href="/api/login">
-            <Button className="bg-button-custom hover:bg-button-custom/90 text-gray-700 border border-gray-300 shadow-sm font-medium">
+            <Button className="bg-header-footer-button hover:bg-header-footer-button/80 text-gray-700 border border-gray-300 shadow-sm font-medium">
               Sign In
             </Button>
           </a>

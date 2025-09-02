@@ -9,6 +9,8 @@ import ufoLottieUrl from '@assets/Ridiculous UFO_1756786094438.lottie?url';
 import dividerLottieUrl from '@assets/Squiggly Divider Line_1756786094439.lottie?url';
 import wavesLottieUrl from '@assets/wavess_1756786094441.lottie?url';
 import rocketLottieUrl from '@assets/Rocket in space_1756786094442.lottie?url';
+import animation1Url from '@assets/animation (1)_1756842479164.json?url';
+import animation2Url from '@assets/animation (2)_1756842479163.json?url';
 
 interface IdeaCardProps {
   idea: Idea;
@@ -48,7 +50,7 @@ function getLottieAnimationForIdea(idea: Idea): string {
   
   // Create a hash-based rotation for variety - this ensures each card gets a different animation
   const hash = idea.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const baseAnimation = hash % 5; // 0-4 range for 5 animations
+  const baseAnimation = hash % 7; // 0-6 range for 7 animations
   
   // Strong keyword matching can override the hash (but only for very specific matches)
   if (content.includes('skateboard') || content.includes('skate')) {
@@ -75,8 +77,12 @@ function getLottieAnimationForIdea(idea: Idea): string {
     case 3:
       return wavesLottieUrl;
     case 4:
-    default:
       return dividerLottieUrl;
+    case 5:
+      return animation1Url;
+    case 6:
+    default:
+      return animation2Url;
   }
 }
 

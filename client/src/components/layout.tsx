@@ -153,7 +153,7 @@ export default function Layout({ children }: LayoutProps) {
               <a href="/api/logout">
                 <Button
                   size="sm"
-                  className="bg-button-custom border border-gray-300 hover:bg-button-custom/90 hover-lift text-gray-700 transition-all duration-300 px-4 py-2 shadow-sm font-medium"
+                  className="bg-header-footer-button border border-gray-300 hover:bg-header-footer-button/80 hover-lift text-gray-700 transition-all duration-300 px-4 py-2 shadow-sm font-medium"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
@@ -163,7 +163,7 @@ export default function Layout({ children }: LayoutProps) {
               <a href="/api/login">
                 <Button
                   size="sm"
-                  className="bg-button-custom border border-gray-300 hover:bg-button-custom/90 hover-lift text-gray-700 transition-all duration-300 px-4 py-2 shadow-sm font-medium"
+                  className="bg-header-footer-button border border-gray-300 hover:bg-header-footer-button/80 hover-lift text-gray-700 transition-all duration-300 px-4 py-2 shadow-sm font-medium"
                 >
                   <LogIn className="h-4 w-4 mr-2" />
                   Login
@@ -197,14 +197,14 @@ export default function Layout({ children }: LayoutProps) {
                       size="sm"
                       className={`flex flex-col items-center space-y-1 p-3 h-auto transition-all duration-300 relative rounded-lg ${
                         isActive
-                          ? "bg-button-custom border border-gray-300 shadow-sm font-semibold"
-                          : "hover:text-gray-700 hover:bg-button-custom/20 hover-lift font-medium"
+                          ? "bg-header-footer-button border border-gray-300 shadow-sm font-semibold"
+                          : "hover:text-gray-700 hover:bg-header-footer-button/20 hover-lift font-medium"
                       }`}
                     >
                       <Icon className="h-5 w-5 text-gray-600" />
                       <span className="text-xs font-medium text-gray-600">{item.label}</span>
                       {item.badge && item.badge > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-button-custom border border-gray-300 text-gray-700 text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-sm">
+                        <span className="absolute -top-1 -right-1 bg-header-footer-button border border-gray-300 text-gray-700 text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-sm">
                           {item.badge}
                         </span>
                       )}
