@@ -1,7 +1,15 @@
 import { type Idea } from "@shared/schema";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 import { generateAbstractSVG } from "@/utils/svg-generator";
-import { generateProcessingIllustration } from "@/utils/p5-sketches";
+import Lottie from 'lottie-react';
+import { useState, useEffect } from 'react';
+
+// Import Lottie animation files as URLs
+import skateLottieUrl from '@assets/Orange skating_1756786094430.lottie?url';
+import ufoLottieUrl from '@assets/Ridiculous UFO_1756786094438.lottie?url';  
+import dividerLottieUrl from '@assets/Squiggly Divider Line_1756786094439.lottie?url';
+import wavesLottieUrl from '@assets/wavess_1756786094441.lottie?url';
+import rocketLottieUrl from '@assets/Rocket in space_1756786094442.lottie?url';
 
 interface IdeaCardProps {
   idea: Idea;
@@ -23,59 +31,91 @@ const cardStyles = [
   "bg-card-taupe card-shadow hover-lift border border-gray-200"
 ];
 
-// Function to determine which illustration to use
-function getIllustrationForIdea(idea: Idea, hue: number): string {
-  const content = (idea.sourceContent || idea.title || '').toLowerCase();
-  const prompt = (idea.sourceContent || idea.title) + idea.id;
-  
-  // FOR TESTING: Show rocket on every card to test animation
-  return generateProcessingIllustration('rocket', prompt);
-  
-  // Create a hash-based rotation so we see variety of new illustrations
-  const hash = idea.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const illustrationType = hash % 4; // 0-3 range
-  
-  // Check for reading-related keywords (books, learning, education, writing)
-  if (content.includes('read') || content.includes('book') || content.includes('glasses') || 
-      content.includes('study') || content.includes('library') || content.includes('literature') ||
-      content.includes('novel') || content.includes('chapter') || content.includes('learn') ||
-      content.includes('education') || content.includes('write') || content.includes('story') ||
-      content.includes('author') || content.includes('script') || content.includes('text') ||
-      illustrationType === 0) {
-    return generateProcessingIllustration('reading', prompt);
+// Component to load and display Lottie animations
+function LottieAnimation({ url, className }: { url: string; className?: string }) {
+  const [animationData, setAnimationData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        setAnimationData(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to load Lottie animation:', err);
+        setError(true);
+        setLoading(false);
+      });
+  }, [url]);
+
+  if (loading) {
+    return <div className={`${className} flex items-center justify-center bg-gray-100 rounded animate-pulse`}>Loading...</div>;
   }
+
+  if (error || !animationData) {
+    return <div className={`${className} flex items-center justify-center bg-gray-100 rounded`}>Animation not available</div>;
+  }
+
+  return (
+    <Lottie
+      animationData={animationData}
+      loop={true}
+      autoplay={true}
+      className={className}
+    />
+  );
+}
+
+// Function to determine which Lottie animation to use
+function getLottieAnimationForIdea(idea: Idea): string {
+  const content = (idea.sourceContent || idea.title || '').toLowerCase();
   
-  // Check for skateboarding/youthful energy keywords  
+  // Create a hash-based rotation for variety
+  const hash = idea.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const animationType = hash % 5; // 0-4 range for 5 animations
+  
+  // Check for skateboarding/movement/sports keywords
   if (content.includes('skateboard') || content.includes('skate') || content.includes('kid') ||
       content.includes('child') || content.includes('playground') || content.includes('youth') ||
       content.includes('fun') || content.includes('exciting') || content.includes('ride') ||
       content.includes('energy') || content.includes('play') || content.includes('game') ||
       content.includes('sport') || content.includes('active') || content.includes('movement') ||
-      illustrationType === 1) {
-    return generateProcessingIllustration('skateboard', prompt);
+      animationType === 0) {
+    return skateLottieUrl;
   }
   
-  // Check for hiking/journey/adventure keywords
-  if (content.includes('hik') || content.includes('mountain') || content.includes('trail') ||
-      content.includes('outdoor') || content.includes('climb') || content.includes('nature') ||
-      content.includes('adventure') || content.includes('explore') || content.includes('backpack') ||
-      content.includes('journey') || content.includes('path') || content.includes('walk') ||
-      content.includes('travel') || content.includes('discover') || content.includes('quest') ||
-      content.includes('goal') || content.includes('challenge') || content.includes('progress') ||
-      illustrationType === 2) {
-    return generateProcessingIllustration('hiking', prompt);
+  // Check for space/rocket/technology keywords
+  if (content.includes('rocket') || content.includes('space') || content.includes('launch') ||
+      content.includes('technology') || content.includes('innovation') || content.includes('future') ||
+      content.includes('sci-fi') || content.includes('astronaut') || content.includes('galaxy') ||
+      content.includes('universe') || content.includes('exploration') ||
+      animationType === 1) {
+    return rocketLottieUrl;
   }
   
-  // Show Processing illustrations 75% of the time for variety
-  if (illustrationType === 3) {
-    const subType = hash % 3;
-    if (subType === 0) return generateProcessingIllustration('reading', prompt);
-    if (subType === 1) return generateProcessingIllustration('skateboard', prompt);
-    return generateProcessingIllustration('hiking', prompt);
+  // Check for UFO/alien/mysterious/weird keywords
+  if (content.includes('ufo') || content.includes('alien') || content.includes('mysterious') ||
+      content.includes('weird') || content.includes('strange') || content.includes('unusual') ||
+      content.includes('flying') || content.includes('magical') || content.includes('fantasy') ||
+      content.includes('surreal') || content.includes('bizarre') ||
+      animationType === 2) {
+    return ufoLottieUrl;
   }
   
-  // Use original abstract SVG only 25% of the time now
-  return generateAbstractSVG(prompt, 400, 128, hue);
+  // Check for water/nature/flowing/organic keywords
+  if (content.includes('water') || content.includes('wave') || content.includes('ocean') ||
+      content.includes('sea') || content.includes('nature') || content.includes('flow') ||
+      content.includes('organic') || content.includes('natural') || content.includes('beach') ||
+      content.includes('surf') || content.includes('liquid') || content.includes('fluid') ||
+      animationType === 3) {
+    return wavesLottieUrl;
+  }
+  
+  // Default to divider line for everything else
+  return dividerLottieUrl;
 }
 
 export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDirection, showSwipeEffects }: IdeaCardProps) {
@@ -171,13 +211,11 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
               {idea.title}
             </h3>
             
-            {/* People Illustration below text */}
+            {/* Lottie Animation below text */}
             <div className="flex justify-center w-full">
-              <div 
+              <LottieAnimation 
+                url={getLottieAnimationForIdea(idea)}
                 className="w-full h-32"
-                dangerouslySetInnerHTML={{ 
-                  __html: getIllustrationForIdea(idea, hue)
-                }}
               />
             </div>
           </div>
