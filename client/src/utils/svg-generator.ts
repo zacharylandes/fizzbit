@@ -13,330 +13,591 @@ export function generateAbstractSVG(prompt: string, width: number = 300, height:
   
   // Use provided color or generate a random hue
   const hue = color !== null ? color : (seed % 360);
-  const strokeWidth = ((seed >> 3) % 3) + 1;
   
   // Generate multiple varied parameters from the seed
-  const numElements = (seed % 8) + 3; // 3-10 elements
-  const style = seed % 20; // 20 different style variations
+  const numElements = (seed % 4) + 2; // 2-5 elements for less clutter
+  const style = seed % 20; // 20 different cartoonish style variations
   const animationType = (seed >> 5) % 4; // 4 animation types
-  const layoutType = (seed >> 7) % 3; // 3 layout types
   
   let content = "";
   
-  // Generate varied elements based on style
+  // Add magical sparkly background stars
+  const numStars = (seed % 6) + 3;
+  for (let i = 0; i < numStars; i++) {
+    const starSeed = seed + (i * 123);
+    const starX = (starSeed % width);
+    const starY = ((starSeed >> 4) % height);
+    const starSize = ((starSeed >> 8) % 3) + 2;
+    content += `
+      <g>
+        <polygon points="${generateStarPoints(starX, starY, starSize, 5)}" 
+          fill="hsl(45,90%,80%)" opacity="0.8">
+          <animateTransform attributeName="transform" type="rotate"
+            from="0 ${starX} ${starY}" to="360 ${starX} ${starY}" dur="${4 + i * 2}s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" from="0.4" to="1" dur="${2 + i}s" 
+            repeatCount="indefinite" direction="alternate"/>
+        </polygon>
+      </g>`;
+  }
+  
+  // Generate cartoonish characters and elements
   for (let i = 0; i < numElements; i++) {
     const elementSeed = seed + (i * 347); // Prime number for better distribution
-    const x = (elementSeed % width);
-    const y = ((elementSeed >> 4) % height);
-    const size = ((elementSeed >> 8) % 50) + 10;
-    const angle = (elementSeed >> 12) % 360;
+    const x = (elementSeed % (width - 80)) + 40; // Keep characters away from edges
+    const y = ((elementSeed >> 4) % (height - 80)) + 40;
+    const size = ((elementSeed >> 8) % 30) + 25; // Bigger characters
     
-    // Create different element types based on style variation
+    // Create different cartoonish elements based on style variation
     switch(style % 20) {
-      case 0: // Flowing curves
-        const cx1 = x + ((elementSeed >> 16) % 60) - 30;
-        const cy1 = y + ((elementSeed >> 20) % 60) - 30;
-        const cx2 = x + ((elementSeed >> 24) % 80) - 40;
-        const cy2 = y + ((elementSeed >> 28) % 80) - 40;
+      case 0: // Happy bear
         content += `
-          <path d="M${x} ${y} C${cx1} ${cy1} ${cx2} ${cy2} ${x + size} ${y + size/2}" 
-            fill="none" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}" opacity="0.7">
-            <animateTransform attributeName="transform" type="rotate"
-              from="0 ${x} ${y}" to="${angle}" dur="${3 + i}s" repeatCount="indefinite"/>
-          </path>`;
-        break;
-        
-      case 1: // Organic blobs
-        const r1 = size * 0.6;
-        const r2 = size * 0.8;
-        content += `
-          <ellipse cx="${x}" cy="${y}" rx="${r1}" ry="${r2}" 
-            fill="hsla(${hue},70%,50%,0.3)" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}">
-            <animateTransform attributeName="transform" type="rotate"
-              from="0 ${x} ${y}" to="360 ${x} ${y}" dur="${4 + (i % 3)}s" repeatCount="indefinite"/>
-          </ellipse>`;
-        break;
-        
-      case 2: // Jagged lines
-        const points = [];
-        const numPoints = (elementSeed % 6) + 3;
-        for (let j = 0; j < numPoints; j++) {
-          const px = x + ((elementSeed >> (j*4)) % size) - size/2;
-          const py = y + ((elementSeed >> (j*4 + 2)) % size) - size/2;
-          points.push(`${px},${py}`);
-        }
-        content += `
-          <polyline points="${points.join(' ')}" 
-            fill="none" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}">
-            <animate attributeName="opacity" from="0.4" to="1" dur="${2 + i}s" 
-              repeatCount="indefinite" direction="alternate"/>
-          </polyline>`;
-        break;
-        
-      case 3: // Spiraling dots
-        const numDots = (elementSeed % 5) + 2;
-        for (let j = 0; j < numDots; j++) {
-          const spiralRadius = j * 8 + 5;
-          const spiralAngle = j * 45 + (elementSeed % 360);
-          const dotX = x + spiralRadius * Math.cos(spiralAngle * Math.PI / 180);
-          const dotY = y + spiralRadius * Math.sin(spiralAngle * Math.PI / 180);
-          content += `
-            <circle cx="${dotX}" cy="${dotY}" r="${2 + j}" 
-              fill="hsl(${hue},70%,50%)" opacity="0.6">
-              <animate attributeName="r" from="${2 + j}" to="${4 + j}" dur="${3 + j}s" 
+          <g>
+            <!-- Bear body -->
+            <ellipse cx="${x}" cy="${y + 15}" rx="${size * 0.8}" ry="${size * 0.6}" 
+              fill="hsl(30,50%,60%)" stroke="hsl(30,50%,40%)" stroke-width="2">
+              <animateTransform attributeName="transform" type="scale"
+                from="1" to="1.1" dur="${3 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <!-- Bear head -->
+            <circle cx="${x}" cy="${y - 10}" r="${size * 0.5}" 
+              fill="hsl(30,50%,65%)" stroke="hsl(30,50%,40%)" stroke-width="2">
+              <animate attributeName="cy" from="${y - 10}" to="${y - 12}" dur="${2 + i}s" 
                 repeatCount="indefinite" direction="alternate"/>
-            </circle>`;
-        }
+            </circle>
+            <!-- Bear ears -->
+            <circle cx="${x - size * 0.3}" cy="${y - 25}" r="${size * 0.15}" fill="hsl(30,50%,60%)"/>
+            <circle cx="${x + size * 0.3}" cy="${y - 25}" r="${size * 0.15}" fill="hsl(30,50%,60%)"/>
+            <!-- Bear eyes -->
+            <circle cx="${x - size * 0.15}" cy="${y - 15}" r="3" fill="black">
+              <animate attributeName="r" from="2" to="4" dur="0.5s" repeatCount="indefinite" direction="alternate"/>
+            </circle>
+            <circle cx="${x + size * 0.15}" cy="${y - 15}" r="3" fill="black">
+              <animate attributeName="r" from="2" to="4" dur="0.5s" repeatCount="indefinite" direction="alternate"/>
+            </circle>
+            <!-- Bear nose -->
+            <ellipse cx="${x}" cy="${y - 5}" rx="3" ry="2" fill="hsl(0,50%,30%)"/>
+          </g>`;
         break;
         
-      case 4: // Intersecting arcs
-        const arcRadius = size * 0.7;
+      case 1: // Bouncing cat
         content += `
-          <path d="M${x - arcRadius} ${y} A${arcRadius} ${arcRadius} 0 0 1 ${x + arcRadius} ${y}" 
-            fill="none" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}">
-            <animateTransform attributeName="transform" type="scale"
-              from="1" to="1.3" dur="${3 + i}s" repeatCount="indefinite" direction="alternate"/>
-          </path>
-          <path d="M${x} ${y - arcRadius} A${arcRadius} ${arcRadius} 0 0 1 ${x} ${y + arcRadius}" 
-            fill="none" stroke="hsl(${(hue + 30) % 360},70%,50%)" stroke-width="${strokeWidth}">
-            <animateTransform attributeName="transform" type="scale"
-              from="1.2" to="0.8" dur="${4 + i}s" repeatCount="indefinite" direction="alternate"/>
-          </path>`;
+          <g>
+            <!-- Cat body -->
+            <ellipse cx="${x}" cy="${y + 10}" rx="${size * 0.7}" ry="${size * 0.5}" 
+              fill="hsl(${hue},60%,70%)" stroke="hsl(${hue},60%,50%)" stroke-width="2">
+              <animateTransform attributeName="transform" type="translate"
+                from="0,0" to="0,-5" dur="${2 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <!-- Cat head -->
+            <circle cx="${x}" cy="${y - 8}" r="${size * 0.4}" 
+              fill="hsl(${hue},60%,75%)" stroke="hsl(${hue},60%,50%)" stroke-width="2"/>
+            <!-- Cat ears -->
+            <polygon points="${x - size * 0.25},${y - 20} ${x - size * 0.1},${y - 30} ${x - size * 0.35},${y - 25}" 
+              fill="hsl(${hue},60%,70%)"/>
+            <polygon points="${x + size * 0.25},${y - 20} ${x + size * 0.1},${y - 30} ${x + size * 0.35},${y - 25}" 
+              fill="hsl(${hue},60%,70%)"/>
+            <!-- Cat tail -->
+            <path d="M${x + size * 0.6} ${y + 5} Q${x + size * 0.9} ${y - 10} ${x + size * 0.7} ${y - 25}" 
+              fill="none" stroke="hsl(${hue},60%,60%)" stroke-width="4" stroke-linecap="round">
+              <animate attributeName="d" from="M${x + size * 0.6} ${y + 5} Q${x + size * 0.9} ${y - 10} ${x + size * 0.7} ${y - 25}" 
+                       to="M${x + size * 0.6} ${y + 5} Q${x + size * 1.1} ${y - 5} ${x + size * 0.8} ${y - 20}" 
+                       dur="${3 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </path>
+          </g>`;
         break;
         
-      case 5: // Branching paths
-        const branchLength = size * 0.8;
-        const numBranches = (elementSeed % 4) + 2;
-        for (let j = 0; j < numBranches; j++) {
-          const branchAngle = (j * 360 / numBranches) + (elementSeed % 60);
-          const endX = x + branchLength * Math.cos(branchAngle * Math.PI / 180);
-          const endY = y + branchLength * Math.sin(branchAngle * Math.PI / 180);
-          content += `
-            <path d="M${x} ${y} L${endX} ${endY}" 
-              stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}" opacity="0.8">
-              <animate attributeName="stroke-dasharray" from="0,100" to="100,0" dur="${2 + j}s" 
+      case 2: // Floating balloon
+        content += `
+          <g>
+            <!-- Balloon -->
+            <ellipse cx="${x}" cy="${y - 10}" rx="${size * 0.6}" ry="${size * 0.8}" 
+              fill="hsl(${hue},80%,70%)" stroke="hsl(${hue},80%,50%)" stroke-width="2">
+              <animateTransform attributeName="transform" type="translate"
+                from="0,0" to="0,-8" dur="${4 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <!-- Balloon string -->
+            <line x1="${x}" y1="${y + 20}" x2="${x}" y2="${y + 40}" 
+              stroke="hsl(0,0%,30%)" stroke-width="1">
+              <animate attributeName="x1" from="${x}" to="${x + 3}" dur="${2 + i}s" 
                 repeatCount="indefinite" direction="alternate"/>
-            </path>`;
-        }
+            </line>
+            <!-- Balloon highlight -->
+            <ellipse cx="${x - size * 0.2}" cy="${y - 20}" rx="${size * 0.15}" ry="${size * 0.2}" 
+              fill="hsl(${hue},40%,90%)" opacity="0.8"/>
+          </g>`;
         break;
         
-      case 6: // Wobbly rectangles
-        const rectWidth = size * 0.6;
-        const rectHeight = size * 0.4;
+      case 3: // Smiling sun
         content += `
-          <rect x="${x - rectWidth/2}" y="${y - rectHeight/2}" width="${rectWidth}" height="${rectHeight}" 
-            fill="hsla(${hue},70%,50%,0.2)" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}" 
-            rx="${(elementSeed % 10) + 5}">
-            <animateTransform attributeName="transform" type="skewX"
-              from="-5" to="5" dur="${3 + i}s" repeatCount="indefinite" direction="alternate"/>
-          </rect>`;
-        break;
-        
-      case 7: // Flowing ribbons
-        const ribbonPoints = [];
-        for (let j = 0; j < 8; j++) {
-          const ribbonX = x + (j * size / 8) + ((elementSeed >> (j*2)) % 20) - 10;
-          const ribbonY = y + Math.sin(j * 0.5) * (size/4) + ((elementSeed >> (j*2 + 1)) % 15) - 7;
-          ribbonPoints.push(`${ribbonX},${ribbonY}`);
-        }
-        content += `
-          <polyline points="${ribbonPoints.join(' ')}" 
-            fill="none" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth + 1}">
-            <animate attributeName="stroke-dasharray" from="5,5" to="10,2" dur="${4 + i}s" 
-              repeatCount="indefinite" direction="alternate"/>
-          </polyline>`;
-        break;
-        
-      case 8: // Radiating spokes
-        const spokeLength = size * 0.9;
-        const numSpokes = (elementSeed % 6) + 4;
-        for (let j = 0; j < numSpokes; j++) {
-          const spokeAngle = (j * 360 / numSpokes) + (elementSeed % 45);
-          const spokeEndX = x + spokeLength * Math.cos(spokeAngle * Math.PI / 180);
-          const spokeEndY = y + spokeLength * Math.sin(spokeAngle * Math.PI / 180);
-          content += `
-            <line x1="${x}" y1="${y}" x2="${spokeEndX}" y2="${spokeEndY}" 
-              stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}" opacity="0.6">
-              <animate attributeName="opacity" from="0.2" to="0.9" dur="${2 + j * 0.3}s" 
+          <g>
+            <!-- Sun face -->
+            <circle cx="${x}" cy="${y}" r="${size * 0.5}" 
+              fill="hsl(45,90%,70%)" stroke="hsl(45,90%,50%)" stroke-width="3">
+              <animate attributeName="r" from="${size * 0.5}" to="${size * 0.55}" dur="${3 + i}s" 
                 repeatCount="indefinite" direction="alternate"/>
-            </line>`;
-        }
+            </circle>
+            <!-- Sun rays -->
+            ${Array.from({length: 8}, (_, j) => {
+              const rayAngle = j * 45;
+              const rayX1 = x + (size * 0.7) * Math.cos(rayAngle * Math.PI / 180);
+              const rayY1 = y + (size * 0.7) * Math.sin(rayAngle * Math.PI / 180);
+              const rayX2 = x + (size * 0.9) * Math.cos(rayAngle * Math.PI / 180);
+              const rayY2 = y + (size * 0.9) * Math.sin(rayAngle * Math.PI / 180);
+              return `
+                <line x1="${rayX1}" y1="${rayY1}" x2="${rayX2}" y2="${rayY2}" 
+                  stroke="hsl(45,90%,60%)" stroke-width="3" stroke-linecap="round">
+                  <animate attributeName="opacity" from="0.6" to="1" dur="${1.5 + j * 0.2}s" 
+                    repeatCount="indefinite" direction="alternate"/>
+                </line>`;
+            }).join('')}
+            <!-- Sun eyes -->
+            <circle cx="${x - size * 0.15}" cy="${y - size * 0.1}" r="3" fill="black"/>
+            <circle cx="${x + size * 0.15}" cy="${y - size * 0.1}" r="3" fill="black"/>
+            <!-- Sun smile -->
+            <path d="M${x - size * 0.2} ${y + size * 0.1} Q${x} ${y + size * 0.3} ${x + size * 0.2} ${y + size * 0.1}" 
+              fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+          </g>`;
         break;
         
-      case 9: // Nested shapes
-        const outerSize = size;
-        const innerSize = size * 0.6;
+      case 4: // Dancing flower
         content += `
-          <circle cx="${x}" cy="${y}" r="${outerSize/2}" 
-            fill="none" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}" opacity="0.5">
-            <animate attributeName="r" from="${outerSize/2}" to="${outerSize/2 + 10}" dur="${4 + i}s" 
-              repeatCount="indefinite" direction="alternate"/>
-          </circle>
-          <polygon points="${generatePolygonPoints(x, y, innerSize/2, (elementSeed % 5) + 3)}" 
-            fill="hsla(${(hue + 120) % 360},70%,50%,0.3)" stroke="hsl(${(hue + 120) % 360},70%,50%)" stroke-width="${strokeWidth}">
-            <animateTransform attributeName="transform" type="rotate"
-              from="0 ${x} ${y}" to="360 ${x} ${y}" dur="${5 + i}s" repeatCount="indefinite"/>
-          </polygon>`;
-        break;
-        
-      case 10: // Concentric waves
-        const waveRadius = size * 0.3;
-        for (let j = 0; j < 4; j++) {
-          const currentRadius = waveRadius + (j * 15);
-          content += `
-            <circle cx="${x}" cy="${y}" r="${currentRadius}" 
-              fill="none" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}" opacity="${0.8 - j * 0.15}">
-              <animate attributeName="r" from="${currentRadius - 5}" to="${currentRadius + 8}" dur="${2.5 + j * 0.5}s" 
+          <g>
+            <!-- Flower stem -->
+            <line x1="${x}" y1="${y + 20}" x2="${x}" y2="${y + 50}" 
+              stroke="hsl(120,60%,40%)" stroke-width="4">
+              <animate attributeName="x2" from="${x}" to="${x + 5}" dur="${3 + i}s" 
                 repeatCount="indefinite" direction="alternate"/>
-            </circle>`;
-        }
+            </line>
+            <!-- Flower petals -->
+            ${Array.from({length: 6}, (_, j) => {
+              const petalAngle = j * 60;
+              const petalX = x + (size * 0.4) * Math.cos(petalAngle * Math.PI / 180);
+              const petalY = y + (size * 0.4) * Math.sin(petalAngle * Math.PI / 180);
+              return `
+                <ellipse cx="${petalX}" cy="${petalY}" rx="${size * 0.2}" ry="${size * 0.35}" 
+                  fill="hsl(${(hue + j * 30) % 360},80%,70%)" opacity="0.9"
+                  transform="rotate(${petalAngle} ${petalX} ${petalY})">
+                  <animateTransform attributeName="transform" type="rotate"
+                    from="${petalAngle} ${petalX} ${petalY}" to="${petalAngle + 10} ${petalX} ${petalY}" 
+                    dur="${2 + j * 0.3}s" repeatCount="indefinite" direction="alternate"/>
+                </ellipse>`;
+            }).join('')}
+            <!-- Flower center -->
+            <circle cx="${x}" cy="${y}" r="${size * 0.15}" fill="hsl(45,90%,60%)">
+              <animate attributeName="r" from="${size * 0.12}" to="${size * 0.18}" dur="${2 + i}s" 
+                repeatCount="indefinite" direction="alternate"/>
+            </circle>
+          </g>`;
         break;
         
-      case 11: // Lightning zigzags
-        const zigzagPoints = [];
-        const segments = (elementSeed % 6) + 4;
-        let zigX = x - size/2;
-        let zigY = y;
-        for (let j = 0; j < segments; j++) {
-          zigX += size / segments;
-          zigY = y + (j % 2 === 0 ? -size/3 : size/3) + ((elementSeed >> (j*3)) % 20) - 10;
-          zigzagPoints.push(`${zigX},${zigY}`);
-        }
+      case 5: // Playful bird
         content += `
-          <polyline points="${zigzagPoints.join(' ')}" 
-            fill="none" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth + 1}">
-            <animate attributeName="stroke-width" from="${strokeWidth}" to="${strokeWidth + 3}" dur="${3 + i}s" 
-              repeatCount="indefinite" direction="alternate"/>
-          </polyline>`;
-        break;
-        
-      case 12: // Morphing blobs
-        const blobRadius = size * 0.4;
-        content += `
-          <ellipse cx="${x}" cy="${y}" rx="${blobRadius}" ry="${blobRadius * 0.7}" 
-            fill="hsla(${hue},70%,50%,0.4)" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}">
-            <animate attributeName="rx" from="${blobRadius * 0.8}" to="${blobRadius * 1.3}" dur="${4 + i}s" 
-              repeatCount="indefinite" direction="alternate"/>
-            <animate attributeName="ry" from="${blobRadius * 1.2}" to="${blobRadius * 0.5}" dur="${3.5 + i}s" 
-              repeatCount="indefinite" direction="alternate"/>
-          </ellipse>`;
-        break;
-        
-      case 13: // Orbital paths
-        const orbitRadius = size * 0.6;
-        const numOrbits = (elementSeed % 3) + 2;
-        for (let j = 0; j < numOrbits; j++) {
-          const currentOrbitRadius = orbitRadius - (j * 15);
-          const orbitSpeed = 3 + (j * 2);
-          content += `
-            <circle cx="${x}" cy="${y}" r="${currentOrbitRadius}" 
-              fill="none" stroke="hsl(${(hue + j * 60) % 360},70%,50%)" stroke-width="${strokeWidth}" 
-              stroke-dasharray="10,5" opacity="0.7">
+          <g>
+            <!-- Bird body -->
+            <ellipse cx="${x}" cy="${y}" rx="${size * 0.7}" ry="${size * 0.4}" 
+              fill="hsl(${hue},70%,65%)" stroke="hsl(${hue},70%,45%)" stroke-width="2">
+              <animateTransform attributeName="transform" type="translate"
+                from="0,0" to="3,-3" dur="${2.5 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <!-- Bird head -->
+            <circle cx="${x + size * 0.5}" cy="${y - 5}" r="${size * 0.3}" 
+              fill="hsl(${hue},70%,70%)" stroke="hsl(${hue},70%,45%)" stroke-width="2"/>
+            <!-- Bird beak -->
+            <polygon points="${x + size * 0.7},${y - 5} ${x + size * 0.9},${y - 2} ${x + size * 0.7},${y + 2}" 
+              fill="hsl(30,80%,50%)"/>
+            <!-- Bird eye -->
+            <circle cx="${x + size * 0.55}" cy="${y - 8}" r="2" fill="black"/>
+            <!-- Bird wing -->
+            <ellipse cx="${x - size * 0.1}" cy="${y - 5}" rx="${size * 0.3}" ry="${size * 0.2}" 
+              fill="hsl(${(hue + 20) % 360},70%,60%)" opacity="0.8">
               <animateTransform attributeName="transform" type="rotate"
-                from="0 ${x} ${y}" to="360 ${x} ${y}" dur="${orbitSpeed}s" repeatCount="indefinite"/>
-            </circle>`;
-        }
+                from="0 ${x - size * 0.1} ${y - 5}" to="15 ${x - size * 0.1} ${y - 5}" 
+                dur="${1.5 + i * 0.3}s" repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+          </g>`;
         break;
         
-      case 14: // Crystal formations
-        const crystalSize = size * 0.8;
-        const crystalSides = (elementSeed % 4) + 5;
-        for (let j = 0; j < 3; j++) {
-          const crystalX = x + ((elementSeed >> (j*4)) % 30) - 15;
-          const crystalY = y + ((elementSeed >> (j*4 + 2)) % 30) - 15;
-          const currentSize = crystalSize - (j * 10);
-          content += `
-            <polygon points="${generatePolygonPoints(crystalX, crystalY, currentSize/2, crystalSides)}" 
-              fill="hsla(${(hue + j * 30) % 360},70%,50%,0.2)" stroke="hsl(${(hue + j * 30) % 360},70%,50%)" stroke-width="${strokeWidth}">
-              <animate attributeName="opacity" from="0.2" to="0.8" dur="${4 + j}s" 
-                repeatCount="indefinite" direction="alternate"/>
-            </polygon>`;
-        }
-        break;
-        
-      case 15: // Flowing streams
-        const streamPath = `M${x - size/2} ${y} Q${x} ${y - size/2} ${x + size/2} ${y} Q${x} ${y + size/2} ${x - size/2} ${y}`;
+      case 6: // Cute mushroom
         content += `
-          <path d="${streamPath}" fill="none" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth + 1}" opacity="0.6">
-            <animate attributeName="stroke-dasharray" from="0,100" to="50,50" dur="${5 + i}s" 
-              repeatCount="indefinite"/>
-            <animate attributeName="opacity" from="0.3" to="0.9" dur="${3 + i}s" 
-              repeatCount="indefinite" direction="alternate"/>
-          </path>`;
+          <g>
+            <!-- Mushroom cap -->
+            <ellipse cx="${x}" cy="${y - 10}" rx="${size * 0.6}" ry="${size * 0.3}" 
+              fill="hsl(0,70%,65%)" stroke="hsl(0,70%,45%)" stroke-width="2">
+              <animate attributeName="ry" from="${size * 0.3}" to="${size * 0.35}" dur="${3 + i}s" 
+                repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <!-- Mushroom stem -->
+            <rect x="${x - size * 0.15}" y="${y - 5}" width="${size * 0.3}" height="${size * 0.8}" 
+              fill="hsl(30,30%,85%)" stroke="hsl(30,30%,70%)" stroke-width="1" rx="8"/>
+            <!-- Mushroom spots -->
+            <circle cx="${x - size * 0.2}" cy="${y - 15}" r="3" fill="white" opacity="0.9">
+              <animate attributeName="opacity" from="0.5" to="1" dur="${2 + i}s" 
+                repeatCount="indefinite" direction="alternate"/>
+            </circle>
+            <circle cx="${x + size * 0.1}" cy="${y - 20}" r="2" fill="white" opacity="0.9"/>
+            <circle cx="${x + size * 0.25}" cy="${y - 12}" r="2.5" fill="white" opacity="0.9"/>
+          </g>`;
         break;
         
-      case 16: // Pulsing diamonds
-        const diamondSize = size * 0.6;
-        const diamondPoints = `${x},${y - diamondSize/2} ${x + diamondSize/2},${y} ${x},${y + diamondSize/2} ${x - diamondSize/2},${y}`;
+      case 7: // Rainbow cloud
         content += `
-          <polygon points="${diamondPoints}" 
-            fill="hsla(${hue},70%,50%,0.3)" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}">
-            <animateTransform attributeName="transform" type="scale"
-              from="0.8" to="1.4" dur="${3.5 + i}s" repeatCount="indefinite" direction="alternate"/>
-            <animate attributeName="fill-opacity" from="0.1" to="0.5" dur="${4 + i}s" 
-              repeatCount="indefinite" direction="alternate"/>
-          </polygon>`;
+          <g>
+            <!-- Cloud -->
+            <ellipse cx="${x}" cy="${y}" rx="${size * 0.8}" ry="${size * 0.4}" fill="hsl(200,20%,90%)" opacity="0.9">
+              <animateTransform attributeName="transform" type="translate"
+                from="0,0" to="5,0" dur="${4 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <circle cx="${x - size * 0.4}" cy="${y}" r="${size * 0.25}" fill="hsl(200,20%,90%)" opacity="0.9"/>
+            <circle cx="${x + size * 0.4}" cy="${y}" r="${size * 0.25}" fill="hsl(200,20%,90%)" opacity="0.9"/>
+            <circle cx="${x}" cy="${y - size * 0.2}" r="${size * 0.3}" fill="hsl(200,20%,90%)" opacity="0.9"/>
+            <!-- Rainbow -->
+            ${Array.from({length: 4}, (_, j) => {
+              const rainbowY = y + 25 + j * 3;
+              const rainbowHue = j * 90;
+              return `
+                <path d="M${x - size * 0.6} ${rainbowY} Q${x} ${rainbowY - 10} ${x + size * 0.6} ${rainbowY}" 
+                  fill="none" stroke="hsl(${rainbowHue},80%,60%)" stroke-width="3" opacity="0.8">
+                  <animate attributeName="opacity" from="0.4" to="1" dur="${2 + j * 0.5}s" 
+                    repeatCount="indefinite" direction="alternate"/>
+                </path>`;
+            }).join('')}
+          </g>`;
         break;
         
-      case 17: // Swirling vortex
-        const vortexRadius = size * 0.5;
-        const spiralTurns = (elementSeed % 3) + 2;
-        let spiralPath = `M${x} ${y}`;
-        for (let j = 0; j < spiralTurns * 10; j++) {
-          const spiralAngle = (j / 10) * 2 * Math.PI;
-          const currentRadius = (vortexRadius * j) / (spiralTurns * 10);
-          const spiralX = x + currentRadius * Math.cos(spiralAngle);
-          const spiralY = y + currentRadius * Math.sin(spiralAngle);
-          spiralPath += ` L${spiralX} ${spiralY}`;
-        }
+      case 8: // Happy ghost
         content += `
-          <path d="${spiralPath}" fill="none" stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}">
-            <animate attributeName="stroke-dasharray" from="5,5" to="15,3" dur="${4 + i}s" 
-              repeatCount="indefinite" direction="alternate"/>
-          </path>`;
+          <g>
+            <!-- Ghost body -->
+            <path d="M${x - size * 0.4} ${y + 20} 
+                     Q${x - size * 0.4} ${y - 20} ${x} ${y - 20} 
+                     Q${x + size * 0.4} ${y - 20} ${x + size * 0.4} ${y + 20}
+                     L${x + size * 0.2} ${y + 15}
+                     L${x} ${y + 25}
+                     L${x - size * 0.2} ${y + 15} Z" 
+              fill="hsl(200,30%,95%)" stroke="hsl(200,30%,80%)" stroke-width="2" opacity="0.9">
+              <animateTransform attributeName="transform" type="translate"
+                from="0,0" to="0,-6" dur="${3 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </path>
+            <!-- Ghost eyes -->
+            <circle cx="${x - size * 0.15}" cy="${y - 5}" r="3" fill="black"/>
+            <circle cx="${x + size * 0.15}" cy="${y - 5}" r="3" fill="black"/>
+            <!-- Ghost mouth -->
+            <ellipse cx="${x}" cy="${y + 5}" rx="5" ry="3" fill="black"/>
+          </g>`;
         break;
         
-      case 18: // Fractal branches
-        const branchDepth = 3;
-        const drawBranch = (startX: number, startY: number, endX: number, endY: number, depth: number): string => {
-          if (depth <= 0) return '';
-          const midX = (startX + endX) / 2 + ((elementSeed >> depth) % 20) - 10;
-          const midY = (startY + endY) / 2 + ((elementSeed >> (depth + 2)) % 20) - 10;
-          const leftEndX = midX + ((elementSeed >> (depth + 4)) % 30) - 15;
-          const leftEndY = midY + ((elementSeed >> (depth + 6)) % 30) - 15;
-          const rightEndX = midX + ((elementSeed >> (depth + 8)) % 30) - 15;
-          const rightEndY = midY + ((elementSeed >> (depth + 10)) % 30) - 15;
-          
-          return `
-            <line x1="${startX}" y1="${startY}" x2="${midX}" y2="${midY}" 
-              stroke="hsl(${hue},70%,50%)" stroke-width="${strokeWidth}" opacity="${0.8 - (3-depth) * 0.2}">
-              <animate attributeName="opacity" from="0.3" to="0.9" dur="${2 + depth}s" 
-                repeatCount="indefinite" direction="alternate"/>
-            </line>` +
-            drawBranch(midX, midY, leftEndX, leftEndY, depth - 1) +
-            drawBranch(midX, midY, rightEndX, rightEndY, depth - 1);
-        };
-        content += drawBranch(x, y + size/2, x, y - size/2, branchDepth);
+      case 9: // Bouncing frog
+        content += `
+          <g>
+            <!-- Frog body -->
+            <ellipse cx="${x}" cy="${y + 5}" rx="${size * 0.6}" ry="${size * 0.4}" 
+              fill="hsl(120,60%,50%)" stroke="hsl(120,60%,30%)" stroke-width="2">
+              <animateTransform attributeName="transform" type="scale"
+                from="1" to="1.15" dur="${2 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <!-- Frog head -->
+            <ellipse cx="${x}" cy="${y - 15}" rx="${size * 0.5}" ry="${size * 0.35}" 
+              fill="hsl(120,60%,55%)" stroke="hsl(120,60%,30%)" stroke-width="2"/>
+            <!-- Frog eyes -->
+            <circle cx="${x - size * 0.2}" cy="${y - 25}" r="${size * 0.1}" fill="hsl(120,60%,55%)"/>
+            <circle cx="${x + size * 0.2}" cy="${y - 25}" r="${size * 0.1}" fill="hsl(120,60%,55%)"/>
+            <circle cx="${x - size * 0.2}" cy="${y - 25}" r="2" fill="black"/>
+            <circle cx="${x + size * 0.2}" cy="${y - 25}" r="2" fill="black"/>
+          </g>`;
         break;
         
-      case 19: // Particle clusters
-        const numParticles = (elementSeed % 8) + 6;
-        const clusterRadius = size * 0.4;
-        for (let j = 0; j < numParticles; j++) {
-          const particleAngle = (j * 360 / numParticles) + (elementSeed % 360);
-          const particleDistance = (elementSeed >> (j*2)) % clusterRadius;
-          const particleX = x + particleDistance * Math.cos(particleAngle * Math.PI / 180);
-          const particleY = y + particleDistance * Math.sin(particleAngle * Math.PI / 180);
-          const particleSize = ((elementSeed >> (j*3)) % 4) + 2;
-          content += `
-            <circle cx="${particleX}" cy="${particleY}" r="${particleSize}" 
-              fill="hsl(${(hue + j * 20) % 360},70%,50%)" opacity="0.7">
-              <animate attributeName="r" from="${particleSize}" to="${particleSize + 2}" dur="${2 + j * 0.3}s" 
+      case 10: // Magic wand with sparkles
+        content += `
+          <g>
+            <!-- Wand -->
+            <line x1="${x - size * 0.4}" y1="${y + 20}" x2="${x + size * 0.4}" y2="${y - 20}" 
+              stroke="hsl(30,50%,40%)" stroke-width="3" stroke-linecap="round">
+              <animateTransform attributeName="transform" type="rotate"
+                from="0 ${x} ${y}" to="10 ${x} ${y}" dur="${2 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </line>
+            <!-- Star tip -->
+            <polygon points="${generateStarPoints(x + size * 0.4, y - 20, 8, 5)}" 
+              fill="hsl(45,90%,70%)" stroke="hsl(45,90%,50%)" stroke-width="1">
+              <animateTransform attributeName="transform" type="rotate"
+                from="0 ${x + size * 0.4} ${y - 20}" to="360 ${x + size * 0.4} ${y - 20}" 
+                dur="${4 + i}s" repeatCount="indefinite"/>
+            </polygon>
+            <!-- Magic sparkles -->
+            ${Array.from({length: 4}, (_, j) => {
+              const sparkleX = x + ((elementSeed >> (j*4)) % 60) - 30;
+              const sparkleY = y + ((elementSeed >> (j*4 + 2)) % 60) - 30;
+              return `
+                <polygon points="${generateStarPoints(sparkleX, sparkleY, 3, 4)}" 
+                  fill="hsl(${45 + j * 60},90%,70%)" opacity="0.8">
+                  <animate attributeName="opacity" from="0.3" to="1" dur="${1 + j * 0.5}s" 
+                    repeatCount="indefinite" direction="alternate"/>
+                  <animateTransform attributeName="transform" type="scale"
+                    from="0.5" to="1.2" dur="${2 + j * 0.3}s" repeatCount="indefinite" direction="alternate"/>
+                </polygon>`;
+            }).join('')}
+          </g>`;
+        break;
+        
+      case 11: // Cute rocket
+        content += `
+          <g>
+            <!-- Rocket body -->
+            <ellipse cx="${x}" cy="${y}" rx="${size * 0.25}" ry="${size * 0.8}" 
+              fill="hsl(${hue},70%,60%)" stroke="hsl(${hue},70%,40%)" stroke-width="2">
+              <animateTransform attributeName="transform" type="translate"
+                from="0,0" to="0,-8" dur="${2.5 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <!-- Rocket tip -->
+            <polygon points="${x},${y - size * 0.8} ${x - size * 0.2},${y - size * 0.4} ${x + size * 0.2},${y - size * 0.4}" 
+              fill="hsl(0,70%,60%)"/>
+            <!-- Rocket fins -->
+            <polygon points="${x - size * 0.25},${y + size * 0.6} ${x - size * 0.4},${y + size * 0.8} ${x - size * 0.1},${y + size * 0.8}" 
+              fill="hsl(${hue},70%,50%)"/>
+            <polygon points="${x + size * 0.25},${y + size * 0.6} ${x + size * 0.4},${y + size * 0.8} ${x + size * 0.1},${y + size * 0.8}" 
+              fill="hsl(${hue},70%,50%)"/>
+            <!-- Rocket window -->
+            <circle cx="${x}" cy="${y - size * 0.2}" r="${size * 0.1}" fill="hsl(200,50%,80%)"/>
+            <!-- Rocket flames -->
+            <ellipse cx="${x}" cy="${y + size * 0.9}" rx="${size * 0.15}" ry="${size * 0.3}" 
+              fill="hsl(15,90%,60%)" opacity="0.8">
+              <animate attributeName="ry" from="${size * 0.2}" to="${size * 0.4}" dur="0.5s" 
                 repeatCount="indefinite" direction="alternate"/>
-              <animate attributeName="opacity" from="0.4" to="1" dur="${3 + j * 0.2}s" 
+            </ellipse>
+          </g>`;
+        break;
+        
+      case 12: // Bouncing heart
+        content += `
+          <g>
+            <path d="M${x} ${y + size * 0.3}
+                     C${x} ${y - size * 0.2} ${x - size * 0.5} ${y - size * 0.2} ${x - size * 0.5} ${y}
+                     C${x - size * 0.5} ${y + size * 0.2} ${x} ${y + size * 0.5} ${x} ${y + size * 0.3}
+                     C${x} ${y + size * 0.5} ${x + size * 0.5} ${y + size * 0.2} ${x + size * 0.5} ${y}
+                     C${x + size * 0.5} ${y - size * 0.2} ${x} ${y - size * 0.2} ${x} ${y + size * 0.3}" 
+              fill="hsl(340,80%,65%)" stroke="hsl(340,80%,45%)" stroke-width="2">
+              <animateTransform attributeName="transform" type="scale"
+                from="1" to="1.2" dur="${1.5 + i}s" repeatCount="indefinite" direction="alternate"/>
+              <animate attributeName="fill" from="hsl(340,80%,65%)" to="hsl(340,90%,75%)" dur="${2 + i}s" 
                 repeatCount="indefinite" direction="alternate"/>
-            </circle>`;
-        }
+            </path>
+          </g>`;
+        break;
+        
+      case 13: // Jumping bunny
+        content += `
+          <g>
+            <!-- Bunny body -->
+            <ellipse cx="${x}" cy="${y + 10}" rx="${size * 0.5}" ry="${size * 0.6}" 
+              fill="hsl(30,30%,90%)" stroke="hsl(30,30%,70%)" stroke-width="2">
+              <animateTransform attributeName="transform" type="translate"
+                from="0,0" to="0,-5" dur="${2 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <!-- Bunny head -->
+            <circle cx="${x}" cy="${y - 15}" r="${size * 0.35}" 
+              fill="hsl(30,30%,92%)" stroke="hsl(30,30%,70%)" stroke-width="2"/>
+            <!-- Bunny ears -->
+            <ellipse cx="${x - size * 0.2}" cy="${y - 35}" rx="${size * 0.08}" ry="${size * 0.25}" 
+              fill="hsl(30,30%,90%)" stroke="hsl(30,30%,70%)" stroke-width="1">
+              <animateTransform attributeName="transform" type="rotate"
+                from="0 ${x - size * 0.2} ${y - 35}" to="5 ${x - size * 0.2} ${y - 35}" 
+                dur="${3 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <ellipse cx="${x + size * 0.2}" cy="${y - 35}" rx="${size * 0.08}" ry="${size * 0.25}" 
+              fill="hsl(30,30%,90%)" stroke="hsl(30,30%,70%)" stroke-width="1">
+              <animateTransform attributeName="transform" type="rotate"
+                from="0 ${x + size * 0.2} ${y - 35}" to="-5 ${x + size * 0.2} ${y - 35}" 
+                dur="${3 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <!-- Bunny nose -->
+            <circle cx="${x}" cy="${y - 12}" r="1.5" fill="hsl(340,70%,60%)"/>
+            <!-- Bunny tail -->
+            <circle cx="${x - size * 0.4}" cy="${y + 5}" r="${size * 0.12}" fill="hsl(30,30%,95%)">
+              <animate attributeName="r" from="${size * 0.1}" to="${size * 0.15}" dur="${2 + i}s" 
+                repeatCount="indefinite" direction="alternate"/>
+            </circle>
+          </g>`;
+        break;
+        
+      case 14: // Butterfly
+        content += `
+          <g>
+            <!-- Butterfly body -->
+            <ellipse cx="${x}" cy="${y}" rx="2" ry="${size * 0.6}" fill="hsl(30,50%,30%)"/>
+            <!-- Upper wings -->
+            <ellipse cx="${x - size * 0.3}" cy="${y - size * 0.2}" rx="${size * 0.25}" ry="${size * 0.35}" 
+              fill="hsl(${hue},80%,70%)" stroke="hsl(${hue},80%,50%)" stroke-width="1" opacity="0.9">
+              <animateTransform attributeName="transform" type="rotate"
+                from="0 ${x - size * 0.3} ${y - size * 0.2}" to="15 ${x - size * 0.3} ${y - size * 0.2}" 
+                dur="${1.5 + i * 0.2}s" repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <ellipse cx="${x + size * 0.3}" cy="${y - size * 0.2}" rx="${size * 0.25}" ry="${size * 0.35}" 
+              fill="hsl(${hue},80%,70%)" stroke="hsl(${hue},80%,50%)" stroke-width="1" opacity="0.9">
+              <animateTransform attributeName="transform" type="rotate"
+                from="0 ${x + size * 0.3} ${y - size * 0.2}" to="-15 ${x + size * 0.3} ${y - size * 0.2}" 
+                dur="${1.5 + i * 0.2}s" repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <!-- Lower wings -->
+            <ellipse cx="${x - size * 0.25}" cy="${y + size * 0.2}" rx="${size * 0.15}" ry="${size * 0.25}" 
+              fill="hsl(${(hue + 60) % 360},80%,70%)" opacity="0.8"/>
+            <ellipse cx="${x + size * 0.25}" cy="${y + size * 0.2}" rx="${size * 0.15}" ry="${size * 0.25}" 
+              fill="hsl(${(hue + 60) % 360},80%,70%)" opacity="0.8"/>
+          </g>`;
+        break;
+        
+      case 15: // Cheerful octopus
+        content += `
+          <g>
+            <!-- Octopus head -->
+            <circle cx="${x}" cy="${y - 10}" r="${size * 0.4}" 
+              fill="hsl(${hue},70%,65%)" stroke="hsl(${hue},70%,45%)" stroke-width="2">
+              <animate attributeName="r" from="${size * 0.38}" to="${size * 0.42}" dur="${3 + i}s" 
+                repeatCount="indefinite" direction="alternate"/>
+            </circle>
+            <!-- Octopus tentacles -->
+            ${Array.from({length: 4}, (_, j) => {
+              const tentacleAngle = j * 90 + 45;
+              const tentacleX = x + (size * 0.6) * Math.cos(tentacleAngle * Math.PI / 180);
+              const tentacleY = y + (size * 0.6) * Math.sin(tentacleAngle * Math.PI / 180);
+              return `
+                <path d="M${x} ${y + 10} Q${tentacleX} ${y + 20} ${tentacleX} ${tentacleY}" 
+                  fill="none" stroke="hsl(${hue},70%,60%)" stroke-width="4" stroke-linecap="round">
+                  <animate attributeName="d" 
+                    from="M${x} ${y + 10} Q${tentacleX} ${y + 20} ${tentacleX} ${tentacleY}"
+                    to="M${x} ${y + 10} Q${tentacleX + 10} ${y + 15} ${tentacleX + 5} ${tentacleY - 5}"
+                    dur="${2.5 + j * 0.3}s" repeatCount="indefinite" direction="alternate"/>
+                </path>`;
+            }).join('')}
+            <!-- Octopus eyes -->
+            <circle cx="${x - size * 0.15}" cy="${y - 15}" r="3" fill="white"/>
+            <circle cx="${x + size * 0.15}" cy="${y - 15}" r="3" fill="white"/>
+            <circle cx="${x - size * 0.15}" cy="${y - 15}" r="1.5" fill="black"/>
+            <circle cx="${x + size * 0.15}" cy="${y - 15}" r="1.5" fill="black"/>
+          </g>`;
+        break;
+        
+      case 16: // Friendly alien
+        content += `
+          <g>
+            <!-- Alien body -->
+            <ellipse cx="${x}" cy="${y + 5}" rx="${size * 0.4}" ry="${size * 0.6}" 
+              fill="hsl(${hue},60%,70%)" stroke="hsl(${hue},60%,50%)" stroke-width="2">
+              <animate attributeName="ry" from="${size * 0.55}" to="${size * 0.65}" dur="${3 + i}s" 
+                repeatCount="indefinite" direction="alternate"/>
+            </ellipse>
+            <!-- Alien head -->
+            <ellipse cx="${x}" cy="${y - 20}" rx="${size * 0.5}" ry="${size * 0.4}" 
+              fill="hsl(${hue},60%,75%)" stroke="hsl(${hue},60%,50%)" stroke-width="2"/>
+            <!-- Alien antennae -->
+            <line x1="${x - size * 0.2}" y1="${y - 35}" x2="${x - size * 0.3}" y2="${y - 45}" 
+              stroke="hsl(${hue},60%,50%)" stroke-width="2" stroke-linecap="round">
+              <animateTransform attributeName="transform" type="rotate"
+                from="0 ${x - size * 0.2} ${y - 35}" to="10 ${x - size * 0.2} ${y - 35}" 
+                dur="${2 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </line>
+            <line x1="${x + size * 0.2}" y1="${y - 35}" x2="${x + size * 0.3}" y2="${y - 45}" 
+              stroke="hsl(${hue},60%,50%)" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="${x - size * 0.3}" cy="${y - 45}" r="3" fill="hsl(45,90%,60%)"/>
+            <circle cx="${x + size * 0.3}" cy="${y - 45}" r="3" fill="hsl(45,90%,60%)"/>
+            <!-- Alien eyes -->
+            <ellipse cx="${x - size * 0.1}" cy="${y - 25}" rx="4" ry="6" fill="black"/>
+            <ellipse cx="${x + size * 0.1}" cy="${y - 25}" rx="4" ry="6" fill="black"/>
+          </g>`;
+        break;
+        
+      case 17: // Smiling donut
+        content += `
+          <g>
+            <!-- Donut base -->
+            <circle cx="${x}" cy="${y}" r="${size * 0.5}" 
+              fill="hsl(30,70%,70%)" stroke="hsl(30,70%,50%)" stroke-width="2">
+              <animateTransform attributeName="transform" type="rotate"
+                from="0 ${x} ${y}" to="360 ${x} ${y}" dur="${8 + i}s" repeatCount="indefinite"/>
+            </circle>
+            <!-- Donut hole -->
+            <circle cx="${x}" cy="${y}" r="${size * 0.2}" fill="white"/>
+            <!-- Donut sprinkles -->
+            ${Array.from({length: 8}, (_, j) => {
+              const sprinkleAngle = j * 45 + (elementSeed % 45);
+              const sprinkleRadius = (size * 0.3) + ((elementSeed >> (j*2)) % 10);
+              const sprinkleX = x + sprinkleRadius * Math.cos(sprinkleAngle * Math.PI / 180);
+              const sprinkleY = y + sprinkleRadius * Math.sin(sprinkleAngle * Math.PI / 180);
+              return `
+                <rect x="${sprinkleX - 1}" y="${sprinkleY - 3}" width="2" height="6" 
+                  fill="hsl(${j * 45},80%,60%)" rx="1"
+                  transform="rotate(${sprinkleAngle} ${sprinkleX} ${sprinkleY})">
+                  <animate attributeName="opacity" from="0.6" to="1" dur="${1 + j * 0.2}s" 
+                    repeatCount="indefinite" direction="alternate"/>
+                </rect>`;
+            }).join('')}
+          </g>`;
+        break;
+        
+      case 18: // Dancing robot
+        content += `
+          <g>
+            <!-- Robot body -->
+            <rect x="${x - size * 0.3}" y="${y - 5}" width="${size * 0.6}" height="${size * 0.7}" 
+              fill="hsl(${hue},50%,60%)" stroke="hsl(${hue},50%,40%)" stroke-width="2" rx="5">
+              <animateTransform attributeName="transform" type="translate"
+                from="0,0" to="2,0" dur="${2 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </rect>
+            <!-- Robot head -->
+            <rect x="${x - size * 0.25}" y="${y - 35}" width="${size * 0.5}" height="${size * 0.4}" 
+              fill="hsl(${hue},50%,65%)" stroke="hsl(${hue},50%,40%)" stroke-width="2" rx="3"/>
+            <!-- Robot antenna -->
+            <line x1="${x}" y1="${y - 35}" x2="${x}" y2="${y - 45}" stroke="hsl(${hue},50%,40%)" stroke-width="2"/>
+            <circle cx="${x}" cy="${y - 45}" r="3" fill="hsl(0,80%,60%)">
+              <animate attributeName="fill" from="hsl(0,80%,60%)" to="hsl(120,80%,60%)" dur="${1.5 + i}s" 
+                repeatCount="indefinite" direction="alternate"/>
+            </circle>
+            <!-- Robot eyes -->
+            <circle cx="${x - size * 0.1}" cy="${y - 25}" r="3" fill="hsl(200,80%,50%)"/>
+            <circle cx="${x + size * 0.1}" cy="${y - 25}" r="3" fill="hsl(200,80%,50%)"/>
+            <!-- Robot arms -->
+            <rect x="${x - size * 0.5}" y="${y - 15}" width="${size * 0.15}" height="${size * 0.4}" 
+              fill="hsl(${hue},50%,60%)" rx="3">
+              <animateTransform attributeName="transform" type="rotate"
+                from="0 ${x - size * 0.5} ${y - 15}" to="20 ${x - size * 0.5} ${y - 15}" 
+                dur="${2.5 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </rect>
+            <rect x="${x + size * 0.35}" y="${y - 15}" width="${size * 0.15}" height="${size * 0.4}" 
+              fill="hsl(${hue},50%,60%)" rx="3">
+              <animateTransform attributeName="transform" type="rotate"
+                from="0 ${x + size * 0.35} ${y - 15}" to="-20 ${x + size * 0.35} ${y - 15}" 
+                dur="${2.5 + i}s" repeatCount="indefinite" direction="alternate"/>
+            </rect>
+          </g>`;
+        break;
+        
+      case 19: // Sleeping moon
+        content += `
+          <g>
+            <!-- Moon -->
+            <circle cx="${x}" cy="${y}" r="${size * 0.4}" 
+              fill="hsl(45,40%,85%)" stroke="hsl(45,40%,70%)" stroke-width="2">
+              <animate attributeName="cy" from="${y}" to="${y - 3}" dur="${4 + i}s" 
+                repeatCount="indefinite" direction="alternate"/>
+            </circle>
+            <!-- Moon craters -->
+            <circle cx="${x - size * 0.1}" cy="${y - 5}" r="2" fill="hsl(45,40%,75%)" opacity="0.7"/>
+            <circle cx="${x + size * 0.15}" cy="${y + 8}" r="3" fill="hsl(45,40%,75%)" opacity="0.7"/>
+            <!-- Sleeping face -->
+            <path d="M${x - size * 0.15} ${y - 5} Q${x - size * 0.1} ${y - 8} ${x - size * 0.05} ${y - 5}" 
+              fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+            <path d="M${x + size * 0.05} ${y - 5} Q${x + size * 0.1} ${y - 8} ${x + size * 0.15} ${y - 5}" 
+              fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+            <path d="M${x - size * 0.1} ${y + 8} Q${x} ${y + 12} ${x + size * 0.1} ${y + 8}" 
+              fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+            <!-- Zzz sleep bubbles -->
+            <text x="${x + size * 0.6}" y="${y - 15}" fill="hsl(200,30%,60%)" font-size="12" opacity="0.8">Z
+              <animate attributeName="opacity" from="0.4" to="1" dur="${2 + i}s" 
+                repeatCount="indefinite" direction="alternate"/>
+            </text>
+            <text x="${x + size * 0.7}" y="${y - 25}" fill="hsl(200,30%,60%)" font-size="10" opacity="0.6">z
+              <animate attributeName="opacity" from="0.2" to="0.8" dur="${2.5 + i}s" 
+                repeatCount="indefinite" direction="alternate"/>
+            </text>
+          </g>`;
         break;
     }
   }
@@ -345,9 +606,36 @@ export function generateAbstractSVG(prompt: string, width: number = 300, height:
     <svg xmlns="http://www.w3.org/2000/svg"
          viewBox="0 0 ${width} ${height}"
          width="${width}" height="${height}">
+      <!-- Animated background gradient -->
+      <defs>
+        <radialGradient id="bg-${seed}" cx="50%" cy="50%" r="70%">
+          <stop offset="0%" stop-color="hsl(${hue},30%,95%)" stop-opacity="0.3">
+            <animate attributeName="stop-opacity" from="0.1" to="0.5" dur="${6}s" 
+              repeatCount="indefinite" direction="alternate"/>
+          </stop>
+          <stop offset="100%" stop-color="hsl(${(hue + 120) % 360},30%,90%)" stop-opacity="0.1"/>
+        </radialGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#bg-${seed})"/>
       ${content}
     </svg>
   `;
+}
+
+function generateStarPoints(cx: number, cy: number, size: number, numPoints: number): string {
+  const points = [];
+  const outerRadius = size;
+  const innerRadius = size * 0.4;
+  
+  for (let i = 0; i < numPoints * 2; i++) {
+    const angle = (i * Math.PI) / numPoints;
+    const radius = i % 2 === 0 ? outerRadius : innerRadius;
+    const x = cx + radius * Math.cos(angle - Math.PI / 2);
+    const y = cy + radius * Math.sin(angle - Math.PI / 2);
+    points.push(`${x},${y}`);
+  }
+  
+  return points.join(' ');
 }
 
 function generatePolygonPoints(cx: number, cy: number, radius: number, sides: number): string {
