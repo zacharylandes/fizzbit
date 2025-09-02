@@ -358,37 +358,10 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
 async function addSVGToIdeas(ideas: IdeaResponse[], originalPrompt: string): Promise<IdeaResponse[]> {
   const finalIdeas = [...ideas];
   
-  // STEP 1: Create 5 pure abstract SVG ideas (no text) 
-  console.log('🎨 Generating 5 pure abstract SVGs...');
-  const pureAbstractSVGs = await generatePureAbstractSVGs(originalPrompt, 5);
-  console.log(`🎨 Successfully generated ${pureAbstractSVGs.length} abstract SVGs`);
-  
-  // STEP 2: Distribute pure SVG ideas throughout the cards (sprinkle them in)
-  if (pureAbstractSVGs.length > 0) {
-    // Calculate positions to insert SVGs evenly throughout
-    const totalSlots = 25;
-    const svgPositions = [];
-    
-    // Spread SVGs evenly: positions 4, 9, 14, 19, 24 (every 5 cards)
-    for (let i = 0; i < Math.min(pureAbstractSVGs.length, 5); i++) {
-      svgPositions.push(4 + (i * 5)); // 4, 9, 14, 19, 24
-    }
-    
-    // Insert SVGs at calculated positions
-    svgPositions.forEach((position, index) => {
-      if (position < totalSlots && pureAbstractSVGs[index]) {
-        // Make sure we don't exceed the array bounds
-        if (position < finalIdeas.length) {
-          finalIdeas.splice(position, 0, pureAbstractSVGs[index]);
-        } else {
-          finalIdeas.push(pureAbstractSVGs[index]);
-        }
-        console.log(`🎨 Inserted abstract SVG at position ${position + 1}`);
-      }
-    });
-  } else {
-    console.log('🚨 No abstract SVGs generated, keeping all text ideas');
-  }
+  // Add procedural SVG generation flag to all text ideas
+  finalIdeas.forEach(idea => {
+    idea.svg = "PROCEDURAL"; // Mark for client-side people illustration generation
+  });
   
   // Ensure we have exactly 25 ideas total
   while (finalIdeas.length > 25) {
