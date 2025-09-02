@@ -9,7 +9,7 @@ html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  background-color: hsl(35, 20%, 96%);
+  background-color: hsl(220, 15%, 8%);
   overscroll-behavior: none;
 }
 
@@ -56,45 +56,46 @@ input, textarea {
 }
 
 :root {
-  /* Athos 2.0 Beige Theme Colors */
-  --background: hsl(35, 20%, 96%);  /* Warm beige background */
-  --foreground: hsl(0, 0%, 20%);
-  --muted: hsl(35, 15%, 92%);
-  --muted-foreground: hsl(0, 0%, 45%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(0, 0%, 20%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(0, 0%, 20%);
-  --border: hsl(35, 12%, 85%);
-  --input: hsl(35, 12%, 90%);
-  --primary: hsl(270, 60%, 50%);  /* Purple primary */
+  /* Modern Dark Professional Theme */
+  --background: hsl(220, 15%, 8%);    /* Dark background */
+  --foreground: hsl(0, 0%, 95%);      /* Light text */
+  --muted: hsl(220, 10%, 15%);        /* Dark muted */
+  --muted-foreground: hsl(0, 0%, 65%); /* Light muted text */
+  --popover: hsl(220, 12%, 12%);      /* Dark popover */
+  --popover-foreground: hsl(0, 0%, 95%);
+  --card: hsl(220, 12%, 12%);         /* Dark cards */
+  --card-foreground: hsl(0, 0%, 95%);
+  --border: hsl(220, 10%, 22%);       /* Dark borders */
+  --input: hsl(220, 10%, 18%);        /* Dark inputs */
+  --primary: hsl(250, 80%, 60%);      /* Modern purple primary */
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(35, 15%, 95%);
-  --secondary-foreground: hsl(0, 0%, 25%);
-  --accent: hsl(35, 15%, 93%);
-  --accent-foreground: hsl(0, 0%, 25%);
-  --destructive: hsl(0, 84.2%, 60.2%);
+  --secondary: hsl(220, 10%, 18%);    /* Dark secondary */
+  --secondary-foreground: hsl(0, 0%, 85%);
+  --accent: hsl(220, 15%, 20%);       /* Dark accent */
+  --accent-foreground: hsl(0, 0%, 90%);
+  --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 5%, 64.9%);
-  --radius: 0.5rem;
+  --ring: hsl(250, 50%, 50%);
+  --radius: 0.75rem;
   
-  /* Pastel Card Colors from Athos 2.0 - Enhanced for better contrast */
-  --card-sage: hsl(85, 35%, 45%);        /* Darker sage green for better contrast */
-  --card-sage-bg: hsl(85, 25%, 90%);     /* Light sage background */
-  --card-blue-gray: hsl(210, 30%, 40%);  /* Darker blue-gray for better contrast */
-  --card-blue-gray-bg: hsl(210, 25%, 88%); /* Light blue-gray background */
-  --card-cream: hsl(45, 50%, 70%);       /* Adjusted cream */
-  --card-cream-text: hsl(35, 60%, 30%);  /* Much darker brown text for cream cards */
-  --card-light-blue: hsl(200, 45%, 50%); /* Darker light blue for better contrast */
-  --card-light-blue-bg: hsl(200, 35%, 92%); /* Light blue background */
-  --card-purple-gray: hsl(270, 25%, 35%); /* Darker purple-gray for better contrast */
-  --card-purple-gray-bg: hsl(270, 20%, 90%); /* Light purple background */
-  --card-lavender: hsl(280, 40%, 50%);   /* Darker lavender for better contrast */
-  --card-lavender-bg: hsl(280, 35%, 92%); /* Light lavender background */
-  --card-peach: hsl(15, 50%, 50%);       /* Darker peach for better contrast */
-  --card-peach-bg: hsl(15, 45%, 92%);    /* Light peach background */
-  --card-mint: hsl(160, 40%, 45%);       /* Darker mint green for better contrast */
-  --card-mint-bg: hsl(160, 35%, 92%);    /* Light mint background */
+  /* Modern Dark Theme Card Colors */
+  --card-sage: hsl(85, 50%, 60%);        /* Bright sage for dark theme */
+  --card-sage-bg: hsl(85, 40%, 15%);     /* Dark sage background */
+  --card-blue-gray: hsl(210, 60%, 65%);  /* Bright blue-gray */
+  --card-blue-gray-bg: hsl(210, 35%, 16%); /* Dark blue-gray background */
+  --card-cream: hsl(45, 60%, 70%);       /* Warm cream */
+  --card-cream-text: hsl(45, 60%, 70%);  /* Same color for text in dark theme */
+  --card-cream-bg: hsl(45, 35%, 14%);    /* Dark cream background */
+  --card-light-blue: hsl(200, 70%, 65%); /* Bright light blue */
+  --card-light-blue-bg: hsl(200, 40%, 16%); /* Dark blue background */
+  --card-purple-gray: hsl(270, 60%, 70%); /* Bright purple-gray */
+  --card-purple-gray-bg: hsl(270, 35%, 15%); /* Dark purple background */
+  --card-lavender: hsl(280, 60%, 70%);   /* Bright lavender */
+  --card-lavender-bg: hsl(280, 40%, 16%); /* Dark lavender background */
+  --card-peach: hsl(15, 70%, 65%);       /* Bright peach */
+  --card-peach-bg: hsl(15, 40%, 15%);    /* Dark peach background */
+  --card-mint: hsl(160, 60%, 60%);       /* Bright mint green */
+  --card-mint-bg: hsl(160, 40%, 15%);    /* Dark mint background */
   
   /* Professional Primary Colors */
   --primary-blue: hsl(210, 20%, 55%);
@@ -189,40 +190,38 @@ input, textarea {
   .bg-primary-pink { background-color: var(--primary-pink); }
   .border-primary-pink { border-color: var(--primary-pink); }
   
-  /* Pastel Card Utility Classes - with !important to override button defaults */
+  /* Dark Theme Card Utility Classes */
   .bg-card-sage { background-color: var(--card-sage-bg) !important; }
-  .bg-card-sage-bg { background-color: var(--card-sage-bg) !important; }
   .text-card-sage { color: var(--card-sage) !important; }
   .border-card-sage { border-color: var(--card-sage); }
   
   .bg-card-blue-gray { background-color: var(--card-blue-gray-bg) !important; }
-  .bg-card-blue-gray-bg { background-color: var(--card-blue-gray-bg) !important; }
   .text-card-blue-gray { color: var(--card-blue-gray) !important; }
   .border-card-blue-gray { border-color: var(--card-blue-gray); }
   
-  .bg-card-cream { background-color: var(--card-cream) !important; }
-  .text-card-cream { color: var(--card-cream-text) !important; }
-  .border-card-cream { border-color: var(--card-cream-text); }
+  .bg-card-cream { background-color: var(--card-cream-bg) !important; }
+  .text-card-cream { color: var(--card-cream) !important; }
+  .border-card-cream { border-color: var(--card-cream); }
   
   .bg-card-light-blue { background-color: var(--card-light-blue-bg) !important; }
-  .bg-card-light-blue-bg { background-color: var(--card-light-blue-bg) !important; }
   .text-card-light-blue { color: var(--card-light-blue) !important; }
   .border-card-light-blue { border-color: var(--card-light-blue); }
   
   .bg-card-purple-gray { background-color: var(--card-purple-gray-bg) !important; }
-  .bg-card-purple-gray-bg { background-color: var(--card-purple-gray-bg) !important; }
   .text-card-purple-gray { color: var(--card-purple-gray) !important; }
   .border-card-purple-gray { border-color: var(--card-purple-gray); }
   
-  .bg-card-lavender { background-color: var(--card-lavender) !important; }
-  .bg-card-lavender-bg { background-color: var(--card-lavender-bg) !important; }
+  .bg-card-lavender { background-color: var(--card-lavender-bg) !important; }
   .text-card-lavender { color: var(--card-lavender) !important; }
   .border-card-lavender { border-color: var(--card-lavender); }
   
-  .bg-card-peach { background-color: var(--card-peach) !important; }
-  .bg-card-peach-bg { background-color: var(--card-peach-bg) !important; }
+  .bg-card-peach { background-color: var(--card-peach-bg) !important; }
   .text-card-peach { color: var(--card-peach) !important; }
   .border-card-peach { border-color: var(--card-peach); }
+  
+  .bg-card-mint { background-color: var(--card-mint-bg) !important; }
+  .text-card-mint { color: var(--card-mint) !important; }
+  .border-card-mint { border-color: var(--card-mint); }
   
   /* Accent Colors */
   .text-accent-blue { color: var(--accent-blue); }
@@ -474,5 +473,213 @@ input, textarea {
 
   .glow-electric-cyan {
     box-shadow: 0 0 20px hsla(180, 100%, 70%, 0.3);
+  }
+
+  /* SWIPE ANIMATIONS - Speed Lines & Stars */
+  
+  /* Speed lines that appear when swiping */
+  .speed-lines {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 20;
+  }
+  
+  .speed-lines::before,
+  .speed-lines::after {
+    content: '';
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, hsl(250, 80%, 60%), transparent);
+    animation: speed-line 0.4s ease-out;
+  }
+  
+  .speed-lines::before {
+    width: 60px;
+    top: -10px;
+    animation-delay: 0.05s;
+  }
+  
+  .speed-lines::after {
+    width: 40px;
+    top: 10px;
+    animation-delay: 0.1s;
+  }
+  
+  @keyframes speed-line {
+    0% {
+      opacity: 0;
+      transform: translateX(-30px) scale(0.5);
+    }
+    50% {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(30px) scale(0.8);
+    }
+  }
+  
+  /* Star burst effect */
+  .star-burst {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 25;
+  }
+  
+  .star-burst .star {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: hsl(45, 100%, 70%);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    animation: star-explosion 0.6s ease-out forwards;
+  }
+  
+  .star-burst .star:nth-child(1) { 
+    animation-delay: 0s;
+    --angle: 0deg;
+    --distance: 40px;
+  }
+  .star-burst .star:nth-child(2) { 
+    animation-delay: 0.05s;
+    --angle: 45deg;
+    --distance: 35px;
+  }
+  .star-burst .star:nth-child(3) { 
+    animation-delay: 0.1s;
+    --angle: 90deg;
+    --distance: 45px;
+  }
+  .star-burst .star:nth-child(4) { 
+    animation-delay: 0.05s;
+    --angle: 135deg;
+    --distance: 38px;
+  }
+  .star-burst .star:nth-child(5) { 
+    animation-delay: 0.15s;
+    --angle: 180deg;
+    --distance: 42px;
+  }
+  .star-burst .star:nth-child(6) { 
+    animation-delay: 0.1s;
+    --angle: 225deg;
+    --distance: 36px;
+  }
+  .star-burst .star:nth-child(7) { 
+    animation-delay: 0.2s;
+    --angle: 270deg;
+    --distance: 44px;
+  }
+  .star-burst .star:nth-child(8) { 
+    animation-delay: 0.15s;
+    --angle: 315deg;
+    --distance: 39px;
+  }
+  
+  @keyframes star-explosion {
+    0% {
+      opacity: 1;
+      transform: rotate(0deg) scale(0.3);
+    }
+    50% {
+      opacity: 0.8;
+      transform: rotate(180deg) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: rotate(360deg) scale(0.2)
+        translateX(var(--distance))
+        translateY(calc(var(--distance) * sin(var(--angle))));
+    }
+  }
+  
+  /* Swipe trail effect */
+  .swipe-trail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 15;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      hsla(250, 80%, 60%, 0.1) 20%, 
+      hsla(250, 80%, 60%, 0.2) 50%, 
+      hsla(250, 80%, 60%, 0.1) 80%, 
+      transparent 100%);
+    opacity: 0;
+    animation: swipe-trail-flash 0.3s ease-out;
+  }
+  
+  @keyframes swipe-trail-flash {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  
+  /* Enhanced card swipe animations */
+  .swipe-left {
+    animation: enhanced-slide-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  
+  .swipe-right {
+    animation: enhanced-slide-right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  
+  .swipe-up {
+    animation: enhanced-slide-up 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  
+  @keyframes enhanced-slide-left {
+    0% {
+      transform: translateX(0) rotate(0deg) scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: translateX(-50px) rotate(-8deg) scale(1.05);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateX(-120vw) rotate(-25deg) scale(0.8);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes enhanced-slide-right {
+    0% {
+      transform: translateX(0) rotate(0deg) scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: translateX(50px) rotate(8deg) scale(1.05);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateX(120vw) rotate(25deg) scale(0.8);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes enhanced-slide-up {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: translateY(-30px) scale(1.1);
+      opacity: 0.9;
+    }
+    100% {
+      transform: translateY(-120vh) scale(0.7);
+      opacity: 0;
+    }
   }
 }

@@ -6,6 +6,9 @@ interface IdeaCardProps {
   idea: Idea;
   position: "top" | "middle" | "bottom";
   colorIndex: number;
+  isSwipeAnimating?: boolean;
+  swipeDirection?: 'left' | 'right' | 'up';
+  showSwipeEffects?: boolean;
 }
 
 const cardStyles = [
@@ -16,7 +19,7 @@ const cardStyles = [
   "bg-card-purple-gray border-card-purple-gray/40 card-shadow hover-lift"
 ];
 
-export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
+export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDirection, showSwipeEffects }: IdeaCardProps) {
   const cardNumber = position === "top" ? 1 : position === "middle" ? 2 : 3;
   const cardStyle = cardStyles[colorIndex % cardStyles.length];
 
@@ -51,7 +54,32 @@ export function IdeaCard({ idea, position, colorIndex }: IdeaCardProps) {
   const hue = hueValues[colorIndex % hueValues.length];
 
   return (
-    <div className={`relative rounded-xl border overflow-hidden w-full h-full cursor-pointer transition-all duration-300 ${cardStyle}`} style={{ fontFamily: 'Crimson Text, serif' }}>
+    <div className={`relative rounded-xl border overflow-hidden w-full h-full cursor-pointer transition-all duration-300 ${cardStyle} ${
+      isSwipeAnimating ? `swipe-${swipeDirection}` : ''
+    }`} style={{ fontFamily: 'Crimson Text, serif' }}>
+      {/* Swipe Animation Effects */}
+      {showSwipeEffects && (
+        <>
+          {/* Speed Lines */}
+          <div className="speed-lines"></div>
+          
+          {/* Star Burst */}
+          <div className="star-burst">
+            <div className="star"></div>
+            <div className="star"></div>
+            <div className="star"></div>
+            <div className="star"></div>
+            <div className="star"></div>
+            <div className="star"></div>
+            <div className="star"></div>
+            <div className="star"></div>
+          </div>
+          
+          {/* Swipe Trail */}
+          <div className="swipe-trail"></div>
+        </>
+      )}
+      
       {/* Card Content */}
       <div className="p-6 relative h-full">
         <div className="flex items-start justify-end mb-4">
