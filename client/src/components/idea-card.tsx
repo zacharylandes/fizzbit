@@ -12,14 +12,10 @@ interface IdeaCardProps {
 }
 
 const cardStyles = [
-  "bg-card-lime border-none card-shadow hover-lift",
-  "bg-card-white border border-gray-200 card-shadow hover-lift", 
-  "bg-card-emerald border-none card-shadow hover-lift",
-  "bg-card-royal-blue border-none card-shadow hover-lift",
-  "bg-card-coral border-none card-shadow hover-lift",
-  "bg-card-purple border-none card-shadow hover-lift",
-  "bg-card-teal border-none card-shadow hover-lift",
-  "bg-card-magenta border-none card-shadow hover-lift"
+  "bg-card-cream card-shadow hover-lift",
+  "bg-card-white card-shadow hover-lift", 
+  "bg-card-mint card-shadow hover-lift",
+  "bg-card-peach card-shadow hover-lift"
 ];
 
 export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDirection, showSwipeEffects }: IdeaCardProps) {
@@ -27,38 +23,26 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
   const cardStyle = cardStyles[colorIndex % cardStyles.length];
 
   const accentColors = [
-    "text-card-lime",
+    "text-card-cream",
     "text-card-white", 
-    "text-card-emerald",
-    "text-card-royal-blue",
-    "text-card-coral",
-    "text-card-purple",
-    "text-card-teal",
-    "text-card-magenta"
+    "text-card-mint",
+    "text-card-peach"
   ];
   
-  // Corresponding colors for modern geometric illustrations
+  // Corresponding colors for subtle illustrations
   const strokeColors = [
-    "#A3C639", // Bright lime
-    "#333333", // Dark for white cards
-    "#22C55E", // Bright emerald
-    "#3B82F6", // Royal blue
-    "#F97316", // Bright coral
-    "#A855F7", // Bright purple
-    "#06B6D4", // Bright teal
-    "#EC4899"  // Bright magenta
+    "#8B7355", // Warm brown for cream
+    "#374151", // Dark gray for white cards
+    "#059669", // Subtle green for mint
+    "#DC2626"  // Subtle red for peach
   ];
   
-  // Hue values for modern geometric SVG generation
+  // Hue values for subtle SVG generation
   const hueValues = [
-    75,   // lime
+    45,   // warm brown
     0,    // neutral for white
-    150,  // emerald
-    230,  // royal blue
-    15,   // coral
-    270,  // purple
-    180,  // teal
-    320   // magenta
+    150,  // mint green
+    15    // warm orange
   ];
   
   const accentColor = accentColors[colorIndex % accentColors.length];
@@ -110,7 +94,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
         {/* Title (only show if not empty) */}
         {idea.title && idea.title.trim().length > 0 ? (
           <div className="flex flex-col items-center justify-start h-full pt-8">
-            <h3 className={`text-xl font-bold text-center leading-tight mb-6 ${accentColor}`} style={{ fontFamily: 'Inter, sans-serif', fontWeight: '800' }}>
+            <h3 className={`text-2xl font-black text-center leading-tight mb-6 ${accentColor}`} style={{ fontFamily: 'Inter, sans-serif', fontWeight: '900' }}>
               {idea.title}
             </h3>
             
@@ -164,11 +148,11 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
         
         {/* Swipe Indicators */}
         <div className="absolute bottom-4 left-6 right-6 flex justify-between items-center">
-          <div className="flex items-center text-xs text-foreground bg-white/60 border border-border px-2 py-1 rounded-lg hover:bg-white/80 transition-all duration-300">
+          <div className="flex items-center text-xs text-foreground bg-black/5 px-2 py-1 rounded-lg transition-all duration-300">
             <ArrowLeft className="w-3 h-3 mr-1" />
             Dismiss
           </div>
-          <div className={`flex items-center text-xs bg-white/60 border border-border px-2 py-1 rounded-lg hover:bg-white/80 transition-all duration-300 ${accentColor}`}>
+          <div className={`flex items-center text-xs bg-black/5 px-2 py-1 rounded-lg transition-all duration-300 ${accentColor}`}>
             <ArrowUp className="w-3 h-3 mr-1" />
             Explore
           </div>

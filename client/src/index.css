@@ -78,23 +78,15 @@ input, textarea {
   --ring: hsl(250, 50%, 50%);
   --radius: 1rem;
   
-  /* Bright Vibrant Card Colors */
-  --card-lime: hsl(75, 85%, 65%);        /* Bright lime yellow */
-  --card-lime-bg: hsl(75, 85%, 65%);     /* Lime background */
+  /* Pastel Card Colors from Reference */
+  --card-cream: hsl(0, 0%, 15%);         /* Dark text on cream */
+  --card-cream-bg: hsl(55, 70%, 88%);    /* Light cream background */
   --card-white: hsl(0, 0%, 15%);         /* Dark text on white */
   --card-white-bg: hsl(0, 0%, 100%);     /* White background */
-  --card-emerald: hsl(0, 0%, 100%);      /* White text on emerald */
-  --card-emerald-bg: hsl(150, 85%, 45%); /* Bright emerald background */
-  --card-royal-blue: hsl(0, 0%, 100%);   /* White text on blue */
-  --card-royal-blue-bg: hsl(230, 85%, 55%); /* Royal blue background */
-  --card-coral: hsl(0, 0%, 100%);        /* White text on coral */
-  --card-coral-bg: hsl(15, 85%, 60%);    /* Bright coral background */
-  --card-purple: hsl(0, 0%, 100%);       /* White text on purple */
-  --card-purple-bg: hsl(270, 80%, 60%);  /* Bright purple background */
-  --card-teal: hsl(0, 0%, 100%);         /* White text on teal */
-  --card-teal-bg: hsl(180, 75%, 45%);    /* Bright teal background */
-  --card-magenta: hsl(0, 0%, 100%);      /* White text on magenta */
-  --card-magenta-bg: hsl(320, 85%, 60%); /* Bright magenta background */
+  --card-mint: hsl(0, 0%, 15%);          /* Dark text on mint */
+  --card-mint-bg: hsl(150, 30%, 88%);    /* Light mint background */
+  --card-peach: hsl(0, 0%, 15%);         /* Dark text on peach */
+  --card-peach-bg: hsl(25, 60%, 88%);    /* Light peach background */
   
   /* Professional Primary Colors */
   --primary-blue: hsl(210, 20%, 55%);
@@ -189,38 +181,18 @@ input, textarea {
   .bg-primary-pink { background-color: var(--primary-pink); }
   .border-primary-pink { border-color: var(--primary-pink); }
   
-  /* Bright Vibrant Card Utility Classes */
-  .bg-card-lime { background-color: var(--card-lime-bg) !important; }
-  .text-card-lime { color: var(--card-lime) !important; }
-  .border-card-lime { border-color: var(--card-lime); }
+  /* Pastel Card Utility Classes */
+  .bg-card-cream { background-color: var(--card-cream-bg) !important; }
+  .text-card-cream { color: var(--card-cream) !important; }
   
   .bg-card-white { background-color: var(--card-white-bg) !important; }
   .text-card-white { color: var(--card-white) !important; }
-  .border-card-white { border-color: var(--card-white); }
   
-  .bg-card-emerald { background-color: var(--card-emerald-bg) !important; }
-  .text-card-emerald { color: var(--card-emerald) !important; }
-  .border-card-emerald { border-color: var(--card-emerald); }
+  .bg-card-mint { background-color: var(--card-mint-bg) !important; }
+  .text-card-mint { color: var(--card-mint) !important; }
   
-  .bg-card-royal-blue { background-color: var(--card-royal-blue-bg) !important; }
-  .text-card-royal-blue { color: var(--card-royal-blue) !important; }
-  .border-card-royal-blue { border-color: var(--card-royal-blue); }
-  
-  .bg-card-coral { background-color: var(--card-coral-bg) !important; }
-  .text-card-coral { color: var(--card-coral) !important; }
-  .border-card-coral { border-color: var(--card-coral); }
-  
-  .bg-card-purple { background-color: var(--card-purple-bg) !important; }
-  .text-card-purple { color: var(--card-purple) !important; }
-  .border-card-purple { border-color: var(--card-purple); }
-  
-  .bg-card-teal { background-color: var(--card-teal-bg) !important; }
-  .text-card-teal { color: var(--card-teal) !important; }
-  .border-card-teal { border-color: var(--card-teal); }
-  
-  .bg-card-magenta { background-color: var(--card-magenta-bg) !important; }
-  .text-card-magenta { color: var(--card-magenta) !important; }
-  .border-card-magenta { border-color: var(--card-magenta); }
+  .bg-card-peach { background-color: var(--card-peach-bg) !important; }
+  .text-card-peach { color: var(--card-peach) !important; }
   
   /* Accent Colors */
   .text-accent-blue { color: var(--accent-blue); }
@@ -267,6 +239,8 @@ input, textarea {
   /* Card Styles */
   .card-shadow {
     box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    border: 4px solid #000000 !important;
+    border-radius: 16px !important;
   }
   
   .card-shadow-lg {

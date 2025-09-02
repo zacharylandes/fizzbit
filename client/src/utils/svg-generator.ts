@@ -11,190 +11,166 @@ export function generateAbstractSVG(prompt: string, width: number = 300, height:
   // Use only the prompt for deterministic generation (no timestamp/random for stability)
   const seed = hashString(prompt);
   
-  // Use provided color or generate a random hue
+  // Use provided color or generate a muted hue
   const hue = color !== null ? color : (seed % 360);
   
-  // Generate parameters for modern geometric design
-  const numElements = (seed % 3) + 1; // 1-3 elements for clean modern look
-  const style = seed % 12; // 12 different modern geometric styles
+  // Generate parameters for clean, simple design
+  const style = seed % 8; // 8 different simple styles
   
   let content = "";
   
-  // Generate modern geometric elements
-  for (let i = 0; i < numElements; i++) {
-    const elementSeed = seed + (i * 347); // Prime number for better distribution
-    const x = (elementSeed % (width - 120)) + 60; // Keep shapes centered
-    const y = ((elementSeed >> 4) % (height - 80)) + 40;
-    const size = ((elementSeed >> 8) % 50) + 30; // Modern sized elements
-    
-    // Create different modern geometric elements
-    switch(style % 12) {
-      case 0: // Modern geometric squares
-        content += `
-          <g>
-            <rect x="${x - size/2}" y="${y - size/2}" width="${size}" height="${size}" 
-              fill="hsl(${hue},70%,60%)" rx="8" opacity="0.9">
-            </rect>
-            <rect x="${x - size/4}" y="${y - size/4}" width="${size/2}" height="${size/2}" 
-              fill="hsl(${(hue + 60) % 360},70%,70%)" rx="4" opacity="0.8">
-            </rect>
-          </g>`;
-        break;
-        
-      case 1: // Overlapping circles
-        content += `
-          <g>
-            <circle cx="${x - 15}" cy="${y}" r="${size * 0.4}" 
-              fill="hsl(${hue},80%,65%)" opacity="0.8">
-            </circle>
-            <circle cx="${x + 15}" cy="${y}" r="${size * 0.4}" 
-              fill="hsl(${(hue + 120) % 360},80%,65%)" opacity="0.8">
-            </circle>
-            <circle cx="${x}" cy="${y - 20}" r="${size * 0.3}" 
-              fill="hsl(${(hue + 240) % 360},80%,65%)" opacity="0.8">
-            </circle>
-          </g>`;
-        break;
-        
-      case 2: // Modern triangular composition
-        content += `
-          <g>
-            <polygon points="${x},${y - size/2} ${x - size/2},${y + size/2} ${x + size/2},${y + size/2}" 
-              fill="hsl(${hue},75%,60%)" opacity="0.9">
-            </polygon>
-            <polygon points="${x},${y - size/4} ${x - size/4},${y + size/4} ${x + size/4},${y + size/4}" 
-              fill="hsl(${(hue + 180) % 360},75%,70%)" opacity="0.8">
-            </polygon>
-          </g>`;
-        break;
-        
-      case 3: // Abstract flowing shapes
-        const curve1X = x + (elementSeed % 40) - 20;
-        const curve1Y = y + ((elementSeed >> 6) % 40) - 20;
-        const curve2X = x + ((elementSeed >> 12) % 40) - 20;
-        const curve2Y = y + ((elementSeed >> 18) % 40) - 20;
-        content += `
-          <g>
-            <path d="M${x - size/2} ${y} Q${curve1X} ${curve1Y} ${x + size/2} ${y} Q${curve2X} ${curve2Y} ${x - size/2} ${y}" 
-              fill="hsl(${hue},70%,65%)" opacity="0.85">
-            </path>
-          </g>`;
-        break;
-        
-      case 4: // Geometric grid pattern
-        content += `
-          <g>
-            <rect x="${x - size/2}" y="${y - size/2}" width="${size/3}" height="${size/3}" 
-              fill="hsl(${hue},80%,60%)" opacity="0.9">
-            </rect>
-            <rect x="${x - size/6}" y="${y - size/2}" width="${size/3}" height="${size/3}" 
-              fill="hsl(${(hue + 60) % 360},80%,60%)" opacity="0.9">
-            </rect>
-            <rect x="${x + size/6}" y="${y - size/2}" width="${size/3}" height="${size/3}" 
-              fill="hsl(${(hue + 120) % 360},80%,60%)" opacity="0.9">
-            </rect>
-            <rect x="${x - size/2}" y="${y - size/6}" width="${size/3}" height="${size/3}" 
-              fill="hsl(${(hue + 180) % 360},80%,60%)" opacity="0.9">
-            </rect>
-            <rect x="${x + size/6}" y="${y - size/6}" width="${size/3}" height="${size/3}" 
-              fill="hsl(${(hue + 240) % 360},80%,60%)" opacity="0.9">
-            </rect>
-          </g>`;
-        break;
-        
-      case 5: // Modern hexagon cluster
-        content += `
-          <g>
-            <polygon points="${generateHexagonPoints(x, y, size * 0.4)}" 
-              fill="hsl(${hue},75%,65%)" opacity="0.9">
-            </polygon>
-            <polygon points="${generateHexagonPoints(x - 25, y + 15, size * 0.3)}" 
-              fill="hsl(${(hue + 60) % 360},75%,65%)" opacity="0.8">
-            </polygon>
-            <polygon points="${generateHexagonPoints(x + 25, y + 15, size * 0.3)}" 
-              fill="hsl(${(hue + 120) % 360},75%,65%)" opacity="0.8">
-            </polygon>
-          </g>`;
-        break;
-        
-      case 6: // Abstract wave forms
-        content += `
-          <g>
-            <path d="M${x - size/2} ${y} Q${x - size/4} ${y - size/3} ${x} ${y} Q${x + size/4} ${y + size/3} ${x + size/2} ${y}" 
-              fill="none" stroke="hsl(${hue},80%,60%)" stroke-width="12" stroke-linecap="round" opacity="0.9">
-            </path>
-            <path d="M${x - size/2} ${y + 20} Q${x - size/4} ${y - size/3 + 20} ${x} ${y + 20} Q${x + size/4} ${y + size/3 + 20} ${x + size/2} ${y + 20}" 
-              fill="none" stroke="hsl(${(hue + 180) % 360},80%,60%)" stroke-width="8" stroke-linecap="round" opacity="0.7">
-            </path>
-          </g>`;
-        break;
-        
-      case 7: // Modern diamond pattern
-        content += `
-          <g>
-            <polygon points="${x},${y - size/2} ${x + size/2},${y} ${x},${y + size/2} ${x - size/2},${y}" 
-              fill="hsl(${hue},75%,60%)" opacity="0.9">
-            </polygon>
-            <polygon points="${x},${y - size/4} ${x + size/4},${y} ${x},${y + size/4} ${x - size/4},${y}" 
-              fill="hsl(${(hue + 120) % 360},75%,70%)" opacity="0.8">
-            </polygon>
-          </g>`;
-        break;
-        
-      case 8: // Circular segments
-        content += `
-          <g>
-            <path d="M${x} ${y - size/2} A${size/2} ${size/2} 0 0 1 ${x + size/2} ${y} Z" 
-              fill="hsl(${hue},80%,65%)" opacity="0.9">
-            </path>
-            <path d="M${x + size/2} ${y} A${size/2} ${size/2} 0 0 1 ${x} ${y + size/2} Z" 
-              fill="hsl(${(hue + 90) % 360},80%,65%)" opacity="0.9">
-            </path>
-            <path d="M${x} ${y + size/2} A${size/2} ${size/2} 0 0 1 ${x - size/2} ${y} Z" 
-              fill="hsl(${(hue + 180) % 360},80%,65%)" opacity="0.9">
-            </path>
-          </g>`;
-        break;
-        
-      case 9: // Modern abstract blob
-        content += `
-          <g>
-            <ellipse cx="${x}" cy="${y}" rx="${size * 0.6}" ry="${size * 0.4}" 
-              fill="hsl(${hue},75%,65%)" opacity="0.85" transform="rotate(${elementSeed % 360} ${x} ${y})">
-            </ellipse>
-            <circle cx="${x + 15}" cy="${y - 15}" r="${size * 0.2}" 
-              fill="hsl(${(hue + 60) % 360},80%,70%)" opacity="0.9">
-            </circle>
-          </g>`;
-        break;
-        
-      case 10: // Geometric mountains
-        content += `
-          <g>
-            <polygon points="${x - size/2},${y + size/3} ${x - size/4},${y - size/3} ${x},${y} ${x + size/4},${y - size/2} ${x + size/2},${y + size/3}" 
-              fill="hsl(${hue},70%,60%)" opacity="0.9">
-            </polygon>
-            <polygon points="${x - size/3},${y + size/3} ${x - size/6},${y - size/6} ${x + size/6},${y + size/6} ${x + size/3},${y + size/3}" 
-              fill="hsl(${(hue + 120) % 360},70%,65%)" opacity="0.8">
-            </polygon>
-          </g>`;
-        break;
-        
-      case 11: // Modern spiral forms
-        content += `
-          <g>
-            <circle cx="${x}" cy="${y}" r="${size * 0.4}" 
-              fill="none" stroke="hsl(${hue},80%,60%)" stroke-width="8" opacity="0.9">
-            </circle>
-            <circle cx="${x}" cy="${y}" r="${size * 0.25}" 
-              fill="none" stroke="hsl(${(hue + 120) % 360},80%,60%)" stroke-width="6" opacity="0.8">
-            </circle>
-            <circle cx="${x}" cy="${y}" r="${size * 0.1}" 
-              fill="hsl(${(hue + 240) % 360},80%,70%)" opacity="0.9">
-            </circle>
-          </g>`;
-        break;
-    }
+  // Create simple, clean illustrations matching the reference style
+  const x = width / 2;
+  const y = height / 2;
+  
+  switch(style % 8) {
+    case 0: // Simple card/rectangle mockup
+      content += `
+        <g>
+          <rect x="${x - 60}" y="${y - 30}" width="120" height="60" 
+            fill="none" stroke="hsl(${hue},40%,50%)" stroke-width="2" rx="8" opacity="0.6">
+          </rect>
+          <rect x="${x - 50}" y="${y - 20}" width="30" height="4" 
+            fill="hsl(${hue},40%,50%)" rx="2" opacity="0.4">
+          </rect>
+          <rect x="${x - 50}" y="${y - 10}" width="60" height="4" 
+            fill="hsl(${hue},40%,50%)" rx="2" opacity="0.3">
+          </rect>
+          <rect x="${x - 50}" y="${y}" width="40" height="4" 
+            fill="hsl(${hue},40%,50%)" rx="2" opacity="0.3">
+          </rect>
+        </g>`;
+      break;
+      
+    case 1: // Simple chart/graph
+      content += `
+        <g>
+          <rect x="${x - 15}" y="${y + 10}" width="8" height="30" 
+            fill="hsl(${hue},50%,60%)" rx="2" opacity="0.7">
+          </rect>
+          <rect x="${x - 3}" y="${y - 10}" width="8" height="50" 
+            fill="hsl(${(hue + 60) % 360},50%,60%)" rx="2" opacity="0.7">
+          </rect>
+          <rect x="${x + 9}" y="${y}" width="8" height="40" 
+            fill="hsl(${(hue + 120) % 360},50%,60%)" rx="2" opacity="0.7">
+          </rect>
+          <line x1="${x - 40}" y1="${y + 45}" x2="${x + 40}" y2="${y + 45}" 
+            stroke="hsl(${hue},30%,50%)" stroke-width="2" opacity="0.4"/>
+          <line x1="${x - 40}" y1="${y + 45}" x2="${x - 40}" y2="${y - 30}" 
+            stroke="hsl(${hue},30%,50%)" stroke-width="2" opacity="0.4"/>
+        </g>`;
+      break;
+      
+    case 2: // Simple circle with dot (like progress indicator)
+      content += `
+        <g>
+          <circle cx="${x}" cy="${y}" r="40" 
+            fill="none" stroke="hsl(${hue},50%,60%)" stroke-width="6" opacity="0.3">
+          </circle>
+          <circle cx="${x}" cy="${y}" r="40" 
+            fill="none" stroke="hsl(${hue},60%,50%)" stroke-width="6" stroke-dasharray="40 200" opacity="0.7">
+          </circle>
+          <circle cx="${x}" cy="${y}" r="8" 
+            fill="hsl(${(hue + 180) % 360},70%,60%)" opacity="0.8">
+          </circle>
+        </g>`;
+      break;
+      
+    case 3: // Simple list items
+      content += `
+        <g>
+          <circle cx="${x - 50}" cy="${y - 20}" r="4" 
+            fill="hsl(${hue},60%,50%)" opacity="0.6">
+          </circle>
+          <rect x="${x - 40}" y="${y - 22}" width="60" height="4" 
+            fill="hsl(${hue},40%,50%)" rx="2" opacity="0.4">
+          </rect>
+          
+          <circle cx="${x - 50}" cy="${y}" r="4" 
+            fill="hsl(${(hue + 60) % 360},60%,50%)" opacity="0.6">
+          </circle>
+          <rect x="${x - 40}" y="${y - 2}" width="50" height="4" 
+            fill="hsl(${hue},40%,50%)" rx="2" opacity="0.4">
+          </rect>
+          
+          <circle cx="${x - 50}" cy="${y + 20}" r="4" 
+            fill="hsl(${(hue + 120) % 360},60%,50%)" opacity="0.6">
+          </circle>
+          <rect x="${x - 40}" y="${y + 18}" width="40" height="4" 
+            fill="hsl(${hue},40%,50%)" rx="2" opacity="0.4">
+          </rect>
+        </g>`;
+      break;
+      
+    case 4: // Simple device/screen mockup
+      content += `
+        <g>
+          <rect x="${x - 40}" y="${y - 25}" width="80" height="50" 
+            fill="none" stroke="hsl(${hue},40%,50%)" stroke-width="3" rx="8" opacity="0.6">
+          </rect>
+          <rect x="${x - 30}" y="${y - 15}" width="60" height="3" 
+            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.5">
+          </rect>
+          <rect x="${x - 30}" y="${y - 8}" width="25" height="3" 
+            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.4">
+          </rect>
+          <rect x="${x - 30}" y="${y - 1}" width="35" height="3" 
+            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.4">
+          </rect>
+          <circle cx="${x + 20}" cy="${y + 10}" r="8" 
+            fill="hsl(${(hue + 120) % 360},60%,60%)" opacity="0.5">
+          </circle>
+        </g>`;
+      break;
+      
+    case 5: // Simple geometric shape with line
+      content += `
+        <g>
+          <rect x="${x - 25}" y="${y - 25}" width="50" height="50" 
+            fill="hsl(${hue},50%,60%)" rx="8" opacity="0.3">
+          </rect>
+          <line x1="${x - 40}" y1="${y + 40}" x2="${x + 40}" y2="${y - 40}" 
+            stroke="hsl(${(hue + 180) % 360},60%,50%)" stroke-width="3" opacity="0.6"/>
+          <circle cx="${x + 30}" cy="${y - 30}" r="6" 
+            fill="hsl(${(hue + 60) % 360},70%,60%)" opacity="0.7">
+          </circle>
+        </g>`;
+      break;
+      
+    case 6: // Simple document/page mockup
+      content += `
+        <g>
+          <rect x="${x - 35}" y="${y - 30}" width="70" height="60" 
+            fill="none" stroke="hsl(${hue},40%,50%)" stroke-width="2" rx="4" opacity="0.6">
+          </rect>
+          <rect x="${x - 25}" y="${y - 20}" width="50" height="3" 
+            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.5">
+          </rect>
+          <rect x="${x - 25}" y="${y - 12}" width="40" height="3" 
+            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.4">
+          </rect>
+          <rect x="${x - 25}" y="${y - 4}" width="35" height="3" 
+            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.4">
+          </rect>
+          <rect x="${x - 25}" y="${y + 8}" width="45" height="3" 
+            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.4">
+          </rect>
+        </g>`;
+      break;
+      
+    case 7: // Simple arrow or pointer
+      content += `
+        <g>
+          <circle cx="${x - 20}" cy="${y}" r="15" 
+            fill="hsl(${hue},60%,60%)" opacity="0.4">
+          </circle>
+          <polygon points="${x + 10},${y - 15} ${x + 30},${y} ${x + 10},${y + 15}" 
+            fill="hsl(${(hue + 120) % 360},60%,50%)" opacity="0.6">
+          </polygon>
+          <line x1="${x - 5}" y1="${y}" x2="${x + 15}" y2="${y}" 
+            stroke="hsl(${hue},50%,50%)" stroke-width="3" opacity="0.5"/>
+        </g>`;
+      break;
   }
   
   return `
