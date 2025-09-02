@@ -123,26 +123,26 @@ export default function Layout({ children }: LayoutProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-card-plum flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <div className="w-16 h-16 mx-auto mb-4 border-4 border-card-plum border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-card-plum">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className="min-h-screen bg-card-soft-coral text-foreground flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Header */}
-      <div className="border-b border-border bg-background shadow-sm">
+      <div className="border-b-2 border-card-plum/30 bg-card-plum shadow-sm">
         <div className="max-w-7xl mx-auto px-6 pt-4 pb-2">
           <div className="flex items-center justify-between">
             {/* FizzBit Brand */}
             <Link href="/">
               <div className="flex items-center space-x-2 cursor-pointer hover-lift transition-all duration-300 p-1 rounded-lg hover:bg-accent/10">
                 <img src={spiralLogoImage} alt="FizzBit Logo" className="h-20 w-20 object-contain" />
-                <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
+                <h1 className="text-xl font-bold text-card-plum" style={{ fontFamily: 'Crimson Text, serif' }}>
                   FizzBit
                 </h1>
               </div>
@@ -153,7 +153,7 @@ export default function Layout({ children }: LayoutProps) {
               <a href="/api/logout">
                 <Button
                   size="sm"
-                  className="bg-card-purple-gray-bg border-card-purple-gray/40 hover:bg-card-purple-gray-bg/90 hover-lift text-card-purple-gray transition-all duration-300 px-4 py-2 card-shadow font-medium"
+                  className="bg-card-terracotta border-2 border-card-terracotta/20 hover:bg-card-terracotta/90 hover-lift text-card-terracotta transition-all duration-300 px-4 py-2 button-shadow font-medium"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
@@ -163,7 +163,7 @@ export default function Layout({ children }: LayoutProps) {
               <a href="/api/login">
                 <Button
                   size="sm"
-                  className="bg-card-blue-gray-bg border-card-blue-gray/40 hover:bg-card-blue-gray-bg/90 hover-lift text-card-blue-gray transition-all duration-300 px-4 py-2 card-shadow font-medium"
+                  className="bg-card-soft-coral border-2 border-card-soft-coral/20 hover:bg-card-soft-coral/90 hover-lift text-card-soft-coral transition-all duration-300 px-4 py-2 button-shadow font-medium"
                 >
                   <LogIn className="h-4 w-4 mr-2" />
                   Login
@@ -181,7 +181,7 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Footer Navigation */}
       {isAuthenticated && (
-        <div className={`fixed bottom-0 left-0 right-0 border-t border-border bg-background transition-transform duration-300 z-50 ${
+        <div className={`fixed bottom-0 left-0 right-0 border-t-2 border-card-muted-gold/30 bg-card-muted-gold transition-transform duration-300 z-50 ${
           showFooter && !isKeyboardOpen ? 'translate-y-0' : 'translate-y-full'
         }`}>
           <div className="max-w-7xl mx-auto px-6 py-4">
@@ -197,14 +197,14 @@ export default function Layout({ children }: LayoutProps) {
                       size="sm"
                       className={`flex flex-col items-center space-y-1 p-3 h-auto transition-all duration-300 relative rounded-lg ${
                         isActive
-                          ? "bg-card-sage-bg border border-card-sage/30 card-shadow font-semibold"
-                          : "hover:text-card-sage hover:bg-card-sage-bg hover-lift font-medium"
+                          ? "bg-card-terracotta border-2 border-card-terracotta/30 button-shadow font-semibold"
+                          : "hover:text-card-terracotta hover:bg-card-terracotta/20 hover-lift font-medium"
                       }`}
                     >
-                      <Icon className="h-5 w-5 text-card-sage" />
-                      <span className="text-xs font-medium text-card-sage">{item.label}</span>
+                      <Icon className="h-5 w-5 text-card-muted-gold" />
+                      <span className="text-xs font-medium text-card-muted-gold">{item.label}</span>
                       {item.badge && item.badge > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-card-sage-bg border border-card-sage/40 text-card-sage text-xs rounded-full h-5 w-5 flex items-center justify-center card-shadow">
+                        <span className="absolute -top-1 -right-1 bg-card-terracotta border-2 border-card-terracotta/40 text-card-muted-gold text-xs rounded-full h-5 w-5 flex items-center justify-center button-shadow">
                           {item.badge}
                         </span>
                       )}

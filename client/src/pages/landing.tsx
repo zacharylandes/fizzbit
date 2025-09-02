@@ -56,7 +56,7 @@ export default function LandingPage() {
       {/* Features Section */}
       <div className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-card-peach bg-card-peach-bg/30 px-4 py-2 rounded-lg border-2 border-card-peach/40 container-shadow" style={{ fontFamily: 'Crimson Text, serif' }}>
             Enhance Your Creativity
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto" style={{ fontFamily: 'Inter, sans-serif' }}>

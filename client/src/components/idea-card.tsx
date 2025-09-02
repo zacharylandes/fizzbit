@@ -12,7 +12,6 @@ interface IdeaCardProps {
 }
 
 const cardStyles = [
-  "bg-card-white card-shadow hover-lift", 
   "bg-card-mint card-shadow hover-lift",
   "bg-card-peach card-shadow hover-lift",
   "bg-card-maroon card-shadow hover-lift",
@@ -29,7 +28,6 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
   const cardStyle = cardStyles[colorIndex % cardStyles.length];
 
   const accentColors = [
-    "text-card-white", 
     "text-card-mint",
     "text-card-peach",
     "text-card-maroon",
@@ -43,7 +41,6 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
   
   // Corresponding colors for soft illustrations
   const strokeColors = [
-    "#374151", // Dark gray for white cards
     "#059669", // Subtle green for mint
     "#DC2626", // Subtle red for peach
     "#72313E", // Dark maroon
@@ -57,7 +54,6 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
   
   // Hue values for soft SVG generation
   const hueValues = [
-    0,    // neutral for white
     150,  // mint green
     15,   // warm orange
     334,  // maroon
@@ -180,7 +176,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
             <ArrowUp className="w-3 h-3 mr-1" />
             Explore
           </div>
-          <div className="flex items-center text-xs text-card-sage bg-white/60 border border-border px-2 py-1 rounded-lg hover:bg-white/80 transition-all duration-300">
+          <div className="flex items-center text-xs text-card-mint bg-card-mint-bg/60 border-2 border-card-mint/30 px-2 py-1 rounded-lg hover:bg-card-mint-bg/80 transition-all duration-300 button-shadow">
             <ArrowRight className="w-3 h-3 mr-1" />
             Save
           </div>
