@@ -12,15 +12,15 @@ interface IdeaCardProps {
 }
 
 const cardStyles = [
-  "bg-card-mint card-shadow hover-lift",
-  "bg-card-peach card-shadow hover-lift",
-  "bg-card-maroon card-shadow hover-lift",
-  "bg-card-blue card-shadow hover-lift",
-  "bg-card-coral card-shadow hover-lift",
-  "bg-card-soft-coral card-shadow hover-lift",
-  "bg-card-muted-gold card-shadow hover-lift",
-  "bg-card-terracotta card-shadow hover-lift",
-  "bg-card-plum card-shadow hover-lift"
+  "bg-card-mint card-shadow hover-lift border border-gray-200",
+  "bg-card-peach card-shadow hover-lift border border-gray-200",
+  "bg-card-blue card-shadow hover-lift border border-gray-200",
+  "bg-card-coral card-shadow hover-lift border border-gray-200",
+  "bg-card-soft-coral card-shadow hover-lift border border-gray-200",
+  "bg-card-muted-gold card-shadow hover-lift border border-gray-200",
+  "bg-card-terracotta card-shadow hover-lift border border-gray-200",
+  "bg-card-plum card-shadow hover-lift border border-gray-200",
+  "bg-card-green card-shadow hover-lift border border-gray-200"
 ];
 
 export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDirection, showSwipeEffects }: IdeaCardProps) {
@@ -30,39 +30,39 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
   const accentColors = [
     "text-card-mint",
     "text-card-peach",
-    "text-card-maroon",
     "text-card-blue",
     "text-card-coral",
     "text-card-soft-coral",
     "text-card-muted-gold",
     "text-card-terracotta",
-    "text-card-plum"
+    "text-card-plum",
+    "text-card-green"
   ];
   
-  // Corresponding colors for soft illustrations
+  // Corresponding colors for professional illustrations
   const strokeColors = [
-    "#059669", // Subtle green for mint
-    "#DC2626", // Subtle red for peach
-    "#72313E", // Dark maroon
-    "#3587A4", // Blue
-    "#CE5B3B", // Coral red
-    "#FF8A80", // Soft coral
-    "#E6C068", // Muted gold
-    "#E07A5F", // Light terracotta
-    "#C39BD3"  // Gentle plum
+    "#6B7280", // Subtle gray-green for mint
+    "#6B7280", // Subtle gray for peach
+    "#6B7280", // Subtle gray for blue
+    "#6B7280", // Subtle gray for coral
+    "#6B7280", // Subtle gray for soft coral
+    "#6B7280", // Subtle gray for muted gold
+    "#6B7280", // Subtle gray for terracotta
+    "#6B7280", // Subtle gray for plum
+    "#6B7280"  // Subtle gray for green
   ];
   
-  // Hue values for soft SVG generation
+  // Hue values for professional SVG generation
   const hueValues = [
     150,  // mint green
     15,   // warm orange
-    334,  // maroon
     196,  // blue
     13,   // coral
     4,    // soft coral
     49,   // muted gold
-    13,   // terracotta
-    282   // gentle plum
+    20,   // terracotta
+    282,  // gentle plum
+    140   // green
   ];
   
   const accentColor = accentColors[colorIndex % accentColors.length];
@@ -176,7 +176,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
             <ArrowUp className="w-3 h-3 mr-1" />
             Explore
           </div>
-          <div className="flex items-center text-xs text-card-mint bg-card-mint-bg/60 border-2 border-card-mint/30 px-2 py-1 rounded-lg hover:bg-card-mint-bg/80 transition-all duration-300 button-shadow">
+          <div className="flex items-center text-xs text-gray-600 bg-gray-100 border border-gray-200 px-2 py-1 rounded hover:bg-gray-200 transition-all duration-300">
             <ArrowRight className="w-3 h-3 mr-1" />
             Save
           </div>

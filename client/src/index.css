@@ -78,27 +78,25 @@ input, textarea {
   --ring: hsl(250, 50%, 50%);
   --radius: 1rem;
   
-  /* Beautiful Soft Card Colors */
-  --card-white: hsl(0, 0%, 15%);         /* Dark text on white */
-  --card-white-bg: hsl(0, 0%, 100%);     /* White background */
-  --card-mint: hsl(0, 0%, 15%);          /* Dark text on mint */
-  --card-mint-bg: hsl(150, 30%, 88%);    /* Light mint background */
-  --card-peach: hsl(0, 0%, 15%);         /* Dark text on peach */
-  --card-peach-bg: hsl(25, 60%, 88%);    /* Light peach background */
-  --card-maroon: hsl(0, 0%, 100%);       /* White text on maroon */
-  --card-maroon-bg: hsl(334, 40%, 32%);  /* Dark maroon background */
-  --card-blue: hsl(0, 0%, 100%);         /* White text on blue */
-  --card-blue-bg: hsl(196, 51%, 43%);    /* Blue background */
-  --card-coral: hsl(0, 0%, 100%);        /* White text on coral */
-  --card-coral-bg: hsl(13, 60%, 52%);    /* Coral red background */
-  --card-soft-coral: hsl(0, 0%, 15%);    /* Dark text on soft coral */
-  --card-soft-coral-bg: hsl(4, 100%, 75%); /* Soft coral #FF8A80 */
-  --card-muted-gold: hsl(0, 0%, 15%);    /* Dark text on muted gold */
-  --card-muted-gold-bg: hsl(49, 63%, 66%); /* Muted gold #E6C068 */
-  --card-terracotta: hsl(0, 0%, 100%);   /* White text on terracotta */
-  --card-terracotta-bg: hsl(13, 70%, 62%); /* Light terracotta #E07A5F */
-  --card-plum: hsl(0, 0%, 15%);          /* Dark text on plum */
-  --card-plum-bg: hsl(282, 39%, 74%);    /* Gentle plum #C39BD3 */
+  /* Professional Soft Card Colors - Matching Reference */
+  --card-mint: hsl(0, 0%, 40%);           /* Dark gray text */
+  --card-mint-bg: hsl(170, 15%, 92%);     /* Very subtle mint */
+  --card-peach: hsl(0, 0%, 40%);          /* Dark gray text */
+  --card-peach-bg: hsl(25, 25%, 92%);     /* Very subtle peach */
+  --card-blue: hsl(0, 0%, 40%);           /* Dark gray text */
+  --card-blue-bg: hsl(200, 20%, 92%);     /* Very subtle blue */
+  --card-coral: hsl(0, 0%, 40%);          /* Dark gray text */
+  --card-coral-bg: hsl(15, 25%, 92%);     /* Very subtle coral */
+  --card-soft-coral: hsl(0, 0%, 40%);     /* Dark gray text */
+  --card-soft-coral-bg: hsl(5, 20%, 93%); /* Very subtle soft coral */
+  --card-muted-gold: hsl(0, 0%, 40%);     /* Dark gray text */
+  --card-muted-gold-bg: hsl(45, 20%, 92%); /* Very subtle gold */
+  --card-terracotta: hsl(0, 0%, 40%);     /* Dark gray text */
+  --card-terracotta-bg: hsl(20, 20%, 92%); /* Very subtle terracotta */
+  --card-plum: hsl(0, 0%, 40%);           /* Dark gray text */
+  --card-plum-bg: hsl(280, 15%, 92%);     /* Very subtle plum */
+  --card-green: hsl(0, 0%, 40%);          /* Dark gray text */
+  --card-green-bg: hsl(140, 20%, 92%);    /* Very subtle green */
   
   /* Professional Primary Colors */
   --primary-blue: hsl(210, 20%, 55%);
@@ -193,18 +191,12 @@ input, textarea {
   .bg-primary-pink { background-color: var(--primary-pink); }
   .border-primary-pink { border-color: var(--primary-pink); }
   
-  /* Beautiful Soft Card Utility Classes */
-  .bg-card-white { background-color: var(--card-white-bg) !important; }
-  .text-card-white { color: var(--card-white) !important; }
-  
+  /* Professional Soft Card Utility Classes */
   .bg-card-mint { background-color: var(--card-mint-bg) !important; }
   .text-card-mint { color: var(--card-mint) !important; }
   
   .bg-card-peach { background-color: var(--card-peach-bg) !important; }
   .text-card-peach { color: var(--card-peach) !important; }
-  
-  .bg-card-maroon { background-color: var(--card-maroon-bg) !important; }
-  .text-card-maroon { color: var(--card-maroon) !important; }
   
   .bg-card-blue { background-color: var(--card-blue-bg) !important; }
   .text-card-blue { color: var(--card-blue) !important; }
@@ -223,6 +215,9 @@ input, textarea {
   
   .bg-card-plum { background-color: var(--card-plum-bg) !important; }
   .text-card-plum { color: var(--card-plum) !important; }
+  
+  .bg-card-green { background-color: var(--card-green-bg) !important; }
+  .text-card-green { color: var(--card-green) !important; }
   
   /* Accent Colors */
   .text-accent-blue { color: var(--accent-blue); }
