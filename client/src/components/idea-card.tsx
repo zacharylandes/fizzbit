@@ -1,8 +1,7 @@
 import { type Idea } from "@shared/schema";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 import { generateAbstractSVG } from "@/utils/svg-generator";
-import Lottie from 'lottie-react';
-import { useState, useEffect } from 'react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 // Import Lottie animation files as URLs
 import skateLottieUrl from '@assets/Orange skating_1756786094430.lottie?url';
@@ -31,39 +30,13 @@ const cardStyles = [
   "bg-card-taupe card-shadow hover-lift border border-gray-200"
 ];
 
-// Component to load and display Lottie animations
+// Component to display DotLottie animations
 function LottieAnimation({ url, className }: { url: string; className?: string }) {
-  const [animationData, setAnimationData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        setAnimationData(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Failed to load Lottie animation:', err);
-        setError(true);
-        setLoading(false);
-      });
-  }, [url]);
-
-  if (loading) {
-    return <div className={`${className} flex items-center justify-center bg-gray-100 rounded animate-pulse`}>Loading...</div>;
-  }
-
-  if (error || !animationData) {
-    return <div className={`${className} flex items-center justify-center bg-gray-100 rounded`}>Animation not available</div>;
-  }
-
   return (
-    <Lottie
-      animationData={animationData}
-      loop={true}
-      autoplay={true}
+    <DotLottieReact
+      src={url}
+      loop
+      autoplay
       className={className}
     />
   );
