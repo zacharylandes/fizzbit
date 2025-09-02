@@ -96,6 +96,12 @@ input, textarea {
   --card-taupe: hsl(0, 0%, 40%);          /* Dark gray text */
   --card-taupe-bg: hsl(30, 25%, 93%);     /* Soft Taupe #EFEAE7 */
   
+  /* Custom header/footer and button colors */
+  --header-footer: hsl(0, 0%, 40%);       /* Dark gray text */
+  --header-footer-bg: hsl(207, 50%, 94%); /* Light Blue #E7EFF8 */
+  --button-custom: hsl(0, 0%, 40%);       /* Dark gray text */
+  --button-custom-bg: hsl(24, 43%, 94%);  /* Cream #F7EEE8 */
+  
   /* Professional Primary Colors */
   --primary-blue: hsl(210, 20%, 55%);
   --primary-purple: hsl(270, 30%, 55%);
@@ -213,6 +219,12 @@ input, textarea {
   
   .bg-card-taupe { background-color: var(--card-taupe-bg) !important; }
   .text-card-taupe { color: var(--card-taupe) !important; }
+  
+  /* Custom header/footer and button utility classes */
+  .bg-header-footer { background-color: var(--header-footer-bg) !important; }
+  .text-header-footer { color: var(--header-footer) !important; }
+  .bg-button-custom { background-color: var(--button-custom-bg) !important; }
+  .text-button-custom { color: var(--button-custom) !important; }
   
   /* Accent Colors */
   .text-accent-blue { color: var(--accent-blue); }
