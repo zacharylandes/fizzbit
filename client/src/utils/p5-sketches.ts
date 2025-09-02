@@ -187,8 +187,57 @@ export function createWomanHikingSketch(seed: number): string {
     </svg>`;
 }
 
+export function createRocketSketch(seed: number): string {
+  const centerX = 150;
+  const centerY = 75;
+  
+  return `
+    <svg width="300" height="150" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+      <rect width="300" height="150" fill="#f0f8ff"/>
+      
+      <!-- Animated rocket container -->
+      <g class="rocket-animation">
+        <!-- Rocket body -->
+        ${processingSvgLine(centerX - 15, centerY - 20, centerX - 15, centerY + 25, seed, 0)}
+        ${processingSvgLine(centerX + 15, centerY - 20, centerX + 15, centerY + 25, seed, 10)}
+        ${processingSvgLine(centerX - 15, centerY + 25, centerX + 15, centerY + 25, seed, 20)}
+        
+        <!-- Rocket nose cone -->
+        ${processingSvgLine(centerX - 15, centerY - 20, centerX, centerY - 35, seed, 100)}
+        ${processingSvgLine(centerX, centerY - 35, centerX + 15, centerY - 20, seed, 110)}
+        
+        <!-- Rocket fins -->
+        ${processingSvgLine(centerX - 15, centerY + 15, centerX - 25, centerY + 30, seed, 200)}
+        ${processingSvgLine(centerX - 25, centerY + 30, centerX - 15, centerY + 25, seed, 210)}
+        ${processingSvgLine(centerX + 15, centerY + 15, centerX + 25, centerY + 30, seed, 220)}
+        ${processingSvgLine(centerX + 25, centerY + 30, centerX + 15, centerY + 25, seed, 230)}
+        
+        <!-- Friendly rocket window -->
+        ${processingSvgCircle(centerX, centerY - 5, 12, seed, 300)}
+        
+        <!-- Happy rocket face -->
+        <circle cx="${centerX - 4 + handDrawnOffset(seed, 40, 0.5)}" cy="${centerY - 8 + handDrawnOffset(seed, 41, 0.5)}" r="2" fill="#000"/>
+        <circle cx="${centerX + 4 + handDrawnOffset(seed, 42, 0.5)}" cy="${centerY - 8 + handDrawnOffset(seed, 43, 0.5)}" r="2" fill="#000"/>
+        <path d="M ${centerX - 5 + handDrawnOffset(seed, 44, 1)} ${centerY - 2 + handDrawnOffset(seed, 45, 1)} Q ${centerX} ${centerY + 2} ${centerX + 5 + handDrawnOffset(seed, 46, 1)} ${centerY - 2 + handDrawnOffset(seed, 47, 1)}" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+        
+        <!-- Rocket shading -->
+        <line x1="${centerX - 10}" y1="${centerY - 15}" x2="${centerX - 10}" y2="${centerY + 20}" stroke="#666" stroke-width="2" opacity="0.3"/>
+        <line x1="${centerX + 10}" y1="${centerY - 15}" x2="${centerX + 10}" y2="${centerY + 20}" stroke="#666" stroke-width="2" opacity="0.3"/>
+        
+        <!-- Flame/exhaust -->
+        <path d="M ${centerX - 8} ${centerY + 25} Q ${centerX - 12} ${centerY + 35} ${centerX - 6} ${centerY + 40} Q ${centerX} ${centerY + 45} ${centerX + 6} ${centerY + 40} Q ${centerX + 12} ${centerY + 35} ${centerX + 8} ${centerY + 25}" fill="#ff6b35" stroke="#000" stroke-width="3" opacity="0.8"/>
+        
+        <!-- Stars in background -->
+        <circle cx="${centerX - 60 + handDrawnOffset(seed, 60, 5)}" cy="${centerY - 40 + handDrawnOffset(seed, 61, 5)}" r="1.5" fill="#000" opacity="0.4"/>
+        <circle cx="${centerX + 70 + handDrawnOffset(seed, 62, 5)}" cy="${centerY - 30 + handDrawnOffset(seed, 63, 5)}" r="1" fill="#000" opacity="0.4"/>
+        <circle cx="${centerX - 80 + handDrawnOffset(seed, 64, 5)}" cy="${centerY + 10 + handDrawnOffset(seed, 65, 5)}" r="1.2" fill="#000" opacity="0.4"/>
+        <circle cx="${centerX + 90 + handDrawnOffset(seed, 66, 5)}" cy="${centerY + 20 + handDrawnOffset(seed, 67, 5)}" r="0.8" fill="#000" opacity="0.4"/>
+      </g>
+    </svg>`;
+}
+
 // Function to generate Processing-style SVG illustrations
-export function generateProcessingIllustration(type: 'reading' | 'skateboard' | 'hiking', prompt: string): string {
+export function generateProcessingIllustration(type: 'reading' | 'skateboard' | 'hiking' | 'rocket', prompt: string): string {
   const seed = hashString(prompt);
   
   switch (type) {
@@ -198,6 +247,8 @@ export function generateProcessingIllustration(type: 'reading' | 'skateboard' | 
       return createKidSkateboardSketch(seed);
     case 'hiking':
       return createWomanHikingSketch(seed);
+    case 'rocket':
+      return createRocketSketch(seed);
     default:
       return createPersonReadingSketch(seed);
   }

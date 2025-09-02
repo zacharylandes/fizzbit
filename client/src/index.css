@@ -685,3 +685,27 @@ input, textarea {
     }
   }
 }
+
+/* Rocket animation */
+.rocket-animation {
+  animation: rocket-fly 4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes rocket-fly {
+  0% {
+    transform: translateX(-50px) translateY(5px) rotate(-5deg);
+  }
+  25% {
+    transform: translateX(0px) translateY(-2px) rotate(0deg);
+  }
+  50% {
+    transform: translateX(50px) translateY(5px) rotate(5deg);
+  }
+  75% {
+    transform: translateX(0px) translateY(8px) rotate(0deg);
+  }
+  100% {
+    transform: translateX(-50px) translateY(5px) rotate(-5deg);
+  }
+}

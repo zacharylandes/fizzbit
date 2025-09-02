@@ -28,6 +28,9 @@ function getIllustrationForIdea(idea: Idea, hue: number): string {
   const content = (idea.sourceContent || idea.title || '').toLowerCase();
   const prompt = (idea.sourceContent || idea.title) + idea.id;
   
+  // FOR TESTING: Show rocket on every card to test animation
+  return generateProcessingIllustration('rocket', prompt);
+  
   // Create a hash-based rotation so we see variety of new illustrations
   const hash = idea.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const illustrationType = hash % 4; // 0-3 range
