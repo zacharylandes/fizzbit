@@ -133,16 +133,16 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-card-soft-coral text-foreground flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className="min-h-screen bg-white text-foreground flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Header */}
-      <div className="border-b-2 border-card-plum/30 bg-card-plum shadow-sm">
+      <div className="border-b-2 border-card-muted-gold/30 bg-card-muted-gold shadow-sm">
         <div className="max-w-7xl mx-auto px-6 pt-4 pb-2">
           <div className="flex items-center justify-between">
             {/* FizzBit Brand */}
             <Link href="/">
               <div className="flex items-center space-x-2 cursor-pointer hover-lift transition-all duration-300 p-1 rounded-lg hover:bg-accent/10">
                 <img src={spiralLogoImage} alt="FizzBit Logo" className="h-20 w-20 object-contain" />
-                <h1 className="text-xl font-bold text-card-plum" style={{ fontFamily: 'Crimson Text, serif' }}>
+                <h1 className="text-xl font-bold text-card-muted-gold" style={{ fontFamily: 'Crimson Text, serif' }}>
                   FizzBit
                 </h1>
               </div>
