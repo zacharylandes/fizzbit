@@ -28,28 +28,50 @@ function getIllustrationForIdea(idea: Idea, hue: number): string {
   const content = (idea.sourceContent || idea.title || '').toLowerCase();
   const prompt = (idea.sourceContent || idea.title) + idea.id;
   
-  // Check for reading-related keywords
+  // Create a hash-based rotation so we see variety of new illustrations
+  const hash = idea.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const illustrationType = hash % 4; // 0-3 range
+  
+  // Check for reading-related keywords (books, learning, education, writing)
   if (content.includes('read') || content.includes('book') || content.includes('glasses') || 
       content.includes('study') || content.includes('library') || content.includes('literature') ||
-      content.includes('novel') || content.includes('chapter')) {
+      content.includes('novel') || content.includes('chapter') || content.includes('learn') ||
+      content.includes('education') || content.includes('write') || content.includes('story') ||
+      content.includes('author') || content.includes('script') || content.includes('text') ||
+      illustrationType === 0) {
     return generateProcessingIllustration('reading', prompt);
   }
   
-  // Check for skateboarding/kid activity keywords
+  // Check for skateboarding/youthful energy keywords  
   if (content.includes('skateboard') || content.includes('skate') || content.includes('kid') ||
       content.includes('child') || content.includes('playground') || content.includes('youth') ||
-      content.includes('fun') || content.includes('exciting') || content.includes('ride')) {
+      content.includes('fun') || content.includes('exciting') || content.includes('ride') ||
+      content.includes('energy') || content.includes('play') || content.includes('game') ||
+      content.includes('sport') || content.includes('active') || content.includes('movement') ||
+      illustrationType === 1) {
     return generateProcessingIllustration('skateboard', prompt);
   }
   
-  // Check for hiking/outdoor activity keywords
+  // Check for hiking/journey/adventure keywords
   if (content.includes('hik') || content.includes('mountain') || content.includes('trail') ||
       content.includes('outdoor') || content.includes('climb') || content.includes('nature') ||
-      content.includes('adventure') || content.includes('explore') || content.includes('backpack')) {
+      content.includes('adventure') || content.includes('explore') || content.includes('backpack') ||
+      content.includes('journey') || content.includes('path') || content.includes('walk') ||
+      content.includes('travel') || content.includes('discover') || content.includes('quest') ||
+      content.includes('goal') || content.includes('challenge') || content.includes('progress') ||
+      illustrationType === 2) {
     return generateProcessingIllustration('hiking', prompt);
   }
   
-  // Default to the regular abstract SVG
+  // Show Processing illustrations 75% of the time for variety
+  if (illustrationType === 3) {
+    const subType = hash % 3;
+    if (subType === 0) return generateProcessingIllustration('reading', prompt);
+    if (subType === 1) return generateProcessingIllustration('skateboard', prompt);
+    return generateProcessingIllustration('hiking', prompt);
+  }
+  
+  // Use original abstract SVG only 25% of the time now
   return generateAbstractSVG(prompt, 400, 128, hue);
 }
 
