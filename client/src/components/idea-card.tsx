@@ -9,7 +9,7 @@ import ufoLottieUrl from '@assets/Ridiculous UFO_1756786094438.lottie?url';
 import dividerLottieUrl from '@assets/Squiggly Divider Line_1756786094439.lottie?url';
 import wavesLottieUrl from '@assets/wavess_1756786094441.lottie?url';
 import rocketLottieUrl from '@assets/Rocket in space_1756786094442.lottie?url';
-import devilLottieUrl from '@assets/devil.json?url';
+import devildoneLottieUrl from '@assets/devildone.json?url';
 
 interface IdeaCardProps {
   idea: Idea;
@@ -65,7 +65,7 @@ function getLottieAnimationForIdea(idea: Idea): string {
     return wavesLottieUrl;
   }
   if (content.includes('devil') || content.includes('demon') || content.includes('evil')) {
-    return devilLottieUrl;
+    return devildoneLottieUrl;
   }
   
   // For all other cards, use hash-based rotation to ensure variety
@@ -82,7 +82,7 @@ function getLottieAnimationForIdea(idea: Idea): string {
       return dividerLottieUrl;
     case 5:
     default:
-      return devilLottieUrl;
+      return devildoneLottieUrl;
   }
 }
 
