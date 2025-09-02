@@ -46,49 +46,38 @@ function LottieAnimation({ url, className }: { url: string; className?: string }
 function getLottieAnimationForIdea(idea: Idea): string {
   const content = (idea.sourceContent || idea.title || '').toLowerCase();
   
-  // Create a hash-based rotation for variety
+  // Create a hash-based rotation for variety - this ensures each card gets a different animation
   const hash = idea.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const animationType = hash % 5; // 0-4 range for 5 animations
+  const baseAnimation = hash % 5; // 0-4 range for 5 animations
   
-  // Check for skateboarding/movement/sports keywords
-  if (content.includes('skateboard') || content.includes('skate') || content.includes('kid') ||
-      content.includes('child') || content.includes('playground') || content.includes('youth') ||
-      content.includes('fun') || content.includes('exciting') || content.includes('ride') ||
-      content.includes('energy') || content.includes('play') || content.includes('game') ||
-      content.includes('sport') || content.includes('active') || content.includes('movement') ||
-      animationType === 0) {
+  // Strong keyword matching can override the hash (but only for very specific matches)
+  if (content.includes('skateboard') || content.includes('skate')) {
     return skateLottieUrl;
   }
-  
-  // Check for space/rocket/technology keywords
-  if (content.includes('rocket') || content.includes('space') || content.includes('launch') ||
-      content.includes('technology') || content.includes('innovation') || content.includes('future') ||
-      content.includes('sci-fi') || content.includes('astronaut') || content.includes('galaxy') ||
-      content.includes('universe') || content.includes('exploration') ||
-      animationType === 1) {
+  if (content.includes('rocket') || content.includes('space') || content.includes('astronaut')) {
     return rocketLottieUrl;
   }
-  
-  // Check for UFO/alien/mysterious/weird keywords
-  if (content.includes('ufo') || content.includes('alien') || content.includes('mysterious') ||
-      content.includes('weird') || content.includes('strange') || content.includes('unusual') ||
-      content.includes('flying') || content.includes('magical') || content.includes('fantasy') ||
-      content.includes('surreal') || content.includes('bizarre') ||
-      animationType === 2) {
+  if (content.includes('ufo') || content.includes('alien')) {
     return ufoLottieUrl;
   }
-  
-  // Check for water/nature/flowing/organic keywords
-  if (content.includes('water') || content.includes('wave') || content.includes('ocean') ||
-      content.includes('sea') || content.includes('nature') || content.includes('flow') ||
-      content.includes('organic') || content.includes('natural') || content.includes('beach') ||
-      content.includes('surf') || content.includes('liquid') || content.includes('fluid') ||
-      animationType === 3) {
+  if (content.includes('water') || content.includes('wave') || content.includes('ocean')) {
     return wavesLottieUrl;
   }
   
-  // Default to divider line for everything else
-  return dividerLottieUrl;
+  // For all other cards, use hash-based rotation to ensure variety
+  switch (baseAnimation) {
+    case 0:
+      return skateLottieUrl;
+    case 1:
+      return rocketLottieUrl;
+    case 2:
+      return ufoLottieUrl;
+    case 3:
+      return wavesLottieUrl;
+    case 4:
+    default:
+      return dividerLottieUrl;
+  }
 }
 
 export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDirection, showSwipeEffects }: IdeaCardProps) {
