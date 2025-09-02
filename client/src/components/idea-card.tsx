@@ -108,42 +108,21 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
           </div>
         </div>
         
-        {/* Title (only show if not empty) */}
-        {idea.title && idea.title.trim().length > 0 ? (
+        {/* Only render cards with valid titles */}
+        {idea.title && idea.title.trim().length > 0 && (
           <div className="flex flex-col items-center justify-start h-full pt-8">
             <h3 className="text-2xl font-black text-center leading-tight mb-6 text-black" style={{ fontFamily: 'Inter, sans-serif', fontWeight: '900' }}>
               {idea.title}
             </h3>
             
-            {/* SVG Drawing below text */}
-            {idea.svg && (
-              <div className="flex justify-center w-full">
-                <div 
-                  className="w-full h-32"
-                  dangerouslySetInnerHTML={{ 
-                    __html: idea.svg === "PROCEDURAL" 
-                      ? generateAbstractSVG((idea.sourceContent || idea.title) + idea.id, 400, 128, hue)
-                      : idea.svg
-                          .replace(/stroke="black"/gi, `stroke="${strokeColor}"`)
-                          .replace(/stroke='black'/gi, `stroke='${strokeColor}'`)
-                          .replace(/stroke:black/gi, `stroke:${strokeColor}`)
-                          .replace(/stroke="#000000"/gi, `stroke="${strokeColor}"`)
-                          .replace(/stroke='#000000'/gi, `stroke='${strokeColor}'`)
-                          .replace(/stroke="#000"/gi, `stroke="${strokeColor}"`)
-                          .replace(/stroke='#000'/gi, `stroke='${strokeColor}'`)
-                          .replace(/stroke:\s*black/gi, `stroke:${strokeColor}`)
-                          .replace(/stroke:\s*#000000/gi, `stroke:${strokeColor}`)
-                          .replace(/stroke:\s*#000/gi, `stroke:${strokeColor}`)
-                  }}
-                />
-              </div>
-            )}
-          </div>
-) : (
-          // Card with no title and no SVG
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center text-xs text-black opacity-60">
-              Visual Inspiration
+            {/* People Illustration below text */}
+            <div className="flex justify-center w-full">
+              <div 
+                className="w-full h-32"
+                dangerouslySetInnerHTML={{ 
+                  __html: generateAbstractSVG((idea.sourceContent || idea.title) + idea.id, 400, 128, hue)
+                }}
+              />
             </div>
           </div>
         )}
