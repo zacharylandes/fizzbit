@@ -1187,6 +1187,7 @@ export default function SavedPage() {
                   const isBeingInteracted = swipeState.ideaId === idea.id;
                   const isDeleting = isBeingInteracted && swipeState.isDeleting;
                   const isDragging = isBeingInteracted && swipeState.isDragging;
+                  // Calculate natural drag offset that follows finger smoothly
                   const swipeOffsetX = isBeingInteracted && !swipeState.isVerticalDrag ? swipeState.currentX - swipeState.startX : 0;
                   const swipeOffsetY = isBeingInteracted && swipeState.isVerticalDrag ? swipeState.currentY - swipeState.startY : 0;
                   
@@ -1227,7 +1228,7 @@ export default function SavedPage() {
                       key={`${idea.id}-${colorIndex}`}
                       className="relative"
                       style={{
-                        transform: `translate(${swipeOffsetX}px, ${swipeOffsetY + reorderOffsetY}px)`,
+                        transform: `translate(${swipeOffsetX}px, ${swipeOffsetY + (isBeingInteracted ? 0 : reorderOffsetY)}px)`,
                         transition: isDragging && isBeingInteracted ? 'none' : 'transform 0.2s ease-out, opacity 0.1s ease',
                         zIndex: isBeingInteracted ? 10 : 1,
                         opacity: isDeleting ? 0 : 1,
