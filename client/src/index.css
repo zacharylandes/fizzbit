@@ -9,7 +9,7 @@ html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  background-color: hsl(220, 15%, 8%);
+  background-color: hsl(0, 0%, 98%);
   overscroll-behavior: none;
 }
 
@@ -56,46 +56,45 @@ input, textarea {
 }
 
 :root {
-  /* Modern Dark Professional Theme */
-  --background: hsl(220, 15%, 8%);    /* Dark background */
-  --foreground: hsl(0, 0%, 95%);      /* Light text */
-  --muted: hsl(220, 10%, 15%);        /* Dark muted */
-  --muted-foreground: hsl(0, 0%, 65%); /* Light muted text */
-  --popover: hsl(220, 12%, 12%);      /* Dark popover */
-  --popover-foreground: hsl(0, 0%, 95%);
-  --card: hsl(220, 12%, 12%);         /* Dark cards */
-  --card-foreground: hsl(0, 0%, 95%);
-  --border: hsl(220, 10%, 22%);       /* Dark borders */
-  --input: hsl(220, 10%, 18%);        /* Dark inputs */
-  --primary: hsl(250, 80%, 60%);      /* Modern purple primary */
+  /* Bright Modern Vibrant Theme */
+  --background: hsl(0, 0%, 98%);      /* Clean white background */
+  --foreground: hsl(0, 0%, 15%);      /* Dark text */
+  --muted: hsl(0, 0%, 94%);           /* Light muted */
+  --muted-foreground: hsl(0, 0%, 40%); /* Medium gray text */
+  --popover: hsl(0, 0%, 100%);        /* White popover */
+  --popover-foreground: hsl(0, 0%, 15%);
+  --card: hsl(0, 0%, 100%);           /* White cards */
+  --card-foreground: hsl(0, 0%, 15%);
+  --border: hsl(0, 0%, 88%);          /* Light borders */
+  --input: hsl(0, 0%, 96%);           /* Light inputs */
+  --primary: hsl(250, 80%, 60%);      /* Purple primary */
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(220, 10%, 18%);    /* Dark secondary */
-  --secondary-foreground: hsl(0, 0%, 85%);
-  --accent: hsl(220, 15%, 20%);       /* Dark accent */
-  --accent-foreground: hsl(0, 0%, 90%);
+  --secondary: hsl(0, 0%, 96%);       /* Light secondary */
+  --secondary-foreground: hsl(0, 0%, 25%);
+  --accent: hsl(0, 0%, 94%);          /* Light accent */
+  --accent-foreground: hsl(0, 0%, 20%);
   --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(250, 50%, 50%);
-  --radius: 0.75rem;
+  --radius: 1rem;
   
-  /* Modern Dark Theme Card Colors */
-  --card-sage: hsl(85, 50%, 60%);        /* Bright sage for dark theme */
-  --card-sage-bg: hsl(85, 40%, 15%);     /* Dark sage background */
-  --card-blue-gray: hsl(210, 60%, 65%);  /* Bright blue-gray */
-  --card-blue-gray-bg: hsl(210, 35%, 16%); /* Dark blue-gray background */
-  --card-cream: hsl(45, 60%, 70%);       /* Warm cream */
-  --card-cream-text: hsl(45, 60%, 70%);  /* Same color for text in dark theme */
-  --card-cream-bg: hsl(45, 35%, 14%);    /* Dark cream background */
-  --card-light-blue: hsl(200, 70%, 65%); /* Bright light blue */
-  --card-light-blue-bg: hsl(200, 40%, 16%); /* Dark blue background */
-  --card-purple-gray: hsl(270, 60%, 70%); /* Bright purple-gray */
-  --card-purple-gray-bg: hsl(270, 35%, 15%); /* Dark purple background */
-  --card-lavender: hsl(280, 60%, 70%);   /* Bright lavender */
-  --card-lavender-bg: hsl(280, 40%, 16%); /* Dark lavender background */
-  --card-peach: hsl(15, 70%, 65%);       /* Bright peach */
-  --card-peach-bg: hsl(15, 40%, 15%);    /* Dark peach background */
-  --card-mint: hsl(160, 60%, 60%);       /* Bright mint green */
-  --card-mint-bg: hsl(160, 40%, 15%);    /* Dark mint background */
+  /* Bright Vibrant Card Colors */
+  --card-lime: hsl(75, 85%, 65%);        /* Bright lime yellow */
+  --card-lime-bg: hsl(75, 85%, 65%);     /* Lime background */
+  --card-white: hsl(0, 0%, 15%);         /* Dark text on white */
+  --card-white-bg: hsl(0, 0%, 100%);     /* White background */
+  --card-emerald: hsl(0, 0%, 100%);      /* White text on emerald */
+  --card-emerald-bg: hsl(150, 85%, 45%); /* Bright emerald background */
+  --card-royal-blue: hsl(0, 0%, 100%);   /* White text on blue */
+  --card-royal-blue-bg: hsl(230, 85%, 55%); /* Royal blue background */
+  --card-coral: hsl(0, 0%, 100%);        /* White text on coral */
+  --card-coral-bg: hsl(15, 85%, 60%);    /* Bright coral background */
+  --card-purple: hsl(0, 0%, 100%);       /* White text on purple */
+  --card-purple-bg: hsl(270, 80%, 60%);  /* Bright purple background */
+  --card-teal: hsl(0, 0%, 100%);         /* White text on teal */
+  --card-teal-bg: hsl(180, 75%, 45%);    /* Bright teal background */
+  --card-magenta: hsl(0, 0%, 100%);      /* White text on magenta */
+  --card-magenta-bg: hsl(320, 85%, 60%); /* Bright magenta background */
   
   /* Professional Primary Colors */
   --primary-blue: hsl(210, 20%, 55%);
@@ -190,38 +189,38 @@ input, textarea {
   .bg-primary-pink { background-color: var(--primary-pink); }
   .border-primary-pink { border-color: var(--primary-pink); }
   
-  /* Dark Theme Card Utility Classes */
-  .bg-card-sage { background-color: var(--card-sage-bg) !important; }
-  .text-card-sage { color: var(--card-sage) !important; }
-  .border-card-sage { border-color: var(--card-sage); }
+  /* Bright Vibrant Card Utility Classes */
+  .bg-card-lime { background-color: var(--card-lime-bg) !important; }
+  .text-card-lime { color: var(--card-lime) !important; }
+  .border-card-lime { border-color: var(--card-lime); }
   
-  .bg-card-blue-gray { background-color: var(--card-blue-gray-bg) !important; }
-  .text-card-blue-gray { color: var(--card-blue-gray) !important; }
-  .border-card-blue-gray { border-color: var(--card-blue-gray); }
+  .bg-card-white { background-color: var(--card-white-bg) !important; }
+  .text-card-white { color: var(--card-white) !important; }
+  .border-card-white { border-color: var(--card-white); }
   
-  .bg-card-cream { background-color: var(--card-cream-bg) !important; }
-  .text-card-cream { color: var(--card-cream) !important; }
-  .border-card-cream { border-color: var(--card-cream); }
+  .bg-card-emerald { background-color: var(--card-emerald-bg) !important; }
+  .text-card-emerald { color: var(--card-emerald) !important; }
+  .border-card-emerald { border-color: var(--card-emerald); }
   
-  .bg-card-light-blue { background-color: var(--card-light-blue-bg) !important; }
-  .text-card-light-blue { color: var(--card-light-blue) !important; }
-  .border-card-light-blue { border-color: var(--card-light-blue); }
+  .bg-card-royal-blue { background-color: var(--card-royal-blue-bg) !important; }
+  .text-card-royal-blue { color: var(--card-royal-blue) !important; }
+  .border-card-royal-blue { border-color: var(--card-royal-blue); }
   
-  .bg-card-purple-gray { background-color: var(--card-purple-gray-bg) !important; }
-  .text-card-purple-gray { color: var(--card-purple-gray) !important; }
-  .border-card-purple-gray { border-color: var(--card-purple-gray); }
+  .bg-card-coral { background-color: var(--card-coral-bg) !important; }
+  .text-card-coral { color: var(--card-coral) !important; }
+  .border-card-coral { border-color: var(--card-coral); }
   
-  .bg-card-lavender { background-color: var(--card-lavender-bg) !important; }
-  .text-card-lavender { color: var(--card-lavender) !important; }
-  .border-card-lavender { border-color: var(--card-lavender); }
+  .bg-card-purple { background-color: var(--card-purple-bg) !important; }
+  .text-card-purple { color: var(--card-purple) !important; }
+  .border-card-purple { border-color: var(--card-purple); }
   
-  .bg-card-peach { background-color: var(--card-peach-bg) !important; }
-  .text-card-peach { color: var(--card-peach) !important; }
-  .border-card-peach { border-color: var(--card-peach); }
+  .bg-card-teal { background-color: var(--card-teal-bg) !important; }
+  .text-card-teal { color: var(--card-teal) !important; }
+  .border-card-teal { border-color: var(--card-teal); }
   
-  .bg-card-mint { background-color: var(--card-mint-bg) !important; }
-  .text-card-mint { color: var(--card-mint) !important; }
-  .border-card-mint { border-color: var(--card-mint); }
+  .bg-card-magenta { background-color: var(--card-magenta-bg) !important; }
+  .text-card-magenta { color: var(--card-magenta) !important; }
+  .border-card-magenta { border-color: var(--card-magenta); }
   
   /* Accent Colors */
   .text-accent-blue { color: var(--accent-blue); }

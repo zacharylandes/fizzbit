@@ -12,11 +12,14 @@ interface IdeaCardProps {
 }
 
 const cardStyles = [
-  "bg-card-sage border-card-sage/40 card-shadow hover-lift",
-  "bg-card-blue-gray border-card-blue-gray/40 card-shadow hover-lift", 
-  "bg-card-cream border-card-cream/40 card-shadow hover-lift",
-  "bg-card-light-blue border-card-light-blue/40 card-shadow hover-lift",
-  "bg-card-purple-gray border-card-purple-gray/40 card-shadow hover-lift"
+  "bg-card-lime border-none card-shadow hover-lift",
+  "bg-card-white border border-gray-200 card-shadow hover-lift", 
+  "bg-card-emerald border-none card-shadow hover-lift",
+  "bg-card-royal-blue border-none card-shadow hover-lift",
+  "bg-card-coral border-none card-shadow hover-lift",
+  "bg-card-purple border-none card-shadow hover-lift",
+  "bg-card-teal border-none card-shadow hover-lift",
+  "bg-card-magenta border-none card-shadow hover-lift"
 ];
 
 export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDirection, showSwipeEffects }: IdeaCardProps) {
@@ -24,29 +27,38 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
   const cardStyle = cardStyles[colorIndex % cardStyles.length];
 
   const accentColors = [
-    "text-card-sage",
-    "text-card-blue-gray", 
-    "text-card-cream",
-    "text-card-light-blue",
-    "text-card-purple-gray"
+    "text-card-lime",
+    "text-card-white", 
+    "text-card-emerald",
+    "text-card-royal-blue",
+    "text-card-coral",
+    "text-card-purple",
+    "text-card-teal",
+    "text-card-magenta"
   ];
   
-  // Corresponding hex colors for SVG stroke (converted from HSL values in CSS)
+  // Corresponding colors for modern geometric illustrations
   const strokeColors = [
-    "#6B7C3E", // hsl(85, 35%, 45%) - sage
-    "#3F4A66", // hsl(210, 30%, 40%) - blue-gray  
-    "#8B6914", // hsl(35, 60%, 30%) - brown for cream
-    "#4080A6", // hsl(200, 45%, 50%) - light blue
-    "#554059"  // hsl(270, 25%, 35%) - purple-gray
+    "#A3C639", // Bright lime
+    "#333333", // Dark for white cards
+    "#22C55E", // Bright emerald
+    "#3B82F6", // Royal blue
+    "#F97316", // Bright coral
+    "#A855F7", // Bright purple
+    "#06B6D4", // Bright teal
+    "#EC4899"  // Bright magenta
   ];
   
-  // Hue values for procedural SVG generation (extracted from HSL values above)
+  // Hue values for modern geometric SVG generation
   const hueValues = [
-    85,   // sage green
-    210,  // blue-gray
-    35,   // cream/brown
-    200,  // light blue
-    270   // purple-gray
+    75,   // lime
+    0,    // neutral for white
+    150,  // emerald
+    230,  // royal blue
+    15,   // coral
+    270,  // purple
+    180,  // teal
+    320   // magenta
   ];
   
   const accentColor = accentColors[colorIndex % accentColors.length];
@@ -98,7 +110,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
         {/* Title (only show if not empty) */}
         {idea.title && idea.title.trim().length > 0 ? (
           <div className="flex flex-col items-center justify-start h-full pt-8">
-            <h3 className={`text-lg font-bold text-center leading-relaxed mb-6 ${accentColor}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+            <h3 className={`text-xl font-bold text-center leading-tight mb-6 ${accentColor}`} style={{ fontFamily: 'Inter, sans-serif', fontWeight: '800' }}>
               {idea.title}
             </h3>
             
