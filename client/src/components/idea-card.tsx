@@ -15,7 +15,10 @@ const cardStyles = [
   "bg-card-cream card-shadow hover-lift",
   "bg-card-white card-shadow hover-lift", 
   "bg-card-mint card-shadow hover-lift",
-  "bg-card-peach card-shadow hover-lift"
+  "bg-card-peach card-shadow hover-lift",
+  "bg-card-maroon card-shadow hover-lift",
+  "bg-card-blue card-shadow hover-lift",
+  "bg-card-coral card-shadow hover-lift"
 ];
 
 export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDirection, showSwipeEffects }: IdeaCardProps) {
@@ -26,23 +29,32 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
     "text-card-cream",
     "text-card-white", 
     "text-card-mint",
-    "text-card-peach"
+    "text-card-peach",
+    "text-card-maroon",
+    "text-card-blue",
+    "text-card-coral"
   ];
   
-  // Corresponding colors for subtle illustrations
+  // Corresponding colors for colorful illustrations
   const strokeColors = [
     "#8B7355", // Warm brown for cream
     "#374151", // Dark gray for white cards
     "#059669", // Subtle green for mint
-    "#DC2626"  // Subtle red for peach
+    "#DC2626", // Subtle red for peach
+    "#72313E", // Dark maroon
+    "#3587A4", // Blue
+    "#CE5B3B"  // Coral red
   ];
   
-  // Hue values for subtle SVG generation
+  // Hue values for colorful SVG generation
   const hueValues = [
     45,   // warm brown
     0,    // neutral for white
     150,  // mint green
-    15    // warm orange
+    15,   // warm orange
+    334,  // maroon
+    196,  // blue
+    13    // coral
   ];
   
   const accentColor = accentColors[colorIndex % accentColors.length];
