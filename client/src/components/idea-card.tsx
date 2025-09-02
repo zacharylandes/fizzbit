@@ -111,7 +111,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
         {/* Title (only show if not empty) */}
         {idea.title && idea.title.trim().length > 0 ? (
           <div className="flex flex-col items-center justify-start h-full pt-8">
-            <h3 className={`text-2xl font-black text-center leading-tight mb-6 ${accentColor}`} style={{ fontFamily: 'Inter, sans-serif', fontWeight: '900' }}>
+            <h3 className="text-2xl font-black text-center leading-tight mb-6 text-black" style={{ fontFamily: 'Inter, sans-serif', fontWeight: '900' }}>
               {idea.title}
             </h3>
             
@@ -139,22 +139,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
               </div>
             )}
           </div>
-        ) : idea.svg ? (
-          // Pure visual card with SVG only
-          <div className="flex items-center justify-center h-full">
-            <div 
-              className="w-full h-48"
-              dangerouslySetInnerHTML={{ 
-                __html: idea.svg === "PROCEDURAL" 
-                  ? generateAbstractSVG((idea.sourceContent || "abstract visual") + idea.id, 400, 192, hue)
-                  : idea.svg
-                      .replace(/stroke="black"/g, `stroke="${strokeColor}"`)
-                      .replace(/stroke='black'/g, `stroke='${strokeColor}'`)
-                      .replace(/stroke:black/g, `stroke:${strokeColor}`)
-              }}
-            />
-          </div>
-        ) : (
+) : (
           // Card with no title and no SVG
           <div className="flex items-center justify-center h-full">
             <div className="text-center text-xs text-black opacity-60">
@@ -169,7 +154,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
             <ArrowLeft className="w-3 h-3 mr-1" />
             Dismiss
           </div>
-          <div className={`flex items-center text-xs bg-black/5 px-2 py-1 rounded-lg transition-all duration-300 ${accentColor}`}>
+          <div className="flex items-center text-xs bg-black/5 px-2 py-1 rounded-lg transition-all duration-300 text-black">
             <ArrowUp className="w-3 h-3 mr-1" />
             Explore
           </div>

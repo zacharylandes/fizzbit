@@ -14,208 +14,163 @@ export function generateAbstractSVG(prompt: string, width: number = 300, height:
   // Use provided color or generate a muted hue
   const hue = color !== null ? color : (seed % 360);
   
-  // Generate parameters for clean, simple design
-  const style = seed % 8; // 8 different simple styles
+  // Generate parameters for people illustrations
+  const style = seed % 6; // 6 different people activity styles
   
   let content = "";
   
-  // Create simple, clean illustrations matching the reference style
+  // Create people illustrations like the reference examples
   const x = width / 2;
   const y = height / 2;
+  const strokeColor = "#333";
+  const strokeWidth = "2";
   
-  switch(style % 8) {
-    case 0: // Simple card/rectangle mockup
+  switch(style % 6) {
+    case 0: // Person reading/studying 
       content += `
         <g>
-          <rect x="${x - 60}" y="${y - 30}" width="120" height="60" 
-            fill="none" stroke="hsl(${hue},40%,50%)" stroke-width="2" rx="8" opacity="0.6">
-          </rect>
-          <rect x="${x - 50}" y="${y - 20}" width="30" height="4" 
-            fill="hsl(${hue},40%,50%)" rx="2" opacity="0.4">
-          </rect>
-          <rect x="${x - 50}" y="${y - 10}" width="60" height="4" 
-            fill="hsl(${hue},40%,50%)" rx="2" opacity="0.3">
-          </rect>
-          <rect x="${x - 50}" y="${y}" width="40" height="4" 
-            fill="hsl(${hue},40%,50%)" rx="2" opacity="0.3">
-          </rect>
+          <!-- Person sitting with book -->
+          <circle cx="${x - 20}" cy="${y - 40}" r="8" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <!-- Smiling face -->
+          <circle cx="${x - 22}" cy="${y - 43}" r="1" fill="${strokeColor}"/>
+          <circle cx="${x - 18}" cy="${y - 43}" r="1" fill="${strokeColor}"/>
+          <path d="M ${x - 23} ${y - 38} Q ${x - 20} ${y - 35} ${x - 17} ${y - 38}" fill="none" stroke="${strokeColor}" stroke-width="1"/>
+          <!-- Body -->
+          <rect x="${x - 25}" y="${y - 32}" width="10" height="20" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}" rx="2"/>
+          <!-- Arms holding book -->
+          <line x1="${x - 25}" y1="${y - 25}" x2="${x - 35}" y2="${y - 20}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <line x1="${x - 15}" y1="${y - 25}" x2="${x - 5}" y2="${y - 20}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <!-- Book -->
+          <rect x="${x - 30}" y="${y - 25}" width="20" height="15" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}" rx="2"/>
+          <line x1="${x - 20}" y1="${y - 25}" x2="${x - 20}" y2="${y - 10}" stroke="${strokeColor}" stroke-width="1"/>
+          <!-- Legs -->
+          <line x1="${x - 22}" y1="${y - 12}" x2="${x - 22}" y2="${y + 5}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <line x1="${x - 18}" y1="${y - 12}" x2="${x - 18}" y2="${y + 5}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
         </g>`;
       break;
       
-    case 1: // Simple chart/graph
+    case 1: // Person with clock (time management)
       content += `
         <g>
-          <rect x="${x - 15}" y="${y + 10}" width="8" height="30" 
-            fill="hsl(${hue},50%,60%)" rx="2" opacity="0.7">
-          </rect>
-          <rect x="${x - 3}" y="${y - 10}" width="8" height="50" 
-            fill="hsl(${(hue + 60) % 360},50%,60%)" rx="2" opacity="0.7">
-          </rect>
-          <rect x="${x + 9}" y="${y}" width="8" height="40" 
-            fill="hsl(${(hue + 120) % 360},50%,60%)" rx="2" opacity="0.7">
-          </rect>
-          <line x1="${x - 40}" y1="${y + 45}" x2="${x + 40}" y2="${y + 45}" 
-            stroke="hsl(${hue},30%,50%)" stroke-width="2" opacity="0.4"/>
-          <line x1="${x - 40}" y1="${y + 45}" x2="${x - 40}" y2="${y - 30}" 
-            stroke="hsl(${hue},30%,50%)" stroke-width="2" opacity="0.4"/>
+          <!-- Large clock -->
+          <circle cx="${x}" cy="${y - 5}" r="35" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <line x1="${x}" y1="${y - 35}" x2="${x}" y2="${y - 30}" stroke="${strokeColor}" stroke-width="2"/>
+          <line x1="${x + 30}" y1="${y - 5}" x2="${x + 25}" y2="${y - 5}" stroke="${strokeColor}" stroke-width="2"/>
+          <line x1="${x}" y1="${y + 25}" x2="${x}" y2="${y + 20}" stroke="${strokeColor}" stroke-width="2"/>
+          <line x1="${x - 30}" y1="${y - 5}" x2="${x - 25}" y2="${y - 5}" stroke="${strokeColor}" stroke-width="2"/>
+          <!-- Clock hands -->
+          <line x1="${x}" y1="${y - 5}" x2="${x - 8}" y2="${y - 15}" stroke="${strokeColor}" stroke-width="2"/>
+          <line x1="${x}" y1="${y - 5}" x2="${x + 12}" y2="${y - 5}" stroke="${strokeColor}" stroke-width="2"/>
+          <!-- Person 1 (left) -->
+          <circle cx="${x - 50}" cy="${y - 20}" r="6" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <circle cx="${x - 52}" cy="${y - 22}" r="0.8" fill="${strokeColor}"/>
+          <circle cx="${x - 48}" cy="${y - 22}" r="0.8" fill="${strokeColor}"/>
+          <path d="M ${x - 52} ${y - 18} Q ${x - 50} ${y - 16} ${x - 48} ${y - 18}" fill="none" stroke="${strokeColor}" stroke-width="1"/>
+          <line x1="${x - 50}" y1="${y - 14}" x2="${x - 50}" y2="${y + 5}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <line x1="${x - 50}" y1="${y - 10}" x2="${x - 40}" y2="${y - 15}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <!-- Person 2 (right) -->
+          <circle cx="${x + 50}" cy="${y - 20}" r="6" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <circle cx="${x + 48}" cy="${y - 22}" r="0.8" fill="${strokeColor}"/>
+          <circle cx="${x + 52}" cy="${y - 22}" r="0.8" fill="${strokeColor}"/>
+          <path d="M ${x + 48} ${y - 18} Q ${x + 50} ${y - 16} ${x + 52} ${y - 18}" fill="none" stroke="${strokeColor}" stroke-width="1"/>
+          <line x1="${x + 50}" y1="${y - 14}" x2="${x + 50}" y2="${y + 5}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <line x1="${x + 50}" y1="${y - 10}" x2="${x + 40}" y2="${y - 15}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
         </g>`;
       break;
       
-    case 2: // Simple circle with dot (like progress indicator)
+    case 2: // Person with pencil (writing/creating)
       content += `
         <g>
-          <circle cx="${x}" cy="${y}" r="40" 
-            fill="none" stroke="hsl(${hue},50%,60%)" stroke-width="6" opacity="0.3">
-          </circle>
-          <circle cx="${x}" cy="${y}" r="40" 
-            fill="none" stroke="hsl(${hue},60%,50%)" stroke-width="6" stroke-dasharray="40 200" opacity="0.7">
-          </circle>
-          <circle cx="${x}" cy="${y}" r="8" 
-            fill="hsl(${(hue + 180) % 360},70%,60%)" opacity="0.8">
-          </circle>
+          <!-- Large pencil -->
+          <rect x="${x - 5}" y="${y - 45}" width="10" height="60" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}" rx="2"/>
+          <polygon points="${x - 5},${y + 15} ${x},${y + 25} ${x + 5},${y + 15}" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <rect x="${x - 6}" y="${y - 50}" width="12" height="8" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <!-- Pencil details -->
+          <line x1="${x - 5}" y1="${y - 30}" x2="${x + 5}" y2="${y - 30}" stroke="${strokeColor}" stroke-width="1"/>
+          <line x1="${x - 5}" y1="${y - 20}" x2="${x + 5}" y2="${y - 20}" stroke="${strokeColor}" stroke-width="1"/>
+          <!-- Person holding pencil -->
+          <circle cx="${x - 25}" cy="${y - 15}" r="6" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <circle cx="${x - 27}" cy="${y - 17}" r="0.8" fill="${strokeColor}"/>
+          <circle cx="${x - 23}" cy="${y - 17}" r="0.8" fill="${strokeColor}"/>
+          <path d="M ${x - 27} ${y - 13} Q ${x - 25} ${y - 11} ${x - 23} ${y - 13}" fill="none" stroke="${strokeColor}" stroke-width="1"/>
+          <line x1="${x - 25}" y1="${y - 9}" x2="${x - 25}" y2="${y + 8}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <line x1="${x - 25}" y1="${y - 5}" x2="${x - 15}" y2="${y - 10}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <!-- Paper with scribbles -->
+          <rect x="${x + 15}" y="${y - 10}" width="25" height="20" fill="none" stroke="${strokeColor}" stroke-width="1" rx="2"/>
+          <line x1="${x + 18}" y1="${y - 6}" x2="${x + 35}" y2="${y - 6}" stroke="${strokeColor}" stroke-width="0.8"/>
+          <line x1="${x + 18}" y1="${y - 2}" x2="${x + 32}" y2="${y - 2}" stroke="${strokeColor}" stroke-width="0.8"/>
+          <line x1="${x + 18}" y1="${y + 2}" x2="${x + 38}" y2="${y + 2}" stroke="${strokeColor}" stroke-width="0.8"/>
         </g>`;
       break;
       
-    case 3: // Simple list items
+    case 3: // Person speaking/presenting 
       content += `
         <g>
-          <circle cx="${x - 50}" cy="${y - 20}" r="4" 
-            fill="hsl(${hue},60%,50%)" opacity="0.6">
-          </circle>
-          <rect x="${x - 40}" y="${y - 22}" width="60" height="4" 
-            fill="hsl(${hue},40%,50%)" rx="2" opacity="0.4">
-          </rect>
-          
-          <circle cx="${x - 50}" cy="${y}" r="4" 
-            fill="hsl(${(hue + 60) % 360},60%,50%)" opacity="0.6">
-          </circle>
-          <rect x="${x - 40}" y="${y - 2}" width="50" height="4" 
-            fill="hsl(${hue},40%,50%)" rx="2" opacity="0.4">
-          </rect>
-          
-          <circle cx="${x - 50}" cy="${y + 20}" r="4" 
-            fill="hsl(${(hue + 120) % 360},60%,50%)" opacity="0.6">
-          </circle>
-          <rect x="${x - 40}" y="${y + 18}" width="40" height="4" 
-            fill="hsl(${hue},40%,50%)" rx="2" opacity="0.4">
-          </rect>
+          <!-- Person -->
+          <circle cx="${x - 30}" cy="${y - 25}" r="8" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <circle cx="${x - 32}" cy="${y - 27}" r="1" fill="${strokeColor}"/>
+          <circle cx="${x - 28}" cy="${y - 27}" r="1" fill="${strokeColor}"/>
+          <path d="M ${x - 33} ${y - 23} Q ${x - 30} ${y - 20} ${x - 27} ${y - 23}" fill="none" stroke="${strokeColor}" stroke-width="1"/>
+          <line x1="${x - 30}" y1="${y - 17}" x2="${x - 30}" y2="${y + 5}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <!-- Arm pointing -->
+          <line x1="${x - 30}" y1="${y - 10}" x2="${x - 10}" y2="${y - 20}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <!-- Speech bubble -->
+          <ellipse cx="${x + 10}" cy="${y - 30}" rx="20" ry="12" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <polygon points="${x - 8},${y - 25} ${x - 5},${y - 20} ${x - 12},${y - 22}" fill="none" stroke="${strokeColor}" stroke-width="1"/>
+          <!-- Text lines in bubble -->
+          <line x1="${x - 5}" y1="${y - 33}" x2="${x + 15}" y2="${y - 33}" stroke="${strokeColor}" stroke-width="1"/>
+          <line x1="${x + 5}" y1="${y - 30}" x2="${x + 25}" y2="${y - 30}" stroke="${strokeColor}" stroke-width="1"/>
+          <line x1="${x - 2}" y1="${y - 27}" x2="${x + 18}" y2="${y - 27}" stroke="${strokeColor}" stroke-width="1"/>
         </g>`;
       break;
       
-    case 4: // Simple device/screen mockup
+    case 4: // Person hiking/walking 
       content += `
         <g>
-          <rect x="${x - 40}" y="${y - 25}" width="80" height="50" 
-            fill="none" stroke="hsl(${hue},40%,50%)" stroke-width="3" rx="8" opacity="0.6">
-          </rect>
-          <rect x="${x - 30}" y="${y - 15}" width="60" height="3" 
-            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.5">
-          </rect>
-          <rect x="${x - 30}" y="${y - 8}" width="25" height="3" 
-            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.4">
-          </rect>
-          <rect x="${x - 30}" y="${y - 1}" width="35" height="3" 
-            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.4">
-          </rect>
-          <circle cx="${x + 20}" cy="${y + 10}" r="8" 
-            fill="hsl(${(hue + 120) % 360},60%,60%)" opacity="0.5">
-          </circle>
+          <!-- Person walking -->
+          <circle cx="${x - 10}" cy="${y - 35}" r="6" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <circle cx="${x - 12}" cy="${y - 37}" r="0.8" fill="${strokeColor}"/>
+          <circle cx="${x - 8}" cy="${y - 37}" r="0.8" fill="${strokeColor}"/>
+          <path d="M ${x - 12} ${y - 33} Q ${x - 10} ${y - 31} ${x - 8} ${y - 33}" fill="none" stroke="${strokeColor}" stroke-width="1"/>
+          <line x1="${x - 10}" y1="${y - 29}" x2="${x - 10}" y2="${y - 10}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <!-- Walking stick -->
+          <line x1="${x - 10}" y1="${y - 20}" x2="${x - 25}" y2="${y + 5}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <!-- Backpack -->
+          <rect x="${x - 7}" y="${y - 25}" width="6" height="8" fill="none" stroke="${strokeColor}" stroke-width="1" rx="1"/>
+          <!-- Legs in walking position -->
+          <line x1="${x - 12}" y1="${y - 10}" x2="${x - 12}" y2="${y + 5}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <line x1="${x - 8}" y1="${y - 10}" x2="${x - 5}" y2="${y + 5}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <!-- Simple mountain/hills in background -->
+          <polygon points="${x + 10},${y + 10} ${x + 25},${y - 15} ${x + 40},${y + 10}" fill="none" stroke="${strokeColor}" stroke-width="1"/>
+          <polygon points="${x + 20},${y + 10} ${x + 35},${y - 25} ${x + 50},${y + 10}" fill="none" stroke="${strokeColor}" stroke-width="1"/>
         </g>`;
       break;
       
-    case 5: // Simple geometric shape with line
+    case 5: // Person celebrating/happy 
       content += `
         <g>
-          <rect x="${x - 25}" y="${y - 25}" width="50" height="50" 
-            fill="hsl(${hue},50%,60%)" rx="8" opacity="0.3">
-          </rect>
-          <line x1="${x - 40}" y1="${y + 40}" x2="${x + 40}" y2="${y - 40}" 
-            stroke="hsl(${(hue + 180) % 360},60%,50%)" stroke-width="3" opacity="0.6"/>
-          <circle cx="${x + 30}" cy="${y - 30}" r="6" 
-            fill="hsl(${(hue + 60) % 360},70%,60%)" opacity="0.7">
-          </circle>
-        </g>`;
-      break;
-      
-    case 6: // Simple document/page mockup
-      content += `
-        <g>
-          <rect x="${x - 35}" y="${y - 30}" width="70" height="60" 
-            fill="none" stroke="hsl(${hue},40%,50%)" stroke-width="2" rx="4" opacity="0.6">
-          </rect>
-          <rect x="${x - 25}" y="${y - 20}" width="50" height="3" 
-            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.5">
-          </rect>
-          <rect x="${x - 25}" y="${y - 12}" width="40" height="3" 
-            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.4">
-          </rect>
-          <rect x="${x - 25}" y="${y - 4}" width="35" height="3" 
-            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.4">
-          </rect>
-          <rect x="${x - 25}" y="${y + 8}" width="45" height="3" 
-            fill="hsl(${hue},50%,60%)" rx="1" opacity="0.4">
-          </rect>
-        </g>`;
-      break;
-      
-    case 7: // Simple arrow or pointer
-      content += `
-        <g>
-          <circle cx="${x - 20}" cy="${y}" r="15" 
-            fill="hsl(${hue},60%,60%)" opacity="0.4">
-          </circle>
-          <polygon points="${x + 10},${y - 15} ${x + 30},${y} ${x + 10},${y + 15}" 
-            fill="hsl(${(hue + 120) % 360},60%,50%)" opacity="0.6">
-          </polygon>
-          <line x1="${x - 5}" y1="${y}" x2="${x + 15}" y2="${y}" 
-            stroke="hsl(${hue},50%,50%)" stroke-width="3" opacity="0.5"/>
+          <!-- Person with raised arms -->
+          <circle cx="${x}" cy="${y - 30}" r="8" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <circle cx="${x - 2}" cy="${y - 32}" r="1" fill="${strokeColor}"/>
+          <circle cx="${x + 2}" cy="${y - 32}" r="1" fill="${strokeColor}"/>
+          <path d="M ${x - 3} ${y - 28} Q ${x} ${y - 25} ${x + 3} ${y - 28}" fill="none" stroke="${strokeColor}" stroke-width="1"/>
+          <line x1="${x}" y1="${y - 22}" x2="${x}" y2="${y + 5}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <!-- Arms raised in celebration -->
+          <line x1="${x}" y1="${y - 15}" x2="${x - 20}" y2="${y - 35}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <line x1="${x}" y1="${y - 15}" x2="${x + 20}" y2="${y - 35}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <!-- Legs -->
+          <line x1="${x - 3}" y1="${y + 5}" x2="${x - 8}" y2="${y + 20}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <line x1="${x + 3}" y1="${y + 5}" x2="${x + 8}" y2="${y + 20}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+          <!-- Celebration elements -->
+          <circle cx="${x - 25}" cy="${y - 40}" r="2" fill="none" stroke="${strokeColor}" stroke-width="1"/>
+          <circle cx="${x + 25}" cy="${y - 40}" r="2" fill="none" stroke="${strokeColor}" stroke-width="1"/>
+          <line x1="${x - 15}" y1="${y - 45}" x2="${x - 18}" y2="${y - 40}" stroke="${strokeColor}" stroke-width="1"/>
+          <line x1="${x + 15}" y1="${y - 45}" x2="${x + 18}" y2="${y - 40}" stroke="${strokeColor}" stroke-width="1"/>
         </g>`;
       break;
   }
   
-  return `
-    <svg xmlns="http://www.w3.org/2000/svg"
-         viewBox="0 0 ${width} ${height}"
-         width="${width}" height="${height}">
-      ${content}
-    </svg>
-  `;
-}
-
-function generateHexagonPoints(cx: number, cy: number, radius: number): string {
-  const points = [];
-  for (let i = 0; i < 6; i++) {
-    const angle = (i * Math.PI) / 3;
-    const x = cx + radius * Math.cos(angle);
-    const y = cy + radius * Math.sin(angle);
-    points.push(`${x},${y}`);
-  }
-  return points.join(' ');
-}
-
-function generateStarPoints(cx: number, cy: number, size: number, numPoints: number): string {
-  const points = [];
-  const outerRadius = size;
-  const innerRadius = size * 0.4;
-  
-  for (let i = 0; i < numPoints * 2; i++) {
-    const angle = (i * Math.PI) / numPoints;
-    const radius = i % 2 === 0 ? outerRadius : innerRadius;
-    const x = cx + radius * Math.cos(angle - Math.PI / 2);
-    const y = cy + radius * Math.sin(angle - Math.PI / 2);
-    points.push(`${x},${y}`);
-  }
-  
-  return points.join(' ');
-}
-
-function generatePolygonPoints(cx: number, cy: number, radius: number, sides: number): string {
-  const points = [];
-  for (let i = 0; i < sides; i++) {
-    const angle = (i * 2 * Math.PI) / sides;
-    const x = cx + radius * Math.cos(angle);
-    const y = cy + radius * Math.sin(angle);
-    points.push(`${x},${y}`);
-  }
-  return points.join(' ');
+  return `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+    ${content}
+  </svg>`;
 }
