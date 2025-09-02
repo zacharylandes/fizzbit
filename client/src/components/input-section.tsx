@@ -550,7 +550,7 @@ export function InputSection({
 
   return (
     <div className="mb-3 relative z-10">
-      <div className="bg-card border border-border rounded-xl p-4 container-shadow">
+      <div className="bg-card border-2 border-card-plum/30 rounded-xl p-4 container-shadow">
         <div className="flex flex-row gap-3">
           {/* Image Upload Button */}
           <input
@@ -563,7 +563,7 @@ export function InputSection({
           />
           <Button
             asChild
-            className="flex-1 bg-card-blue border-none hover:bg-card-blue/90 hover-lift text-card-blue rounded-lg py-3 px-4 font-medium button-shadow touch-target text-center transition-all duration-300"
+            className="flex-1 bg-card-blue border-2 border-card-blue/20 hover:bg-card-blue/90 hover-lift text-card-blue rounded-lg py-3 px-4 font-medium button-shadow touch-target text-center transition-all duration-300"
             disabled={isLoading}
           >
             <label htmlFor="image-upload" className="cursor-pointer flex items-center justify-center text-card-blue font-medium">
@@ -575,7 +575,7 @@ export function InputSection({
           {/* Text Input Toggle */}
           <Button
             onClick={() => setShowTextInput(!showTextInput)}
-            className="flex-1 bg-card-mint border-none hover:bg-card-mint/90 hover-lift text-card-mint rounded-lg py-3 px-4 font-medium button-shadow touch-target text-center transition-all duration-300"
+            className="flex-1 bg-card-mint border-2 border-card-mint/20 hover:bg-card-mint/90 hover-lift text-card-mint rounded-lg py-3 px-4 font-medium button-shadow touch-target text-center transition-all duration-300"
             disabled={isLoading}
           >
             <Edit className="mr-2 h-4 w-4" />
@@ -590,14 +590,14 @@ export function InputSection({
             <>
               <Button
                 onClick={stopRecording}
-                className="flex-1 bg-card-coral hover:bg-card-coral/90 text-card-coral border-none button-shadow rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target"
+                className="flex-1 bg-card-coral border-2 border-card-coral/20 hover:bg-card-coral/90 text-card-coral button-shadow rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target"
               >
                 <div className="w-3 h-3 bg-white rounded-sm mr-2"></div>
                 {formatDuration(recordingDuration)}
               </Button>
               <Button
                 onClick={cancelRecording}
-                className="bg-card-maroon hover:bg-card-maroon/90 text-card-maroon border-none button-shadow rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target"
+                className="bg-card-maroon border-2 border-card-maroon/20 hover:bg-card-maroon/90 text-card-maroon button-shadow rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -606,7 +606,7 @@ export function InputSection({
             // Normal voice input button
             <Button
               onClick={startRecording}
-              className="flex-1 bg-card-peach border-none hover:bg-card-peach/90 hover-lift text-card-peach button-shadow rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target"
+              className="flex-1 bg-card-peach border-2 border-card-peach/20 hover:bg-card-peach/90 hover-lift text-card-peach button-shadow rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target"
               disabled={isLoading}
             >
               <Mic className="mr-2 h-4 w-4" />
@@ -618,8 +618,8 @@ export function InputSection({
             onClick={() => setShowDrawingPad(!showDrawingPad)}
             className={`flex-1 ${
               showDrawingPad
-                ? 'bg-card-maroon hover:bg-card-maroon/90 text-card-maroon border-none button-shadow'
-                : 'bg-card-cream border-none hover:bg-card-cream/90 hover-lift text-card-cream button-shadow'
+                ? 'bg-card-maroon border-2 border-card-maroon/20 hover:bg-card-maroon/90 text-card-maroon button-shadow'
+                : 'bg-card-muted-gold border-2 border-card-muted-gold/20 hover:bg-card-muted-gold/90 hover-lift text-card-muted-gold button-shadow'
             } rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target`}
             disabled={isLoading}
           >
@@ -630,7 +630,7 @@ export function InputSection({
 
         {/* Drawing Pad */}
         {showDrawingPad && (
-          <div className="mt-4 p-4 bg-card-mint border-none rounded-lg container-shadow">
+          <div className="mt-4 p-4 bg-card-mint border-2 border-card-mint/30 rounded-lg container-shadow">
             <div className="flex flex-col items-center space-y-3">
               <canvas
                 ref={canvasRef}
@@ -651,14 +651,14 @@ export function InputSection({
                   onClick={clearCanvas}
                   variant="outline"
                   size="sm"
-                  className="text-xs border-2 border-card-mint text-card-mint hover:bg-card-mint/10 button-shadow"
+                  className="text-xs border-2 border-card-mint/50 text-card-mint hover:bg-card-mint/10 button-shadow"
                 >
                   Clear
                 </Button>
                 <Button
                   onClick={submitDrawing}
                   disabled={generateFromDrawingMutation.isPending}
-                  className="bg-card-blue border-none hover:bg-card-blue/90 text-card-blue text-xs button-shadow"
+                  className="bg-card-blue border-2 border-card-blue/20 hover:bg-card-blue/90 text-card-blue text-xs button-shadow"
                 >
                   {generateFromDrawingMutation.isPending ? (
                     <>
@@ -683,14 +683,14 @@ export function InputSection({
             <Textarea 
               value={textPrompt}
               onChange={(e) => handleTextPromptChange(e.target.value)}
-              className="w-full h-24 p-3 bg-background border-2 border-card-cream rounded-lg focus:border-card-mint focus:outline-none resize-none text-sm text-foreground placeholder:text-muted-foreground container-shadow" 
+              className="w-full h-24 p-3 bg-background border-2 border-card-muted-gold/30 rounded-lg focus:border-card-mint focus:outline-none resize-none text-sm text-foreground placeholder:text-muted-foreground container-shadow" 
               placeholder="Describe your creative inspiration or what you'd like ideas about..."
               disabled={isLoading}
             />
             <Button
               onClick={handleGenerateFromText}
               disabled={!textPrompt.trim() || isLoading}
-              className="w-full bg-card-coral border-none hover:bg-card-coral/90 hover-lift text-card-coral rounded-lg py-3 font-medium touch-target transition-all duration-300 button-shadow"
+              className="w-full bg-card-coral border-2 border-card-coral/20 hover:bg-card-coral/90 hover-lift text-card-coral rounded-lg py-3 font-medium touch-target transition-all duration-300 button-shadow"
             >
               {isLoading ? (
                 <>
@@ -709,7 +709,7 @@ export function InputSection({
         
         {/* Upload Preview Area - Enhanced */}
         {uploadedImage && (
-          <div className="mt-4 p-3 bg-card border-2 border-card-cream rounded-lg container-shadow">
+          <div className="mt-4 p-3 bg-card border-2 border-card-soft-coral/30 rounded-lg container-shadow">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium text-foreground">Uploaded Image</h3>
               <Button
@@ -724,7 +724,7 @@ export function InputSection({
             <img 
               src={uploadedImage} 
               alt="Uploaded for inspiration" 
-              className="max-h-20 mx-auto rounded object-cover border-2 border-card-mint card-shadow"
+              className="max-h-20 mx-auto rounded object-cover border-2 border-card-soft-coral/50 card-shadow"
             />
             <p className="text-xs text-muted-foreground mt-2 text-center">
               {isLoading ? "Analyzing your image..." : "Image ready for idea generation"}

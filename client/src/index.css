@@ -78,9 +78,7 @@ input, textarea {
   --ring: hsl(250, 50%, 50%);
   --radius: 1rem;
   
-  /* Expanded Colorful Card Colors */
-  --card-cream: hsl(0, 0%, 15%);         /* Dark text on cream */
-  --card-cream-bg: hsl(55, 70%, 88%);    /* Light cream background */
+  /* Beautiful Soft Card Colors */
   --card-white: hsl(0, 0%, 15%);         /* Dark text on white */
   --card-white-bg: hsl(0, 0%, 100%);     /* White background */
   --card-mint: hsl(0, 0%, 15%);          /* Dark text on mint */
@@ -93,6 +91,14 @@ input, textarea {
   --card-blue-bg: hsl(196, 51%, 43%);    /* Blue background */
   --card-coral: hsl(0, 0%, 100%);        /* White text on coral */
   --card-coral-bg: hsl(13, 60%, 52%);    /* Coral red background */
+  --card-soft-coral: hsl(0, 0%, 15%);    /* Dark text on soft coral */
+  --card-soft-coral-bg: hsl(4, 100%, 75%); /* Soft coral #FF8A80 */
+  --card-muted-gold: hsl(0, 0%, 15%);    /* Dark text on muted gold */
+  --card-muted-gold-bg: hsl(49, 63%, 66%); /* Muted gold #E6C068 */
+  --card-terracotta: hsl(0, 0%, 100%);   /* White text on terracotta */
+  --card-terracotta-bg: hsl(13, 70%, 62%); /* Light terracotta #E07A5F */
+  --card-plum: hsl(0, 0%, 15%);          /* Dark text on plum */
+  --card-plum-bg: hsl(282, 39%, 74%);    /* Gentle plum #C39BD3 */
   
   /* Professional Primary Colors */
   --primary-blue: hsl(210, 20%, 55%);
@@ -187,10 +193,7 @@ input, textarea {
   .bg-primary-pink { background-color: var(--primary-pink); }
   .border-primary-pink { border-color: var(--primary-pink); }
   
-  /* Expanded Colorful Card Utility Classes */
-  .bg-card-cream { background-color: var(--card-cream-bg) !important; }
-  .text-card-cream { color: var(--card-cream) !important; }
-  
+  /* Beautiful Soft Card Utility Classes */
   .bg-card-white { background-color: var(--card-white-bg) !important; }
   .text-card-white { color: var(--card-white) !important; }
   
@@ -208,6 +211,18 @@ input, textarea {
   
   .bg-card-coral { background-color: var(--card-coral-bg) !important; }
   .text-card-coral { color: var(--card-coral) !important; }
+  
+  .bg-card-soft-coral { background-color: var(--card-soft-coral-bg) !important; }
+  .text-card-soft-coral { color: var(--card-soft-coral) !important; }
+  
+  .bg-card-muted-gold { background-color: var(--card-muted-gold-bg) !important; }
+  .text-card-muted-gold { color: var(--card-muted-gold) !important; }
+  
+  .bg-card-terracotta { background-color: var(--card-terracotta-bg) !important; }
+  .text-card-terracotta { color: var(--card-terracotta) !important; }
+  
+  .bg-card-plum { background-color: var(--card-plum-bg) !important; }
+  .text-card-plum { color: var(--card-plum) !important; }
   
   /* Accent Colors */
   .text-accent-blue { color: var(--accent-blue); }

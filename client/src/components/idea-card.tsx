@@ -12,13 +12,16 @@ interface IdeaCardProps {
 }
 
 const cardStyles = [
-  "bg-card-cream card-shadow hover-lift",
   "bg-card-white card-shadow hover-lift", 
   "bg-card-mint card-shadow hover-lift",
   "bg-card-peach card-shadow hover-lift",
   "bg-card-maroon card-shadow hover-lift",
   "bg-card-blue card-shadow hover-lift",
-  "bg-card-coral card-shadow hover-lift"
+  "bg-card-coral card-shadow hover-lift",
+  "bg-card-soft-coral card-shadow hover-lift",
+  "bg-card-muted-gold card-shadow hover-lift",
+  "bg-card-terracotta card-shadow hover-lift",
+  "bg-card-plum card-shadow hover-lift"
 ];
 
 export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDirection, showSwipeEffects }: IdeaCardProps) {
@@ -26,35 +29,44 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
   const cardStyle = cardStyles[colorIndex % cardStyles.length];
 
   const accentColors = [
-    "text-card-cream",
     "text-card-white", 
     "text-card-mint",
     "text-card-peach",
     "text-card-maroon",
     "text-card-blue",
-    "text-card-coral"
+    "text-card-coral",
+    "text-card-soft-coral",
+    "text-card-muted-gold",
+    "text-card-terracotta",
+    "text-card-plum"
   ];
   
-  // Corresponding colors for colorful illustrations
+  // Corresponding colors for soft illustrations
   const strokeColors = [
-    "#8B7355", // Warm brown for cream
     "#374151", // Dark gray for white cards
     "#059669", // Subtle green for mint
     "#DC2626", // Subtle red for peach
     "#72313E", // Dark maroon
     "#3587A4", // Blue
-    "#CE5B3B"  // Coral red
+    "#CE5B3B", // Coral red
+    "#FF8A80", // Soft coral
+    "#E6C068", // Muted gold
+    "#E07A5F", // Light terracotta
+    "#C39BD3"  // Gentle plum
   ];
   
-  // Hue values for colorful SVG generation
+  // Hue values for soft SVG generation
   const hueValues = [
-    45,   // warm brown
     0,    // neutral for white
     150,  // mint green
     15,   // warm orange
     334,  // maroon
     196,  // blue
-    13    // coral
+    13,   // coral
+    4,    // soft coral
+    49,   // muted gold
+    13,   // terracotta
+    282   // gentle plum
   ];
   
   const accentColor = accentColors[colorIndex % accentColors.length];
