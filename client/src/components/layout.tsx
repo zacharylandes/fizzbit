@@ -135,7 +135,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-white text-foreground flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Header */}
-      <div className="border-b border-gray-200 bg-white shadow-sm">
+      <div className="border-b border-gray-200 bg-card-sand shadow-sm">
         <div className="max-w-7xl mx-auto px-6 pt-4 pb-2">
           <div className="flex items-center justify-between">
             {/* FizzBit Brand */}
@@ -153,7 +153,7 @@ export default function Layout({ children }: LayoutProps) {
               <a href="/api/logout">
                 <Button
                   size="sm"
-                  className="bg-card-coral border border-gray-300 hover:bg-card-coral/90 hover-lift text-gray-700 transition-all duration-300 px-4 py-2 shadow-sm font-medium"
+                  className="bg-card-sage border border-gray-300 hover:bg-card-sage/90 hover-lift text-gray-700 transition-all duration-300 px-4 py-2 shadow-sm font-medium"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
@@ -181,7 +181,7 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Footer Navigation */}
       {isAuthenticated && (
-        <div className={`fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white transition-transform duration-300 z-50 ${
+        <div className={`fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-card-sand transition-transform duration-300 z-50 ${
           showFooter && !isKeyboardOpen ? 'translate-y-0' : 'translate-y-full'
         }`}>
           <div className="max-w-7xl mx-auto px-6 py-4">
@@ -197,14 +197,14 @@ export default function Layout({ children }: LayoutProps) {
                       size="sm"
                       className={`flex flex-col items-center space-y-1 p-3 h-auto transition-all duration-300 relative rounded-lg ${
                         isActive
-                          ? "bg-card-muted-gold border border-gray-300 shadow-sm font-semibold"
+                          ? "bg-card-sand border border-gray-300 shadow-sm font-semibold"
                           : "hover:text-gray-700 hover:bg-gray-100 hover-lift font-medium"
                       }`}
                     >
                       <Icon className="h-5 w-5 text-gray-600" />
                       <span className="text-xs font-medium text-gray-600">{item.label}</span>
                       {item.badge && item.badge > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-card-coral border border-gray-300 text-gray-700 text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-sm">
+                        <span className="absolute -top-1 -right-1 bg-card-rose border border-gray-300 text-gray-700 text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-sm">
                           {item.badge}
                         </span>
                       )}

@@ -13,14 +13,13 @@ interface IdeaCardProps {
 
 const cardStyles = [
   "bg-card-mint card-shadow hover-lift border border-gray-200",
+  "bg-card-lavender card-shadow hover-lift border border-gray-200",
   "bg-card-peach card-shadow hover-lift border border-gray-200",
+  "bg-card-rose card-shadow hover-lift border border-gray-200",
+  "bg-card-sage card-shadow hover-lift border border-gray-200",
+  "bg-card-sand card-shadow hover-lift border border-gray-200",
   "bg-card-blue card-shadow hover-lift border border-gray-200",
-  "bg-card-coral card-shadow hover-lift border border-gray-200",
-  "bg-card-soft-coral card-shadow hover-lift border border-gray-200",
-  "bg-card-muted-gold card-shadow hover-lift border border-gray-200",
-  "bg-card-terracotta card-shadow hover-lift border border-gray-200",
-  "bg-card-plum card-shadow hover-lift border border-gray-200",
-  "bg-card-green card-shadow hover-lift border border-gray-200"
+  "bg-card-taupe card-shadow hover-lift border border-gray-200"
 ];
 
 export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDirection, showSwipeEffects }: IdeaCardProps) {
@@ -29,14 +28,13 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
 
   const accentColors = [
     "text-card-mint",
+    "text-card-lavender",
     "text-card-peach",
+    "text-card-rose",
+    "text-card-sage",
+    "text-card-sand",
     "text-card-blue",
-    "text-card-coral",
-    "text-card-soft-coral",
-    "text-card-muted-gold",
-    "text-card-terracotta",
-    "text-card-plum",
-    "text-card-green"
+    "text-card-taupe"
   ];
   
   // Corresponding colors for professional illustrations
@@ -52,17 +50,16 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
     "#6B7280"  // Subtle gray for green
   ];
   
-  // Hue values for professional SVG generation
+  // Hue values for beautiful SVG generation
   const hueValues = [
-    150,  // mint green
-    15,   // warm orange
-    196,  // blue
-    13,   // coral
-    4,    // soft coral
-    49,   // muted gold
-    20,   // terracotta
-    282,  // gentle plum
-    140   // green
+    170,  // light mint
+    270,  // soft lavender
+    25,   // pale peach
+    345,  // dusty rose
+    140,  // light sage
+    45,   // warm sand
+    210,  // misty blue
+    30    // soft taupe
   ];
   
   const accentColor = accentColors[colorIndex % accentColors.length];

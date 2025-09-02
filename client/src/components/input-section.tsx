@@ -590,14 +590,14 @@ export function InputSection({
             <>
               <Button
                 onClick={stopRecording}
-                className="flex-1 bg-card-coral border border-gray-300 hover:bg-card-coral/90 text-gray-700 shadow-sm rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target"
+                className="flex-1 bg-card-sage border border-gray-300 hover:bg-card-sage/90 text-gray-700 shadow-sm rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target"
               >
                 <div className="w-3 h-3 bg-white rounded-sm mr-2"></div>
                 {formatDuration(recordingDuration)}
               </Button>
               <Button
                 onClick={cancelRecording}
-                className="bg-card-soft-coral border border-gray-300 hover:bg-card-soft-coral/90 text-gray-700 shadow-sm rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target"
+                className="bg-card-rose border border-gray-300 hover:bg-card-rose/90 text-gray-700 shadow-sm rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -618,8 +618,8 @@ export function InputSection({
             onClick={() => setShowDrawingPad(!showDrawingPad)}
             className={`flex-1 ${
               showDrawingPad
-                ? 'bg-card-plum border border-gray-300 hover:bg-card-plum/90 text-gray-700 shadow-sm'
-                : 'bg-card-muted-gold border border-gray-300 hover:bg-card-muted-gold/90 text-gray-700 shadow-sm'
+                ? 'bg-card-lavender border border-gray-300 hover:bg-card-lavender/90 text-gray-700 shadow-sm'
+                : 'bg-card-sand border border-gray-300 hover:bg-card-sand/90 text-gray-700 shadow-sm'
             } rounded-lg py-3 px-4 font-medium text-center transition-all duration-300 touch-target`}
             disabled={isLoading}
           >
@@ -690,7 +690,7 @@ export function InputSection({
             <Button
               onClick={handleGenerateFromText}
               disabled={!textPrompt.trim() || isLoading}
-              className="w-full bg-card-coral border border-gray-300 hover:bg-card-coral/90 text-gray-700 rounded-lg py-3 font-medium touch-target transition-all duration-300 shadow-sm"
+              className="w-full bg-card-sage border border-gray-300 hover:bg-card-sage/90 text-gray-700 rounded-lg py-3 font-medium touch-target transition-all duration-300 shadow-sm"
             >
               {isLoading ? (
                 <>
