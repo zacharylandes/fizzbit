@@ -233,11 +233,10 @@ input, textarea {
   .font-poppins-semibold { font-family: 'Poppins', sans-serif; font-weight: 600; }
   .font-poppins { font-family: 'Poppins', sans-serif; font-weight: 400; }
   
-  /* Inspired title animations */
+  /* Inspired title animations - subtle */
   .inspired-title {
     position: relative;
     display: inline-block;
-    animation: gentle-glow 3s ease-in-out infinite alternate;
   }
   
   .inspired-stars {
@@ -249,86 +248,74 @@ input, textarea {
   .inspired-stars::after {
     content: '✦';
     position: absolute;
-    font-size: 1.2em;
-    animation: twinkle 2s ease-in-out infinite;
-    color: #374151;
+    font-size: 1em;
+    animation: subtle-twinkle 6s ease-in-out infinite;
+    color: #6b7280;
+    opacity: 0.6;
   }
   
   .inspired-stars::before {
-    top: -0.5rem;
-    left: -2rem;
+    top: -0.3rem;
+    left: -1.8rem;
     animation-delay: 0s;
   }
   
   .inspired-stars::after {
-    top: -0.3rem;
-    right: -2rem;
-    animation-delay: 1s;
+    top: -0.2rem;
+    right: -1.8rem;
+    animation-delay: 3s;
   }
   
   .floating-star {
     position: absolute;
-    font-size: 0.8em;
-    animation: float-twinkle 4s ease-in-out infinite;
+    font-size: 0.7em;
+    animation: gentle-float 8s ease-in-out infinite;
     pointer-events: none;
+    color: #9ca3af;
+    opacity: 0.5;
   }
   
   .floating-star:nth-child(1) {
-    top: 10%;
-    left: 15%;
-    animation-delay: 0.5s;
+    top: 15%;
+    left: 18%;
+    animation-delay: 1s;
   }
   
   .floating-star:nth-child(2) {
-    top: 20%;
-    right: 20%;
-    animation-delay: 1.5s;
+    top: 25%;
+    right: 22%;
+    animation-delay: 4s;
   }
   
   .floating-star:nth-child(3) {
-    bottom: 30%;
-    left: 25%;
-    animation-delay: 2.5s;
+    bottom: 35%;
+    left: 28%;
+    animation-delay: 6s;
   }
   
   .floating-star:nth-child(4) {
-    bottom: 15%;
-    right: 30%;
-    animation-delay: 0.8s;
+    bottom: 20%;
+    right: 32%;
+    animation-delay: 2s;
   }
   
-  @keyframes gentle-glow {
-    0% {
-      text-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
-    }
-    100% {
-      text-shadow: 0 0 15px rgba(59, 130, 246, 0.6), 0 0 25px rgba(59, 130, 246, 0.4);
-    }
-  }
-  
-  @keyframes twinkle {
+  @keyframes subtle-twinkle {
     0%, 100% {
       opacity: 0.4;
-      transform: scale(0.8);
     }
     50% {
-      opacity: 1;
-      transform: scale(1.2);
+      opacity: 0.8;
     }
   }
   
-  @keyframes float-twinkle {
+  @keyframes gentle-float {
     0%, 100% {
       opacity: 0.3;
-      transform: translateY(0) scale(0.7);
+      transform: translateY(0);
     }
-    25% {
-      opacity: 0.8;
-      transform: translateY(-10px) scale(1);
-    }
-    75% {
+    50% {
       opacity: 0.6;
-      transform: translateY(5px) scale(0.9);
+      transform: translateY(-3px);
     }
   }
   
