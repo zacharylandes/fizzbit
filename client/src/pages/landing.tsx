@@ -5,22 +5,24 @@ import logoImage from "@/assets/spiral-logo.png";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
+    <div className="min-h-screen bg-white text-foreground" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Hero Section */}
       <div className="relative">
         {/* Navigation */}
-        <nav className="flex items-center justify-between p-6 max-w-7xl mx-auto">
+        <nav className="border-b border-gray-200 bg-header-footer shadow-sm">
+          <div className="flex items-center justify-between p-6 max-w-7xl mx-auto">
           <div className="flex items-center space-x-3">
             <img src={logoImage} alt="FizzBit Logo" className="h-12 w-12 object-contain" />
-            <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
+            <h1 className="text-2xl font-poppins-bold text-foreground">
               FizzBit
             </h1>
           </div>
           <a href="/api/login">
-            <Button className="bg-card-light-blue-bg hover:bg-card-light-blue-bg/90 text-card-light-blue border-0 shadow-sm">
+            <Button className="bg-button-custom hover:bg-button-custom/90 text-gray-700 border border-gray-300 shadow-sm font-medium">
               Sign In
             </Button>
           </a>
+          </div>
         </nav>
         
         {/* Hero Content */}
@@ -32,7 +34,7 @@ export default function LandingPage() {
               </span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
+            <h1 className="text-5xl md:text-7xl font-poppins-bold mb-6 leading-tight text-foreground">
               Swipe Right on <br />
               Endless Creativity
             </h1>
@@ -41,11 +43,11 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="/api/login">
-                <Button className="bg-foreground hover:bg-foreground/90 text-background px-8 py-3 text-base font-medium shadow-sm">
+                <Button className="bg-button-custom hover:bg-button-custom/90 text-gray-700 border border-gray-300 px-8 py-3 text-base font-medium shadow-sm">
                   Get Started →
                 </Button>
               </a>
-              <Button variant="outline" className="border-border hover:bg-muted text-foreground px-8 py-3 text-base font-medium">
+              <Button variant="outline" className="bg-white border-gray-300 hover:bg-gray-50 text-gray-700 px-8 py-3 text-base font-medium">
                 Learn More
               </Button>
             </div>
@@ -56,7 +58,7 @@ export default function LandingPage() {
       {/* Features Section */}
       <div className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-card-peach bg-card-peach-bg/30 px-4 py-2 rounded-lg border-2 border-card-peach/40 container-shadow" style={{ fontFamily: 'Crimson Text, serif' }}>
+          <h2 className="text-4xl md:text-5xl font-poppins-bold mb-4 text-gray-800 bg-header-footer px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
             Enhance Your Creativity
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -69,7 +71,7 @@ export default function LandingPage() {
             <div className="bg-card-sage rounded-2xl p-6 mb-4 shadow-sm border border-card-sage/30 group-hover:shadow-md transition-all duration-300">
               <Image className="h-8 w-8 text-card-sage mx-auto" />
             </div>
-            <h3 className="text-lg font-semibold mb-2 text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>Photo Magic</h3>
+            <h3 className="text-lg font-poppins-semibold mb-2 text-foreground">Photo Magic</h3>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
               Upload any photo and get creative ideas inspired by what you see.
             </p>
@@ -79,7 +81,7 @@ export default function LandingPage() {
             <div className="bg-card-blue-gray rounded-2xl p-6 mb-4 shadow-sm border border-card-blue-gray/30 group-hover:shadow-md transition-all duration-300">
               <Sparkles className="h-8 w-8 text-card-blue-gray mx-auto" />
             </div>
-            <h3 className="text-lg font-semibold mb-2 text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>Text Prompts</h3>
+            <h3 className="text-lg font-poppins-semibold mb-2 text-foreground">Text Prompts</h3>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
               Describe your interests and get personalized creative ideas.
             </p>
@@ -89,7 +91,7 @@ export default function LandingPage() {
             <div className="bg-card-purple-gray rounded-2xl p-6 mb-4 shadow-sm border border-card-purple-gray/30 group-hover:shadow-md transition-all duration-300">
               <Eye className="h-8 w-8 text-card-purple-gray mx-auto" />
             </div>
-            <h3 className="text-lg font-semibold mb-2 text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>Explore & Chain</h3>
+            <h3 className="text-lg font-poppins-semibold mb-2 text-foreground">Explore & Chain</h3>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
               Discover variations that blend your inspiration with new concepts.
             </p>
@@ -99,7 +101,7 @@ export default function LandingPage() {
             <div className="bg-card-light-blue rounded-2xl p-6 mb-4 shadow-sm border border-card-light-blue/30 group-hover:shadow-md transition-all duration-300">
               <Heart className="h-8 w-8 text-card-light-blue mx-auto" />
             </div>
-            <h3 className="text-lg font-semibold mb-2 text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>Save & Organize</h3>
+            <h3 className="text-lg font-poppins-semibold mb-2 text-foreground">Save & Organize</h3>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
               Build your personal collection of favorite creative ideas.
             </p>
@@ -110,7 +112,7 @@ export default function LandingPage() {
       {/* CTA Section */}
       <div className="max-w-7xl mx-auto px-6 py-20">
         <div className="bg-card border border-border rounded-3xl p-12 text-center shadow-sm">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
+          <h2 className="text-3xl md:text-4xl font-poppins-bold mb-4 text-foreground">
             Start your creative journey today
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -118,7 +120,7 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="/api/login">
-              <Button className="bg-foreground hover:bg-foreground/90 text-background px-8 py-3 text-base font-medium shadow-sm">
+              <Button className="bg-button-custom hover:bg-button-custom/90 text-gray-700 border border-gray-300 px-8 py-3 text-base font-medium shadow-sm">
                 Get Started →
               </Button>
             </a>
@@ -130,14 +132,14 @@ export default function LandingPage() {
       </div>
       
       {/* Footer */}
-      <footer className="border-t border-border">
+      <footer className="border-t border-gray-200 bg-header-footer">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-background rounded-lg shadow-sm">
+              <div className="p-2 bg-white rounded-lg shadow-sm">
                 <img src={logoImage} alt="FizzBit Logo" className="h-5 w-5 object-contain" />
               </div>
-              <span className="text-lg font-bold text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>FizzBit</span>
+              <span className="text-lg font-poppins-bold text-foreground">FizzBit</span>
             </div>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
               © 2025 FizzBit. All rights reserved.

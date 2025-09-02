@@ -95,7 +95,7 @@ export default function HomePage() {
       {isAuthenticated ? (
         <div className="max-w-7xl mx-auto w-full px-6 pt-4 pb-2">
           <div className="mb-4 text-center">
-            <h2 className="text-2xl font-crimson font-semibold mb-2 text-gray-800">
+            <h2 className="text-2xl font-poppins-semibold mb-2 text-gray-800">
               Get Inspired
             </h2>
             <p className="text-muted-foreground text-base font-inter">Upload a photo or describe your interests to get personalized creative inspiration.</p>

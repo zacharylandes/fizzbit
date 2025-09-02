@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -225,6 +227,11 @@ input, textarea {
   .text-header-footer { color: var(--header-footer) !important; }
   .bg-button-custom { background-color: var(--button-custom-bg) !important; }
   .text-button-custom { color: var(--button-custom) !important; }
+  
+  /* Font utility classes */
+  .font-poppins-bold { font-family: 'Poppins', sans-serif; font-weight: 700; }
+  .font-poppins-semibold { font-family: 'Poppins', sans-serif; font-weight: 600; }
+  .font-poppins { font-family: 'Poppins', sans-serif; font-weight: 400; }
   
   /* Accent Colors */
   .text-accent-blue { color: var(--accent-blue); }
