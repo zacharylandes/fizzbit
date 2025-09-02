@@ -247,10 +247,11 @@ input, textarea {
   
   .inspired-stars::before,
   .inspired-stars::after {
-    content: '✨';
+    content: '✦';
     position: absolute;
     font-size: 1.2em;
     animation: twinkle 2s ease-in-out infinite;
+    color: #374151;
   }
   
   .inspired-stars::before {

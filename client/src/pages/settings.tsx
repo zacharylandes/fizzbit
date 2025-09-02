@@ -107,7 +107,7 @@ export default function SettingsPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
+        <h1 className="text-3xl font-poppins-semibold mb-2 text-foreground">
           Settings
         </h1>
         <p className="text-muted-foreground" style={{ fontFamily: 'Inter, sans-serif' }}>Manage your account and preferences</p>
@@ -117,7 +117,7 @@ export default function SettingsPage() {
         {/* Profile Settings */}
         <Card className="bg-card border border-card-blue-gray/30 shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-foreground" style={{ fontFamily: 'Crimson Text, serif' }}>
+            <CardTitle className="flex items-center space-x-2 text-foreground font-poppins-semibold">
               <UserIcon className="h-5 w-5" />
               <span>Profile Information</span>
             </CardTitle>
@@ -136,7 +136,7 @@ export default function SettingsPage() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="text-sm font-medium text-foreground" style={{ fontFamily: 'Inter, sans-serif' }}>Profile Picture</h3>
+                  <h3 className="text-sm font-poppins-semibold text-foreground">Profile Picture</h3>
                   <p className="text-xs text-muted-foreground" style={{ fontFamily: 'Inter, sans-serif' }}>Your profile picture from your authentication provider</p>
                 </div>
               </div>

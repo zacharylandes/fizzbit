@@ -105,7 +105,7 @@ export default function HistoryPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-8 pb-32">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">
+        <h1 className="text-3xl font-poppins-semibold mb-2">
           <span className="bg-gradient-to-r from-electric-cyan to-electric-green bg-clip-text text-transparent">
             Prompt History
           </span>
@@ -133,7 +133,7 @@ export default function HistoryPage() {
           <Card className="glass border border-electric-purple/30 glow-electric-purple">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Clock className="h-12 w-12 text-white/50 mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">
+              <h3 className="text-lg font-poppins-semibold text-white mb-2">
                 {searchTerm ? "No matching prompts found" : "No prompt history yet"}
               </h3>
               <p className="text-white/70 text-center mb-4">

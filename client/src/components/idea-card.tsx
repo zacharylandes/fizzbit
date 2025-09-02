@@ -169,7 +169,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
         {/* Only render cards with valid titles */}
         {idea.title && idea.title.trim().length > 0 && (
           <div className="flex flex-col items-center justify-start h-full pt-8">
-            <h3 className="text-2xl font-black text-center leading-tight mb-6 text-black" style={{ fontFamily: 'Inter, sans-serif', fontWeight: '900' }}>
+            <h3 className="text-2xl font-poppins-semibold text-center leading-tight mb-6 text-black">
               {idea.title}
             </h3>
             
