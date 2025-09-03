@@ -23,6 +23,7 @@ export interface IStorage {
   // Idea operations
   getIdea(id: string): Promise<Idea | undefined>;
   createIdea(idea: InsertIdea, userId?: string): Promise<Idea>;
+  updateIdea(id: string, updates: Partial<Pick<Idea, 'title' | 'description'>>, userId: string): Promise<Idea>;
   getRandomIdeas(count: number, excludeIds?: string[]): Promise<Idea[]>;
   saveIdea(ideaId: string, userId: string): Promise<SavedIdea>;
   unsaveIdea(ideaId: string, userId: string): Promise<void>;
@@ -76,6 +77,31 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return idea;
+  }
+
+  async updateIdea(id: string, updates: Partial<Pick<Idea, 'title' | 'description'>>, userId: string): Promise<Idea> {
+    // First check if the user can update this idea (they must have saved it)
+    const savedEntry = await db
+      .select()
+      .from(savedIdeas)
+      .where(and(eq(savedIdeas.ideaId, id), eq(savedIdeas.userId, userId)))
+      .limit(1);
+
+    if (savedEntry.length === 0) {
+      throw new Error('You can only update ideas you have saved');
+    }
+
+    const [updatedIdea] = await db
+      .update(ideas)
+      .set(updates)
+      .where(eq(ideas.id, id))
+      .returning();
+    
+    if (!updatedIdea) {
+      throw new Error('Idea not found');
+    }
+
+    return updatedIdea;
   }
 
   async getRandomIdeas(count: number, excludeIds: string[] = []): Promise<Idea[]> {

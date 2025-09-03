@@ -526,21 +526,40 @@ export default function SavedPage() {
     }
   }, [savedIdeas, isMobile]);
 
-  const handleSaveEdit = useCallback(() => {
+  const handleSaveEdit = useCallback(async () => {
     if (!editingCard) return;
     
-    // Here you would typically call an API to update the idea
-    // For now, we'll just update the local state
-    toast({
-      title: "Idea Updated",
-      description: "Your changes have been saved.",
-      variant: "default",
-    });
-    
-    setEditingCard(null);
-    setEditTitle('');
-    setEditDescription('');
-  }, [editingCard, editTitle, editDescription, toast]);
+    try {
+      // Call the API to update the idea
+      await apiRequest(`/api/ideas/${editingCard}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          title: editTitle,
+          description: editDescription
+        })
+      });
+      
+      // Invalidate the saved ideas query to refetch the updated data
+      queryClient.invalidateQueries({ queryKey: ['/api/ideas/saved'] });
+      
+      setEditingCard(null);
+      setEditTitle('');
+      setEditDescription('');
+      setExpandedCard(null);
+      
+      toast({
+        title: "Idea updated",
+        description: "Your changes have been saved successfully."
+      });
+    } catch (error) {
+      console.error('Error updating idea:', error);
+      toast({
+        title: "Update failed",
+        description: "Could not save your changes. Please try again.",
+        variant: "destructive"
+      });
+    }
+  }, [editingCard, editTitle, editDescription, toast, queryClient]);
 
   const handleCancelEdit = useCallback(() => {
     setEditingCard(null);

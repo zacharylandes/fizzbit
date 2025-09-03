@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertIdeaSchema } from "@shared/schema";
+import { insertIdeaSchema, type Idea } from "@shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { generateIdeasFromText, generateIdeasFromImage, generateRelatedIdeas } from "./huggingface";
 import { transcribeAudio } from "./whisper";
@@ -626,6 +626,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error unsaving idea:", error);
       res.status(500).json({ error: "Failed to remove idea" });
+    }
+  });
+
+  // Update a saved idea - requires authentication
+  app.put("/api/ideas/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { title, description } = req.body;
+      const userId = req.user.claims.sub;
+
+      if (!title && !description) {
+        return res.status(400).json({ error: "Title or description is required" });
+      }
+
+      const updates: Partial<Pick<Idea, 'title' | 'description'>> = {};
+      if (title !== undefined) updates.title = title;
+      if (description !== undefined) updates.description = description;
+
+      const updatedIdea = await storage.updateIdea(id, updates, userId);
+      res.json({ idea: updatedIdea });
+    } catch (error) {
+      console.error("Error updating idea:", error);
+      if (error instanceof Error && error.message === 'You can only update ideas you have saved') {
+        return res.status(403).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Failed to update idea" });
     }
   });
 
