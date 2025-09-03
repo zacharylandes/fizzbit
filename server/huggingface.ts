@@ -227,7 +227,7 @@ function parseIdeasFromResponse(response: string, originalPrompt: string, count:
         if (titleStr.length < 2 || 
             titleStr.length > 150 ||
             words.length < 1 || 
-            words.length > 20 ||
+            words.length > 30 ||
             titleStr.toLowerCase().includes('creative concept') ||
             titleStr.toLowerCase().includes('creative idea') ||
             titleStr.toLowerCase().includes('action step')) {
