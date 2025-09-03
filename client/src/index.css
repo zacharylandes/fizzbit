@@ -761,6 +761,11 @@ input, textarea {
     font-size: 1.2rem !important;
   }
 
+  /* Custom gap overrides */
+  .gap-3 {
+    gap: 0.1rem !important;
+  }
+
   /* Enhanced card swipe animations */
   .swipe-left {
     animation: enhanced-slide-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
