@@ -1497,15 +1497,9 @@ export default function SavedPage() {
                   onTouchEnd={!isDrawingMode ? handleTouchEnd : undefined}
                 >
                   <Card 
-                    className={`${cardStyles[colorIndex]} w-full h-full border-2 card-shadow hover-lift transition-all duration-300 flex flex-col cursor-pointer ${
+                    className={`${cardStyles[colorIndex]} w-full h-full border-2 card-shadow hover-lift transition-all duration-300 flex flex-col cursor-move ${
                       expandedCard === idea.id ? 'ring-2 ring-primary/30' : ''
                     }`}
-                    onClick={(e) => {
-                      if (!isDragging) {
-                        e.stopPropagation();
-                        handleCardClick(idea);
-                      }
-                    }}
                   >
                     {/* Drag Handle - Even Smaller */}
                     <div className="flex-shrink-0 p-1 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50 rounded-t-lg">
