@@ -1577,7 +1577,7 @@ export default function SavedPage() {
         
         {!isLoading && filteredIdeas.length > 0 && !isMobile && (
           // Desktop: Grid layout
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 p-6">
             {filteredIdeas.map((idea, index) => {
               const colorIndex = cardColors[idea.id] ?? index % 8;
               const cardStyles = [
@@ -1597,7 +1597,7 @@ export default function SavedPage() {
                   className={`${cardStyles[colorIndex]} w-full border-2 card-shadow hover-lift transition-all duration-300 flex flex-col cursor-pointer`}
                   onClick={() => handleCardClick(idea)}
                 >
-                  <div className="flex-shrink-0 p-2 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50">
+                  <div className="flex-shrink-0 p-2 border-b border-gray-400/30 bg-gray-100/50 dark:bg-gray-800/50 rounded-t-lg">
                     <div className="flex items-center justify-between">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -1627,22 +1627,35 @@ export default function SavedPage() {
                         </DropdownMenuContent>
                       </DropdownMenu>
                       
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          unsaveIdeaMutation.mutate(idea.id);
-                        }}
-                        className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleStartEditing(idea.id);
+                          }}
+                          className="h-6 w-6 p-0 hover:bg-gray-200 dark:hover:bg-gray-700"
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            unsaveIdeaMutation.mutate(idea.id);
+                          }}
+                          className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="flex-1 p-4 flex flex-col">
-                    <h3 className="font-normal text-lg leading-tight text-gray-800 dark:text-gray-100 h-full flex items-center justify-center text-center px-2">
+                  <div className="flex-1 p-4 flex flex-col overflow-hidden">
+                    <h3 className="font-normal text-lg leading-tight text-gray-800 dark:text-gray-100 text-left truncate">
                       {idea.title}
                     </h3>
                   </div>
