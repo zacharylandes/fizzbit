@@ -79,6 +79,28 @@ export default function SavedPage() {
   const [groupTitles, setGroupTitles] = useState<{ [colorIndex: number]: string }>({});
   const [editingGroup, setEditingGroup] = useState<number | null>(null);
   
+  // Canvas zoom and pan state
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  
+  // Drawing state
+  const [isDrawingMode, setIsDrawingMode] = useState(false);
+  const [drawingState, setDrawingState] = useState({
+    isDrawing: false,
+    color: '#3b82f6',
+    size: 3,
+    paths: [] as Array<{
+      id: string;
+      points: { x: number; y: number }[];
+      color: string;
+      size: number;
+    }>
+  });
+  
+  // SVG reference for drawing
+  const svgRef = useRef<SVGSVGElement>(null);
+  
   // Color definitions for all dropdowns
   const colorCircles = [
     "bg-green-200",
@@ -415,6 +437,161 @@ export default function SavedPage() {
     },
   });
 
+  // Zoom handlers
+  const handleZoomIn = useCallback(() => {
+    setZoom(prev => Math.min(prev * 1.2, 3));
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    setZoom(prev => Math.max(prev / 1.2, 0.3));
+  }, []);
+
+  // Drawing handlers
+  const handleDrawingStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDrawingMode || !svgRef.current) return;
+    
+    const rect = svgRef.current.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    const x = (clientX - rect.left - pan.x) / zoom;
+    const y = (clientY - rect.top - pan.y) / zoom;
+    
+    setDrawingState(prev => ({
+      ...prev,
+      isDrawing: true,
+      paths: [...prev.paths, {
+        id: Date.now().toString(),
+        points: [{ x, y }],
+        color: prev.color,
+        size: prev.size
+      }]
+    }));
+  }, [isDrawingMode, zoom, pan, drawingState]);
+
+  const handleDrawingMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDrawingMode || !drawingState.isDrawing || !svgRef.current) return;
+    
+    const rect = svgRef.current.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    const x = (clientX - rect.left - pan.x) / zoom;
+    const y = (clientY - rect.top - pan.y) / zoom;
+    
+    setDrawingState(prev => ({
+      ...prev,
+      paths: prev.paths.map((path, index) => 
+        index === prev.paths.length - 1 
+          ? { ...path, points: [...path.points, { x, y }] }
+          : path
+      )
+    }));
+  }, [isDrawingMode, zoom, pan, drawingState]);
+
+  const handleDrawingEnd = useCallback(() => {
+    if (!isDrawingMode) return;
+    setDrawingState(prev => ({ ...prev, isDrawing: false }));
+  }, [isDrawingMode]);
+
+  const clearDrawings = useCallback(() => {
+    setDrawingState(prev => ({ ...prev, paths: [] }));
+  }, []);
+
+  // Card interaction handlers
+  const changeCardColor = useCallback((ideaId: string, colorIndex: number) => {
+    setCardColors(prev => ({ ...prev, [ideaId]: colorIndex }));
+  }, []);
+
+  const handleCardClick = useCallback((idea: Idea) => {
+    if (isMobile) {
+      // On mobile, expand inline or navigate
+      setExpandedCard(expandedCard === idea.id ? null : idea.id);
+    } else {
+      // On desktop, open modal
+      setExpandedCard(idea.id);
+    }
+  }, [isMobile, expandedCard]);
+
+  const handleStartEditing = useCallback((ideaId: string) => {
+    const idea = savedIdeas.find(i => i.id === ideaId);
+    if (idea) {
+      setEditingCard(ideaId);
+      setEditTitle(idea.title);
+      setEditDescription(idea.description || '');
+    }
+  }, [savedIdeas]);
+
+  const handleSaveEdit = useCallback(() => {
+    if (!editingCard) return;
+    
+    // Here you would typically call an API to update the idea
+    // For now, we'll just update the local state
+    toast({
+      title: "Idea Updated",
+      description: "Your changes have been saved.",
+      variant: "default",
+    });
+    
+    setEditingCard(null);
+    setEditTitle('');
+    setEditDescription('');
+  }, [editingCard, editTitle, editDescription, toast]);
+
+  const handleCancelEdit = useCallback(() => {
+    setEditingCard(null);
+    setEditTitle('');
+    setEditDescription('');
+  }, []);
+
+  const handleMobileInteractionStart = useCallback((e: React.TouchEvent | React.MouseEvent, ideaId: string, index: number) => {
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    // Clear any existing hold timer
+    if (swipeState.holdTimer) {
+      clearTimeout(swipeState.holdTimer);
+    }
+    
+    // Set a timer to enable dragging after hold duration
+    const holdTimer = setTimeout(() => {
+      setSwipeState(prev => ({ ...prev, canDrag: true }));
+    }, 200); // 200ms hold to enable drag
+    
+    setSwipeState({
+      ideaId,
+      startX: clientX,
+      startY: clientY,
+      currentX: clientX,
+      currentY: clientY,
+      isDragging: false,
+      isVerticalDrag: false,
+      dragIndex: index,
+      isDeleting: false,
+      holdTimer,
+      canDrag: false,
+      startTime: Date.now(),
+    });
+  }, [swipeState.holdTimer]);
+
+  // Helper functions
+  const getGroupTitle = useCallback((colorIndex: number) => {
+    return groupTitles[colorIndex] || `Group ${colorIndex + 1}`;
+  }, [groupTitles]);
+
+  const handleEditGroupTitle = useCallback((colorIndex: number, newTitle: string) => {
+    setGroupTitles(prev => ({ ...prev, [colorIndex]: newTitle.trim() }));
+    setEditingGroup(null);
+  }, []);
+
+  // Filtered ideas based on selected color group
+  const filteredIdeas = useMemo(() => {
+    if (selectedColorGroup === null) {
+      return savedIdeas;
+    }
+    return savedIdeas.filter(idea => cardColors[idea.id] === selectedColorGroup);
+  }, [savedIdeas, selectedColorGroup, cardColors]);
+
   // Initialize positions and colors for new ideas
   useEffect(() => {
     if (savedIdeas.length > 0) {
@@ -671,118 +848,6 @@ export default function SavedPage() {
     };
   }, [dragState, isPanning, zoom, pan]);
 
-  // Drawing handlers
-  const handleDrawingStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDrawingMode || !svgRef.current) return;
-    
-    e.preventDefault();
-    const rect = svgRef.current.getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    
-    const x = (clientX - rect.left - pan.x) / zoom;
-    const y = (clientY - rect.top - pan.y) / zoom;
-    
-    const newPath = {
-      id: Date.now().toString(),
-      points: [{ x, y }],
-      color: drawingState.color,
-      size: drawingState.size,
-    };
-    
-    setDrawingState(prev => ({
-      ...prev,
-      isDrawing: true,
-      paths: [...prev.paths, newPath],
-    }));
-  }, [isDrawingMode, zoom, pan, drawingState.color, drawingState.size]);
-
-  const handleDrawingMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (!drawingState.isDrawing || !svgRef.current) return;
-    
-    e.preventDefault();
-    const rect = svgRef.current.getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    
-    const x = (clientX - rect.left - pan.x) / zoom;
-    const y = (clientY - rect.top - pan.y) / zoom;
-    
-    setDrawingState(prev => ({
-      ...prev,
-      paths: prev.paths.map((path, index) => 
-        index === prev.paths.length - 1
-          ? { ...path, points: [...path.points, { x, y }] }
-          : path
-      ),
-    }));
-  }, [drawingState.isDrawing, zoom, pan]);
-
-  const handleDrawingEnd = useCallback(() => {
-    setDrawingState(prev => ({ ...prev, isDrawing: false }));
-  }, []);
-
-  // Zoom controls
-  const handleZoomIn = () => setZoom(prev => Math.min(prev * 1.2, 3));
-  const handleZoomOut = () => setZoom(prev => Math.max(prev / 1.2, 0.3));
-
-  // Clear all drawings
-  const clearDrawings = () => {
-    setDrawingState(prev => ({ ...prev, paths: [] }));
-  };
-
-  // Change card color
-  const changeCardColor = (ideaId: string, colorIndex: number) => {
-    console.log('🎨 Changing card color:', { ideaId, colorIndex });
-    setCardColors(prev => {
-      const newColors = {
-        ...prev,
-        [ideaId]: colorIndex
-      };
-      console.log('🎨 New card colors state:', newColors);
-      return newColors;
-    });
-  };
-
-  // Mobile interaction start handler with hold delay
-  const handleMobileInteractionStart = (e: React.TouchEvent | React.MouseEvent, ideaId: string, index: number) => {
-    // Don't prevent default initially - allow natural scrolling
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    const startTime = Date.now();
-    
-    // Clear any existing timer
-    if (swipeState.holdTimer) {
-      clearTimeout(swipeState.holdTimer);
-    }
-    
-    // Set a timer to enable drag after very short hold for instant responsiveness
-    const holdTimer = setTimeout(() => {
-      setSwipeState(prev => ({
-        ...prev,
-        canDrag: true
-      }));
-    }, 150);
-    
-    // Don't set isDragging immediately - wait for actual movement
-    setSwipeState({
-      ideaId,
-      startX: clientX,
-      startY: clientY,
-      currentX: clientX,
-      currentY: clientY,
-      isDragging: false, // Changed to false - only set to true when actual dragging starts
-      isVerticalDrag: false,
-      dragIndex: index,
-      isDeleting: false,
-      holdTimer,
-      canDrag: false,
-      startTime,
-    });
-  };
-
-
-
   if (authLoading) {
     return (
       <div className="min-h-screen bg-card-peach flex items-center justify-center">
@@ -804,77 +869,6 @@ export default function SavedPage() {
     ...Object.values(cardColors),
     ...Object.keys(groupTitles).map(k => parseInt(k))
   ])).sort((a, b) => a - b);
-  
-  // Get default group title
-  const getGroupTitle = (colorIndex: number) => {
-    return groupTitles[colorIndex] || `Group ${colorIndex + 1}`;
-  };
-  
-  // Handle group title editing
-  const handleEditGroupTitle = (colorIndex: number, newTitle: string) => {
-    setGroupTitles(prev => ({
-      ...prev,
-      [colorIndex]: newTitle
-    }));
-    setEditingGroup(null);
-  };
-
-  // Handle card expansion and editing
-  const handleCardClick = (idea: Idea) => {
-    console.log('Card click triggered for:', idea.id, { expandedCard, swipeState });
-    if (expandedCard === idea.id) {
-      setExpandedCard(null);
-      setEditingCard(null);
-    } else {
-      setExpandedCard(idea.id);
-      setEditTitle(idea.title);
-      setEditDescription(idea.description);
-    }
-  };
-
-  const handleStartEditing = (ideaId: string) => {
-    const idea = savedIdeas.find(i => i.id === ideaId);
-    if (idea) {
-      setExpandedCard(ideaId);
-      setEditTitle(idea.title);
-      setEditDescription(idea.description);
-      setEditingCard(ideaId);
-    }
-  };
-
-  const handleSaveEdit = async () => {
-    if (!editingCard) return;
-    
-    try {
-      // Here you would make API call to update the idea
-      // For now, we'll just close the editing state
-      setEditingCard(null);
-      setExpandedCard(null);
-      
-      toast({
-        title: "Idea Updated",
-        description: "Your changes have been saved",
-        duration: 2000,
-        variant: "default",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to save changes. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditingCard(null);
-    // Reset edit values to original
-    const idea = savedIdeas.find(i => i.id === expandedCard);
-    if (idea) {
-      setEditTitle(idea.title);
-      setEditDescription(idea.description);
-    }
-  };
 
   // Scroll editing group into view with footer clearance
   useEffect(() => {
@@ -911,11 +905,6 @@ export default function SavedPage() {
       }, 150);
     }
   }, [editingGroup]);
-  
-  // Filter ideas by selected color group
-  const filteredIdeas = selectedColorGroup !== null 
-    ? savedIdeas.filter(idea => cardColors[idea.id] === selectedColorGroup)
-    : savedIdeas;
 
   return (
     <div className="min-h-screen bg-white" data-keyboard-open={isKeyboardOpen}>
@@ -1090,7 +1079,7 @@ export default function SavedPage() {
               </div>
             )}
                 
-                {isDrawingMode && (
+            {isDrawingMode && (
                   <>
                     {/* Color Picker */}
                     <div className="flex items-center gap-1">
@@ -1141,7 +1130,6 @@ export default function SavedPage() {
                   <ZoomIn className="h-4 w-4" />
                 </Button>
               </div>
-            )}
           </div>
         </div>
         {isLoading && (
@@ -1650,7 +1638,6 @@ export default function SavedPage() {
             })}
           </div>
         )}
-      </div>
       </div>
 
       {/* Desktop Card Expansion Modal */}
