@@ -1494,8 +1494,8 @@ export default function SavedPage() {
                   style={{
                     left: position.x,
                     top: position.y,
-                    width: isMobile ? '110px' : '160px', // Smaller on mobile for 3 across
-                    height: isMobile ? '110px' : '160px',
+                    width: isMobile ? '110px' : '320px', // Double width on desktop
+                    height: isMobile ? '110px' : '200px',
                   }}
                   onMouseDown={(e) => !isDrawingMode && handleMouseDown(e, idea.id)}
                   onTouchStart={(e) => !isDrawingMode && handleTouchStart(e, idea.id)}
@@ -1545,25 +1545,38 @@ export default function SavedPage() {
                           </DropdownMenuContent>
                         </DropdownMenu>
                         
-                        {/* Delete Button - Right Side */}
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            unsaveIdeaMutation.mutate(idea.id);
-                          }}
-                          className="h-4 w-4 p-0 hover:bg-red-100 hover:text-red-600 text-gray-400 dark:text-gray-500"
-                        >
-                          <Trash2 className="h-2 w-2" />
-                        </Button>
+                        {/* Edit and Delete Buttons - Right Side */}
+                        <div className="flex items-center gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStartEditing(idea.id);
+                            }}
+                            className="h-4 w-4 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-500"
+                          >
+                            <Pencil className="h-2 w-2" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              unsaveIdeaMutation.mutate(idea.id);
+                            }}
+                            className="h-4 w-4 p-0 hover:bg-red-100 hover:text-red-600 text-gray-400 dark:text-gray-500"
+                          >
+                            <Trash2 className="h-2 w-2" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                     
                     {/* Content */}
                     <div className="flex-1 p-2 flex flex-col overflow-hidden">
-                      {/* Title - Expanded to use full space */}
-                      <h3 className="font-normal text-lg leading-tight text-gray-800 dark:text-gray-100 text-center h-full flex items-center justify-center px-2 overflow-hidden">
+                      {/* Title - Left aligned and truncated from beginning */}
+                      <h3 className="font-normal text-sm leading-tight text-gray-800 dark:text-gray-100 text-left truncate px-2 py-1">
                         {idea.title}
                       </h3>
                       
