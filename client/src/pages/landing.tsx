@@ -11,10 +11,10 @@ export default function LandingPage() {
         {/* Navigation */}
         <nav className="border-b border-gray-200 bg-header-footer shadow-sm">
           <div className="flex items-center justify-between p-6 max-w-7xl mx-auto">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-3">
             <img src={spiralLogoImage} alt="FizzBit Logo" className="h-12 w-12 object-contain" />
-            <h1 className="text-2xl font-poppins text-foreground">
-              FizzBit
+            <h1 className="text-2xl font-poppins font-medium text-foreground">
+              fizzbit
             </h1>
           </div>
           <a href="/api/login">
@@ -132,14 +132,14 @@ export default function LandingPage() {
       <footer className="border-t border-gray-200 bg-header-footer">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-3">
               <div className="p-2 bg-white rounded-lg shadow-sm">
                 <img src={spiralLogoImage} alt="FizzBit Logo" className="h-5 w-5 object-contain" />
               </div>
-              <span className="text-lg font-poppins text-foreground">FizzBit</span>
+              <span className="text-lg font-poppins font-medium text-foreground">fizzbit</span>
             </div>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-              © 2025 FizzBit. All rights reserved.
+              © 2025 fizzbit. All rights reserved.
             </p>
           </div>
         </div>
