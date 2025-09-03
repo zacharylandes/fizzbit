@@ -233,8 +233,8 @@ input, textarea {
   .text-header-footer-button { color: var(--header-footer-button) !important; }
   
   /* Font utility classes */
-  .font-poppins-bold { font-family: 'Poppins', sans-serif; font-weight: 600; }
-  .font-poppins-semibold { font-family: 'Poppins', sans-serif; font-weight: 500; }
+  .font-poppins-bold { font-family: 'Poppins', sans-serif; font-weight: 400; }
+  .font-poppins-semibold { font-family: 'Poppins', sans-serif; font-weight: 300; }
   .font-poppins { font-family: 'Poppins', sans-serif; font-weight: 400; }
   
   /* Inspired title animations - subtle */

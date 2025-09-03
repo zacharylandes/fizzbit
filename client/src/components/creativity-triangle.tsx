@@ -183,7 +183,7 @@ export const CreativityTriangle = ({ onWeightsChange, className = "" }: Creativi
   return (
     <div className={`w-full max-w-md mx-auto ${className}`}>
       <div className="text-center mb-4">
-        <h3 className="text-lg font-medium text-gray-800 mb-1">
+        <h3 className="text-lg font-light text-gray-800 mb-1">
           Creativity Blend
         </h3>
         <p className="text-gray-500 text-sm">Drag to set your creative style</p>
@@ -261,15 +261,15 @@ export const CreativityTriangle = ({ onWeightsChange, className = "" }: Creativi
       {/* Weight Display */}
       <div className="grid grid-cols-3 gap-2 mb-3">
         <div className="text-center">
-          <div className="text-lg font-semibold text-purple-500">{Math.round(weights.wild * 100)}%</div>
+          <div className="text-lg font-normal text-purple-500">{Math.round(weights.wild * 100)}%</div>
           <div className="text-xs text-gray-600">Wild</div>
         </div>
         <div className="text-center">
-          <div className="text-lg font-semibold text-green-500">{Math.round(weights.actionable * 100)}%</div>
+          <div className="text-lg font-normal text-green-500">{Math.round(weights.actionable * 100)}%</div>
           <div className="text-xs text-gray-600">Actionable</div>
         </div>
         <div className="text-center">
-          <div className="text-lg font-semibold text-blue-500">{Math.round(weights.deep * 100)}%</div>
+          <div className="text-lg font-normal text-blue-500">{Math.round(weights.deep * 100)}%</div>
           <div className="text-xs text-gray-600">Deep</div>
         </div>
       </div>

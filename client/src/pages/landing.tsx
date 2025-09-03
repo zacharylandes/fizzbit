@@ -13,7 +13,7 @@ export default function LandingPage() {
           <div className="flex items-center justify-between p-6 max-w-7xl mx-auto">
           <div className="flex items-center space-x-3">
             <img src={logoImage} alt="FizzBit Logo" className="h-12 w-12 object-contain" />
-            <h1 className="text-2xl font-poppins-bold text-foreground">
+            <h1 className="text-2xl font-poppins text-foreground">
               FizzBit
             </h1>
           </div>
@@ -34,7 +34,7 @@ export default function LandingPage() {
               </span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-poppins-bold mb-6 leading-tight text-foreground">
+            <h1 className="text-5xl md:text-7xl font-poppins mb-6 leading-tight text-foreground">
               Swipe Right on <br />
               Endless Creativity
             </h1>
@@ -55,7 +55,7 @@ export default function LandingPage() {
       {/* Features Section */}
       <div className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-poppins-bold mb-4 text-gray-800 bg-header-footer px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
+          <h2 className="text-4xl md:text-5xl font-poppins mb-4 text-gray-800 bg-header-footer px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
             Enhance Your Creativity
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -68,7 +68,7 @@ export default function LandingPage() {
             <div className="bg-card-mint card-shadow hover-lift rounded-2xl p-6 mb-4 border border-gray-200 group-hover:shadow-md transition-all duration-300">
               <Image className="h-8 w-8 text-card-mint mx-auto" />
             </div>
-            <h3 className="text-lg font-poppins-semibold mb-2 text-foreground">Photo Magic</h3>
+            <h3 className="text-lg font-poppins mb-2 text-foreground">Photo Magic</h3>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
               Upload any photo and get creative ideas inspired by what you see.
             </p>
@@ -78,7 +78,7 @@ export default function LandingPage() {
             <div className="bg-card-lavender card-shadow hover-lift rounded-2xl p-6 mb-4 border border-gray-200 group-hover:shadow-md transition-all duration-300">
               <Sparkles className="h-8 w-8 text-card-lavender mx-auto" />
             </div>
-            <h3 className="text-lg font-poppins-semibold mb-2 text-foreground">Text Prompts</h3>
+            <h3 className="text-lg font-poppins mb-2 text-foreground">Text Prompts</h3>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
               Describe your interests and get personalized creative ideas.
             </p>
@@ -88,7 +88,7 @@ export default function LandingPage() {
             <div className="bg-card-peach card-shadow hover-lift rounded-2xl p-6 mb-4 border border-gray-200 group-hover:shadow-md transition-all duration-300">
               <Eye className="h-8 w-8 text-card-peach mx-auto" />
             </div>
-            <h3 className="text-lg font-poppins-semibold mb-2 text-foreground">Explore & Chain</h3>
+            <h3 className="text-lg font-poppins mb-2 text-foreground">Explore & Chain</h3>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
               Discover variations that blend your inspiration with new concepts.
             </p>
@@ -98,7 +98,7 @@ export default function LandingPage() {
             <div className="bg-card-rose card-shadow hover-lift rounded-2xl p-6 mb-4 border border-gray-200 group-hover:shadow-md transition-all duration-300">
               <Heart className="h-8 w-8 text-card-rose mx-auto" />
             </div>
-            <h3 className="text-lg font-poppins-semibold mb-2 text-foreground">Save & Organize</h3>
+            <h3 className="text-lg font-poppins mb-2 text-foreground">Save & Organize</h3>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
               Build your personal collection of favorite creative ideas.
             </p>
@@ -109,7 +109,7 @@ export default function LandingPage() {
       {/* CTA Section */}
       <div className="max-w-7xl mx-auto px-6 py-20">
         <div className="bg-card border border-border rounded-3xl p-12 text-center shadow-sm">
-          <h2 className="text-3xl md:text-4xl font-poppins-bold mb-4 text-foreground">
+          <h2 className="text-3xl md:text-4xl font-poppins mb-4 text-foreground">
             Start your creative journey today
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -136,7 +136,7 @@ export default function LandingPage() {
               <div className="p-2 bg-white rounded-lg shadow-sm">
                 <img src={logoImage} alt="FizzBit Logo" className="h-5 w-5 object-contain" />
               </div>
-              <span className="text-lg font-poppins-bold text-foreground">FizzBit</span>
+              <span className="text-lg font-poppins text-foreground">FizzBit</span>
             </div>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
               © 2025 FizzBit. All rights reserved.

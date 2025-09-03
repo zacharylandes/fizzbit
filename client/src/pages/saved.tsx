@@ -1064,7 +1064,7 @@ export default function SavedPage() {
             
             {/* Header Text */}
             <div className="flex-1">
-              <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-crimson font-semibold text-foreground`}>
+              <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-crimson font-normal text-foreground`}>
                 {selectedColorGroup !== null 
                   ? `${getGroupTitle(selectedColorGroup)} (${filteredIdeas.length})`
                   : `Saved Ideas (${filteredIdeas.length})`
@@ -1155,7 +1155,7 @@ export default function SavedPage() {
             <div className="text-center p-8">
               <div className="bg-card border border-card-sage/30 rounded-2xl p-8 max-w-sm mx-auto shadow-sm">
                 <Heart className="h-12 w-12 mx-auto mb-4 text-card-sage" />
-                <h2 className="text-xl font-crimson font-semibold text-foreground mb-2">
+                <h2 className="text-xl font-crimson font-normal text-foreground mb-2">
                   {selectedColorGroup !== null ? 'No ideas in this group' : 'No saved ideas yet'}
                 </h2>
                 <p className="text-muted-foreground mb-6 font-inter text-sm">
@@ -1317,7 +1317,7 @@ export default function SavedPage() {
                               // Display mode
                               <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                  <h3 className={`font-bold text-sm text-gray-800 dark:text-gray-100 ${
+                                  <h3 className={`font-normal text-sm text-gray-800 dark:text-gray-100 ${
                                     expandedCard === idea.id ? '' : 'truncate'
                                   }`}>
                                     {idea.title}
@@ -1563,7 +1563,7 @@ export default function SavedPage() {
                     {/* Content */}
                     <div className="flex-1 p-2 flex flex-col overflow-hidden">
                       {/* Title - Much Larger and Centered */}
-                      <h3 className="font-bold text-base leading-tight mb-2 text-gray-800 dark:text-gray-100 line-clamp-2 text-center overflow-hidden">
+                      <h3 className="font-normal text-base leading-tight mb-2 text-gray-800 dark:text-gray-100 line-clamp-2 text-center overflow-hidden">
                         {idea.title}
                       </h3>
                       
@@ -1650,7 +1650,7 @@ export default function SavedPage() {
                   </div>
                   
                   <div className="flex-1 p-4 flex flex-col">
-                    <h3 className="font-bold text-lg leading-tight mb-2 text-gray-800 dark:text-gray-100">
+                    <h3 className="font-normal text-lg leading-tight mb-2 text-gray-800 dark:text-gray-100">
                       {idea.title}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed flex-1">
@@ -1671,7 +1671,7 @@ export default function SavedPage() {
           <div className="bg-background border border-border rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
-                <h2 className="text-lg font-bold text-foreground">
+                <h2 className="text-lg font-normal text-foreground">
                   {editingCard === expandedCard ? 'Edit Idea' : 'Idea Details'}
                 </h2>
                 <Button
@@ -1721,7 +1721,7 @@ export default function SavedPage() {
                 // Display mode
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
-                    <h3 className="text-xl font-bold text-foreground leading-tight">
+                    <h3 className="text-xl font-normal text-foreground leading-tight">
                       {savedIdeas.find(i => i.id === expandedCard)?.title}
                     </h3>
                     <Button

@@ -199,7 +199,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
         {/* Only render cards with valid titles */}
         {idea.title && idea.title.trim().length > 0 && (
           <div className="flex flex-col items-center justify-start h-full pt-8">
-            <h3 className="text-lg font-poppins-bold text-center leading-tight mb-6 text-black">
+            <h3 className="text-lg font-poppins text-center leading-tight mb-6 text-black">
               {idea.title}
             </h3>
             
