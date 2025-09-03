@@ -80,33 +80,31 @@ input, textarea {
   --ring: hsl(250, 50%, 50%);
   --radius: 1rem;
   
-  /* Beautiful Card Colors - Updated Palette */
-  --card-mint: hsl(0, 0%, 0%);            /* Black text */
-  --card-mint-bg: hsl(210, 50%, 80%);     /* Light Blue #AECAEA */
-  --card-lavender: hsl(0, 0%, 0%);        /* Black text */
-  --card-lavender-bg: hsl(147, 28%, 80%); /* Light Green #C1D7CB */
-  --card-peach: hsl(0, 0%, 0%);           /* Black text */
-  --card-peach-bg: hsl(32, 40%, 80%);     /* Cream #E0CDB8 */
-  --card-rose: hsl(0, 0%, 0%);            /* Black text */
-  --card-rose-bg: hsl(0, 20%, 72%);       /* Dusty Rose #C4ABAB */
-  --card-sage: hsl(0, 0%, 0%);            /* Black text */
-  --card-sage-bg: hsl(199, 20%, 64%);     /* Blue Gray #90AAB6 */
-  --card-sand: hsl(0, 0%, 0%);            /* Black text */
-  --card-sand-bg: hsl(210, 50%, 80%);     /* Light Blue #AECAEA */
-  --card-blue: hsl(0, 0%, 0%);            /* Black text */
-  --card-blue-bg: hsl(147, 28%, 80%);     /* Light Green #C1D7CB */
-  --card-taupe: hsl(0, 0%, 0%);           /* Black text */
-  --card-taupe-bg: hsl(32, 40%, 80%);     /* Cream #E0CDB8 */
+  /* Beautiful Card Colors - Exact User Specification */
+  --card-mint: hsl(0, 0%, 40%);           /* Dark gray text */
+  --card-mint-bg: hsl(170, 30%, 94%);     /* Light Mint #E6F4F1 */
+  --card-lavender: hsl(0, 0%, 40%);       /* Dark gray text */
+  --card-lavender-bg: hsl(270, 35%, 94%); /* Soft Lavender #EDE9F5 */
+  --card-peach: hsl(0, 0%, 40%);          /* Dark gray text */
+  --card-peach-bg: hsl(25, 50%, 94%);     /* Pale Peach #F9EDE8 */
+  --card-rose: hsl(0, 0%, 40%);           /* Dark gray text */
+  --card-rose-bg: hsl(345, 30%, 94%);     /* Dusty Rose #F3E6E9 */
+  --card-sage: hsl(0, 0%, 40%);           /* Dark gray text */
+  --card-sage-bg: hsl(140, 25%, 94%);     /* Light Sage #E9F1EC */
+  --card-sand: hsl(0, 0%, 40%);           /* Dark gray text */
+  --card-sand-bg: hsl(45, 35%, 94%);      /* Warm Sand #F5F2EA */
+  --card-blue: hsl(0, 0%, 40%);           /* Dark gray text */
+  --card-blue-bg: hsl(210, 50%, 94%);     /* Misty Blue #E5EEF7 */
+  --card-taupe: hsl(0, 0%, 40%);          /* Dark gray text */
+  --card-taupe-bg: hsl(30, 25%, 93%);     /* Soft Taupe #EFEAE7 */
   
   /* Custom header/footer and button colors */
-  --header-footer: hsl(0, 0%, 0%);        /* Black text */
-  --header-footer-bg: hsl(202, 20%, 80%); /* Header/Footer Blue #C1CFD7 */
-  --button-custom: hsl(0, 0%, 0%);        /* Black text */
-  --button-custom-bg: hsl(32, 40%, 80%);  /* Button Cream #E0CDB8 */
-  --header-footer-button: hsl(0, 0%, 0%);  /* Black text */
-  --header-footer-button-bg: hsl(147, 28%, 80%); /* Light Green #C1D7CB */
-  --contrast-color-1: hsl(210, 50%, 80%); /* Light Blue #AECAEA */
-  --contrast-color-2: hsl(0, 20%, 72%);   /* Dusty Rose #C4ABAB */
+  --header-footer: hsl(0, 0%, 40%);       /* Dark gray text */
+  --header-footer-bg: hsl(207, 50%, 94%); /* Light Blue #E7EFF8 */
+  --button-custom: hsl(0, 0%, 40%);       /* Dark gray text */
+  --button-custom-bg: hsl(24, 43%, 94%);  /* Cream #F7EEE8 */
+  --header-footer-button: hsl(0, 0%, 40%); /* Dark gray text */
+  --header-footer-button-bg: hsl(134, 20%, 92%); /* Light Green #EBF4EF */
   
   /* Professional Primary Colors */
   --primary-blue: hsl(210, 20%, 55%);
