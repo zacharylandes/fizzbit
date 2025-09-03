@@ -531,12 +531,9 @@ export default function SavedPage() {
     
     try {
       // Call the API to update the idea
-      await apiRequest(`/api/ideas/${editingCard}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          title: editTitle,
-          description: editDescription
-        })
+      await apiRequest('PUT', `/api/ideas/${editingCard}`, {
+        title: editTitle,
+        description: editDescription
       });
       
       // Invalidate the saved ideas query to refetch the updated data
