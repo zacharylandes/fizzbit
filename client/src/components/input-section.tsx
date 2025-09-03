@@ -562,14 +562,12 @@ export function InputSection({
             disabled={isLoading}
           />
           <Button
-            asChild
+            onClick={() => !isLoading && document.getElementById('image-upload')?.click()}
             className="flex-1 bg-card-blue border border-gray-300 hover:bg-card-blue/90 text-gray-700 rounded-lg py-3 px-4 font-medium shadow-sm touch-target text-center transition-all duration-300"
             disabled={isLoading}
           >
-            <label htmlFor="image-upload" className="cursor-pointer flex items-center justify-center text-gray-700 font-medium">
-              <Camera className="mr-2 h-4 w-4" />
-              Upload Image
-            </label>
+            <Camera className="mr-2 h-4 w-4" />
+            Upload Image
           </Button>
 
           {/* Text Input Toggle */}
