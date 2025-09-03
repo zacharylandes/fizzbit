@@ -34,14 +34,14 @@ const cardStyles = [
   "bg-card-taupe card-shadow hover-lift border border-gray-200"
 ];
 
-// Component to display DotLottie animations with improved state handling
-function LottieAnimation({ url, className, isSwipeAnimating }: { url: string; className?: string; isSwipeAnimating?: boolean }) {
+// Component to display DotLottie animations with stable rendering
+function LottieAnimation({ url, className }: { url: string; className?: string }) {
   return (
     <DotLottieReact
       src={url}
       loop
       autoplay
-      className={`${className} ${isSwipeAnimating ? 'animate-pause' : ''}`}
+      className={className}
       style={{
         willChange: 'transform',
         backfaceVisibility: 'hidden',
@@ -208,7 +208,6 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
               <LottieAnimation 
                 url={getLottieAnimationForIdea(idea)}
                 className="w-full h-32"
-                isSwipeAnimating={isSwipeAnimating}
               />
             </div>
           </div>
