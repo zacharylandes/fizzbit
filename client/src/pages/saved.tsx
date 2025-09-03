@@ -1511,11 +1511,12 @@ export default function SavedPage() {
                             variant="ghost"
                             onClick={(e) => {
                               e.stopPropagation();
+                              console.log('Edit button clicked for idea:', idea.id);
                               handleStartEditing(idea.id);
                             }}
-                            className="h-4 w-4 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-500"
+                            className="h-6 w-6 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-500"
                           >
-                            <Pencil className="h-2 w-2" />
+                            <Pencil className="h-3 w-3" />
                           </Button>
                           <Button
                             size="sm"
@@ -1524,9 +1525,9 @@ export default function SavedPage() {
                               e.stopPropagation();
                               unsaveIdeaMutation.mutate(idea.id);
                             }}
-                            className="h-4 w-4 p-0 hover:bg-red-100 hover:text-red-600 text-gray-400 dark:text-gray-500"
+                            className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600 text-gray-400 dark:text-gray-500"
                           >
-                            <Trash2 className="h-2 w-2" />
+                            <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
                       </div>
@@ -1607,11 +1608,12 @@ export default function SavedPage() {
                           variant="ghost"
                           onClick={(e) => {
                             e.stopPropagation();
+                            console.log('Grid Edit button clicked for idea:', idea.id);
                             handleStartEditing(idea.id);
                           }}
-                          className="h-6 w-6 p-0 hover:bg-gray-200 dark:hover:bg-gray-700"
+                          className="h-7 w-7 p-0 hover:bg-gray-200 dark:hover:bg-gray-700"
                         >
-                          <Pencil className="h-3 w-3" />
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           size="sm"
@@ -1620,9 +1622,9 @@ export default function SavedPage() {
                             e.stopPropagation();
                             unsaveIdeaMutation.mutate(idea.id);
                           }}
-                          className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600"
+                          className="h-7 w-7 p-0 hover:bg-red-100 hover:text-red-600"
                         >
-                          <Trash2 className="h-3 w-3" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
