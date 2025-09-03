@@ -736,6 +736,26 @@ input, textarea {
     100% { opacity: 0; }
   }
   
+  /* Smooth animation handling during swipes */
+  .animate-pause {
+    animation-play-state: paused !important;
+  }
+  
+  /* Hardware acceleration for better performance */
+  .relative.rounded-xl {
+    will-change: transform;
+    backface-visibility: hidden;
+    perspective: 1000px;
+    transform: translateZ(0);
+  }
+  
+  /* Improved Lottie animation smoothness during swipes */
+  .lottie-container {
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
+  
   /* Enhanced card swipe animations */
   .swipe-left {
     animation: enhanced-slide-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;

@@ -10,6 +10,11 @@ import dividerLottieUrl from '@assets/Squiggly Divider Line_1756786094439.lottie
 import wavesLottieUrl from '@assets/wavess_1756786094441.lottie?url';
 import rocketLottieUrl from '@assets/Rocket in space_1756786094442.lottie?url';
 import devildoneLottieUrl from '@assets/devildone.json?url';
+import nightCityLottieUrl from '@assets/Night city_1756862324144.lottie?url';
+import karltioLottieUrl from '@assets/Karltio Cooking_1756862324148.lottie?url';
+import slipperLottieUrl from '@assets/Slipper_1756862324148.lottie?url';
+import windowLottieUrl from '@assets/Window_1756862324149.lottie?url';
+import diceLottieUrl from '@assets/dice 6_1756862324149.lottie?url';
 
 interface IdeaCardProps {
   idea: Idea;
@@ -31,14 +36,20 @@ const cardStyles = [
   "bg-card-taupe card-shadow hover-lift border border-gray-200"
 ];
 
-// Component to display DotLottie animations
-function LottieAnimation({ url, className }: { url: string; className?: string }) {
+// Component to display DotLottie animations with improved state handling
+function LottieAnimation({ url, className, isSwipeAnimating }: { url: string; className?: string; isSwipeAnimating?: boolean }) {
   return (
     <DotLottieReact
       src={url}
       loop
       autoplay
-      className={className}
+      className={`${className} ${isSwipeAnimating ? 'animate-pause' : ''}`}
+      style={{
+        willChange: 'transform',
+        backfaceVisibility: 'hidden',
+        perspective: '1000px',
+        transform: 'translateZ(0)'
+      }}
     />
   );
 }
@@ -49,7 +60,7 @@ function getLottieAnimationForIdea(idea: Idea): string {
   
   // Create a hash-based rotation for variety - this ensures each card gets a different animation
   const hash = idea.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const baseAnimation = hash % 6; // 0-5 range for 6 animations
+  const baseAnimation = hash % 11; // 0-10 range for 11 animations
   
   // Strong keyword matching can override the hash (but only for very specific matches)
   if (content.includes('skateboard') || content.includes('skate')) {
@@ -67,6 +78,21 @@ function getLottieAnimationForIdea(idea: Idea): string {
   if (content.includes('devil') || content.includes('demon') || content.includes('evil')) {
     return devildoneLottieUrl;
   }
+  if (content.includes('city') || content.includes('night') || content.includes('building')) {
+    return nightCityLottieUrl;
+  }
+  if (content.includes('cook') || content.includes('food') || content.includes('recipe') || content.includes('kitchen')) {
+    return karltioLottieUrl;
+  }
+  if (content.includes('shoe') || content.includes('slipper') || content.includes('foot')) {
+    return slipperLottieUrl;
+  }
+  if (content.includes('window') || content.includes('view') || content.includes('house')) {
+    return windowLottieUrl;
+  }
+  if (content.includes('dice') || content.includes('game') || content.includes('random') || content.includes('chance')) {
+    return diceLottieUrl;
+  }
   
   // For all other cards, use hash-based rotation to ensure variety
   switch (baseAnimation) {
@@ -81,8 +107,18 @@ function getLottieAnimationForIdea(idea: Idea): string {
     case 4:
       return dividerLottieUrl;
     case 5:
-    default:
       return devildoneLottieUrl;
+    case 6:
+      return nightCityLottieUrl;
+    case 7:
+      return karltioLottieUrl;
+    case 8:
+      return slipperLottieUrl;
+    case 9:
+      return windowLottieUrl;
+    case 10:
+    default:
+      return diceLottieUrl;
   }
 }
 
@@ -184,6 +220,7 @@ export function IdeaCard({ idea, position, colorIndex, isSwipeAnimating, swipeDi
               <LottieAnimation 
                 url={getLottieAnimationForIdea(idea)}
                 className="w-full h-32"
+                isSwipeAnimating={isSwipeAnimating}
               />
             </div>
           </div>
