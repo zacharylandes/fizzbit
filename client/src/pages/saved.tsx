@@ -441,9 +441,9 @@ export default function SavedPage() {
         savedIdeas.forEach((idea, index) => {
           if (!newPositions[idea.id]) {
             // Arrange in a grid pattern initially - responsive for mobile
-            const cols = isMobile ? 3 : 4; // 3 columns on mobile, 4 on desktop
-            const cardSize = isMobile ? 110 : 160;
-            const spacing = isMobile ? 120 : 200;
+            const cols = isMobile ? 3 : 3; // 3 columns on mobile, 3 on desktop to fit wider cards
+            const cardSize = isMobile ? 110 : 320; // Account for new wider desktop cards
+            const spacing = isMobile ? 120 : 340; // Wider spacing for desktop
             
             const col = index % cols;
             const row = Math.floor(index / cols);
@@ -1293,21 +1293,15 @@ export default function SavedPage() {
                           {/* Content */}
                           <div className="flex-1 min-w-0">
                             {editingCard === idea.id ? (
-                              // Editing mode
+                              // Editing mode - single text area
                               <div className="space-y-2">
-                                <input
-                                  type="text"
+                                <textarea
                                   value={editTitle}
                                   onChange={(e) => setEditTitle(e.target.value)}
-                                  className="w-full text-sm font-bold bg-transparent border-b border-gray-300 dark:border-gray-600 focus:border-primary focus:outline-none"
+                                  className="w-full text-sm bg-transparent border border-gray-300 dark:border-gray-600 rounded px-2 py-1 focus:border-primary focus:outline-none resize-none"
+                                  rows={3}
                                   onClick={(e) => e.stopPropagation()}
-                                />
-                                <textarea
-                                  value={editDescription}
-                                  onChange={(e) => setEditDescription(e.target.value)}
-                                  className="w-full text-xs bg-transparent border border-gray-300 dark:border-gray-600 rounded px-2 py-1 focus:border-primary focus:outline-none resize-none"
-                                  rows={expandedCard === idea.id ? 4 : 2}
-                                  onClick={(e) => e.stopPropagation()}
+                                  placeholder="Edit your idea..."
                                 />
                                 <div className="flex gap-1 pt-1">
                                   <Button
@@ -1575,10 +1569,12 @@ export default function SavedPage() {
                     
                     {/* Content */}
                     <div className="flex-1 p-2 flex flex-col overflow-hidden">
-                      {/* Title - Left aligned and truncated from beginning */}
-                      <h3 className="font-normal text-sm leading-tight text-gray-800 dark:text-gray-100 text-left truncate px-2 py-1">
-                        {idea.title}
-                      </h3>
+                      {/* Title - Wrapped text instead of truncated */}
+                      <div className="flex-1 p-2">
+                        <p className="font-normal text-sm leading-relaxed text-gray-800 dark:text-gray-100 text-left break-words">
+                          {idea.title}
+                        </p>
+                      </div>
                       
                     </div>
                   </Card>
@@ -1703,24 +1699,16 @@ export default function SavedPage() {
               </div>
 
               {editingCard === expandedCard ? (
-                // Editing mode
+                // Editing mode - single text area
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Title</label>
-                    <input
-                      type="text"
+                    <label className="block text-sm font-medium mb-2">Edit Idea</label>
+                    <textarea
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
-                      className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Description</label>
-                    <textarea
-                      value={editDescription}
-                      onChange={(e) => setEditDescription(e.target.value)}
                       className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-                      rows={6}
+                      rows={8}
+                      placeholder="Edit your idea..."
                     />
                   </div>
                   <div className="flex gap-2 pt-2">
