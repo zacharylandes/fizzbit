@@ -1092,76 +1092,75 @@ export default function SavedPage() {
                 }
               </h1>
             </div>
+            
+            {/* Drawing and Zoom Controls */}
+            {filteredIdeas.length > 0 && !isMobile && (
+              <div className="flex items-center gap-2">
+                {/* Drawing Mode Toggle */}
+                <Button
+                  size="sm"
+                  variant={isDrawingMode ? "default" : "outline"}
+                  onClick={() => setIsDrawingMode(!isDrawingMode)}
+                  className="h-8 px-3"
+                >
+                  <Pencil className="h-4 w-4 mr-1" />
+                  <span className="text-xs">Draw</span>
+                </Button>
+                
+                {isDrawingMode && (
+                  <>
+                    {/* Color Picker */}
+                    <div className="flex items-center gap-1">
+                      {['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#000000'].map(color => (
+                        <button
+                          key={color}
+                          className={`w-6 h-6 rounded-full border-2 ${
+                            drawingState.color === color ? 'border-gray-800' : 'border-gray-300'
+                          }`}
+                          style={{ backgroundColor: color }}
+                          onClick={() => setDrawingState(prev => ({ ...prev, color }))}
+                        />
+                      ))}
+                    </div>
+                    
+                    {/* Clear Drawings */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={clearDrawings}
+                      className="h-8 px-2"
+                    >
+                      <Eraser className="h-3 w-3" />
+                    </Button>
+                  </>
+                )}
+                
+                <div className="w-px h-6 bg-border mx-1" />
+                
+                {/* Zoom Controls */}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleZoomOut}
+                  className="h-8 w-8 p-0"
+                >
+                  <ZoomOut className="h-4 w-4" />
+                </Button>
+                <span className="text-sm text-muted-foreground min-w-[3rem] text-center">
+                  {Math.round(zoom * 100)}%
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleZoomIn}
+                  className="h-8 w-8 p-0"
+                >
+                  <ZoomIn className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
-        {/* Drawing and Zoom Controls */}
-        {filteredIdeas.length > 0 && !isMobile && (
-          <div className="absolute right-4 z-10 bg-background/95 backdrop-blur-sm border border-border rounded-lg px-3 py-2 shadow-sm" style={{ top: isMobile ? '68px' : '84px' }}>
-            <div className="flex items-center gap-2">
-              {/* Drawing Mode Toggle */}
-              <Button
-                size="sm"
-                variant={isDrawingMode ? "default" : "outline"}
-                onClick={() => setIsDrawingMode(!isDrawingMode)}
-                className="h-8 px-3"
-              >
-                <Pencil className="h-4 w-4 mr-1" />
-                <span className="text-xs">Draw</span>
-              </Button>
-              
-              {isDrawingMode && (
-                <>
-                  {/* Color Picker */}
-                  <div className="flex items-center gap-1">
-                    {['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#000000'].map(color => (
-                      <button
-                        key={color}
-                        className={`w-6 h-6 rounded-full border-2 ${
-                          drawingState.color === color ? 'border-gray-800' : 'border-gray-300'
-                        }`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => setDrawingState(prev => ({ ...prev, color }))}
-                      />
-                    ))}
-                  </div>
-                  
-                  {/* Clear Drawings */}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={clearDrawings}
-                    className="h-8 px-2"
-                  >
-                    <Eraser className="h-3 w-3" />
-                  </Button>
-                </>
-              )}
-              
-              <div className="w-px h-6 bg-border mx-1" />
-              
-              {/* Zoom Controls */}
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleZoomOut}
-                className="h-8 w-8 p-0"
-              >
-                <ZoomOut className="h-4 w-4" />
-              </Button>
-              <span className="text-sm text-muted-foreground min-w-[3rem] text-center">
-                {Math.round(zoom * 100)}%
-              </span>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleZoomIn}
-                className="h-8 w-8 p-0"
-              >
-                <ZoomIn className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        )}
         {isLoading && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
