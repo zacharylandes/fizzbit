@@ -1012,7 +1012,7 @@ export default function SavedPage() {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-[0.5px] border-gray-400 ${colorCircles[colorIndex] || 'bg-gray-300'}`} />
+                      <div className={`w-5 h-5 rounded-full ${colorCircles[colorIndex] || 'bg-gray-300'}`} />
                       <div className="flex-1 min-w-0">
                         {editingGroup === colorIndex ? (
                           <input
