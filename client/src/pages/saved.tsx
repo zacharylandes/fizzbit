@@ -519,8 +519,12 @@ export default function SavedPage() {
       setEditingCard(ideaId);
       setEditTitle(idea.title);
       setEditDescription(idea.description || '');
+      // On desktop, also open the modal to show the editing interface
+      if (!isMobile) {
+        setExpandedCard(ideaId);
+      }
     }
-  }, [savedIdeas]);
+  }, [savedIdeas, isMobile]);
 
   const handleSaveEdit = useCallback(() => {
     if (!editingCard) return;
