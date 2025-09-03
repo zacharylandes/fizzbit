@@ -133,9 +133,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-white rounded-lg shadow-sm">
-                <img src={spiralLogoImage} alt="FizzBit Logo" className="h-5 w-5 object-contain" />
-              </div>
+              <img src={spiralLogoImage} alt="FizzBit Logo" className="h-6 w-6 object-contain" />
               <span className="text-lg font-poppins font-medium text-foreground">fizzbit</span>
             </div>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
