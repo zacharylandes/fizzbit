@@ -1392,7 +1392,7 @@ export default function SavedPage() {
                                     }}
                                     className="flex items-center gap-3 py-3 px-3 touch-manipulation cursor-pointer hover:bg-accent"
                                   >
-                                    <div className={`w-4 h-4 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')} border border-gray-300`} />
+                                    <div className={`w-4 h-4 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')} border-[0.5px] border-gray-400`} />
                                     <span className="text-sm">{groupTitles[idx] || `Group ${idx + 1}`}</span>
                                   </DropdownMenuItem>
                                 ))}
@@ -1557,7 +1557,7 @@ export default function SavedPage() {
                                 }}
                                 className="flex items-center gap-2"
                               >
-                                <div className={`w-3 h-3 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')}`} />
+                                <div className={`w-3 h-3 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')} border-[0.5px] border-gray-400`} />
                                 <span className="text-xs">{groupTitles[idx] || `Group ${idx + 1}`}</span>
                               </DropdownMenuItem>
                             ))}
@@ -1647,7 +1647,7 @@ export default function SavedPage() {
                               }}
                               className="flex items-center gap-2"
                             >
-                              <div className={`w-3 h-3 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')}`} />
+                              <div className={`w-3 h-3 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')} border-[0.5px] border-gray-400`} />
                               <span className="text-xs">{groupTitles[idx] || `Group ${idx + 1}`}</span>
                             </DropdownMenuItem>
                           ))}
