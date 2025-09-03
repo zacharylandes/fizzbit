@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, Image, ArrowRight, Heart, Eye } from "lucide-react";
-import logoImage from "@/assets/spiral-logo.png";
+import spiralLogoImage from "@/assets/spiral-logo.png";
 
 export default function LandingPage() {
   return (
@@ -12,7 +12,7 @@ export default function LandingPage() {
         <nav className="border-b border-gray-200 bg-header-footer shadow-sm">
           <div className="flex items-center justify-between p-6 max-w-7xl mx-auto">
           <div className="flex items-center space-x-3">
-            <img src={logoImage} alt="FizzBit Logo" className="h-12 w-12 object-contain" />
+            <img src={spiralLogoImage} alt="FizzBit Logo" className="h-12 w-12 object-contain" />
             <h1 className="text-2xl font-poppins text-foreground">
               FizzBit
             </h1>
@@ -134,7 +134,7 @@ export default function LandingPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-white rounded-lg shadow-sm">
-                <img src={logoImage} alt="FizzBit Logo" className="h-5 w-5 object-contain" />
+                <img src={spiralLogoImage} alt="FizzBit Logo" className="h-5 w-5 object-contain" />
               </div>
               <span className="text-lg font-poppins text-foreground">FizzBit</span>
             </div>
