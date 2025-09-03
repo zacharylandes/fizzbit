@@ -155,11 +155,14 @@ export default function HistoryPage() {
         ) : (
           filteredHistory.map((prompt: PromptHistory, index: number) => {
             const cardStyles = [
-              "bg-card-sage border-card-sage/40 card-shadow hover-lift",
-              "bg-card-blue-gray border-card-blue-gray/40 card-shadow hover-lift", 
-              "bg-card-cream border-card-cream/40 card-shadow hover-lift",
-              "bg-card-light-blue border-card-light-blue/40 card-shadow hover-lift",
-              "bg-card-purple-gray border-card-purple-gray/40 card-shadow hover-lift"
+              "bg-card-mint card-shadow hover-lift border border-gray-200",
+              "bg-card-lavender card-shadow hover-lift border border-gray-200",
+              "bg-card-peach card-shadow hover-lift border border-gray-200",
+              "bg-card-rose card-shadow hover-lift border border-gray-200",
+              "bg-card-sage card-shadow hover-lift border border-gray-200",
+              "bg-card-sand card-shadow hover-lift border border-gray-200",
+              "bg-card-blue card-shadow hover-lift border border-gray-200",
+              "bg-card-taupe card-shadow hover-lift border border-gray-200"
             ];
             
             return (

@@ -68,8 +68,8 @@ export default function LandingPage() {
         
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="text-center group">
-            <div className="bg-card-sage rounded-2xl p-6 mb-4 shadow-sm border border-card-sage/30 group-hover:shadow-md transition-all duration-300">
-              <Image className="h-8 w-8 text-card-sage mx-auto" />
+            <div className="bg-card-mint card-shadow hover-lift rounded-2xl p-6 mb-4 border border-gray-200 group-hover:shadow-md transition-all duration-300">
+              <Image className="h-8 w-8 text-card-mint mx-auto" />
             </div>
             <h3 className="text-lg font-poppins-semibold mb-2 text-foreground">Photo Magic</h3>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -78,8 +78,8 @@ export default function LandingPage() {
           </div>
           
           <div className="text-center group">
-            <div className="bg-card-blue-gray rounded-2xl p-6 mb-4 shadow-sm border border-card-blue-gray/30 group-hover:shadow-md transition-all duration-300">
-              <Sparkles className="h-8 w-8 text-card-blue-gray mx-auto" />
+            <div className="bg-card-lavender card-shadow hover-lift rounded-2xl p-6 mb-4 border border-gray-200 group-hover:shadow-md transition-all duration-300">
+              <Sparkles className="h-8 w-8 text-card-lavender mx-auto" />
             </div>
             <h3 className="text-lg font-poppins-semibold mb-2 text-foreground">Text Prompts</h3>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -88,8 +88,8 @@ export default function LandingPage() {
           </div>
           
           <div className="text-center group">
-            <div className="bg-card-purple-gray rounded-2xl p-6 mb-4 shadow-sm border border-card-purple-gray/30 group-hover:shadow-md transition-all duration-300">
-              <Eye className="h-8 w-8 text-card-purple-gray mx-auto" />
+            <div className="bg-card-peach card-shadow hover-lift rounded-2xl p-6 mb-4 border border-gray-200 group-hover:shadow-md transition-all duration-300">
+              <Eye className="h-8 w-8 text-card-peach mx-auto" />
             </div>
             <h3 className="text-lg font-poppins-semibold mb-2 text-foreground">Explore & Chain</h3>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -98,8 +98,8 @@ export default function LandingPage() {
           </div>
           
           <div className="text-center group">
-            <div className="bg-card-light-blue rounded-2xl p-6 mb-4 shadow-sm border border-card-light-blue/30 group-hover:shadow-md transition-all duration-300">
-              <Heart className="h-8 w-8 text-card-light-blue mx-auto" />
+            <div className="bg-card-rose card-shadow hover-lift rounded-2xl p-6 mb-4 border border-gray-200 group-hover:shadow-md transition-all duration-300">
+              <Heart className="h-8 w-8 text-card-rose mx-auto" />
             </div>
             <h3 className="text-lg font-poppins-semibold mb-2 text-foreground">Save & Organize</h3>
             <p className="text-muted-foreground text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>

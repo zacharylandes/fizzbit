@@ -1208,19 +1208,19 @@ export default function SavedPage() {
                   }
                   
                   const cardStyles = [
-                    "bg-card-sage border-card-sage/40",
-                    "bg-card-blue-gray border-card-blue-gray/40", 
-                    "bg-card-cream border-card-cream/40",
-                    "bg-card-light-blue border-card-light-blue/40",
-                    "bg-card-purple-gray border-card-purple-gray/40",
-                    "bg-card-peach border-card-peach/40",
-                    "bg-card-lavender border-card-lavender/40",
-                    "bg-card-mint border-card-mint/40"
+                    "bg-card-mint card-shadow hover-lift border border-gray-200",
+                    "bg-card-lavender card-shadow hover-lift border border-gray-200",
+                    "bg-card-peach card-shadow hover-lift border border-gray-200",
+                    "bg-card-rose card-shadow hover-lift border border-gray-200",
+                    "bg-card-sage card-shadow hover-lift border border-gray-200",
+                    "bg-card-sand card-shadow hover-lift border border-gray-200",
+                    "bg-card-blue card-shadow hover-lift border border-gray-200",
+                    "bg-card-taupe card-shadow hover-lift border border-gray-200"
                   ];
                   
                   const colorNames = [
-                    "Sage Green", "Blue Gray", "Cream", "Light Blue",
-                    "Purple Gray", "Peach", "Lavender", "Mint"
+                    "Mint Green", "Lavender", "Peach", "Rose",
+                    "Sage Green", "Sand", "Blue", "Taupe"
                   ];
 
                   return (
@@ -1463,14 +1463,14 @@ export default function SavedPage() {
               
               // Card styles with all pastel colors
               const cardStyles = [
-                "bg-card-sage border-card-sage/40",
-                "bg-card-blue-gray border-card-blue-gray/40", 
-                "bg-card-cream border-card-cream/40",
-                "bg-card-light-blue border-card-light-blue/40",
-                "bg-card-purple-gray border-card-purple-gray/40",
-                "bg-card-peach border-card-peach/40",
-                "bg-card-lavender border-card-lavender/40",
-                "bg-card-mint border-card-mint/40"
+                "bg-card-mint card-shadow hover-lift border border-gray-200",
+                "bg-card-lavender card-shadow hover-lift border border-gray-200",
+                "bg-card-peach card-shadow hover-lift border border-gray-200",
+                "bg-card-rose card-shadow hover-lift border border-gray-200",
+                "bg-card-sage card-shadow hover-lift border border-gray-200",
+                "bg-card-sand card-shadow hover-lift border border-gray-200",
+                "bg-card-blue card-shadow hover-lift border border-gray-200",
+                "bg-card-taupe card-shadow hover-lift border border-gray-200"
               ];
               
               const colorNames = [
