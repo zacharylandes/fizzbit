@@ -41,15 +41,12 @@ export default function LandingPage() {
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
               Transform your ideas, photos, and sketches into endless creative possibilities with AI-powered inspiration that understands your vision.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <a href="/api/login">
                 <Button className="bg-button-custom hover:bg-button-custom/90 text-gray-700 border border-gray-300 px-8 py-3 text-base font-medium shadow-sm">
                   Get Started →
                 </Button>
               </a>
-              <Button variant="outline" className="bg-white border-gray-300 hover:bg-gray-50 text-gray-700 px-8 py-3 text-base font-medium">
-                Learn More
-              </Button>
             </div>
           </div>
         </div>
@@ -118,7 +115,7 @@ export default function LandingPage() {
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto" style={{ fontFamily: 'Inter, sans-serif' }}>
             Join thousands of creators who use FizzBit to unlock their creative potential.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <a href="/api/login">
               <Button className="bg-button-custom hover:bg-button-custom/90 text-gray-700 border border-gray-300 px-8 py-3 text-base font-medium shadow-sm">
                 Get Started →
