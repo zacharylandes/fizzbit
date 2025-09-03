@@ -17,6 +17,22 @@ import { apiRequest } from "@/lib/queryClient";
 import { type Idea } from "@shared/schema";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
+// Audio utility for rearrangement sound effects
+const playRearrangeSound = () => {
+  try {
+    const audio = new Audio();
+    // Gentle pop sound for rearrangement
+    audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSs=';
+    audio.playbackRate = 1.8; // Higher pitch for pleasant pop
+    audio.volume = 0.12; // Subtle volume
+    audio.play().catch(() => {
+      // Silently fail if audio can't play
+    });
+  } catch (error) {
+    // Silently fail if audio creation fails
+  }
+};
+
 interface SavedIdeaPosition {
   ideaId: string;
   x: number;
@@ -197,16 +213,16 @@ export default function SavedPage() {
       const deltaY = clientY - swipeState.startY;
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      // Ultra responsive threshold for drag detection
-      if (!swipeState.isDragging && distance > 15 && swipeState.canDrag) {
+      // Reduced sensitivity threshold for drag detection
+      if (!swipeState.isDragging && distance > 35 && swipeState.canDrag) {
         e.preventDefault(); // Only prevent default when we're sure it's a drag
         setSwipeState(prev => ({ ...prev, isDragging: true }));
       }
       
-      // Only set drag direction if we're actually dragging with ultra responsive threshold
-      if (swipeState.isDragging || (distance > 15 && swipeState.canDrag)) {
-        // Ultra responsive threshold for vertical drag detection
-        if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 25) {
+      // Only set drag direction if we're actually dragging with reduced sensitivity threshold
+      if (swipeState.isDragging || (distance > 35 && swipeState.canDrag)) {
+        // Reduced sensitivity threshold for vertical drag detection
+        if (!swipeState.isVerticalDrag && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 50) {
           e.preventDefault(); // Prevent scrolling only when intentional vertical drag
           setSwipeState(prev => ({ ...prev, isVerticalDrag: true }));
         }
@@ -246,10 +262,13 @@ export default function SavedPage() {
       if (swipeState.isVerticalDrag) {
         // Handle vertical reorder
         const cardHeight = 80; // Approximate height of each card
-        const moveDistance = Math.round(deltaY / cardHeight);
+        const moveDistance = Math.round(deltaY / (cardHeight * 1.5)); // Reduce movement sensitivity
         if (swipeState.dragIndex !== null && Math.abs(moveDistance) > 0) {
           const newIndex = Math.max(0, Math.min(mobileOrder.length - 1, swipeState.dragIndex + moveDistance));
           if (newIndex !== swipeState.dragIndex) {
+            // Play rearrangement sound effect
+            playRearrangeSound();
+            
             // Using callback to access latest functions
             const currentMobileIdea = moveMobileIdea;
             const currentUnsaveIdea = unsaveIdeaMutation;
@@ -942,7 +961,7 @@ export default function SavedPage() {
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 border border-gray-200" />
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 border-[0.5px] border-gray-300" />
                   <span className="text-sm font-medium">All Ideas</span>
                   <span className="ml-auto text-xs text-muted-foreground">
                     {savedIdeas.length}
@@ -993,7 +1012,7 @@ export default function SavedPage() {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border border-gray-300 ${colorCircles[colorIndex] || 'bg-gray-300'}`} />
+                      <div className={`w-5 h-5 rounded-full border-[0.5px] border-gray-400 ${colorCircles[colorIndex] || 'bg-gray-300'}`} />
                       <div className="flex-1 min-w-0">
                         {editingGroup === colorIndex ? (
                           <input

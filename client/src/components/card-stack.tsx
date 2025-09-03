@@ -7,6 +7,33 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Sparkles, Image, Type, ArrowUp } from "lucide-react";
 
+// Audio utility for swipe sound effects
+const playSwipeSound = (direction: 'left' | 'right' | 'up') => {
+  try {
+    const audio = new Audio();
+    
+    if (direction === 'left') {
+      // Whoosh sound for dismiss
+      audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSs=';
+    } else if (direction === 'right') {
+      // Higher pitched whoosh for save
+      audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSs=';
+      audio.playbackRate = 1.3; // Higher pitch for save sound
+    } else if (direction === 'up') {
+      // Magical chime for explore
+      audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSsFJXfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSeF0vLLeSs=';
+      audio.playbackRate = 1.6; // Even higher pitch for explore
+    }
+    
+    audio.volume = 0.15; // Subtle volume
+    audio.play().catch(() => {
+      // Silently fail if audio can't play
+    });
+  } catch (error) {
+    // Silently fail if audio creation fails
+  }
+};
+
 interface CardStackProps {
   initialIdeas?: Idea[];
   onSwipeUpPrompt?: (ideaContent: string) => void;
@@ -284,6 +311,9 @@ export function CardStack({ initialIdeas = [], onSwipeUpPrompt, currentPrompt = 
     if (!idea) return;
 
     console.log('HANDLE SWIPE:', direction, ideaId);
+
+    // Play swipe sound effect
+    playSwipeSound(direction);
 
     // Start animation
     setAnimatingCards(prev => ({
