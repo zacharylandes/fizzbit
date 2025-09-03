@@ -50,17 +50,10 @@ interface DragState {
   offsetY: number;
 }
 
-interface DrawingState {
-  isDrawing: boolean;
-  tool: 'pen' | 'eraser';
-  color: string;
-  size: number;
-  paths: Array<{
-    id: string;
-    points: Array<{ x: number; y: number }>;
-    color: string;
-    size: number;
-  }>;
+// Grid system interfaces
+interface GridPosition {
+  x: number;
+  y: number;
 }
 
 export default function SavedPage() {
@@ -76,17 +69,7 @@ export default function SavedPage() {
     offsetX: 0,
     offsetY: 0,
   });
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isPanning, setIsPanning] = useState(false);
-  const [drawingState, setDrawingState] = useState<DrawingState>({
-    isDrawing: false,
-    tool: 'pen',
-    color: '#3b82f6',
-    size: 3,
-    paths: [],
-  });
-  const [isDrawingMode, setIsDrawingMode] = useState(false);
+  // Grid layout state for card positioning
   const [isMobile, setIsMobile] = useState(false);
   const [mobileOrder, setMobileOrder] = useState<string[]>([]);
   
@@ -143,7 +126,6 @@ export default function SavedPage() {
   });
   
   const canvasRef = useRef<HTMLDivElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
   const { toast } = useToast();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
@@ -851,7 +833,13 @@ export default function SavedPage() {
   };
 
   const handleStartEditing = (ideaId: string) => {
-    setEditingCard(ideaId);
+    const idea = savedIdeas.find(i => i.id === ideaId);
+    if (idea) {
+      setExpandedCard(ideaId);
+      setEditTitle(idea.title);
+      setEditDescription(idea.description);
+      setEditingCard(ideaId);
+    }
   };
 
   const handleSaveEdit = async () => {
@@ -1093,19 +1081,14 @@ export default function SavedPage() {
               </h1>
             </div>
             
-            {/* Drawing and Zoom Controls */}
+            {/* Simple grid info */}
             {filteredIdeas.length > 0 && !isMobile && (
               <div className="flex items-center gap-2">
-                {/* Drawing Mode Toggle */}
-                <Button
-                  size="sm"
-                  variant={isDrawingMode ? "default" : "outline"}
-                  onClick={() => setIsDrawingMode(!isDrawingMode)}
-                  className="h-8 px-3"
-                >
-                  <Pencil className="h-4 w-4 mr-1" />
-                  <span className="text-xs">Draw</span>
-                </Button>
+                <span className="text-sm text-muted-foreground">
+                  {filteredIdeas.length} idea{filteredIdeas.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+            )}
                 
                 {isDrawingMode && (
                   <>
