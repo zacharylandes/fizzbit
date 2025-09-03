@@ -8,7 +8,6 @@ import skateLottieUrl from '@assets/Orange skating_1756786094430.lottie?url';
 import ufoLottieUrl from '@assets/Ridiculous UFO_1756786094438.lottie?url';  
 import dividerLottieUrl from '@assets/Squiggly Divider Line_1756786094439.lottie?url';
 import rocketLottieUrl from '@assets/Rocket in space_1756786094442.lottie?url';
-import devildoneLottieUrl from '@assets/devildone.json?url';
 import nightCityLottieUrl from '@assets/Night city_1756862324144.lottie?url';
 import karltioLottieUrl from '@assets/Karltio Cooking_1756862324148.lottie?url';
 import slipperLottieUrl from '@assets/Slipper_1756862324148.lottie?url';
@@ -59,7 +58,7 @@ function getLottieAnimationForIdea(idea: Idea): string {
   
   // Create a hash-based rotation for variety - this ensures each card gets a different animation
   const hash = idea.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const baseAnimation = hash % 10; // 0-9 range for 10 animations
+  const baseAnimation = hash % 9; // 0-8 range for 9 animations
   
   // Strong keyword matching can override the hash (but only for very specific matches)
   if (content.includes('skateboard') || content.includes('skate')) {
@@ -70,9 +69,6 @@ function getLottieAnimationForIdea(idea: Idea): string {
   }
   if (content.includes('ufo') || content.includes('alien')) {
     return ufoLottieUrl;
-  }
-  if (content.includes('devil') || content.includes('demon') || content.includes('evil')) {
-    return devildoneLottieUrl;
   }
   if (content.includes('city') || content.includes('night') || content.includes('building')) {
     return nightCityLottieUrl;
@@ -101,16 +97,14 @@ function getLottieAnimationForIdea(idea: Idea): string {
     case 3:
       return dividerLottieUrl;
     case 4:
-      return devildoneLottieUrl;
-    case 5:
       return nightCityLottieUrl;
-    case 6:
+    case 5:
       return karltioLottieUrl;
-    case 7:
+    case 6:
       return slipperLottieUrl;
-    case 8:
+    case 7:
       return windowLottieUrl;
-    case 9:
+    case 8:
     default:
       return diceLottieUrl;
   }
