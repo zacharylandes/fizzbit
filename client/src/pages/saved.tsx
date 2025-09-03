@@ -96,6 +96,18 @@ export default function SavedPage() {
   const [groupTitles, setGroupTitles] = useState<{ [colorIndex: number]: string }>({});
   const [editingGroup, setEditingGroup] = useState<number | null>(null);
   
+  // Color definitions for all dropdowns
+  const colorCircles = [
+    "bg-green-200",
+    "bg-blue-200", 
+    "bg-yellow-100",
+    "bg-sky-200",
+    "bg-purple-200",
+    "bg-orange-200",
+    "bg-violet-200",
+    "bg-emerald-200"
+  ];
+  
   // Card expansion and editing state
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [editingCard, setEditingCard] = useState<string | null>(null);
@@ -985,16 +997,6 @@ export default function SavedPage() {
                   "bg-card-mint border-card-mint/40"
                 ];
 
-                const colorCircles = [
-                  "bg-green-200",
-                  "bg-blue-200", 
-                  "bg-yellow-100",
-                  "bg-sky-200",
-                  "bg-purple-200",
-                  "bg-orange-200",
-                  "bg-violet-200",
-                  "bg-emerald-200"
-                ];
                 
                 return (
                   <button
@@ -1392,7 +1394,7 @@ export default function SavedPage() {
                                     }}
                                     className="flex items-center gap-3 py-3 px-3 touch-manipulation cursor-pointer hover:bg-accent"
                                   >
-                                    <div className={`w-4 h-4 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')}`} />
+                                    <div className={`w-4 h-4 rounded-full ${colorCircles[idx] || 'bg-gray-300'}`} />
                                     <span className="text-sm">{groupTitles[idx] || `Group ${idx + 1}`}</span>
                                   </DropdownMenuItem>
                                 ))}
@@ -1557,7 +1559,7 @@ export default function SavedPage() {
                                 }}
                                 className="flex items-center gap-2"
                               >
-                                <div className={`w-3 h-3 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')}`} />
+                                <div className={`w-3 h-3 rounded-full ${colorCircles[idx] || 'bg-gray-300'}`} />
                                 <span className="text-xs">{groupTitles[idx] || `Group ${idx + 1}`}</span>
                               </DropdownMenuItem>
                             ))}
@@ -1647,7 +1649,7 @@ export default function SavedPage() {
                               }}
                               className="flex items-center gap-2"
                             >
-                              <div className={`w-3 h-3 rounded-full ${style.replace(/bg-card-(\w+)/, 'bg-card-$1').replace(/border-card-(\w+)\/40/, '')}`} />
+                              <div className={`w-3 h-3 rounded-full ${colorCircles[idx] || 'bg-gray-300'}`} />
                               <span className="text-xs">{groupTitles[idx] || `Group ${idx + 1}`}</span>
                             </DropdownMenuItem>
                           ))}
