@@ -1337,30 +1337,10 @@ export default function SavedPage() {
                               // Display mode
                               <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                  <h3 className={`font-normal text-sm text-gray-800 dark:text-gray-100 ${
-                                    expandedCard === idea.id ? '' : 'truncate'
-                                  }`}>
+                                  <h3 className="font-normal text-base text-gray-800 dark:text-gray-100 leading-tight w-full">
                                     {idea.title}
                                   </h3>
-                                  {expandedCard === idea.id && (
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleStartEditing(idea.id);
-                                      }}
-                                      className="h-5 w-5 p-0 hover:bg-gray-200 dark:hover:bg-gray-700"
-                                    >
-                                      <Pencil className="h-3 w-3" />
-                                    </Button>
-                                  )}
                                 </div>
-                                <p className={`text-xs text-gray-600 dark:text-gray-300 ${
-                                  expandedCard === idea.id ? '' : 'line-clamp-2'
-                                }`}>
-                                  {idea.description}
-                                </p>
                               </div>
                             )}
                           </div>
@@ -1426,7 +1406,7 @@ export default function SavedPage() {
           // Desktop: Infinite canvas
           <div
             ref={canvasRef}
-            className={`w-full h-full relative select-none ${
+            className={`w-full h-full relative select-none overflow-hidden ${
               isDrawingMode ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing'
             }`}
             style={{
@@ -1582,19 +1562,11 @@ export default function SavedPage() {
                     
                     {/* Content */}
                     <div className="flex-1 p-2 flex flex-col overflow-hidden">
-                      {/* Title - Much Larger and Centered */}
-                      <h3 className="font-normal text-base leading-tight mb-2 text-gray-800 dark:text-gray-100 line-clamp-2 text-center overflow-hidden">
+                      {/* Title - Expanded to use full space */}
+                      <h3 className="font-normal text-lg leading-tight text-gray-800 dark:text-gray-100 text-center h-full flex items-center justify-center px-2 overflow-hidden">
                         {idea.title}
                       </h3>
                       
-                      {/* Description - Smaller with strict overflow handling */}
-                      <div className="flex-1 overflow-hidden">
-                        <p className="text-xs text-gray-600 dark:text-gray-300 text-center leading-relaxed overflow-hidden break-words h-full">
-                          <span className="line-clamp-3">
-                            {idea.description}
-                          </span>
-                        </p>
-                      </div>
                     </div>
                   </Card>
                 </div>
@@ -1670,12 +1642,9 @@ export default function SavedPage() {
                   </div>
                   
                   <div className="flex-1 p-4 flex flex-col">
-                    <h3 className="font-normal text-lg leading-tight mb-2 text-gray-800 dark:text-gray-100">
+                    <h3 className="font-normal text-lg leading-tight text-gray-800 dark:text-gray-100 h-full flex items-center justify-center text-center px-2">
                       {idea.title}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed flex-1">
-                      {idea.description}
-                    </p>
                   </div>
                 </Card>
               );
